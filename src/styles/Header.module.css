@@ -1,0 +1,38 @@
+.navbar {
+  background: #4d9ffe;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 27px 0;
+
+  .navbarLogo {
+    color: #fff;
+    text-align: center;
+    font-family: Sanchez;
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .navbarItem {
+    color: #fff !important;
+    font-family: Roboto;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    flex-shrink: 0;
+    margin-left: 49px;
+  }
+
+  .signInButton {
+  width: 181px;
+  height: 45px;
+  flex-shrink: 0;
+  border-radius: 50px;
+  background: #0075ff;
+}
+}
+

@@ -1,0 +1,93 @@
+.signUpForm {
+  width: 918px;
+  height: 467px;
+  flex-shrink: 0;
+  border-radius: 25px;
+  border: 1px solid #0075ff;
+  background: #fff;
+  margin: 0 auto;
+  margin-top: 8%;
+  justify-content: space-evenly;
+  align-items: center;
+
+  .title {
+    color: #000;
+    text-align: center;
+    font-family: Roboto;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .inputField {
+    border-radius: 50px;
+    border: 1px solid #0075ff;
+    background: #d9d9d9;
+    width: 379px;
+    height: 51px;
+    flex-shrink: 0;
+  }
+
+  .inputField::placeholder {
+    color: #464646;
+    font-family: Roboto;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .userName {
+    margin-bottom: 33px;
+  }
+
+  .forgetPassword {
+    color: #464646;
+    font-family: Arial;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-align: end;
+  }
+
+  .buttonSignIn {
+    width: 42%;
+    border-radius: 50px;
+    border: 1px solid #0075ff;
+    background: #0075ff;
+    color: #fff;
+    text-align: center;
+    font-family: Roboto;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+  .eyeIcon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+}
+
+.link {
+  color: #0029ff;
+  font-family: Roboto;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.signUpText {
+  color: #fff;
+  font-family: Roboto;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-align: center;
+  margin-top: 25px;
+}
