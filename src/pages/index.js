@@ -17,7 +17,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../env';
-
+import Header from '@/components/layouts/Header';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,24 +29,38 @@ function SignInPage() {
     password: '',
   });
 
-  const handleChangeEmail = (e) => {
+  const handleChangeEmail = (e) => {    
     setParamsData({ ...paramsData, email: e.target.value });
+    //console.log(paramsData);
   };
 
   const handleChangePassword = (e) => {
     setParamsData({ ...paramsData, password: e.target.value });
+    //console.log(paramsData);
   };
 
   //input endpoint here
   const handleLoginAccount = async () => {
     const { email, password } = paramsData;
+    //console.log("email/password: " + paramsData);
     if (!email || !password) return;
     try {
-      const response = axios.post(`${BACK_END_PORT}/endpoint`, {
-        paramsData,
+      const response = axios.post(`${BACK_END_PORT}/api/v1/Account/login`, {
+        email, password
       });
-      if (response.data.statusCode === 200) {
-        router.push('/home');
+      //console.log("run api");
+      if ((await response).status === 200) {
+        //console.log((await response).data.token);
+        localStorage.setItem("token", (await response).data.token);
+        if((await response).data.roll === 1){
+          router.push('/admin-pages/adminhome');
+        } else if((await response).data.roll === 2){
+          router.push('/pm-pages/pmhome');
+        } else if((await response).data.roll === 3){
+          router.push('/user-pages/userhome');
+        } else {
+          router.push('/home');
+        }        
       }
     } catch (e) {
       console.error(e);
@@ -89,9 +103,9 @@ function SignInPage() {
                   value={paramsData?.password}
                 />
               </InputGroup>
-              <Text className={styles.forgetPassword}>
+              {/* <Text className={styles.forgetPassword}>
                 <Link href={'#'}>Forget password?</Link>
-              </Text>
+              </Text> */}
             </Box>
             <Button
               className={styles.buttonSignIn}
