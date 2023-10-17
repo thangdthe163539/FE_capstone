@@ -1,8 +1,18 @@
-import { Box } from '@chakra-ui/react';
- 
+import { Box, Button} from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 
 function HomePage() {
-  return <Box>Welcome HomePage</Box>;
+  const router = useRouter();
+  const handleUserManager = () => {
+    router.push('userManager');
+  };
+
+  return <Box>
+    Welcome HomePage
+    <Button onClick={handleUserManager}>
+      click
+    </Button>
+    </Box>;
 }
 
 export default HomePage;

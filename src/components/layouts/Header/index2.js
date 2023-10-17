@@ -1,7 +1,6 @@
 import { Box, Flex, Button, Text } from '@chakra-ui/react';
 import styles from '@/styles/Header2.module.css';
 import Link from 'next/link';
-
 function Header2() {
   return (
     <Box>

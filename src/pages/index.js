@@ -48,6 +48,7 @@ function SignInPage() {
     //console.log("email/password: " + paramsData);
     if (!email || !password) return;
     try {
+
       const response = axios.post(`${BACK_END_PORT}/api/v1/Account/login`, {
         email, password
       });
@@ -86,9 +87,37 @@ function SignInPage() {
 
   const handleGoogleLogin = () => {
     signInWithPopup(auth, provider).then((result) => {
-      const name = result.user.email;
-      console.log(name);
-      console.log(result);
+      const mail = result.user.email;
+      const url = 'http://localhost:5001/api/v1/Account/login'
+
+      const requestData = mail;
+
+      fetch(url, {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify(requestData), 
+      })
+        .then(response => response.json())
+        .then(data => {
+          const id = data.roleAccounts[0].roleId;
+          if(id == 1){
+            router.push('adminpages/adminhome');
+          }
+          if(id == 2){
+            router.push('/pm-pages/pmhome');
+          }
+          if(id == 3){
+            router.push('/user-pages/userhome');
+          }else{
+            router.push('home');
+          }
+        })
+        .catch(error => {
+          console.error('Lỗi:', error);
+        });
+
     }).catch((error) => {
       console.log(error);
     })
