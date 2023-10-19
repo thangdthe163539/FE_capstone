@@ -7,7 +7,7 @@ function Header() {
     <Box>
       <Flex className={`${styles.navbar}`}>
         <Text className={`${styles.navbarLogo}`}>
-          <Link href={"/"}>SoftTrack</Link>
+          <Link href={'/'}>SoftTrack</Link>
         </Text>
         <Flex>
           <Button

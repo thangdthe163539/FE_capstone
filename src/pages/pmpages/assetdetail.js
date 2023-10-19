@@ -14,9 +14,9 @@ import {
   Flex,
   Spacer,
   IconButton,
-  useDisclosure,
   Icon,
   useToast,
+  Center,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -36,25 +36,48 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
-import { ArrowForwardIcon, ViewIcon } from '@chakra-ui/icons';
+import {
+  ArrowForwardIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from '@chakra-ui/icons';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import { AiOutlineEye, AiFillEye } from 'react-icons/ai';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
-const defaultData = {
-  softwareId: '',
-  deviceId: '',
-  name: '',
-  version: '',
-  publisher: '',
-  type: '',
-  installDate: '',
-  status: '',
-};
 
-function SoftwarePage() {
+function AssetDetailPage() {
+  let defaultData = {
+    softwareId: '',
+    deviceId: '',
+    name: '',
+    version: '',
+    publisher: '',
+    type: '',
+    installDate: '',
+    status: '',
+  };
+  let deviceID = null;
+  const router = useRouter();
+
+  try {
+    deviceID = JSON.parse(localStorage.getItem('deviceId'));
+    if (!deviceID || deviceID == null) {
+      router.push('/pmpages/assetlist');
+    } else {
+      defaultData = {
+        ...defaultData,
+        deviceId: deviceID,
+      };
+    }
+  } catch (error) {
+    console.error('Error saving data:', error);
+  }
+
+  //
+
   // console.log(BACK_END_PORT);
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
@@ -63,10 +86,10 @@ function SoftwarePage() {
   const [formData, setFormData] = useState(defaultData);
   const [formData2, setFormData2] = useState(defaultData);
   const [data, setData] = useState([]);
-  const [deviceData, setDeviceData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showSoftwareTable, setShowSoftwareTable] = useState(false);
+  const [showChevronDown, setShowChevronDown] = useState(true);
   const toast = useToast();
-  //
   //
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -105,7 +128,7 @@ function SoftwarePage() {
         type: formData.type,
         installDate: formData.installDate,
         status: false,
-        deviceId: formData.deviceId,
+        deviceId: deviceID,
       });
       console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
@@ -113,7 +136,7 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_device` + deviceID,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -140,7 +163,7 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_device` + deviceID,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -152,14 +175,9 @@ function SoftwarePage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+          `${BACK_END_PORT}/api/v1/Software/list_software_by_device` + deviceID,
         );
         setData(response.data); // Assuming the API returns an array of objects
-        const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Device/list_device_with_user1`,
-        );
-        setDeviceData(response2.data); // Assuming the API returns an array of objects
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
@@ -179,7 +197,7 @@ function SoftwarePage() {
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_device` + deviceID,
       );
       setData(newDataResponse.data);
       toast({
@@ -206,11 +224,52 @@ function SoftwarePage() {
           >
             Home
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Management Software
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>
+          <Link
+            href='/pmpages/assetlist'
+            _hover={{ textDecor: 'underline' }}
+            className={styles.listitem}
+          >
+            Management Assets
+          </Link>
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Asset Detail
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Management Software</Text>
+            <Text fontSize='2xl'>Software</Text>
+            {showChevronDown ? (
+              <Box ml={1}>
+                <ChevronDownIcon
+                  border='1px solid gray'
+                  borderRadius='50'
+                  textAlign='center'
+                  alignItems='center'
+                  mt={2}
+                  _hover={{ backgroundColor: 'gray.100' }}
+                  cursor='pointer'
+                  onClick={() => {
+                    setShowSoftwareTable(true);
+                    setShowChevronDown(false);
+                  }}
+                ></ChevronDownIcon>
+              </Box>
+            ) : (
+              <Box ml={1}>
+                <ChevronUpIcon
+                  border='1px solid gray'
+                  borderRadius='50'
+                  textAlign='center'
+                  alignItems='center'
+                  mt={2}
+                  _hover={{ backgroundColor: 'gray.100' }}
+                  cursor='pointer'
+                  onClick={() => {
+                    setShowSoftwareTable(false);
+                    setShowChevronDown(true);
+                  }}
+                ></ChevronUpIcon>
+              </Box>
+            )}
             <Spacer />
             <Box>
               <IconButton
@@ -218,13 +277,7 @@ function SoftwarePage() {
                 icon={<FaPlus />}
                 colorScheme='gray' // Choose an appropriate color
                 marginRight={1}
-                onClick={() => (
-                  setFormData({
-                    ...formData,
-                    deviceId: deviceData[0].deviceId,
-                  }),
-                  setIsOpenAdd(true)
-                )}
+                onClick={() => setIsOpenAdd(true)}
               />
               <IconButton
                 aria-label='Edit'
@@ -244,43 +297,101 @@ function SoftwarePage() {
             </Box>
           </Flex>
         </ListItem>
-        <ListItem className={styles.list}>
-          <TableContainer>
-            <Table variant='simple'>
-              <TableCaption>Total {data.length} softwares</TableCaption>
-              <Thead>
-                <Tr>
-                  <Th display='none'>Software ID</Th>
-                  <Th>Name</Th>
-                  <Th>Assets</Th>
-                  <Th>Publisher</Th>
-                  <Th>Versions</Th>
-                  <Th>Release</Th>
-                  <Th>Install Date</Th>
-                  <Th>Status</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {data.map((item) => (
-                  <Tr
-                    cursor={'pointer'}
-                    key={item.softwareId}
-                    bg={selectedRow === item.softwareId ? 'green.100' : 'white'} // Change background color for selected rows
-                    onClick={() => handleRowClick(item)}
-                  >
-                    <Td display='none'>{item.softwareId}</Td>
-                    <Td>{item.name}</Td>
-                    <Td>{item.deviceId}</Td>
-                    <Td>{item.publisher}</Td>
-                    <Td>{item.version}</Td>
-                    <Td>{item.type}</Td>
-                    <Td>{item.installDate}</Td>
-                    <Td>{item.status ? 'Have Issues' : 'No Issues'}</Td>
+        {showSoftwareTable && (
+          <ListItem className={styles.list}>
+            <TableContainer>
+              <Table variant='simple'>
+                <TableCaption>Total {data.length} softwares</TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th display='none'>Software ID</Th>
+                    <Th>Name</Th>
+                    <Th display='none'>Assets</Th>
+                    <Th>Publisher</Th>
+                    <Th>Versions</Th>
+                    <Th>Release</Th>
+                    <Th>Install Date</Th>
+                    <Th>Status</Th>
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+                </Thead>
+                <Tbody>
+                  {data.map((item) => (
+                    <Tr
+                      cursor={'pointer'}
+                      key={item.softwareId}
+                      bg={
+                        selectedRow === item.softwareId ? 'green.100' : 'white'
+                      } // Change background color for selected rows
+                      onClick={() => handleRowClick(item)}
+                    >
+                      <Td display='none'>{item.softwareId}</Td>
+                      <Td>{item.name}</Td>
+                      <Td display='none'>{item.deviceId}</Td>
+                      <Td>{item.publisher}</Td>
+                      <Td>{item.version}</Td>
+                      <Td>{item.type}</Td>
+                      <Td>{item.installDate}</Td>
+                      <Td>{item.status ? 'Have Issues' : 'No Issues'}</Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </ListItem>
+        )}
+        <ListItem className={styles.list}>
+          <Flex>
+            <Text fontSize='2xl'>Lisence Keys</Text>
+            <Spacer />
+            <Box>
+              <IconButton
+                aria-label='Add'
+                icon={<FaPlus />}
+                colorScheme='gray' // Choose an appropriate color
+                marginRight={1}
+              />
+              <IconButton
+                aria-label='Edit'
+                icon={<FaEdit />}
+                colorScheme='gray' // Choose an appropriate color
+                marginRight={1}
+                isDisabled={isButtonDisabled}
+              />
+              <IconButton
+                aria-label='Delete'
+                icon={<FaTrash />}
+                colorScheme='gray' // Choose an appropriate color
+                isDisabled={isButtonDisabled}
+              />
+            </Box>
+          </Flex>
+        </ListItem>
+        <ListItem className={styles.list}>
+          <Flex>
+            <Text fontSize='2xl'>Antivirus</Text>
+            <Spacer />
+            <Box>
+              <IconButton
+                aria-label='Add'
+                icon={<FaPlus />}
+                colorScheme='gray' // Choose an appropriate color
+                marginRight={1}
+              />
+              <IconButton
+                aria-label='Edit'
+                icon={<FaEdit />}
+                colorScheme='gray' // Choose an appropriate color
+                marginRight={1}
+                isDisabled={isButtonDisabled}
+              />
+              <IconButton
+                aria-label='Delete'
+                icon={<FaTrash />}
+                colorScheme='gray' // Choose an appropriate color
+                isDisabled={isButtonDisabled}
+              />
+            </Box>
+          </Flex>
         </ListItem>
       </List>
 
@@ -435,20 +546,6 @@ function SoftwarePage() {
                     required
                   />
                 </FormControl>
-                <FormControl>
-                  <FormLabel>Asset</FormLabel>
-                  <Select
-                    name='deviceId'
-                    value={formData.deviceId}
-                    onChange={handleInputChange}
-                  >
-                    {deviceData.map((item) => (
-                      <option key={item.deviceId} value={item.deviceId}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
                 {/* Add more fields for the second column */}
               </GridItem>
             </Grid>
@@ -487,4 +584,4 @@ function SoftwarePage() {
   );
 }
 
-export default SoftwarePage;
+export default AssetDetailPage;
