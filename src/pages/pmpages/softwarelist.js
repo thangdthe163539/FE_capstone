@@ -56,6 +56,19 @@ const defaultData = {
 
 function SoftwarePage() {
   // console.log(BACK_END_PORT);
+  const router = useRouter();
+  const [account, setAccount] = useState(null);
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+    if (storedAccount) {
+      setAccount(JSON.parse(storedAccount));
+      if (!account || account == null) {
+        router.push('http://localhost:3000');
+      }
+    }
+  }, []);
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -113,7 +126,8 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+          account.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -140,7 +154,8 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+          account.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -152,11 +167,13 @@ function SoftwarePage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+          `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+            account.accId,
         );
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Device/list_device_with_user1`,
+          `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
+            account.accId,
         );
         setDeviceData(response2.data); // Assuming the API returns an array of objects
         setLoading(false);
@@ -179,7 +196,8 @@ function SoftwarePage() {
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+          account.accId,
       );
       setData(newDataResponse.data);
       toast({

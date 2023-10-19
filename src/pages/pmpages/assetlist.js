@@ -58,6 +58,21 @@ const defaultData = {
 
 function AssetsPage() {
   // console.log(BACK_END_PORT);
+  const router = useRouter();
+  let account = null;
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+    if (storedAccount) {
+      account = JSON.parse(storedAccount);
+      console.log('asset list');
+      console.log(account);
+      if (!account || account == null) {
+        // router.push('http://localhost:3000');
+      }
+    }
+  }, []);
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -111,7 +126,9 @@ function AssetsPage() {
       setFormData(defaultData);
       setSelectedRow(new Set());
       // Reload new data for the table
-      const newDataResponse = await axios.get(`${BACK_END_PORT}/api/v1/Device`);
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Device/list_device_with_user` + account.accId,
+      );
       setData(newDataResponse.data);
     } catch (error) {
       console.error('Error saving data:', error);
@@ -121,7 +138,10 @@ function AssetsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${BACK_END_PORT}/api/v1/Device`);
+        const response = await axios.get(
+          `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
+            account.accId,
+        );
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
           `${BACK_END_PORT}/api/v1/Account/ListAccount`,
@@ -170,7 +190,9 @@ function AssetsPage() {
       setSelectedRow(new Set());
 
       // Reload the data for the table after deletion
-      const newDataResponse = await axios.get(`${BACK_END_PORT}/api/v1/Device`);
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Device/list_device_with_user` + account.accId,
+      );
       setData(newDataResponse.data);
       toast({
         title: 'Asset Deleted',
