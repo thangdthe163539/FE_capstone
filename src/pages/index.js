@@ -19,6 +19,9 @@ import axios from 'axios';
 import { BACK_END_PORT } from '../../env';
 import Header from '@/components/layouts/Header';
 
+import { initializeApp } from "firebase/app";
+import { confirmPasswordReset, getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+
 const inter = Inter({ subsets: ['latin'] });
 
 function SignInPage() {
@@ -29,7 +32,7 @@ function SignInPage() {
     password: '',
   });
 
-  const handleChangeEmail = (e) => {    
+  const handleChangeEmail = (e) => {
     setParamsData({ ...paramsData, email: e.target.value });
     //console.log(paramsData);
   };
@@ -45,6 +48,7 @@ function SignInPage() {
     //console.log("email/password: " + paramsData);
     if (!email || !password) return;
     try {
+
       const response = axios.post(`${BACK_END_PORT}/api/v1/Account/login`, {
         email, password
       });
@@ -52,20 +56,73 @@ function SignInPage() {
       if ((await response).status === 200) {
         //console.log((await response).data.token);
         localStorage.setItem("token", (await response).data.token);
-        if((await response).data.roll === 1){
+        if ((await response).data.roll === 1) {
           router.push('/admin-pages/adminhome');
-        } else if((await response).data.roll === 2){
+        } else if ((await response).data.roll === 2) {
           router.push('/pm-pages/pmhome');
-        } else if((await response).data.roll === 3){
+        } else if ((await response).data.roll === 3) {
           router.push('/user-pages/userhome');
         } else {
           router.push('/home');
-        }        
+        }
       }
     } catch (e) {
       console.error(e);
     }
   };
+  // start config firebase - login gg
+  const firebaseConfig = {
+    apiKey: "AIzaSyBPQERi46GDLNjIVX2k7RBxro66VxV74tY",
+    authDomain: "capstone-e29dd.firebaseapp.com",
+    projectId: "capstone-e29dd",
+    storageBucket: "capstone-e29dd.appspot.com",
+    messagingSenderId: "525712107578",
+    appId: "1:525712107578:web:0e09593d57696909136d03",
+    measurementId: "G-0QH2KVSVVB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  const handleGoogleLogin = () => {
+    signInWithPopup(auth, provider).then((result) => {
+      const mail = result.user.email;
+      const url = 'http://localhost:5001/api/v1/Account/login'
+
+      const requestData = mail;
+
+      fetch(url, {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify(requestData), 
+      })
+        .then(response => response.json())
+        .then(data => {
+          const id = data.roleAccounts[0].roleId;
+          if(id == 1){
+            router.push('adminpages/adminhome');
+          }
+          if(id == 2){
+            router.push('/pm-pages/pmhome');
+          }
+          if(id == 3){
+            router.push('/user-pages/userhome');
+          }else{
+            router.push('home');
+          }
+        })
+        .catch(error => {
+          console.error('Lỗi:', error);
+        });
+
+    }).catch((error) => {
+      console.log(error);
+    })
+  };
+  //end
 
   return (
     <Box className={styles.homeBody + ' ' + inter.className}>
@@ -103,10 +160,15 @@ function SignInPage() {
                   value={paramsData?.password}
                 />
               </InputGroup>
+
               {/* <Text className={styles.forgetPassword}>
                 <Link href={'#'}>Forget password?</Link>
               </Text> */}
             </Box>
+            <Button onClick={handleGoogleLogin} colorScheme="red">
+              Login with Google
+            </Button>
+
             <Button
               className={styles.buttonSignIn}
               onClick={handleLoginAccount}
