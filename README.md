@@ -4,7 +4,7 @@
 4. Sửa lại endpoint của backend trong file .env
 5. Sửa lại các endpoint gọi hàm ngoài ra các biến paramsData sẽ chứa data gửi đi cho be xử lí ví dụ  tại src/pages/index.js function handleLoginAccount sẽ có dạng const response = axios.post(`${BACK_END_PORT}/endpoint`, {paramsData}); trong đó endpoint là đường dẫn đến be, port be sửa trong env, paramsData dữ liệu gửi cho be xử lí
 6. CSS được chứa trong folders styles ở root sẽ có cách viết giống scss
-
+install firebase@10.5.0
 
 Sau khi đã xong chạy lệnh : npm run dev để vào môi trường dev
 P/: Nếu muốn chạy production thì phải chạy npm run build rồi chạy npm run start 

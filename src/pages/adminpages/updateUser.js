@@ -1,18 +1,20 @@
 import {
     Table, Text,
-    Thead, Checkbox,
+    Thead,
     Tbody, Select,
     Tr, InputGroup,
-    Stack, InputLeftAddon,
-    Td, Input, Button,
+    InputLeftAddon,
+    Input, Button,
     TableContainer, TableCaption,
-    Box, Center
+    Box
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 
-function AddUser() {
+function UpdateUser() {
     const router = useRouter();
+    const { emailEdit } = router.query;
+    const [id, setId] = useState(null);
     const handleBackToList = () => {
         router.push('userManager');
     };
@@ -20,7 +22,6 @@ function AddUser() {
     const [selectedOptionActive, setSelectedOptionActive] = useState('');
     const [selectedOptionRole, setSelectedOptionRole] = useState('');
     const [roles, setRoles] = useState([]);
-
     useEffect(() => {
         const url = 'http://localhost:5001/api/roles';
         fetch(url, {
@@ -28,56 +29,75 @@ function AddUser() {
         })
             .then(response => response.json())
             .then(data => {
-                setRoles(data);
+                setRoles(data); // Lưu danh sách các roles vào state
             })
             .catch(error => {
                 console.error('Lỗi:', error);
             });
     }, []);
 
-
-    const handleAddUser = () => {
-        const url = 'http://localhost:5001/api/v1/Account/Register';
-
-        const email = document.getElementById('email').value;
-        const isActive = selectedOptionActive;
-        const roleName = selectedOptionRole;
-
-        const data = {
-            account1: isActive,
-            email: email,
-            role_Name: roleName
-        };
-
+    useEffect(() => {
+        const url = `http://localhost:5001/api/v1/Account/SearchByEmail?email=${emailEdit}`;
         fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
+            method: 'GET',
         })
-            .then(response => {
-                if (response.ok) {
-                    alert('Create success');
-                } else {
-                    alert('Create failed');
-                }
+            .then(response => response.json())
+            .then(data => {
+                const id = data[0].accId;
+                setId(id);
             })
             .catch(error => {
-                alert('Create failed');
                 console.error('Lỗi:', error);
             });
+    }, []);
+
+    const handleUpdateUser = () => {
+        if (id) {
+            const url = `http://localhost:5001/api/v1/Account/Update_Accpunt${id}`;
+
+            const email = document.getElementById('email').value;
+            const isActive = selectedOptionActive;
+            const roleName = selectedOptionRole;
+
+            const data = {
+                account1: isActive,
+                email: email,
+                role_Name: roleName
+            };
+
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Update success');
+                    } else {
+                        alert('Update failed');
+                    }
+                })
+                .catch(error => {
+                    alert('Update failed');
+                    console.error('Lỗi:', error);
+                });
+        }else {
+            alert('Update failed(id)');
+        }
+
     };
 
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
         <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%', backgroundColor: 'white', width: '50%' }}>
-            Add User
+            Update User
         </Text>
         <hr style={{ borderTop: '1px solid #c4c4c4', width: '100%', marginTop: '0.5%' }} />
 
         <TableContainer>
             <Table variant='simple' style={{ marginTop: '2%', marginLeft: '5%', backgroundColor: 'white', width: '50%' }}>
-                <TableCaption><Button style={{ marginTop: '2%' }} onClick={handleAddUser}>Create</Button></TableCaption>
+                <TableCaption><Button style={{ marginTop: '2%' }} onClick={handleUpdateUser}>Update</Button></TableCaption>
                 <Thead>
                     <Tr>
                         <InputGroup size='lg'>
@@ -114,5 +134,4 @@ function AddUser() {
 
     </Box>;
 }
-
-export default AddUser;
+export default UpdateUser;

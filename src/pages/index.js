@@ -20,8 +20,8 @@ import { BACK_END_PORT } from '../../env';
 import Header from '@/components/layouts/Header';
 
 import { initializeApp } from 'firebase/app';
+
 import {
-  confirmPasswordReset,
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
@@ -65,14 +65,16 @@ function SignInPage() {
           .then((response) => response.json())
           .then((data) => {
             const id = data.roleAccounts[0].roleId;
+            console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {
+              // router.push('/pmpages/pmhome');
               router.push('adminpages/adminhome');
             }
-            if (id == 2) {
+            else if (id == 2) {
               router.push('/pmpages/pmhome');
             }
-            if (id == 3) {
+            else if (id == 3) {
               router.push('/userpages/userhome');
             } else {
               router.push('home');
