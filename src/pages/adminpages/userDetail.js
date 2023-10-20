@@ -16,14 +16,18 @@ function UserDetail() {
     const handleBackToList = () => {
         router.push('userManager');
     };
-    return <Box>
+
+    const handleEdit = (emailtoEdit) => {
+        router.push(`updateUser?emailEdit=${emailtoEdit}`);
+    };
+    return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
         <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%' }}>
             User Details
         </Text>
+        <hr style={{ borderTop: '1px solid #c4c4c4', width: '100%', marginTop: '0.5%' }} />
         <TableContainer>
             <Center>
                 <Table variant='simple' style={{ marginTop: '5%', backgroundColor: 'white', width: '90%' }}>
-                    <TableCaption>Imperial to metric conversion factors</TableCaption>
                     <Thead>
                         <Tr>
                             <Th>Login</Th>
@@ -43,7 +47,11 @@ function UserDetail() {
                 </Table>
             </Center>
         </TableContainer>
-        <Button style={{ marginLeft: '5%', marginTop: '2%' }} onClick={handleBackToList}>Back to List</Button>
+        
+        <Button style={{ marginLeft: '5%', marginTop: '5%' }} onClick={()=>handleEdit(email)}>Edit</Button>
+        <Button style={{ marginLeft: '1%', marginTop: '5%' }} onClick={handleBackToList}>Delete</Button>
+        <Button style={{ marginLeft: '1%', marginTop: '5%' }} onClick={handleBackToList}>Back to List</Button>
+
     </Box>;
 }
 
