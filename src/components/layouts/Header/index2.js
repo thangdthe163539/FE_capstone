@@ -1,28 +1,48 @@
 import { Box, Flex, Button, Text } from '@chakra-ui/react';
 import styles from '@/styles/Header2.module.css';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
 
 function Header2() {
+  const router = useRouter();
+  const [account2, setAccount2] = useState(null); // Initialize the account state
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = JSON.parse(localStorage.getItem('account'));
+    if (storedAccount) {
+      console.log(storedAccount);
+      setAccount2(storedAccount); // Set the account state
+    }
+  }, []);
+
+  function handleLogout() {
+    localStorage.removeItem('account');
+    router.push('/');
+  }
+
   return (
     <Box>
       <Flex className={`${styles.navbar}`}>
         <Text className={`${styles.navbarLogo}`}>
-          <Link href={"/"}>SoftTrack</Link>
+          <Link href={'/'}>SoftTrack</Link>
         </Text>
         <Flex>
-            <Text
-            className={styles.navbarItem}
-            >Welcome Admin</Text>
-            <Button
-                as={'a'}
-                fontSize={'sm'}
-                fontWeight={400}
-                variant={'link'}
-                href={'/'}
-                className={`${styles.navbarItem} ${styles.signInButton}`}
-            >
+          {account2 && account2.account1 != null ? (
+            <Text className={styles.navbarItem}>
+              Welcome {account2.account1}
+            </Text>
+          ) : null}
+          <Button
+            fontSize={'sm'}
+            fontWeight={400}
+            variant={'link'}
+            onClick={handleLogout}
+            className={`${styles.navbarItem} ${styles.signInButton}`}
+          >
             LOG OUT
-            </Button>
+          </Button>
         </Flex>
       </Flex>
     </Box>

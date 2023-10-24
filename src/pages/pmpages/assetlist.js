@@ -17,6 +17,7 @@ import {
   useDisclosure,
   Icon,
   useToast,
+  textDecoration,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -37,12 +38,14 @@ import {
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import { ArrowForwardIcon, ViewIcon } from '@chakra-ui/icons';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaUnderline } from 'react-icons/fa';
 import { AiOutlineEye, AiFillEye } from 'react-icons/ai';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
+import Header2 from '@/components/layouts/Header/index2';
+//
 const defaultData = {
   deviceId: '',
   accId: '',
@@ -58,6 +61,20 @@ const defaultData = {
 
 function AssetsPage() {
   // console.log(BACK_END_PORT);
+  const router = useRouter();
+  let account = null;
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      account = JSON.parse(storedAccount);
+      if (!account || account == null) {
+        // router.push('http://localhost:3000');
+      }
+    }
+  }, []);
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -67,6 +84,8 @@ function AssetsPage() {
   const [accData, setAccData] = useState([]);
   const [deviceData, setDeviceData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredDeviceData, setFilteredDeviceData] = useState([]);
   const toast = useToast();
   //
   //
@@ -111,7 +130,9 @@ function AssetsPage() {
       setFormData(defaultData);
       setSelectedRow(new Set());
       // Reload new data for the table
-      const newDataResponse = await axios.get(`${BACK_END_PORT}/api/v1/Device`);
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Device/list_device_with_user` + account.accId,
+      );
       setData(newDataResponse.data);
     } catch (error) {
       console.error('Error saving data:', error);
@@ -121,7 +142,10 @@ function AssetsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${BACK_END_PORT}/api/v1/Device`);
+        const response = await axios.get(
+          `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
+            account.accId,
+        );
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
           `${BACK_END_PORT}/api/v1/Account/ListAccount`,
@@ -148,6 +172,31 @@ function AssetsPage() {
       setDeviceData(mergedData);
     }
   }, [data, accData]);
+  // Filter function to search for assets
+  const filterAssets = () => {
+    const query = searchQuery.toLowerCase();
+    const filteredData = deviceData.filter((item) => {
+      const name = item.name.toLowerCase();
+      const account = item.accName.toLowerCase();
+      const manufacturer = item.manufacturer.toLowerCase();
+      return (
+        name.includes(query) ||
+        account.includes(query) ||
+        manufacturer.includes(query)
+      );
+    });
+    setFilteredDeviceData(filteredData);
+  };
+
+  // Update filtered data whenever the search query changes
+  useEffect(() => {
+    filterAssets();
+  }, [searchQuery, deviceData]);
+
+  // Handle search input change
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
   //
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -170,7 +219,9 @@ function AssetsPage() {
       setSelectedRow(new Set());
 
       // Reload the data for the table after deletion
-      const newDataResponse = await axios.get(`${BACK_END_PORT}/api/v1/Device`);
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Device/list_device_with_user` + account.accId,
+      );
       setData(newDataResponse.data);
       toast({
         title: 'Asset Deleted',
@@ -202,6 +253,14 @@ function AssetsPage() {
           <Flex>
             <Text fontSize='2xl'>Management Assets</Text>
             <Spacer />
+            <Input
+              type='text'
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+              placeholder='Search'
+              w={300}
+              mr={1}
+            />
             <Box>
               <IconButton
                 aria-label='Add'
@@ -230,46 +289,49 @@ function AssetsPage() {
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
-            <Table variant='simple'>
-              <TableCaption>Total {data.length} assets</TableCaption>
+            <Table
+              variant='striped'
+              colorScheme='gray'
+              className={styles.cTable}
+            >
+              <TableCaption className={styles.cTableCaption}>
+                Total {filteredDeviceData.length} assets
+              </TableCaption>
               <Thead>
                 <Tr>
-                  <Th></Th>
-                  <Th>Account</Th>
-                  <Th>Name</Th>
-                  <Th>IP Address</Th>
-                  <Th>MAC Address</Th>
-                  <Th>Manufacturer</Th>
-                  <Th>Model</Th>
-                  <Th>Serial Number</Th>
-                  <Th>Last Successfull Scan</Th>
-                  <Th>Status</Th>
+                  <Th className={styles.cTh} display='none'>
+                    Account
+                  </Th>
+                  <Th className={styles.cTh}>Name</Th>
+                  <Th className={styles.cTh}>IP Address</Th>
+                  <Th className={styles.cTh}>MAC Address</Th>
+                  <Th className={styles.cTh}>Manufacturer</Th>
+                  <Th className={styles.cTh}>Model</Th>
+                  <Th className={styles.cTh}>Serial Number</Th>
+                  <Th className={styles.cTh}>Last Successful Scan</Th>
+                  <Th className={styles.cTh}>Status</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {deviceData.map((item) => (
+                {filteredDeviceData.map((item) => (
                   <Tr
-                    cursor={'pointer'}
                     key={item.deviceId}
-                    bg={selectedRow === item.deviceId ? 'green.100' : 'white'} // Change background color for selected rows
+                    color={selectedRow === item.deviceId ? 'red' : 'black'}
+                    _hover={{
+                      cursor: 'pointer',
+                    }}
                     onClick={() => handleRowClick(item)}
                   >
-                    <Td>
-                      <Button
-                        bg='none'
-                        border='1px solid gray'
-                        w='5'
-                        h='10'
+                    <Td display='none'>{item.deviceId}</Td>
+                    <Td display='none'>{item.accName}</Td>
+                    <Td className={styles.listitem}>
+                      <Link
+                        href={'/pmpages/assetdetail'}
                         onClick={() => handleDetail(item)}
                       >
-                        <Link href='/pmpages/assetdetail'>
-                          <Icon as={ViewIcon}></Icon>
-                        </Link>
-                      </Button>
+                        {item.name}
+                      </Link>
                     </Td>
-                    <Td display='none'>{item.deviceId}</Td>
-                    <Td>{item.accName}</Td>
-                    <Td>{item.name}</Td>
                     <Td>{item.ipAddress}</Td>
                     <Td>{item.macAddress}</Td>
                     <Td>{item.manufacturer}</Td>
@@ -346,6 +408,7 @@ function AssetsPage() {
                     name='accId'
                     value={formData.accId}
                     onChange={handleInputChange}
+                    isDisabled
                   >
                     {accData.map((item) => (
                       <option key={item.accId} value={item.accId}>

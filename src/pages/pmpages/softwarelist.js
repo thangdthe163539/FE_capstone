@@ -43,6 +43,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
+import Header2 from '@/components/layouts/Header/index2';
+//
 const defaultData = {
   softwareId: '',
   deviceId: '',
@@ -56,6 +58,19 @@ const defaultData = {
 
 function SoftwarePage() {
   // console.log(BACK_END_PORT);
+  const router = useRouter();
+  let account = null;
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+    if (storedAccount) {
+      account = JSON.parse(storedAccount);
+      if (!account || account == null) {
+        // router.push('http://localhost:3000');
+      }
+    }
+  }, []);
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -64,19 +79,22 @@ function SoftwarePage() {
   const [formData2, setFormData2] = useState(defaultData);
   const [data, setData] = useState([]);
   const [deviceData, setDeviceData] = useState([]);
+  const [softwareData, setSoftwareData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
   const toast = useToast();
   //
   //
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    console.log(formData);
+    // console.log(formData);
   };
   const handleInputChange2 = (e) => {
     const { name, value } = e.target;
     setFormData2({ ...formData2, [name]: value });
-    console.log(formData2);
+    // console.log(formData2);
   };
   //
   //
@@ -113,7 +131,8 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+          account.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -125,7 +144,6 @@ function SoftwarePage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(`${BACK_END_PORT}/api/v1/Software`, {
-        // deviceId: formData.deviceId,
         softwareId: formData2.softwareId,
         name: formData2.name,
         version: formData2.version,
@@ -133,6 +151,7 @@ function SoftwarePage() {
         type: formData2.type,
         installDate: formData2.installDate,
         status: formData2.status,
+        deviceId: formData2.deviceId,
       });
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
@@ -140,7 +159,8 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+          account.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -152,11 +172,13 @@ function SoftwarePage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+          `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+            account.accId,
         );
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Device/list_device_with_user1`,
+          `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
+            account.accId,
         );
         setDeviceData(response2.data); // Assuming the API returns an array of objects
         setLoading(false);
@@ -169,6 +191,46 @@ function SoftwarePage() {
     fetchData();
   }, []);
   //
+  useEffect(() => {
+    if (data.length > 0 && deviceData.length > 0) {
+      const mergedData = data.map((software) => {
+        const device = deviceData.find(
+          (sw) => sw.deviceId === software.deviceId,
+        );
+        return {
+          ...software,
+          deviceName: device ? device.name : 'Unknown Device',
+        };
+      });
+      setSoftwareData(mergedData);
+    }
+  }, [data, deviceData]);
+  // Filter function to search for assets
+  const filterAssets = () => {
+    const query = searchQuery.toLowerCase();
+    const filteredData = softwareData.filter((item) => {
+      const name = item.name.toLowerCase();
+      const publisher = item.publisher.toLowerCase();
+      const device = item.deviceName.toLowerCase();
+      return (
+        name.includes(query) ||
+        publisher.includes(query) ||
+        device.includes(query)
+      );
+    });
+    setFilteredSoftwareData(filteredData);
+  };
+
+  // Update filtered data whenever the search query changes
+  useEffect(() => {
+    filterAssets();
+  }, [searchQuery, softwareData]);
+
+  // Handle search input change
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+  //
   const handleDelete = async () => {
     try {
       await axios.delete(
@@ -179,7 +241,8 @@ function SoftwarePage() {
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user1`,
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+          account.accId,
       );
       setData(newDataResponse.data);
       toast({
@@ -212,6 +275,14 @@ function SoftwarePage() {
           <Flex>
             <Text fontSize='2xl'>Management Software</Text>
             <Spacer />
+            <Input
+              type='text'
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+              placeholder='Search'
+              w={300}
+              mr={1}
+            />
             <Box>
               <IconButton
                 aria-label='Add'
@@ -246,31 +317,39 @@ function SoftwarePage() {
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
-            <Table variant='simple'>
-              <TableCaption>Total {data.length} softwares</TableCaption>
+            <Table
+              variant='striped'
+              colorScheme='gray'
+              className={styles.cTable}
+            >
+              <TableCaption>
+                Total {filteredSoftwareData.length} softwares
+              </TableCaption>
               <Thead>
                 <Tr>
                   <Th display='none'>Software ID</Th>
-                  <Th>Name</Th>
-                  <Th>Assets</Th>
-                  <Th>Publisher</Th>
-                  <Th>Versions</Th>
-                  <Th>Release</Th>
-                  <Th>Install Date</Th>
-                  <Th>Status</Th>
+                  <Th className={styles.cTh}>Name</Th>
+                  <Th className={styles.cTh}>Assets</Th>
+                  <Th className={styles.cTh}>Publisher</Th>
+                  <Th className={styles.cTh}>Versions</Th>
+                  <Th className={styles.cTh}>Release</Th>
+                  <Th className={styles.cTh}>Install Date</Th>
+                  <Th className={styles.cTh}>Status</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {data.map((item) => (
+                {filteredSoftwareData.map((item) => (
                   <Tr
-                    cursor={'pointer'}
+                    _hover={{
+                      cursor: 'pointer',
+                    }}
                     key={item.softwareId}
-                    bg={selectedRow === item.softwareId ? 'green.100' : 'white'} // Change background color for selected rows
+                    color={selectedRow === item.softwareId ? 'red' : 'black'}
                     onClick={() => handleRowClick(item)}
                   >
                     <Td display='none'>{item.softwareId}</Td>
                     <Td>{item.name}</Td>
-                    <Td>{item.deviceId}</Td>
+                    <Td>{item.deviceName}</Td>
                     <Td>{item.publisher}</Td>
                     <Td>{item.version}</Td>
                     <Td>{item.type}</Td>

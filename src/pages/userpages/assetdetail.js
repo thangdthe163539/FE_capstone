@@ -65,7 +65,7 @@ function AssetDetailPage() {
   try {
     deviceID = JSON.parse(localStorage.getItem('deviceId'));
     if (!deviceID || deviceID == null) {
-      router.push('/pmpages/assetlist');
+      router.push('/userpages/assetlist');
     } else {
       defaultData = {
         ...defaultData,
@@ -148,6 +148,7 @@ function AssetDetailPage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(`${BACK_END_PORT}/api/v1/Software`, {
+        // deviceId: formData.deviceId,
         softwareId: formData2.softwareId,
         name: formData2.name,
         version: formData2.version,
@@ -155,7 +156,6 @@ function AssetDetailPage() {
         type: formData2.type,
         installDate: formData2.installDate,
         status: formData2.status,
-        deviceId: formData2.deviceId,
       });
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
@@ -218,7 +218,7 @@ function AssetDetailPage() {
       <List>
         <ListItem className={styles.list}>
           <Link
-            href='/pmpages/pmhome'
+            href='/userpages/userhome'
             _hover={{ textDecor: 'underline' }}
             className={styles.listitem}
           >
@@ -226,11 +226,11 @@ function AssetDetailPage() {
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>
           <Link
-            href='/pmpages/assetlist'
+            href='/userpages/assetlist'
             _hover={{ textDecor: 'underline' }}
             className={styles.listitem}
           >
-            Management Assets
+            Assets
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Asset Detail
         </ListItem>
@@ -270,31 +270,6 @@ function AssetDetailPage() {
                 ></ChevronUpIcon>
               </Box>
             )}
-            <Spacer />
-            <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                onClick={() => setIsOpenAdd(true)}
-              />
-              <IconButton
-                aria-label='Edit'
-                icon={<FaEdit />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                onClick={() => setIsOpenEdit(true)}
-                isDisabled={isButtonDisabled}
-              />
-              <IconButton
-                aria-label='Delete'
-                icon={<FaTrash />}
-                colorScheme='gray' // Choose an appropriate color
-                onClick={() => setIsOpenDelete(true)}
-                isDisabled={isButtonDisabled}
-              />
-            </Box>
           </Flex>
         </ListItem>
         {showSoftwareTable && (
@@ -342,244 +317,14 @@ function AssetDetailPage() {
         <ListItem className={styles.list}>
           <Flex>
             <Text fontSize='2xl'>Lisence Keys</Text>
-            <Spacer />
-            <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-              />
-              <IconButton
-                aria-label='Edit'
-                icon={<FaEdit />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                isDisabled={isButtonDisabled}
-              />
-              <IconButton
-                aria-label='Delete'
-                icon={<FaTrash />}
-                colorScheme='gray' // Choose an appropriate color
-                isDisabled={isButtonDisabled}
-              />
-            </Box>
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
             <Text fontSize='2xl'>Antivirus</Text>
-            <Spacer />
-            <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-              />
-              <IconButton
-                aria-label='Edit'
-                icon={<FaEdit />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                isDisabled={isButtonDisabled}
-              />
-              <IconButton
-                aria-label='Delete'
-                icon={<FaTrash />}
-                colorScheme='gray' // Choose an appropriate color
-                isDisabled={isButtonDisabled}
-              />
-            </Box>
           </Flex>
         </ListItem>
       </List>
-
-      <Modal //Modal edit software
-        isOpen={isOpenEdit}
-        onClose={() => setIsOpenEdit(false)}
-        closeOnOverlayClick={false}
-        size='lg'
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Software</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-              <Input
-                name='softwareId'
-                value={formData2.softwareId}
-                onChange={handleInputChange2}
-                display='none'
-              />
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    name='name'
-                    value={formData2.name}
-                    onChange={handleInputChange2}
-                    required
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Version</FormLabel>
-                  <Input
-                    name='version'
-                    value={formData2.version}
-                    onChange={handleInputChange2}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Release</FormLabel>
-                  <Input
-                    name='type'
-                    value={formData2.type}
-                    onChange={handleInputChange2}
-                  />
-                </FormControl>
-                {/* Add more fields for the first column */}
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Publisher</FormLabel>
-                  <Input
-                    name='publisher'
-                    value={formData2.publisher}
-                    onChange={handleInputChange2}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Install Date</FormLabel>
-                  <Input
-                    name='installDate'
-                    value={formData2.installDate}
-                    // onChange={handleInputChange}
-                    isDisabled={true}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Status</FormLabel>
-                  <Input
-                    name='status'
-                    value={formData2.status}
-                    // onChange={handleInputChange}
-                    isDisabled={true}
-                  />
-                </FormControl>
-                {/* Add more fields for the second column */}
-              </GridItem>
-            </Grid>
-            {/* Additional fields can be added to the respective columns */}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveEdit}>
-              Save
-            </Button>
-            <Button onClick={() => setIsOpenEdit(false)}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      <Modal // Modal add new software
-        isOpen={isOpenAdd}
-        onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
-        closeOnOverlayClick={false}
-        size='lg'
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add New Software</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-              <Input
-                name='softwareID'
-                value={formData.softwareId}
-                onChange={handleInputChange}
-                display='none'
-              />
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    name='name'
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Version</FormLabel>
-                  <Input
-                    name='version'
-                    value={formData.version}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Release</FormLabel>
-                  <Input
-                    name='type'
-                    value={formData.type}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                {/* Add more fields for the first column */}
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Publisher</FormLabel>
-                  <Input
-                    name='publisher'
-                    value={formData.publisher}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Install Date</FormLabel>
-                  <Input
-                    name='installDate'
-                    value={formData.installDate}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </FormControl>
-                {/* Add more fields for the second column */}
-              </GridItem>
-            </Grid>
-            {/* Additional fields can be added to the respective columns */}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
-              Save
-            </Button>
-            <Button
-              onClick={() => (setIsOpenAdd(false), setFormData(defaultData))}
-            >
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      <Modal isOpen={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Confirm Delete</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Are you sure you want to delete this software?</Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='red' mr={3} onClick={handleDelete}>
-              Delete
-            </Button>
-            <Button onClick={() => setIsOpenDelete(false)}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </Box>
   );
 }
