@@ -65,8 +65,8 @@ function AssetsPage() {
   const [accData, setAccData] = useState([]);
   const [deviceData, setDeviceData] = useState([]);
   const [loading, setLoading] = useState(true);
-  //
-  //
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredDeviceData, setFilteredDeviceData] = useState([]);
   //
   //
   //
@@ -100,6 +100,31 @@ function AssetsPage() {
       setDeviceData(mergedData);
     }
   }, [data, accData]);
+  // Filter function to search for assets
+  const filterAssets = () => {
+    const query = searchQuery.toLowerCase();
+    const filteredData = deviceData.filter((item) => {
+      const name = item.name.toLowerCase();
+      const account = item.accName.toLowerCase();
+      const manufacturer = item.manufacturer.toLowerCase();
+      return (
+        name.includes(query) ||
+        account.includes(query) ||
+        manufacturer.includes(query)
+      );
+    });
+    setFilteredDeviceData(filteredData);
+  };
+
+  // Update filtered data whenever the search query changes
+  useEffect(() => {
+    filterAssets();
+  }, [searchQuery, deviceData]);
+
+  // Handle search input change
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
   //
   const handleDetail = (item) => {
     localStorage.setItem('deviceId', JSON.stringify(item.deviceId));
@@ -120,12 +145,24 @@ function AssetsPage() {
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Assets
         </ListItem>
         <ListItem className={styles.list}>
-          <Text fontSize='2xl'>Assets</Text>
+          <Flex>
+            <Text fontSize='2xl'>Assets</Text>
+            <Spacer />
+            <Input
+              type='text'
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+              placeholder='Search'
+              w={300}
+            />
+          </Flex>
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
             <Table variant='simple'>
-              <TableCaption>Total {data.length} assets</TableCaption>
+              <TableCaption>
+                Total {filteredDeviceData.length} assets
+              </TableCaption>
               <Thead>
                 <Tr>
                   <Th></Th>
@@ -141,7 +178,7 @@ function AssetsPage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {deviceData.map((item) => (
+                {filteredDeviceData.map((item) => (
                   <Tr>
                     <Td>
                       <Button

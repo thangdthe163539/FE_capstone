@@ -230,7 +230,7 @@ function AssetDetailPage() {
             _hover={{ textDecor: 'underline' }}
             className={styles.listitem}
           >
-            Management Assets
+            Assets
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Asset Detail
         </ListItem>

@@ -21,17 +21,12 @@ import Header from '@/components/layouts/Header';
 
 import { initializeApp } from 'firebase/app';
 
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 const inter = Inter({ subsets: ['latin'] });
 
 function SignInPage() {
   const router = useRouter();
-
   // start config firebase - login gg
   const firebaseConfig = {
     apiKey: 'AIzaSyBPQERi46GDLNjIVX2k7RBxro66VxV74tY',
@@ -65,17 +60,15 @@ function SignInPage() {
           .then((response) => response.json())
           .then((data) => {
             const id = data.roleAccounts[0].roleId;
-            console.log(id);
+            // console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {
               // router.push('/pmpages/pmhome');
               router.push('adminpages/adminhome');
-            }
-            else if (id == 2) {
+            } else if (id == 2) {
               router.push('/pmpages/pmhome');
-            }
-            else if (id == 3) {
-              router.push('/userpages/userhome');
+            } else if (id == 3) {
+              router.push('/pmpages/pmhome');
             } else {
               router.push('home');
             }

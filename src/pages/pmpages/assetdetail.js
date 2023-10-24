@@ -148,7 +148,6 @@ function AssetDetailPage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(`${BACK_END_PORT}/api/v1/Software`, {
-        // deviceId: formData.deviceId,
         softwareId: formData2.softwareId,
         name: formData2.name,
         version: formData2.version,
@@ -156,6 +155,7 @@ function AssetDetailPage() {
         type: formData2.type,
         installDate: formData2.installDate,
         status: formData2.status,
+        deviceId: formData2.deviceId,
       });
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save

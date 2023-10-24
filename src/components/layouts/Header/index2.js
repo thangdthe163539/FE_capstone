@@ -6,17 +6,21 @@ import { useState, useEffect } from 'react';
 
 function Header2() {
   const router = useRouter();
-  const [account, setAccount] = useState(null); // Initialize the account state
+  const [account2, setAccount2] = useState(null); // Initialize the account state
 
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = JSON.parse(localStorage.getItem('account'));
     if (storedAccount) {
-      setAccount(storedAccount); // Set the account state
-      console.log('Header');
       console.log(storedAccount);
+      setAccount2(storedAccount); // Set the account state
     }
   }, []);
+
+  function handleLogout() {
+    localStorage.removeItem('account');
+    router.push('/');
+  }
 
   return (
     <Box>
@@ -25,17 +29,16 @@ function Header2() {
           <Link href={'/'}>SoftTrack</Link>
         </Text>
         <Flex>
-          {account && account.account1 != null ? (
+          {account2 && account2.account1 != null ? (
             <Text className={styles.navbarItem}>
-              Welcome {account.account1}
+              Welcome {account2.account1}
             </Text>
           ) : null}
           <Button
-            as={'a'}
             fontSize={'sm'}
             fontWeight={400}
             variant={'link'}
-            href={'/'}
+            onClick={handleLogout}
             className={`${styles.navbarItem} ${styles.signInButton}`}
           >
             LOG OUT
