@@ -1,0 +1,42 @@
+.title{
+    text-align: center;
+    color: #344e74;
+    font-family: Sanchez;
+    font-style: normal;
+    font-size: 40px;
+    margin-top: 10%;
+    font-weight: bold;
+}
+.formSof{
+    width: 85%;
+    background-color: white;
+    margin-left: 8%;
+    height: 400px;
+    margin-top: 4%;
+}
+.software{
+    color: #344e74;
+    font-family: Sanchez;
+    font-size: 40px;
+    font-style: normal;
+}
+.textSof{
+    font-size: 18px;
+    color: #3c445c;
+}
+.textList{
+    font-size: 18px;
+    color: #5b6585;
+    padding-top: 5%;
+}
+.image{
+    box-shadow: #344e74;
+    padding-top: 3%;
+}
+.formDe{
+    width: 85%;
+    background-color: white;
+    margin-left: 8%;
+    height: 400px;
+    margin-top: 4%;
+}

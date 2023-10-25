@@ -1,0 +1,57 @@
+.footer {
+    height: 300px;
+    background-color: white;
+    color: #344e74;
+}
+
+.logo {
+    background: white;
+    margin-left: 10%;
+    margin-top: 8.5%;
+    height: 20px;
+}
+
+.navbarLogo {
+    color: #344e74;
+    text-align: center;
+    font-family: Sanchez;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    flex-shrink: 0;
+    cursor: pointer;
+    margin-top: 9%;
+}
+
+.contact{
+    color: #344e74;
+    font-family: Sanchez;
+    font-size: 30px;
+    margin-left: 13%;
+    margin-top: 3%;
+}
+.buttonContact{
+    margin-top: 8%;
+    margin-left: -11%;
+}
+.about{
+    color: #344e74;
+    font-family: Sanchez;
+    font-size: 30px;
+    margin-left: 20.3%;
+    margin-top: 3%;
+}
+.textAbout{
+    margin-left:59%;
+    margin-top: -14%;
+}
+.lastline{
+    background-color: whitesmoke;
+    height: 40px;
+    font-family: Sanchez;
+    font-size: 15px;
+    text-align: center;
+    margin-top: 4.5%;
+    padding-top: 0.5%;
+}
