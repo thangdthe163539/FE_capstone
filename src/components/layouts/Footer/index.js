@@ -5,12 +5,13 @@ import Link from 'next/link';
 function Footer() {
   return (
     <Box style={{ height: '320px' }}>
+      <hr style={{ borderTop: '1px solid #c4c4c4', width: '100%', marginTop: '2.5%' }} />
       <Flex className={`${styles.footer}`}>
         <Link className={`${styles.logo}`} href={'/'}><Image src="/lo-go.png" alt="SoftTrack Logo" boxSize="30px" /></Link>
         <Text className={`${styles.navbarLogo}`}>
           <Link href={'/'}>SoftTrack</Link>
         </Text>
-        
+
         <Text className={`${styles.contact}`}>
           Any Question
         </Text>

@@ -4,6 +4,7 @@ import '@/styles/globals.css';
 import { Box, ChakraProvider } from '@chakra-ui/react';
 import { useRouter } from "next/router"
 import Footer from '@/components/layouts/Footer';
+import LastFooter from '@/components/layouts/Footer/lastline';
 import Feature from '@/components/layouts/Feature';
 
 export default function App({ Component, pageProps }) {
@@ -21,10 +22,10 @@ export default function App({ Component, pageProps }) {
         <Component {...pageProps} />
       </Box>
       <Box>
-        <Feature />
+        {router.pathname === ('/') || shouldShowHeader ? <Feature /> : ''}
       </Box>
       <Box>
-        <Footer />
+        {router.pathname === ('/') || shouldShowHeader ? <Footer /> : <LastFooter />}
       </Box>
     </ChakraProvider>
   );

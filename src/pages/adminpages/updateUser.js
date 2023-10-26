@@ -13,17 +13,25 @@ import React, { useState, useEffect } from 'react';
 
 function UpdateUser() {
     const router = useRouter();
-    const { emailEdit } = router.query;
+    const { name, email, status, role, roleid } = router.query;
     const [id, setId] = useState(null);
     const handleBackToList = () => {
         router.push('userManager');
     };
+    const [name1, setName] = useState('');
+    const handleNameChange = (event) => {
+        // Cập nhật biến `name` khi giá trị trong phần tử `<Input>` thay đổi
+        setName(event.target.value);
+    };
+    useEffect(() => {
+        setName(name);
+    }, [name]);
 
     const [selectedOptionActive, setSelectedOptionActive] = useState('');
     const [selectedOptionRole, setSelectedOptionRole] = useState('');
     const [roles, setRoles] = useState([]);
     useEffect(() => {
-        const url = 'http://localhost:5001/api/roles';
+        const url = 'http://localhost:5001/api/roles/listRole';
         fetch(url, {
             method: 'GET',
         })
@@ -37,7 +45,7 @@ function UpdateUser() {
     }, []);
 
     useEffect(() => {
-        const url = `http://localhost:5001/api/v1/Account/SearchByEmail?email=${emailEdit}`;
+        const url = `http://localhost:5001/api/v1/Account/SearchByEmail?email=${email}`;
         fetch(url, {
             method: 'GET',
         })
@@ -56,13 +64,15 @@ function UpdateUser() {
             const url = `http://localhost:5001/api/v1/Account/Update_Accpunt${id}`;
 
             const email = document.getElementById('email').value;
-            const isActive = selectedOptionActive;
-            const roleName = selectedOptionRole;
+            const isActive = selectedOptionActive ? selectedOptionActive : status;
+            const name = document.getElementById('name').value;
+            const role = selectedOptionRole ? selectedOptionRole : roleid;
 
             const data = {
-                account1: isActive,
+                name: name,
                 email: email,
-                role_Name: roleName
+                status: Boolean(isActive),
+                roleId: parseInt(role)
             };
 
             fetch(url, {
@@ -83,7 +93,7 @@ function UpdateUser() {
                     alert('Update failed');
                     console.error('Lỗi:', error);
                 });
-        }else {
+        } else {
             alert('Update failed(id)');
         }
 
@@ -101,30 +111,58 @@ function UpdateUser() {
                 <Thead>
                     <Tr>
                         <InputGroup size='lg'>
-                            <InputLeftAddon children='Login: ' style={{ width: '10%' }} />
-                            <Input id='email' placeholder='Email' style={{ width: '80%' }} />
-                            <Text fontSize='110%' color='black' style={{ marginLeft: '2%', marginTop: '1%' }}>@fpt.edu.vn</Text>
+                            <InputLeftAddon children='Email ' style={{ width: '10%' }} />
+                            <Input id='email' value={email} placeholder='' style={{ width: '40%' }} readOnly />
                         </InputGroup>
                     </Tr>
                 </Thead>
                 <Tbody>
                     <InputGroup size='lg'>
-                        <InputLeftAddon children='Role: ' style={{ width: '10%' }} />
-                        <Select value={selectedOptionRole} onChange={(e) => setSelectedOptionRole(e.target.value)} size='8%'>
-                            {roles.map(role => (
-                                <option key={role.name} value={role.name}>
-                                    {role.name}
-                                </option>
-                            ))}
+                        <InputLeftAddon children='Role ' style={{ width: '10%' }} />
+                        <Select
+                            style={{ width: '25%'}}
+                            value={selectedOptionRole}
+                            onChange={(e) => setSelectedOptionRole(e.target.value)}
+                            size='0%'
+                        >
+                            {roles
+                                .sort((a, b) => (a.roleId == roleid ? -1 : b.roleId == roleid ? 1 : 0))
+                                .map(role1 => (
+                                    <option key={role1.roleId} value={role1.roleId}>
+                                        {role1.name}
+                                    </option>
+                                ))}
                         </Select>
                     </InputGroup>
 
                     <InputGroup size='lg'>
-                        <InputLeftAddon children='isActive: ' style={{ width: '10%' }} />
-                        <Select value={selectedOptionActive} defaultValue='active' onChange={(e) => setSelectedOptionActive(e.target.value)}
-                            size='8%'>
-                            <option value='active'>Active</option>
-                            <option value='inactive'>Inactive</option>
+                        <InputLeftAddon children='Name ' style={{ width: '10%' }} />
+                        <Input id='name' value={name1} placeholder='' style={{ width: '40%' }} onChange={handleNameChange} />
+                    </InputGroup>
+
+
+                    <InputGroup size='lg'>
+                        <InputLeftAddon children='Active ' style={{ width: '10%' }} />
+                        <Select
+                            style={{ width: '15%' }}
+                            value={selectedOptionActive}
+                            onChange={(e) => {
+                                setSelectedOptionActive(e.target.value);
+                            }}
+                            size='8%'
+                        >
+                            {status === 'true' && (
+                                <>
+                                    <option value='true'>Active</option>
+                                    <option value='false'>InActive</option>
+                                </>
+                            )}
+                            {status === 'false' && (
+                                <>
+                                    <option value='false'>InActive</option>
+                                    <option value='true'>Active</option>
+                                </>
+                            )}
                         </Select>
                     </InputGroup>
                 </Tbody>

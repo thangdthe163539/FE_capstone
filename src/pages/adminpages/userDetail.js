@@ -12,13 +12,13 @@ import { useRouter } from 'next/router';
 
 function UserDetail() {
     const router = useRouter();
-    const { email, role } = router.query;
+    const { email, role, roleid, status, name } = router.query;
     const handleBackToList = () => {
         router.push('userManager');
     };
 
-    const handleEdit = (emailtoEdit) => {
-        router.push(`updateUser?emailEdit=${emailtoEdit}`);
+    const handleEdit = (name,email,status,role, roleid) => {
+        router.push(`updateUser?email=${email}&name=${name}&status=${status}&role=${role}&roleid=${roleid}`);
     };
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
         <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%' }}>
@@ -30,27 +30,31 @@ function UserDetail() {
                 <Table variant='simple' style={{ marginTop: '5%', backgroundColor: 'white', width: '90%' }}>
                     <Thead>
                         <Tr>
-                            <Th>Login</Th>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width:'200px' }}>Name</Td>
+                            <Td>{name}</Td>
+                        </Tr>
+                        <Tr>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez' }}>Email</Td>
                             <Td>{email}</Td>
                         </Tr>
                     </Thead>
                     <Tbody>
                         <Tr>
-                            <Th>isActive</Th>
-                            <Td>True</Td>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez' }}>Active</Td>
+                            <Td>{status}</Td>
                         </Tr>
                         <Tr>
-                            <Th>Role_Name</Th>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez' }}>Role Name</Td>
                             <Td>{role}</Td>
                         </Tr>
                     </Tbody>
                 </Table>
             </Center>
         </TableContainer>
-        
-        <Button style={{ marginLeft: '5%', marginTop: '5%' }} onClick={()=>handleEdit(email)}>Edit</Button>
-        <Button style={{ marginLeft: '1%', marginTop: '5%' }} onClick={handleBackToList}>Delete</Button>
-        <Button style={{ marginLeft: '1%', marginTop: '5%' }} onClick={handleBackToList}>Back to List</Button>
+
+        <Button style={{ marginLeft: '5%', marginTop: '5%' }} onClick={() => handleEdit(name,email,status,role, roleid)}>Edit</Button>
+        <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleBackToList}>Delete</Button>
+        <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleBackToList}>Back to List</Button>
 
     </Box>;
 }

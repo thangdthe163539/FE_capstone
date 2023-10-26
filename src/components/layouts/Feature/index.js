@@ -89,7 +89,6 @@ function Feature() {
                     <Image boxSize='350px' objectFit='cover' style={{ width: '550px', height: '300px' }} className={`${styles.image}`} src="/image3.png" />
                 </Box>
             </Flex>
-            <hr style={{ borderTop: '1px solid #c4c4c4', width: '100%', marginTop: '2.5%'}} />
         </Box>
     );
 }
