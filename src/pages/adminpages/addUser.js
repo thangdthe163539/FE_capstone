@@ -62,19 +62,24 @@ function AddUser() {
             .then(response => {
                 console.log(response);
                 if (response.ok) {
-                    alert('Create success');
+                    showAlertWithTimeout('Create success', 3000);
                 } else {
-                    alert('Create failed');
+                    showAlertWithTimeout('Create failed', 3000);
                 }
             })
             .catch(error => {
-                alert('Create failed');
+                showAlertWithTimeout('Create failed', 3000);
                 console.error('Lỗi:', error);
             });
     };
 
-    console.log(selectedOptionActive + 'select');
-
+    function showAlertWithTimeout(message, timeout) {
+        alert(message);
+        setTimeout(function () {
+            // Đóng thông báo sau một khoảng thời gian timeout (được tính bằng mili giây)
+            window.close();
+        }, timeout);
+    }
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
         <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%', backgroundColor: 'white', width: '50%' }}>
             Add User
@@ -88,7 +93,7 @@ function AddUser() {
                     <Tr>
                         <InputGroup size='lg'>
                             <InputLeftAddon children='Email ' style={{ width: '10%' }} />
-                            <Input id='email' placeholder='' style={{ width: '80%' }} />
+                            <Input id='email' placeholder='' style={{ width: '40%' }} />
                             <Text fontSize='110%' color='black' style={{ marginLeft: '2%', marginTop: '1%' }}>@fpt.edu.vn</Text>
                         </InputGroup>
                     </Tr>
@@ -107,7 +112,7 @@ function AddUser() {
 
                     <InputGroup size='lg'>
                         <InputLeftAddon children='Name ' style={{ width: '10%' }} />
-                        <Input id='name' placeholder='' style={{ width: '70%' }} />
+                        <Input id='name' placeholder='' style={{ width: '40%' }} />
                     </InputGroup>
 
                     <InputGroup size='lg'>

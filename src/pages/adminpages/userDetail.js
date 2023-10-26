@@ -12,12 +12,39 @@ import { useRouter } from 'next/router';
 
 function UserDetail() {
     const router = useRouter();
-    const { email, role, roleid, status, name } = router.query;
+    const { email, role, roleid, status, name, accid } = router.query;
+
     const handleBackToList = () => {
         router.push('userManager');
     };
 
-    const handleEdit = (name,email,status,role, roleid) => {
+    const handleDelete = () => {
+        const url = `http://localhost:5001/api/v1/Account/DeleteAccountWith_key?accountId=${accid}`;
+        fetch(url, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                console.log(response);
+                if (response.ok) {
+                    showAlertWithTimeout('Delete success', 3000); // Hiển thị "Delete success" trong 3 giây
+                } else {
+                    showAlertWithTimeout('Delete failed', 3000); // Hiển thị "Delete failed" trong 3 giây
+                }
+            })
+            .catch(error => {
+                showAlertWithTimeout('Delete failed', 3000);
+                console.error('Lỗi:', error);
+            });
+    };
+
+    function showAlertWithTimeout(message, timeout) {
+        alert(message);
+        setTimeout(function () {
+            window.close();
+        }, timeout);
+    }
+
+    const handleEdit = (name, email, status, role, roleid) => {
         router.push(`updateUser?email=${email}&name=${name}&status=${status}&role=${role}&roleid=${roleid}`);
     };
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
@@ -30,7 +57,7 @@ function UserDetail() {
                 <Table variant='simple' style={{ marginTop: '5%', backgroundColor: 'white', width: '90%' }}>
                     <Thead>
                         <Tr>
-                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width:'200px' }}>Name</Td>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '200px' }}>Name</Td>
                             <Td>{name}</Td>
                         </Tr>
                         <Tr>
@@ -52,8 +79,8 @@ function UserDetail() {
             </Center>
         </TableContainer>
 
-        <Button style={{ marginLeft: '5%', marginTop: '5%' }} onClick={() => handleEdit(name,email,status,role, roleid)}>Edit</Button>
-        <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleBackToList}>Delete</Button>
+        <Button style={{ marginLeft: '5%', marginTop: '5%' }} onClick={() => handleEdit(name, email, status, role, roleid)}>Edit</Button>
+        <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleDelete}>Delete</Button>
         <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleBackToList}>Back to List</Button>
 
     </Box>;

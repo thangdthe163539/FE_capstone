@@ -51,7 +51,7 @@ function UpdateUser() {
         })
             .then(response => response.json())
             .then(data => {
-                const id = data[0].accId;
+                const id = data.accId;
                 setId(id);
             })
             .catch(error => {
@@ -85,13 +85,13 @@ function UpdateUser() {
             })
                 .then(response => {
                     if (response.ok) {
-                        alert('Update success');
+                        showAlertWithTimeout('Update success', 3000);
                     } else {
-                        alert('Update failed');
+                        showAlertWithTimeout('Update failed', 3000);
                     }
                 })
                 .catch(error => {
-                    alert('Update failed');
+                    showAlertWithTimeout('Update failed', 3000);
                     console.error('Lỗi:', error);
                 });
         } else {
@@ -99,6 +99,14 @@ function UpdateUser() {
         }
 
     };
+
+    function showAlertWithTimeout(message, timeout) {
+        alert(message);
+        setTimeout(function () {
+            // Đóng thông báo sau một khoảng thời gian timeout (được tính bằng mili giây)
+            window.close();
+        }, timeout);
+    }
 
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
         <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%', backgroundColor: 'white', width: '50%' }}>

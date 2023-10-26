@@ -56,8 +56,8 @@ function UserManager() {
     };
 
     console.log(userData + "dsad");
-    const handleToUserDetails = (email, roleName, roleid, status, name) => {
-        router.push(`userDetail?email=${email}&role=${roleName}&roleid=${roleid}&status=${status}&name=${name}`);
+    const handleToUserDetails = (email, roleName, roleid, status, name, accid) => {
+        router.push(`userDetail?email=${email}&role=${roleName}&roleid=${roleid}&status=${status}&name=${name}&accid=${accid}`);
     };
 
     const handleToAddUser = () => {
@@ -114,7 +114,7 @@ function UserManager() {
                     <Tbody>
                         {userData.map(user => (
                             <Tr key={user.id}>
-                                <Td><Button color={'blue'} variant='link' onClick={() => handleToUserDetails(user.email, user.roleName, user.roleId, user.status, user.name)}>{user.name}</Button></Td>
+                                <Td><Button color={'blue'} variant='link' onClick={() => handleToUserDetails(user.email, user.roleName, user.roleId, user.status, user.name, user.accId)}>{user.name}</Button></Td>
                                 <Td style={{ width: '35%' }}>{user.email}</Td>
                                 <Td>{user.status ? 'true' : 'false'}</Td>
                                 <Td style={{ width: '15%' }}>{user.roleName}</Td>
