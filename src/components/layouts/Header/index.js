@@ -9,18 +9,31 @@ function Header() {
         <Text className={`${styles.navbarLogo}`}>
           <Link href={'/'}>SoftTrack</Link>
         </Text>
-        <Flex>
-          <Button
-            as={'a'}
-            fontSize={'sm'}
-            fontWeight={400}
-            variant={'link'}
-            href={'/'}
-            className={`${styles.navbarItem} ${styles.signInButton}`}
-          >
-            SIGN IN
-          </Button>
-        </Flex>
+        <Text className={`${styles.navbarText}`}>YOU ARE NOT LOGGED IN.</Text>
+        <Text
+          style={{
+            fontSize: '20px',
+            textAlign: 'center',
+            marginTop: '-0.5%',
+            marginLeft: '0.5%',
+            color: '#344e74',
+          }}
+        >
+          (
+        </Text>
+        <Text onClick={handleGoogleLogin} className={`${styles.loggin}`}>
+          LOGIN
+        </Text>
+        <Text
+          style={{
+            fontSize: '20px',
+            textAlign: 'center',
+            marginTop: '-0.5%',
+            color: '#344e74',
+          }}
+        >
+          )
+        </Text>
       </Flex>
     </Box>
   );

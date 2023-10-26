@@ -1,161 +1,108 @@
-import {
-  Button,
-  Flex,
-  Stack,
-  InputGroup,
-  InputRightElement,
-  Input,
-  Text,
-  Box,
-} from '@chakra-ui/react';
-import styles from '@/styles/SignUp.module.css';
+import { Box, Flex, Button, Text, Stack, Center } from '@chakra-ui/react';
 import { Inter } from 'next/font/google';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import axios from 'axios'
+import styles from '@/styles/SignIn.module.css';
 import Link from 'next/link';
-
 import { AiOutlineEye, AiFillEye } from 'react-icons/ai';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import axios from 'axios';
 import { BACK_END_PORT } from '../../env';
-const inter = Inter({ subsets: ['latin'] });
+import { AiFillGoogleCircle } from 'react-icons/ai';
 
-function SignUpPage() {
+import { initializeApp } from 'firebase/app';
+
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+
+function SignInPage() {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showComfirmPassword, setShowComfirmPassword] = useState(false);
-
-  const [paramsData, setParamsData] = useState({
-    email: '',
-    password: '',
-    confirm_password: '',
-    dob: '',
-    name: '',
-  });
-
-  const handleChangeEmail = (e) => {
-    setParamsData({ ...paramsData, email: e.target.value });
+  // start config firebase - login gg
+  const firebaseConfig = {
+    apiKey: 'AIzaSyBPQERi46GDLNjIVX2k7RBxro66VxV74tY',
+    authDomain: 'capstone-e29dd.firebaseapp.com',
+    projectId: 'capstone-e29dd',
+    storageBucket: 'capstone-e29dd.appspot.com',
+    messagingSenderId: '525712107578',
+    appId: '1:525712107578:web:0e09593d57696909136d03',
+    measurementId: 'G-0QH2KVSVVB',
   };
 
-  const handleChangePassword = (e) => {
-    setParamsData({ ...paramsData, password: e.target.value });
-  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
-  const handleChangeConfirmPassword = (e) => {
-    setParamsData({ ...paramsData, confirm_password: e.target.value });
-  };
+  const handleGoogleLogin = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const mail = result.user.email;
+        const url = `${BACK_END_PORT}/api/v1/Account/login`;
 
-  const handleChangeDob = (e) => {
-    setParamsData({ ...paramsData, dob: e.target.value });
-  };
+        const requestData = mail;
 
-  const handleChangeName = (e) => {
-    setParamsData({ ...paramsData, name: e.target.value });
-  };
-
-  //input endpoint here
-  const handleRegisterAccount = async () => {
-    const { email, password, confirm_password, dob, name } = paramsData;
-    if (!email || !password || !confirm_password || !dob || !name) return;
-    if (confirm_password !== password) return;
-    try {
-      const response = axios.post(`${BACK_END_PORT}/endpoint`, {
-        paramsData,
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const id = data.roleId;
+            // console.log(id);
+            localStorage.setItem('account', JSON.stringify(data));
+            if (id == 1) {
+              // router.push('/pmpages/pmhome');
+              router.push('adminpages/adminhome');
+            } else if (id == 2) {
+              router.push('/pmpages/pmhome');
+            } else if (id == 3) {
+              router.push('/pmpages/pmhome');
+            } else {
+              router.push('home');
+            }
+          })
+          .catch((error) => {
+            console.error('Lỗi:', error);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
       });
-      if (response.data.statusCode === 200) {
-        router.push('/home');
-      }
-    } catch (e) {
-      console.error(e);
-    }
   };
+  //end
 
   return (
-    <Stack>
-      return{' '}
-      <Stack className={styles.signUpForm + ' ' + inter.className}>
-        <Text className={styles.title}>Sign Up</Text>
-        <Box>
-          <Flex>
-            <Input
-              className={styles.inputField + ' ' + styles.userName}
-              onChange={handleChangeEmail}
-              placeholder='Account/Email'
-              value={paramsData?.email}
-            />
-            <Box w={'55px'}></Box>
-            <Input
-              className={styles.inputField + ' ' + styles.userName}
-              onChange={handleChangeName}
-              placeholder='Name'
-              value={paramsData?.name}
-            />
-          </Flex>
-          <Flex>
-            <InputGroup w={'379px'}>
-              <InputRightElement
-                height={'51px'}
-                w={'51px'}
-                onClick={() => setShowPassword(!showPassword)}
+    <Box>
+      <Box className={styles.homeBody}>
+        <Flex>
+          <Box className={styles.homeContent} id={styles.LoginForm}>
+            <Text className={styles.title1}>Welcome to SoftTrack</Text>
+            <Text className={styles.title2}>Please login with</Text>
+            <Center>
+              <Button
+                onClick={handleGoogleLogin}
+                colorScheme='red'
+                leftIcon={<AiFillGoogleCircle style={{ fontSize: '1.5em' }} />}
               >
-                {showPassword ? (
-                  <AiFillEye className={styles.eyeIcon} />
-                ) : (
-                  <AiOutlineEye className={styles.eyeIcon} />
-                )}
-              </InputRightElement>
-              <Input
-                type={showPassword ? 'text' : 'password'}
-                placeholder='Password'
-                className={styles.inputField + ' ' + styles.passWord}
-                onChange={handleChangePassword}
-                value={paramsData?.password}
-              />
-            </InputGroup>
-            <Box w={'55px'}></Box>
-
-            <Input
-              className={styles.inputField + ' ' + styles.userName}
-              onChange={handleChangeDob}
-              placeholder='dd/mm/yy'
-              type='date'
-              value={paramsData?.dob}
-            />
-          </Flex>
-          <Flex w={'90%'}>
-            <InputGroup w={'379px'}>
-              <InputRightElement
-                height={'51px'}
-                w={'51px'}
-                onClick={() => setShowComfirmPassword(!showComfirmPassword)}
-              >
-                {showComfirmPassword ? (
-                  <AiFillEye className={styles.eyeIcon} />
-                ) : (
-                  <AiOutlineEye className={styles.eyeIcon} />
-                )}
-              </InputRightElement>
-              <Input
-                type={showComfirmPassword ? 'text' : 'password'}
-                placeholder='Repeat Password'
-                className={styles.inputField + ' ' + styles.passWord}
-                onChange={handleChangeConfirmPassword}
-                value={paramsData?.confirm_password}
-              />
-            </InputGroup>
-          </Flex>
-        </Box>
-        <Button className={styles.buttonSignIn} onClick={handleRegisterAccount}>
-          REGISTER
-        </Button>
-      </Stack>
-      <Text className={styles.signUpText}>
-       Already have an account?{' '}
-        <Link href={'/'} className={styles.link}>
-          Sign In!
-        </Link>
-      </Text>
-    </Stack>
+                Google
+              </Button>
+            </Center>
+          </Box>
+          <Box className={styles.homeContent} id={styles.Banner}>
+            <div className={styles.Layer}></div>
+            <Center>
+              <Text className={styles.title1}>
+                SoftTrack: Navigating Your Software Assets with Precision
+              </Text>
+            </Center>
+            <Link id={styles.Link} href='/'>
+              Back to Home Page
+            </Link>
+          </Box>
+        </Flex>
+      </Box>
+    </Box>
   );
 }
 
-export default SignUpPage;
+export default SignInPage;
