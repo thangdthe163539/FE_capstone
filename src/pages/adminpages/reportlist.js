@@ -17,6 +17,7 @@ import {
   useDisclosure,
   Icon,
   useToast,
+  Textarea,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -46,13 +47,12 @@ import { BACK_END_PORT } from '../../../env';
 import Header2 from '@/components/layouts/Header/index2';
 //
 const defaultData = {
+  reportId: '',
   softwareId: '',
-  deviceId: '',
-  name: '',
-  version: '',
-  publisher: '',
   type: '',
-  installDate: '',
+  description: '',
+  startDate: '',
+  endDate: '',
   status: '',
 };
 
@@ -89,14 +89,10 @@ function ReportPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${BACK_END_PORT}/api/Report/list_reports_by_account/` +
-            account.accId,
-        );
+        const response = await axios.get(`${BACK_END_PORT}/api/Report`);
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
-            account.accId,
+          `${BACK_END_PORT}/api/v1/Software/ListSoftware`,
         );
         setSoftwareData(response2.data); // Assuming the API returns an array of objects
 
@@ -122,7 +118,6 @@ function ReportPage() {
         };
       });
       setReportData(mergedData);
-      console.log(reportData);
     }
   }, [data, softwareData]);
   // Filter function to search for assets
@@ -146,6 +141,49 @@ function ReportPage() {
     setSearchQuery(e.target.value);
   };
   //
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    console.log(formData);
+  };
+  // Function to get the current date and set it for the endDate field
+  const getCurrentDateString = () => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  //
+  const handleSaveAdd = async () => {
+    try {
+      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const response = await axios.post(
+        `${BACK_END_PORT}/api/Report/CreateReport`,
+        {
+          softwareId: formData.softwareId,
+          description: formData.description,
+          type: formData.type,
+          startDate: getCurrentDateString(),
+          endDate: formData.endDate,
+          status: 1,
+          // deviceId: formData.deviceId,
+        },
+      );
+      console.log('Data saved:', response.data);
+      setIsOpenAdd(false); // Close the modal after successful save
+      setFormData(defaultData);
+      setSelectedRow(new Set());
+      // Reload new data for the table
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/Report` + account.accId,
+      );
+      setData(newDataResponse.data);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
+  //
   const handleDetail = (item) => {
     localStorage.setItem('report', JSON.stringify(item));
     // console.log(localStorage.getItem('deviceId'));
@@ -155,7 +193,7 @@ function ReportPage() {
     <Box className={styles.bodybox}>
       <List>
         <ListItem className={styles.list}>
-          <Link href='/pmpages/pmhome' className={styles.listitem}>
+          <Link href='/adminpages/adminhome' className={styles.listitem}>
             Home
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Reports Management
@@ -172,6 +210,15 @@ function ReportPage() {
               w={300}
               mr={1}
             />
+            <Box>
+              <IconButton
+                aria-label='Add'
+                icon={<FaPlus />}
+                colorScheme='gray' // Choose an appropriate color
+                marginRight={1}
+                onClick={() => setIsOpenAdd(true)}
+              />
+            </Box>
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
@@ -199,7 +246,7 @@ function ReportPage() {
                     <Td display='none'>{item.reportId}</Td>
                     <Td className={styles.listitem}>
                       <Link
-                        href={'/pmpages/reportdetail'}
+                        href={'/adminpages/reportdetail'}
                         onClick={() => handleDetail(item)}
                       >
                         {item.name}
@@ -224,6 +271,85 @@ function ReportPage() {
           </TableContainer>
         </ListItem>
       </List>
+
+      <Modal // Modal add new software
+        isOpen={isOpenAdd}
+        onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
+        closeOnOverlayClick={false}
+        size='lg'
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Create New Report</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={8}>
+            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+              <Input
+                name='softwareID'
+                value={formData.softwareId}
+                onChange={handleInputChange}
+                display='none'
+              />
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Software</FormLabel>
+                  <Select
+                    name='softwareId'
+                    value={formData.softwareId}
+                    onChange={handleInputChange}
+                  >
+                    {softwareData
+                      .filter((item) => item.status === 1)
+                      .map((item) => (
+                        <option key={item.softwareId} value={item.softwareId}>
+                          {item.name}
+                        </option>
+                      ))}
+                  </Select>
+                </FormControl>
+                {/* Add more fields for the first column */}
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Type</FormLabel>
+                  <Select
+                    name='type'
+                    value={formData.type}
+                    onChange={handleInputChange}
+                  >
+                    <option value='Issue'>Issue</option>
+                    <option value='Risk'>Risk</option>
+                    <option value='Feedback'>Feedback</option>
+                  </Select>
+                </FormControl>
+                {/* Add more fields for the second column */}
+              </GridItem>
+            </Grid>
+            <FormControl mt={4}>
+              <FormLabel>Description</FormLabel>
+              <Textarea
+                name='description'
+                placeholder='Decription...'
+                width='100%'
+                minH={40}
+                value={formData.description}
+                onChange={handleInputChange}
+              />
+            </FormControl>
+            {/* Additional fields can be added to the respective columns */}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
+              Save
+            </Button>
+            <Button
+              onClick={() => (setIsOpenAdd(false), setFormData(defaultData))}
+            >
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
