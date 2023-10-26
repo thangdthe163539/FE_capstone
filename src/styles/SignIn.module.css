@@ -1,18 +1,5 @@
 .homeBody {
   text-align: center;
-  margin-top: 0px;
-  padding: 0 58px;
-  height: 100vh;
-  /* background-color: #4d9ffe; */
-}
-
-.loginForm {
-  width: 493px;
-  height: 485px;
-  flex-shrink: 0;
-  border-radius: 25px;
-  border: 1px solid #0075ff;
-  background: #fff;
   align-items: center;
   margin: auto;
   width: 100vw;
