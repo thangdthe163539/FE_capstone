@@ -17,6 +17,7 @@ import {
   useDisclosure,
   Icon,
   useToast,
+  Center,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -75,7 +76,7 @@ function SoftwarePage() {
 
   try {
     software = JSON.parse(localStorage.getItem('software'));
-    console.log(software);
+    // console.log(software);
   } catch (error) {
     console.error('Error saving data:', error);
   }
@@ -88,6 +89,9 @@ function SoftwarePage() {
   const [data, setData] = useState([]);
   const [deviceData, setDeviceData] = useState([]);
   const [softwareData, setSoftwareData] = useState([]);
+  const [reportData, setReportData] = useState([]);
+  const [showDeviceTable, setShowDeviceTable] = useState(true);
+  const [showReportTable, setShowReportTable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
@@ -120,47 +124,24 @@ function SoftwarePage() {
     }
   };
   //
-  const handleSaveEdit = async () => {
-    try {
-      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.put(`${BACK_END_PORT}/api/v1/Software`, {
-        softwareId: formData2.softwareId,
-        name: formData2.name,
-        version: formData2.version,
-        publisher: formData2.publisher,
-        type: formData2.type,
-        installDate: formData2.installDate,
-        status: formData2.status,
-        deviceId: formData2.deviceId,
-      });
-      console.log('Data saved:', response.data);
-      setIsOpenEdit(false); // Close the modal after successful save
-      setFormData2(defaultData);
-      setSelectedRow(new Set());
-      // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
-          account.accId,
-      );
-      setData(newDataResponse.data);
-    } catch (error) {
-      console.error('Error saving data:', error);
-    }
-  };
-  //
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
-            account.accId,
+          `${BACK_END_PORT}/api/Report/GetReportsForSoftware/` +
+            software.softwareId,
         );
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
-            account.accId,
+          `${BACK_END_PORT}/api/v1/Device/list_device_with_sw` +
+            software.softwareId,
         );
         setDeviceData(response2.data); // Assuming the API returns an array of objects
+        const response3 = await axios.get(
+          `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
+            account.accId,
+        );
+        setSoftwareData(response3.data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -172,70 +153,33 @@ function SoftwarePage() {
   }, []);
   //
   useEffect(() => {
-    if (data.length > 0 && deviceData.length > 0) {
-      const mergedData = data.map((software) => {
-        const device = deviceData.find(
-          (sw) => sw.deviceId === software.deviceId,
+    if (data.length > 0 && softwareData.length > 0) {
+      const mergedData = data.map((report) => {
+        const software = softwareData.find(
+          (sw) => sw.softwareId === report.softwareId,
         );
         return {
-          ...software,
-          deviceName: device ? device.name : 'Unknown Device',
+          ...report,
+          name: software.name ? software.name : report.softwareId,
         };
       });
-      setSoftwareData(mergedData);
+      setReportData(mergedData);
+      // console.log(reportData);
     }
-  }, [data, deviceData]);
-  // Filter function to search for assets
-  const filterAssets = () => {
-    const query = searchQuery.toLowerCase();
-    const filteredData = softwareData.filter((item) => {
-      const name = item.name.toLowerCase();
-      const publisher = item.publisher.toLowerCase();
-      const device = item.deviceName.toLowerCase();
-      return (
-        name.includes(query) ||
-        publisher.includes(query) ||
-        device.includes(query)
-      );
-    });
-    setFilteredSoftwareData(filteredData);
-  };
-
-  // Update filtered data whenever the search query changes
-  useEffect(() => {
-    filterAssets();
-  }, [searchQuery, softwareData]);
-
-  // Handle search input change
-  const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  }, [data, softwareData]);
   //
-  const handleDelete = async () => {
-    try {
-      await axios.delete(
-        `${BACK_END_PORT}/api/v1/Software?softwareid=` + formData2.softwareId,
-      );
-      setIsOpenDelete(false); // Close the "Confirm Delete" modal
-      setSelectedRow(new Set());
-
-      // Reload the data for the table after deletion
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
-          account.accId,
-      );
-      setData(newDataResponse.data);
-      toast({
-        title: 'Software Deleted',
-        description: 'The software has been successfully deleted.',
-        status: 'success',
-        duration: 3000, // Duration in milliseconds
-        isClosable: true,
-      });
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setLoading(false);
-    }
+  const text_select = {
+    backgroundColor: '#fff',
+    borderBottom: 'none',
+    color: '#4d9ffe',
+  };
+  const handleShowDevice = async () => {
+    setShowDeviceTable(true);
+    setShowReportTable(false);
+  };
+  const handleShowReport = async () => {
+    setShowDeviceTable(false);
+    setShowReportTable(true);
   };
   //
   return (
@@ -257,251 +201,153 @@ function SoftwarePage() {
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
+          <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
+            <Center>
+              <Box className={styles.card}>
+                <Text className={styles.text2}>Name</Text>
+                <Text className={styles.text2}>Publisher</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text>{software.name}</Text>
+                <Text>{software.publisher}</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text className={styles.text2}>Version</Text>
+                <Text className={styles.text2}>Release</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text>{software.version}</Text>
+                <Text>{software.release}</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text className={styles.text2}>Operation System</Text>
+                <Text className={styles.text2}>Status</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text>{software.os}</Text>
+                <Text>
+                  {software.status === 1
+                    ? 'No issue'
+                    : software.status === 2
+                    ? 'Have issue'
+                    : software.status === 3
+                    ? 'Deleted'
+                    : 'Unknown'}
+                </Text>
+              </Box>
+            </Center>
+          </Box>
+        </ListItem>
+        <ListItem className={styles.list}>
           <Flex>
-            <Grid
-              templateRows='repeat(2, 1fr)'
-              templateColumns='repeat(6, 1fr)'
+            <Text
+              className={styles.text}
+              onClick={handleShowDevice}
+              style={showDeviceTable ? text_select : {}}
             >
-              <GridItem rowSpan={1} colSpan={1}>
-                Name
-              </GridItem>
-              <GridItem rowGap={1} colSpan={1}>
-                {software.name}
-              </GridItem>
-              <GridItem rowSpan={1} colSpan={1}>
-                Version
-              </GridItem>
-              <GridItem rowGap={1} colSpan={1}>
-                {software.version}
-              </GridItem>
-              <GridItem rowSpan={1} colSpan={1}>
-                Operation System
-              </GridItem>
-              <GridItem rowGap={1} colSpan={1}>
-                {software.installDate}
-              </GridItem>
-              <GridItem rowSpan={1} colSpan={1}>
-                Publisher
-              </GridItem>
-              <GridItem rowGap={1} colSpan={1}>
-                {software.publisher}
-              </GridItem>
-              <GridItem rowSpan={1} colSpan={1}>
-                Release
-              </GridItem>
-              <GridItem rowGap={1} colSpan={1}>
-                {software.type}
-              </GridItem>
-              <GridItem rowSpan={1} colSpan={1}>
-                Status
-              </GridItem>
-              <GridItem rowGap={1} colSpan={1}>
-                {software.status ? 'Have issues' : 'No issues'}
-              </GridItem>
-            </Grid>
+              Assets
+            </Text>
+            <Text
+              className={styles.text}
+              onClick={handleShowReport}
+              style={showReportTable ? text_select : {}}
+            >
+              Reports
+            </Text>
+            <Spacer />
           </Flex>
         </ListItem>
+        {showDeviceTable && (
+          <ListItem className={styles.list}>
+            <TableContainer>
+              <Table
+                variant='striped'
+                colorScheme='gray'
+                className={styles.cTable}
+              >
+                <TableCaption className={styles.cTableCaption}>
+                  Total {deviceData.length} assets
+                </TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th className={styles.cTh}>Name</Th>
+                    <Th className={styles.cTh}>Manufacturer</Th>
+                    <Th className={styles.cTh}>Model</Th>
+                    <Th className={styles.cTh}>Serial Number</Th>
+                    <Th className={styles.cTh}>Last Successful Scan</Th>
+                    <Th className={styles.cTh}>Status</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {deviceData.map((item) => (
+                    <Tr
+                      key={item.deviceId}
+                      color={selectedRow === item.deviceId ? 'red' : 'black'}
+                    >
+                      <Td>{item.name}</Td>
+                      <Td>{item.manufacturer}</Td>
+                      <Td>{item.model}</Td>
+                      <Td>{item.serialNumber}</Td>
+                      <Td>{item.lastSuccesfullScan}</Td>
+                      <Td>
+                        {item.status === 1
+                          ? 'Active'
+                          : item.status === 2
+                          ? 'Inactive'
+                          : item.status === 3
+                          ? 'Deleted'
+                          : 'Unknown'}
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </ListItem>
+        )}
+        {showReportTable && (
+          <ListItem className={styles.list}>
+            <TableContainer>
+              <Table
+                variant='striped'
+                colorScheme='gray'
+                className={styles.cTable}
+              >
+                <TableCaption>Total {data.length} reports</TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th className={styles.cTh}>Software</Th>
+                    <Th className={styles.cTh}>Type</Th>
+                    <Th className={styles.cTh}>Start Date</Th>
+                    <Th className={styles.cTh}>End Date</Th>
+                    <Th className={styles.cTh}>Status</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {reportData.map((item) => (
+                    <Tr>
+                      <Td display='none'>{item.reportId}</Td>
+                      <Td>{item.name}</Td>
+                      <Td>{item.type}</Td>
+                      <Td>{item.startDate}</Td>
+                      <Td>{item.endDate}</Td>
+                      <Td>
+                        {item.status === 1
+                          ? 'Unsolved'
+                          : item.status === 2
+                          ? 'Solved'
+                          : item.status === 3
+                          ? 'Deleted'
+                          : 'Unknown'}
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </ListItem>
+        )}
       </List>
-
-      <Modal //Modal edit software
-        isOpen={isOpenEdit}
-        onClose={() => setIsOpenEdit(false)}
-        closeOnOverlayClick={false}
-        size='lg'
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Software</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-              <Input
-                name='softwareId'
-                value={formData2.softwareId}
-                onChange={handleInputChange2}
-                display='none'
-              />
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    name='name'
-                    value={formData2.name}
-                    onChange={handleInputChange2}
-                    required
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Version</FormLabel>
-                  <Input
-                    name='version'
-                    value={formData2.version}
-                    onChange={handleInputChange2}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Release</FormLabel>
-                  <Input
-                    name='type'
-                    value={formData2.type}
-                    onChange={handleInputChange2}
-                  />
-                </FormControl>
-                {/* Add more fields for the first column */}
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Publisher</FormLabel>
-                  <Input
-                    name='publisher'
-                    value={formData2.publisher}
-                    onChange={handleInputChange2}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Install Date</FormLabel>
-                  <Input
-                    name='installDate'
-                    value={formData2.installDate}
-                    // onChange={handleInputChange}
-                    isDisabled={true}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Status</FormLabel>
-                  <Input
-                    name='status'
-                    value={formData2.status}
-                    // onChange={handleInputChange}
-                    isDisabled={true}
-                  />
-                </FormControl>
-                {/* Add more fields for the second column */}
-              </GridItem>
-            </Grid>
-            {/* Additional fields can be added to the respective columns */}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveEdit}>
-              Save
-            </Button>
-            <Button onClick={() => setIsOpenEdit(false)}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      <Modal // Modal add new software
-        isOpen={isOpenAdd}
-        onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
-        closeOnOverlayClick={false}
-        size='lg'
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add New Software</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-              <Input
-                name='softwareID'
-                value={formData.softwareId}
-                onChange={handleInputChange}
-                display='none'
-              />
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    name='name'
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Version</FormLabel>
-                  <Input
-                    name='version'
-                    value={formData.version}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Release</FormLabel>
-                  <Input
-                    name='type'
-                    value={formData.type}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                {/* Add more fields for the first column */}
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Publisher</FormLabel>
-                  <Input
-                    name='publisher'
-                    value={formData.publisher}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Install Date</FormLabel>
-                  <Input
-                    name='installDate'
-                    value={formData.installDate}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Asset</FormLabel>
-                  <Select
-                    name='deviceId'
-                    value={formData.deviceId}
-                    onChange={handleInputChange}
-                  >
-                    {deviceData.map((item) => (
-                      <option key={item.deviceId} value={item.deviceId}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-                {/* Add more fields for the second column */}
-              </GridItem>
-            </Grid>
-            {/* Additional fields can be added to the respective columns */}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
-              Save
-            </Button>
-            <Button
-              onClick={() => (setIsOpenAdd(false), setFormData(defaultData))}
-            >
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      <Modal isOpen={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Confirm Delete</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Are you sure you want to delete this software?</Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='red' mr={3} onClick={handleDelete}>
-              Delete
-            </Button>
-            <Button onClick={() => setIsOpenDelete(false)}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </Box>
   );
 }

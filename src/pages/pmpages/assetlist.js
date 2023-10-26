@@ -76,7 +76,7 @@ function AssetsPage() {
         // router.push('http://localhost:3000');
       }
     }
-  }, []);
+  });
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -115,26 +115,30 @@ function AssetsPage() {
   const handleSave = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.put(`${BACK_END_PORT}/api/v1/Device/UpdateDeviceWith`+formData.deviceId, {
-        name: formData.name,
-        cpu: formData.cpu,
-        gpu: formData.gpu,
-        ram: formData.ram,
-        memory: formData.memory,        
-        ipAddress: formData.ipAddress,
-        manufacturer: formData.manufacturer,
-        model: formData.model,
-        serialNumber: formData.serialNumber,
-        lastSuccessfullScan: formData.lastSuccessfullScan,
-        status: formData.status,
-      });
+      const response = await axios.put(
+        `${BACK_END_PORT}/api/v1/Device/UpdateDeviceWith` + formData.deviceId,
+        {
+          name: formData.name,
+          cpu: formData.cpu,
+          gpu: formData.gpu,
+          ram: formData.ram,
+          memory: formData.memory,
+          ipAddress: formData.ipAddress,
+          manufacturer: formData.manufacturer,
+          model: formData.model,
+          serialNumber: formData.serialNumber,
+          lastSuccessfullScan: formData.lastSuccessfullScan,
+          status: formData.status,
+        },
+      );
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
       setFormData(defaultData);
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Device/list_device_with_user` + account.accId,
+        `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
+          account.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -146,7 +150,7 @@ function AssetsPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
+          `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
             account.accId,
         );
         setData(response.data); // Assuming the API returns an array of objects
@@ -180,11 +184,11 @@ function AssetsPage() {
     const query = searchQuery.toLowerCase();
     const filteredData = deviceData.filter((item) => {
       const name = item.name.toLowerCase();
-      const account = item.accName.toLowerCase();
+      const model = item.model.toLowerCase();
       const manufacturer = item.manufacturer.toLowerCase();
       return (
         name.includes(query) ||
-        account.includes(query) ||
+        model.includes(query) ||
         manufacturer.includes(query)
       );
     });
@@ -209,21 +213,23 @@ function AssetsPage() {
     }
   };
   const handleDetail = (item) => {
-    localStorage.setItem('deviceId', JSON.stringify(item.deviceId));
+    localStorage.setItem('device', JSON.stringify(item));
     // console.log(localStorage.getItem('deviceId'));
   };
   //
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `${BACK_END_PORT}/api/v1/Device/with_key?DeviceId=` + formData.deviceId,
+        `${BACK_END_PORT}/api/v1/Device/DeleteDeviceWith_key?DeviceId` +
+          formData.deviceId,
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
       setSelectedRow(new Set());
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Device/list_device_with_user` + account.accId,
+        `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
+          account.accId,
       );
       setData(newDataResponse.data);
       toast({
@@ -243,10 +249,7 @@ function AssetsPage() {
     <Box className={styles.bodybox}>
       <List>
         <ListItem className={styles.list}>
-          <Link
-            href='/pmpages/pmhome'
-            className={styles.listitem}
-          >
+          <Link href='/pmpages/pmhome' className={styles.listitem}>
             Home
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Assets Management
@@ -301,12 +304,7 @@ function AssetsPage() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th className={styles.cTh} display='none'>
-                    Account
-                  </Th>
                   <Th className={styles.cTh}>Name</Th>
-                  <Th className={styles.cTh}>IP Address</Th>
-                  <Th className={styles.cTh}>MAC Address</Th>
                   <Th className={styles.cTh}>Manufacturer</Th>
                   <Th className={styles.cTh}>Model</Th>
                   <Th className={styles.cTh}>Serial Number</Th>
@@ -324,8 +322,6 @@ function AssetsPage() {
                     }}
                     onClick={() => handleRowClick(item)}
                   >
-                    <Td display='none'>{item.deviceId}</Td>
-                    <Td display='none'>{item.accName}</Td>
                     <Td className={styles.listitem}>
                       <Link
                         href={'/pmpages/assetdetail'}
@@ -334,13 +330,19 @@ function AssetsPage() {
                         {item.name}
                       </Link>
                     </Td>
-                    <Td>{item.ipAddress}</Td>
-                    <Td>{item.macAddress}</Td>
                     <Td>{item.manufacturer}</Td>
                     <Td>{item.model}</Td>
                     <Td>{item.serialNumber}</Td>
-                    <Td>{item.lastSuccessfullScan}</Td>
-                    <Td>{item.status ? 'Active' : 'Disabled'}</Td>
+                    <Td>{item.lastSuccesfullScan}</Td>
+                    <Td>
+                      {item.status === 1
+                        ? 'Active'
+                        : item.status === 2
+                        ? 'Inactive'
+                        : item.status === 3
+                        ? 'Deleted'
+                        : 'Unknown'}
+                    </Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -378,52 +380,10 @@ function AssetsPage() {
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>IP Address</FormLabel>
-                  <Input
-                    name='ipAddress'
-                    value={formData.ipAddress}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
                   <FormLabel>Manufacturer</FormLabel>
                   <Input
                     name='manufacturer'
                     value={formData.manufacturer}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Serial Number</FormLabel>
-                  <Input
-                    name='serialNumber'
-                    value={formData.serialNumber}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                {/* Add more fields for the first column */}
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Account</FormLabel>
-                  <Select
-                    name='accId'
-                    value={formData.accId}
-                    onChange={handleInputChange}
-                    isDisabled
-                  >
-                    {accData.map((item) => (
-                      <option key={item.accId} value={item.accId}>
-                        {item.account1}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl>
-                  <FormLabel>MAC Address</FormLabel>
-                  <Input
-                    name='macAddress'
-                    value={formData.macAddress}
                     onChange={handleInputChange}
                   />
                 </FormControl>
@@ -436,10 +396,61 @@ function AssetsPage() {
                   />
                 </FormControl>
                 <FormControl>
+                  <FormLabel>Serial Number</FormLabel>
+                  <Input
+                    name='serialNumber'
+                    value={formData.serialNumber}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>IP Address</FormLabel>
+                  <Input
+                    name='ipAddress'
+                    value={formData.ipAddress}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                {/* Add more fields for the first column */}
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>CPU</FormLabel>
+                  <Input
+                    name='cpu'
+                    value={formData.cpu}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>GPU</FormLabel>
+                  <Input
+                    name='gpu'
+                    value={formData.gpu}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>RAM</FormLabel>
+                  <Input
+                    name='ram'
+                    value={formData.ram}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Memory</FormLabel>
+                  <Input
+                    name='memory'
+                    value={formData.memory}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl>
                   <FormLabel>Last Successful Scan</FormLabel>
                   <Input
-                    name='lastSuccessfullScan'
-                    value={formData.lastSuccessfullScan}
+                    name='lastSuccesfullScan'
+                    value={formData.lastSuccesfullScan}
                     onChange={handleInputChange}
                   />
                 </FormControl>
@@ -454,8 +465,9 @@ function AssetsPage() {
                 value={formData.status}
                 onChange={handleInputChange}
               >
-                <option value='True'>Active</option>
-                <option value='False'>Disable</option>
+                <option value='1'>Active</option>
+                <option value='2'>Inactive</option>
+                <option value='3'>Deleted</option>
               </Select>
             </FormControl>
           </ModalBody>

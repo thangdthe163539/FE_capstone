@@ -61,24 +61,30 @@ function AssetDetailPage() {
   };
 
   const router = useRouter();
-  let deviceID = null;
+  let device = null;
 
   try {
-    deviceID = JSON.parse(localStorage.getItem('deviceId'));
-    if (!deviceID || deviceID == null) {
+    device = JSON.parse(localStorage.getItem('device'));
+    if (!device || device == null) {
       router.push('/pmpages/assetlist');
-    } else {
-      defaultData = {
-        ...defaultData,
-        deviceId: deviceID,
-      };
     }
   } catch (error) {
     console.error('Error saving data:', error);
   }
-
   //
+  let account = null;
 
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      account = JSON.parse(storedAccount);
+      if (!account || account == null) {
+        // router.push('http://localhost:3000');
+      }
+    }
+  });
   // console.log(BACK_END_PORT);
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
@@ -96,12 +102,12 @@ function AssetDetailPage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    console.log(formData);
+    // console.log(formData);
   };
   const handleInputChange2 = (e) => {
     const { name, value } = e.target;
     setFormData2({ ...formData2, [name]: value });
-    console.log(formData2);
+    // console.log(formData2);
   };
   //
   //
@@ -138,7 +144,10 @@ function AssetDetailPage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_device` + deviceID,
+        `${BACK_END_PORT}/api/v1/Software/GetSoftwareForAccountAndDevice?accountId=` +
+          account.accId +
+          `&deviceId=` +
+          device.deviceId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -165,7 +174,10 @@ function AssetDetailPage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_device` + deviceID,
+        `${BACK_END_PORT}/api/v1/Software/GetSoftwareForAccountAndDevice?accountId=` +
+          account.accId +
+          `&deviceId=` +
+          device.deviceId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -177,7 +189,10 @@ function AssetDetailPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_software_by_device` + deviceID,
+          `${BACK_END_PORT}/api/v1/Software/GetSoftwareForAccountAndDevice?accountId=` +
+            account.accId +
+            `&deviceId=` +
+            device.deviceId,
         );
         setData(response.data); // Assuming the API returns an array of objects
       } catch (error) {
@@ -199,7 +214,10 @@ function AssetDetailPage() {
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_device` + deviceID,
+        `${BACK_END_PORT}/api/v1/Software/GetSoftwareForAccountAndDevice?accountId=` +
+          account.accId +
+          `&deviceId=` +
+          device.deviceId,
       );
       setData(newDataResponse.data);
       toast({
@@ -240,23 +258,63 @@ function AssetDetailPage() {
     <Box className={styles.bodybox}>
       <List>
         <ListItem className={styles.list}>
-          <Link
-            href='/pmpages/pmhome'
-            className={styles.listitem}
-          >
+          <Link href='/pmpages/pmhome' className={styles.listitem}>
             Home
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>
-          <Link
-            href='/pmpages/assetlist'
-            className={styles.listitem}
-          >
+          <Link href='/pmpages/assetlist' className={styles.listitem}>
             Assets Management
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Asset Detail
         </ListItem>
         <ListItem className={styles.list}>
           <Text fontSize='2xl'>Asset Detail</Text>
+        </ListItem>
+        <ListItem className={styles.list}>
+          <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
+            <Center>
+              <Box className={styles.card}>
+                <Text className={styles.text2}>Name</Text>
+                <Text className={styles.text2}>Manufacturer</Text>
+                <Text className={styles.text2}>Model</Text>
+                <Text className={styles.text2}>Serial Number</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text>{device.name}</Text>
+                <Text>{device.manufacturer}</Text>
+                <Text>{device.model}</Text>
+                <Text>{device.serialNumber}</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text className={styles.text2}>CPU</Text>
+                <Text className={styles.text2}>GPU</Text>
+                <Text className={styles.text2}>RAM</Text>
+                <Text className={styles.text2}>Memory</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text>{device.cpu}</Text>
+                <Text>{device.gpu}</Text>
+                <Text>{device.ram}GB</Text>
+                <Text>{device.memory}GB</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text className={styles.text2}>Last Successful Scan</Text>
+                <Text className={styles.text2}>Status</Text>
+              </Box>
+              <Box className={styles.card}>
+                <Text>{device.lastSuccesfullScan}</Text>
+                <Text>
+                  {device.status === 1
+                    ? 'Active'
+                    : device.status === 2
+                    ? 'Inactive'
+                    : device.status === 3
+                    ? 'Deleted'
+                    : 'Unknown'}
+                </Text>
+              </Box>
+            </Center>
+          </Box>
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
@@ -275,92 +333,13 @@ function AssetDetailPage() {
             >
               License Keys
             </Text>
-            <Text
+            {/* <Text
               className={styles.text}
               onClick={handleShowAntivirus}
               style={showAntivirusTable ? text_select : {}}
             >
               Antivirus
-            </Text>
-            <Spacer />
-            {showSoftwareTable && (
-              <Box>
-                <IconButton
-                  aria-label='Add'
-                  icon={<FaPlus />}
-                  colorScheme='gray' // Choose an appropriate color
-                  marginRight={1}
-                  onClick={() => setIsOpenAdd(true)}
-                />
-                <IconButton
-                  aria-label='Edit'
-                  icon={<FaEdit />}
-                  colorScheme='gray' // Choose an appropriate color
-                  marginRight={1}
-                  onClick={() => setIsOpenEdit(true)}
-                  isDisabled={isButtonDisabled}
-                />
-                <IconButton
-                  aria-label='Delete'
-                  icon={<FaTrash />}
-                  colorScheme='gray' // Choose an appropriate color
-                  onClick={() => setIsOpenDelete(true)}
-                  isDisabled={isButtonDisabled}
-                />
-              </Box>
-            )}
-            {showLicenseTable && (
-              <Box>
-                <IconButton
-                  aria-label='Add'
-                  icon={<FaPlus />}
-                  colorScheme='gray' // Choose an appropriate color
-                  marginRight={1}
-                  onClick={() => setIsOpenAdd(true)}
-                />
-                <IconButton
-                  aria-label='Edit'
-                  icon={<FaEdit />}
-                  colorScheme='gray' // Choose an appropriate color
-                  marginRight={1}
-                  onClick={() => setIsOpenEdit(true)}
-                  isDisabled={isButtonDisabled}
-                />
-                <IconButton
-                  aria-label='Delete'
-                  icon={<FaTrash />}
-                  colorScheme='gray' // Choose an appropriate color
-                  onClick={() => setIsOpenDelete(true)}
-                  isDisabled={isButtonDisabled}
-                />
-              </Box>
-            )}
-            {showAntivirusTable && (
-              <Box>
-                {/* <IconButton
-                  aria-label='Add'
-                  icon={<FaPlus />}
-                  colorScheme='gray' // Choose an appropriate color
-                  marginRight={1}
-                  onClick={() => setIsOpenAdd(true)}
-                />
-                <IconButton
-                  aria-label='Edit'
-                  icon={<FaEdit />}
-                  colorScheme='gray' // Choose an appropriate color
-                  marginRight={1}
-                  onClick={() => setIsOpenEdit(true)}
-                  isDisabled={isButtonDisabled}
-                /> */}
-                <IconButton
-                  aria-label='Delete'
-                  icon={<FaTrash />}
-                  colorScheme='gray' // Choose an appropriate color
-                  onClick={() => setIsOpenDelete(true)}
-                  isDisabled={isButtonDisabled}
-                />
-              </Box>
-            )}
+            </Text> */}
           </Flex>
         </ListItem>
         {showSoftwareTable && (

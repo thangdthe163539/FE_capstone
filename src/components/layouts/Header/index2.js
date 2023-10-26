@@ -18,7 +18,7 @@ function Header2() {
   }, []);
 
   function handleLogout() {
-    localStorage.removeItem('account');
+    localStorage.clear();
     router.push('/');
   }
 
@@ -29,9 +29,9 @@ function Header2() {
           <Link href={'/'}>SoftTrack</Link>
         </Text>
         <Flex>
-          {account2 && account2.account1 != null ? (
+          {account2 && account2.name != null ? (
             <Text className={styles.navbarItem}>
-              Welcome {account2.account1}
+              {account2.roleName}: {account2.name}
             </Text>
           ) : null}
           <Button

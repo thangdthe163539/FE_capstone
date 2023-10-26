@@ -47,7 +47,7 @@ function SignInPage() {
         })
           .then((response) => response.json())
           .then((data) => {
-            const id = data.roleAccounts[0].roleId;
+            const id = data.roleId;
             // console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {

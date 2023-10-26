@@ -52,8 +52,8 @@ const defaultData = {
   version: '',
   release: '',
   publisher: '',
-  type: '',
-  os: '',
+  type: 'Web App',
+  os: 'Window',
   installDate: '',
   status: '',
 };
@@ -68,11 +68,12 @@ function SoftwarePage() {
     const storedAccount = localStorage.getItem('account');
     if (storedAccount) {
       account = JSON.parse(storedAccount);
+      defaultData.accId = account.accId;
       if (!account || account == null) {
         // router.push('http://localhost:3000');
       }
     }
-  }, []);
+  });
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -91,7 +92,6 @@ function SoftwarePage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    // console.log(formData);
   };
   const handleInputChange2 = (e) => {
     const { name, value } = e.target;
@@ -110,6 +110,7 @@ function SoftwarePage() {
     } else {
       setSelectedRow(item.softwareId);
       setFormData2(item);
+      // console.log(formData2);
       setButtonDisabled(false);
     }
   };
@@ -120,7 +121,6 @@ function SoftwarePage() {
       const response = await axios.post(
         `${BACK_END_PORT}/api/v1/Software/CreateSW`,
         {
-          //softwareId: formData.accId,
           accId: formData.accId,
           name: formData.name,
           publisher: formData.publisher,
@@ -138,7 +138,7 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
           account.accId,
       );
       setData(newDataResponse.data);
@@ -169,7 +169,7 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
           account.accId,
       );
       setData(newDataResponse.data);
@@ -182,7 +182,7 @@ function SoftwarePage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+          `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
             account.accId,
         );
         setData(response.data); // Assuming the API returns an array of objects
@@ -222,12 +222,7 @@ function SoftwarePage() {
     const filteredData = softwareData.filter((item) => {
       const name = item.name.toLowerCase();
       const publisher = item.publisher.toLowerCase();
-      const device = item.deviceName.toLowerCase();
-      return (
-        name.includes(query) ||
-        publisher.includes(query) ||
-        device.includes(query)
-      );
+      return name.includes(query) || publisher.includes(query);
     });
     setFilteredSoftwareData(filteredData);
   };
@@ -258,7 +253,7 @@ function SoftwarePage() {
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
+        `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
           account.accId,
       );
       setData(newDataResponse.data);
@@ -302,13 +297,7 @@ function SoftwarePage() {
                 icon={<FaPlus />}
                 colorScheme='gray' // Choose an appropriate color
                 marginRight={1}
-                onClick={() => (
-                  setFormData({
-                    ...formData,
-                    deviceId: deviceData[0].deviceId,
-                  }),
-                  setIsOpenAdd(true)
-                )}
+                onClick={() => setIsOpenAdd(true)}
               />
               <IconButton
                 aria-label='Edit'
@@ -346,36 +335,46 @@ function SoftwarePage() {
                   <Th className={styles.cTh}>Publisher</Th>
                   <Th className={styles.cTh}>Versions</Th>
                   <Th className={styles.cTh}>Release</Th>
-                  <Th className={styles.cTh}>Install Date</Th>
+                  <Th className={styles.cTh}>Type</Th>
                   <Th className={styles.cTh}>Status</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredSoftwareData.map((item) => (
-                  <Tr
-                    _hover={{
-                      cursor: 'pointer',
-                    }}
-                    key={item.softwareId}
-                    color={selectedRow === item.softwareId ? 'red' : 'black'}
-                    onClick={() => handleRowClick(item)}
-                  >
-                    <Td className={styles.listitem}>
-                      <Link
-                        href={'/pmpages/softwaredetail'}
-                        onClick={() => handleDetail(item)}
-                      >
-                        {item.name}
-                      </Link>
-                    </Td>
-                    <Td>{item.deviceName}</Td>
-                    <Td>{item.publisher}</Td>
-                    <Td>{item.version}</Td>
-                    <Td>{item.type}</Td>
-                    <Td>{item.installDate}</Td>
-                    <Td>{item.status ? 'Have Issues' : 'No Issues'}</Td>
-                  </Tr>
-                ))}
+                {filteredSoftwareData
+                  .filter((item) => item.status === 1 || item.status === 2)
+                  .map((item) => (
+                    <Tr
+                      _hover={{
+                        cursor: 'pointer',
+                      }}
+                      key={item.softwareId}
+                      color={selectedRow === item.softwareId ? 'red' : 'black'}
+                      onClick={() => handleRowClick(item)}
+                    >
+                      <Td className={styles.listitem}>
+                        <Link
+                          href={'/pmpages/softwaredetail'}
+                          onClick={() => handleDetail(item)}
+                        >
+                          {item.name}
+                        </Link>
+                      </Td>
+                      <Td>{item.deviceName}</Td>
+                      <Td>{item.publisher}</Td>
+                      <Td>{item.version}</Td>
+                      <Td>{item.release}</Td>
+                      <Td>{item.type}</Td>
+                      <Td>
+                        {item.status === 1
+                          ? 'No issue'
+                          : item.status === 2
+                          ? 'Have issue'
+                          : item.status === 3
+                          ? 'Deleted'
+                          : 'Unknown'}
+                      </Td>
+                    </Tr>
+                  ))}
               </Tbody>
             </Table>
           </TableContainer>
@@ -421,8 +420,8 @@ function SoftwarePage() {
                 <FormControl>
                   <FormLabel>Release</FormLabel>
                   <Input
-                    name='type'
-                    value={formData2.type}
+                    name='release'
+                    value={formData2.release}
                     onChange={handleInputChange2}
                   />
                 </FormControl>
@@ -438,22 +437,29 @@ function SoftwarePage() {
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Install Date</FormLabel>
-                  <Input
-                    name='installDate'
-                    value={formData2.installDate}
-                    // onChange={handleInputChange}
-                    isDisabled={true}
-                  />
+                  <FormLabel>Type</FormLabel>
+                  <Select
+                    name='type'
+                    value={formData2.type}
+                    onChange={handleInputChange2}
+                  >
+                    <option value='Web App'>Web App</option>
+                    <option value='Desktop App'>Desktop App</option>
+                  </Select>
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Status</FormLabel>
-                  <Input
-                    name='status'
-                    value={formData2.status}
-                    // onChange={handleInputChange}
-                    isDisabled={true}
-                  />
+                  <FormLabel>OS</FormLabel>
+                  <Select
+                    name='os'
+                    value={formData2.os}
+                    onChange={handleInputChange2}
+                  >
+                    <option value='Window'>Window</option>
+                    <option value='macOS'>macOS</option>
+                    <option value='Linux'>Linux</option>
+                    <option value='Android'>Android</option>
+                    <option value='iOS'>iOS</option>
+                  </Select>
                 </FormControl>
                 {/* Add more fields for the second column */}
               </GridItem>
@@ -477,7 +483,7 @@ function SoftwarePage() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New Software</ModalHeader>
+          <ModalHeader>Create New Software</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(2, 1fr)' gap={4}>
@@ -508,8 +514,8 @@ function SoftwarePage() {
                 <FormControl>
                   <FormLabel>Release</FormLabel>
                   <Input
-                    name='type'
-                    value={formData.type}
+                    name='release'
+                    value={formData.release}
                     onChange={handleInputChange}
                   />
                 </FormControl>
@@ -525,26 +531,28 @@ function SoftwarePage() {
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Install Date</FormLabel>
-                  <Input
-                    name='installDate'
-                    value={formData.installDate}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Asset</FormLabel>
+                  <FormLabel>Type</FormLabel>
                   <Select
-                    name='deviceId'
-                    value={formData.deviceId}
+                    name='type'
+                    value={formData.type}
                     onChange={handleInputChange}
                   >
-                    {deviceData.map((item) => (
-                      <option key={item.deviceId} value={item.deviceId}>
-                        {item.name}
-                      </option>
-                    ))}
+                    <option value='Web app'>Web app</option>
+                    <option value='Desktop app'>Desktop app</option>
+                  </Select>
+                </FormControl>
+                <FormControl>
+                  <FormLabel>OS</FormLabel>
+                  <Select
+                    name='os'
+                    value={formData.os}
+                    onChange={handleInputChange}
+                  >
+                    <option value='Window'>Window</option>
+                    <option value='macOS'>macOS</option>
+                    <option value='Linux'>Linux</option>
+                    <option value='Android'>Android</option>
+                    <option value='iOS'>iOS</option>
                   </Select>
                 </FormControl>
                 {/* Add more fields for the second column */}

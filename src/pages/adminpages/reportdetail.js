@@ -95,6 +95,12 @@ function AssetDetailPage() {
       status: e.target.value,
     });
   };
+  const handleTypeChange = (e) => {
+    setFormData({
+      ...formData,
+      type: e.target.value,
+    });
+  };
   // Function to get the current date and set it for the endDate field
   const getCurrentDateString = () => {
     const currentDate = new Date();
@@ -140,7 +146,7 @@ function AssetDetailPage() {
         duration: 3000, // Duration in milliseconds
         isClosable: true,
       });
-      router.push('/pmpages/reportlist');
+      router.push('/adminpages/reportlist');
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -149,11 +155,11 @@ function AssetDetailPage() {
     <Box className={styles.bodybox}>
       <List>
         <ListItem className={styles.list}>
-          <Link href='/pmpages/pmhome' className={styles.listitem}>
+          <Link href='/adminpages/adminhome' className={styles.listitem}>
             Home
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>
-          <Link href='/pmpages/reportlist' className={styles.listitem}>
+          <Link href='/adminpages/reportlist' className={styles.listitem}>
             Reports Management
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Report Detail
@@ -169,7 +175,16 @@ function AssetDetailPage() {
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>Type:</Text>
-              <Text className={styles.text1}>{formData.type}</Text>
+              <Select
+                name='type'
+                value={formData.type}
+                onChange={handleTypeChange} // Add onChange handler
+                border='none'
+              >
+                <option value='Issue'>Issue</option>
+                <option value='Risk'>Risk</option>
+                <option value='Feedback'>Feedback</option>
+              </Select>
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>
