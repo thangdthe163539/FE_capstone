@@ -34,3 +34,35 @@
 .cTableCaption {
   position: top;
 }
+
+.text {
+  padding: 8px 20px;
+  font-size: 18px;
+  background-color: rgb(237, 242, 247);
+  border: 1px solid rgb(153, 153, 152);
+}
+.text:hover {
+  /* text-decoration: underline; */
+  cursor: pointer;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0px 20px;
+}
+.card strong {
+  padding: 5px;
+}
+.card p {
+  padding: 5px;
+  margin-right: 40px;
+}
+
+.text1 {
+  padding: 10px;
+}
+.text2 {
+  font-weight: bold;
+}

@@ -1,29 +1,17 @@
-import {
-  Box,
-  Flex,
-  Button,
-  Text,
-  InputGroup,
-  InputRightElement,
-  Stack,
-  Input,
-} from '@chakra-ui/react';
+import { Box, Flex, Button, Text, Stack, Center } from '@chakra-ui/react';
 import { Inter } from 'next/font/google';
 import styles from '@/styles/SignIn.module.css';
 import Link from 'next/link';
-
 import { AiOutlineEye, AiFillEye } from 'react-icons/ai';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../env';
-import Header from '@/components/layouts/Header';
+import { AiFillGoogleCircle } from 'react-icons/ai';
 
 import { initializeApp } from 'firebase/app';
 
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-
-const inter = Inter({ subsets: ['latin'] });
 
 function SignInPage() {
   const router = useRouter();
@@ -46,7 +34,7 @@ function SignInPage() {
     signInWithPopup(auth, provider)
       .then((result) => {
         const mail = result.user.email;
-        const url = 'http://localhost:5001/api/v1/Account/login';
+        const url = `${BACK_END_PORT}/api/v1/Account/login`;
 
         const requestData = mail;
 
@@ -59,7 +47,7 @@ function SignInPage() {
         })
           .then((response) => response.json())
           .then((data) => {
-            const id = data.roleAccounts[0].roleId;
+            const id = data.roleId;
             // console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {
@@ -84,29 +72,35 @@ function SignInPage() {
   //end
 
   return (
-    <Box className={styles.homeBody + ' ' + inter.className}>
-      <Flex>
-        <Flex alignItems={'center'}>
-          <Stack className={styles.loginForm}>
-            <Box className={styles.loginFormTitle}>
-              <Text className={styles.title1}>Welcome back,</Text>
-              <Text className={styles.title2}>Log In</Text>
-            </Box>
-            <Button onClick={handleGoogleLogin} colorScheme='red'>
-              Login with Google
-            </Button>
-          </Stack>
-          <Box className={styles.dividerVertical} />
+    <Box>
+      <Box className={styles.homeBody}>
+        <Flex>
+          <Box className={styles.homeContent} id={styles.LoginForm}>
+            <Text className={styles.title1}>Welcome to SoftTrack</Text>
+            <Text className={styles.title2}>Please login with</Text>
+            <Center>
+              <Button
+                onClick={handleGoogleLogin}
+                colorScheme='red'
+                leftIcon={<AiFillGoogleCircle style={{ fontSize: '1.5em' }} />}
+              >
+                Google
+              </Button>
+            </Center>
+          </Box>
+          <Box className={styles.homeContent} id={styles.Banner}>
+            <div className={styles.Layer}></div>
+            <Center>
+              <Text className={styles.title1}>
+                SoftTrack: Navigating Your Software Assets with Precision
+              </Text>
+            </Center>
+            <Link id={styles.Link} href='/'>
+              Back to Home Page
+            </Link>
+          </Box>
         </Flex>
-        <Flex className={styles.introduce}>
-          <Flex className={styles.intro}>
-            <Text className={styles.title}>Welcome to SoftTrack,</Text>
-            <Text className={styles.detail}>
-              SoftTrack: Navigating Your Software Assets with Precision
-            </Text>
-          </Flex>
-        </Flex>
-      </Flex>
+      </Box>
     </Box>
   );
 }

@@ -7,13 +7,19 @@ import { useRouter } from 'next/router';
 export default function App({ Component, pageProps }) {
   //
   const router = useRouter();
-  const pathsToShowHeader = ['home', 'sign-up', 'login', ''];
+  const pathsToShowHeader = ['home', ''];
   const shouldShowHeader = pathsToShowHeader.includes(router.pathname);
   //
   return (
     <ChakraProvider>
-      <Box background={'#4d9ffe'} minHeight={'100vh'}>
-        {router.pathname === '/' || shouldShowHeader ? <Header /> : <Header2 />}
+      <Box minHeight={'100vh'}>
+        {router.pathname === '/' ? (
+          ''
+        ) : shouldShowHeader ? (
+          <Header />
+        ) : (
+          <Header2 />
+        )}
         <Component {...pageProps} />
       </Box>
     </ChakraProvider>
