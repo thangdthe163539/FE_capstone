@@ -51,7 +51,7 @@ function UpdateUser() {
         })
             .then(response => response.json())
             .then(data => {
-                const id = data.accId;
+                const id = data[0].accId;
                 setId(id);
             })
             .catch(error => {
@@ -74,8 +74,7 @@ function UpdateUser() {
                 status: Boolean(isActive),
                 roleId: parseInt(role)
             };
-            console.log('adsfksdjf');
-            console.log(isActive);
+
             fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -85,13 +84,13 @@ function UpdateUser() {
             })
                 .then(response => {
                     if (response.ok) {
-                        showAlertWithTimeout('Update success', 3000);
+                        alert('Update success');
                     } else {
-                        showAlertWithTimeout('Update failed', 3000);
+                        alert('Update failed');
                     }
                 })
                 .catch(error => {
-                    showAlertWithTimeout('Update failed', 3000);
+                    alert('Update failed');
                     console.error('Lỗi:', error);
                 });
         } else {
@@ -99,14 +98,6 @@ function UpdateUser() {
         }
 
     };
-
-    function showAlertWithTimeout(message, timeout) {
-        alert(message);
-        setTimeout(function () {
-            // Đóng thông báo sau một khoảng thời gian timeout (được tính bằng mili giây)
-            window.close();
-        }, timeout);
-    }
 
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
         <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%', backgroundColor: 'white', width: '50%' }}>
