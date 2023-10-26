@@ -93,6 +93,8 @@ function AssetDetailPage() {
   const [formData, setFormData] = useState(defaultData);
   const [formData2, setFormData2] = useState(defaultData);
   const [data, setData] = useState([]);
+  const [dataLicense, setDataLicense] = useState([]);
+  const [softwareData, setSoftwareData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSoftwareTable, setShowSoftwareTable] = useState(true);
   const [showLicenseTable, setShowLicenseTable] = useState(false);
@@ -195,6 +197,11 @@ function AssetDetailPage() {
             device.deviceId,
         );
         setData(response.data); // Assuming the API returns an array of objects
+        const response2 = await axios.get(
+          `${BACK_END_PORT}/api/Lisence/list_licenses_by_device/` +
+            device.deviceId,
+        );
+        setDataLicense(response2.data);
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
@@ -203,6 +210,19 @@ function AssetDetailPage() {
 
     fetchData();
   }, []);
+  //
+  useEffect(() => {
+    if (data.length > 0 && dataLicense.length > 0) {
+      const mergedData = dataLicense.map((device) => {
+        const software = data.find((sw) => sw.softwareId === device.softwareId);
+        return {
+          ...device,
+          name: software.name ? software.name : device.softwareId,
+        };
+      });
+      setSoftwareData(mergedData);
+    }
+  }, [data, dataLicense]);
   //
   const handleDelete = async () => {
     try {
@@ -232,6 +252,23 @@ function AssetDetailPage() {
       setLoading(false);
     }
   };
+  //
+  function calculateEndDate(startDate, months) {
+    // Parse the start date into a Date object
+    const startDateObj = new Date(startDate);
+
+    // Calculate the end date by adding the specified number of months
+    startDateObj.setMonth(startDateObj.getMonth() + months);
+
+    // Format the end date as "yyyy-mm-dd"
+    const year = startDateObj.getFullYear();
+    const month = String(startDateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(startDateObj.getDate()).padStart(2, '0');
+
+    const endDate = `${year}-${month}-${day}`;
+
+    return endDate.toString();
+  }
   //
   const text_select = {
     backgroundColor: '#fff',
@@ -382,7 +419,9 @@ function AssetDetailPage() {
           <ListItem className={styles.list}>
             <TableContainer>
               <Table variant='striped' colorScheme='gray'>
-                <TableCaption>Total {data.length} licenses</TableCaption>
+                <TableCaption>
+                  Total {softwareData.length} licenses
+                </TableCaption>
                 <Thead>
                   <Tr>
                     <Th className={styles.cTh}>Software</Th>
@@ -392,17 +431,12 @@ function AssetDetailPage() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {data.map((item) => (
-                    <Tr
-                      cursor={'pointer'}
-                      key={item.softwareId}
-                      color={selectedRow === item.softwareId ? 'red' : 'black'} // Change background color for selected rows
-                      onClick={() => handleRowClick(item)}
-                    >
+                  {softwareData.map((item) => (
+                    <Tr>
                       <Td>{item.name}</Td>
-                      <Td>{item.publisher}</Td>
-                      <Td>{item.version}</Td>
-                      <Td>{item.installDate}</Td>
+                      <Td>{item.lisenceKey}</Td>
+                      <Td>{item.startDate}</Td>
+                      <Td>{calculateEndDate(item.startDate, item.time)}</Td>
                     </Tr>
                   ))}
                 </Tbody>
