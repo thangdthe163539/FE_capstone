@@ -16,46 +16,6 @@ function Header() {
             fontWeight={400}
             variant={'link'}
             href={'/'}
-            className={`${styles.navbarItem}`}
-          >
-            HOME
-          </Button>
-          <Button
-            as={'a'}
-            fontSize={'sm'}
-            fontWeight={400}
-            variant={'link'}
-            href={'#'}
-            className={`${styles.navbarItem}`}
-          >
-            ABOUT
-          </Button>
-          <Button
-            as={'a'}
-            fontSize={'sm'}
-            fontWeight={400}
-            variant={'link'}
-            href={'#'}
-            className={`${styles.navbarItem}`}
-          >
-            FEATURE
-          </Button>
-          <Button
-            as={'a'}
-            fontSize={'sm'}
-            fontWeight={400}
-            variant={'link'}
-            href={'#'}
-            className={`${styles.navbarItem}`}
-          >
-            CONTACT
-          </Button>
-          <Button
-            as={'a'}
-            fontSize={'sm'}
-            fontWeight={400}
-            variant={'link'}
-            href={'/'}
             className={`${styles.navbarItem} ${styles.signInButton}`}
           >
             SIGN IN

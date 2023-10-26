@@ -2,7 +2,7 @@
   background: #4d9ffe;
   justify-content: space-between;
   align-items: center;
-  padding: 32px 27px 0;
+  padding: 10px;
 
   .navbarLogo {
     color: #fff;
@@ -19,7 +19,7 @@
   .navbarItem {
     color: #fff !important;
     font-family: Roboto;
-    font-size: 20px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
@@ -28,11 +28,9 @@
   }
 
   .signInButton {
-  width: 181px;
-  height: 45px;
-  flex-shrink: 0;
-  border-radius: 50px;
-  background: #0075ff;
+    padding: 10px 20px;
+    flex-shrink: 0;
+    border-radius: 50px;
+    background: #0075ff;
+  }
 }
-}
-

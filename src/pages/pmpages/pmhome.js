@@ -13,19 +13,19 @@ function PmHome() {
       <List>
         <ListItem className={styles.list} _hover={{ textDecor: 'underline' }}>
           <Link href='/pmpages/assetlist' className={styles.listitem}>
-            Management Assets
+            Assets Management
           </Link>
         </ListItem>
         <ListItem className={styles.list} _hover={{ textDecor: 'underline' }}>
           <Link href='/pmpages/softwarelist' className={styles.listitem}>
-            Management Softwares
+            Softwares Management
           </Link>
         </ListItem>
-        {/* <ListItem className={styles.list} _hover={{ textDecor: 'underline' }}>
+        <ListItem className={styles.list} _hover={{ textDecor: 'underline' }}>
           <Link href='/pmpages/reportlist' className={styles.listitem}>
-            Management Reports
+             Reports Management
           </Link>
-        </ListItem> */}
+        </ListItem>
       </List>
     </Box>
   );

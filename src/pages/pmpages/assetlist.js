@@ -48,10 +48,12 @@ import Header2 from '@/components/layouts/Header/index2';
 //
 const defaultData = {
   deviceId: '',
-  accId: '',
   name: '',
+  cpu: '',
+  gpu: '',
+  ram: '',
+  memory: '',
   ipAddress: '',
-  macAddress: '',
   manufacturer: '',
   model: '',
   serialNumber: '',
@@ -113,12 +115,13 @@ function AssetsPage() {
   const handleSave = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.put(`${BACK_END_PORT}/api/v1/Device`, {
-        deviceId: formData.deviceId,
-        accId: formData.accId,
+      const response = await axios.put(`${BACK_END_PORT}/api/v1/Device/UpdateDeviceWith`+formData.deviceId, {
         name: formData.name,
+        cpu: formData.cpu,
+        gpu: formData.gpu,
+        ram: formData.ram,
+        memory: formData.memory,        
         ipAddress: formData.ipAddress,
-        macAddress: formData.macAddress,
         manufacturer: formData.manufacturer,
         model: formData.model,
         serialNumber: formData.serialNumber,
@@ -242,16 +245,15 @@ function AssetsPage() {
         <ListItem className={styles.list}>
           <Link
             href='/pmpages/pmhome'
-            _hover={{ textDecor: 'underline' }}
             className={styles.listitem}
           >
             Home
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Management Assets
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Assets Management
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Management Assets</Text>
+            <Text fontSize='2xl'>Assets Management</Text>
             <Spacer />
             <Input
               type='text'

@@ -59,8 +59,9 @@ function AssetDetailPage() {
     installDate: '',
     status: '',
   };
-  let deviceID = null;
+
   const router = useRouter();
+  let deviceID = null;
 
   try {
     deviceID = JSON.parse(localStorage.getItem('deviceId'));
@@ -87,8 +88,9 @@ function AssetDetailPage() {
   const [formData2, setFormData2] = useState(defaultData);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showSoftwareTable, setShowSoftwareTable] = useState(false);
-  const [showChevronDown, setShowChevronDown] = useState(true);
+  const [showSoftwareTable, setShowSoftwareTable] = useState(true);
+  const [showLicenseTable, setShowLicenseTable] = useState(false);
+  const [showAntivirusTable, setShowAntivirusTable] = useState(false);
   const toast = useToast();
   //
   const handleInputChange = (e) => {
@@ -213,13 +215,33 @@ function AssetDetailPage() {
     }
   };
   //
+  const text_select = {
+    backgroundColor: '#fff',
+    borderBottom: 'none',
+    color: '#4d9ffe',
+  };
+  const handleShowSoftware = async () => {
+    setShowSoftwareTable(true);
+    setShowAntivirusTable(false);
+    setShowLicenseTable(false);
+  };
+  const handleShowLicense = async () => {
+    setShowSoftwareTable(false);
+    setShowAntivirusTable(false);
+    setShowLicenseTable(true);
+  };
+  const handleShowAntivirus = async () => {
+    setShowSoftwareTable(false);
+    setShowAntivirusTable(true);
+    setShowLicenseTable(false);
+  };
+  //
   return (
     <Box className={styles.bodybox}>
       <List>
         <ListItem className={styles.list}>
           <Link
             href='/pmpages/pmhome'
-            _hover={{ textDecor: 'underline' }}
             className={styles.listitem}
           >
             Home
@@ -227,91 +249,133 @@ function AssetDetailPage() {
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>
           <Link
             href='/pmpages/assetlist'
-            _hover={{ textDecor: 'underline' }}
             className={styles.listitem}
           >
-            Management Assets
+            Assets Management
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Asset Detail
         </ListItem>
         <ListItem className={styles.list}>
+          <Text fontSize='2xl'>Asset Detail</Text>
+        </ListItem>
+        <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Software</Text>
-            {showChevronDown ? (
-              <Box ml={1}>
-                <ChevronDownIcon
-                  border='1px solid gray'
-                  borderRadius='50'
-                  textAlign='center'
-                  alignItems='center'
-                  mt={2}
-                  _hover={{ backgroundColor: 'gray.100' }}
-                  cursor='pointer'
-                  onClick={() => {
-                    setShowSoftwareTable(true);
-                    setShowChevronDown(false);
-                  }}
-                ></ChevronDownIcon>
-              </Box>
-            ) : (
-              <Box ml={1}>
-                <ChevronUpIcon
-                  border='1px solid gray'
-                  borderRadius='50'
-                  textAlign='center'
-                  alignItems='center'
-                  mt={2}
-                  _hover={{ backgroundColor: 'gray.100' }}
-                  cursor='pointer'
-                  onClick={() => {
-                    setShowSoftwareTable(false);
-                    setShowChevronDown(true);
-                  }}
-                ></ChevronUpIcon>
+            <Text
+              className={styles.text}
+              // pl={0}
+              onClick={handleShowSoftware}
+              style={showSoftwareTable ? text_select : {}}
+            >
+              Software
+            </Text>
+            <Text
+              className={styles.text}
+              onClick={handleShowLicense}
+              style={showLicenseTable ? text_select : {}}
+            >
+              License Keys
+            </Text>
+            <Text
+              className={styles.text}
+              onClick={handleShowAntivirus}
+              style={showAntivirusTable ? text_select : {}}
+            >
+              Antivirus
+            </Text>
+            <Spacer />
+            {showSoftwareTable && (
+              <Box>
+                <IconButton
+                  aria-label='Add'
+                  icon={<FaPlus />}
+                  colorScheme='gray' // Choose an appropriate color
+                  marginRight={1}
+                  onClick={() => setIsOpenAdd(true)}
+                />
+                <IconButton
+                  aria-label='Edit'
+                  icon={<FaEdit />}
+                  colorScheme='gray' // Choose an appropriate color
+                  marginRight={1}
+                  onClick={() => setIsOpenEdit(true)}
+                  isDisabled={isButtonDisabled}
+                />
+                <IconButton
+                  aria-label='Delete'
+                  icon={<FaTrash />}
+                  colorScheme='gray' // Choose an appropriate color
+                  onClick={() => setIsOpenDelete(true)}
+                  isDisabled={isButtonDisabled}
+                />
               </Box>
             )}
-            <Spacer />
-            <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                onClick={() => setIsOpenAdd(true)}
-              />
-              <IconButton
-                aria-label='Edit'
-                icon={<FaEdit />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                onClick={() => setIsOpenEdit(true)}
-                isDisabled={isButtonDisabled}
-              />
-              <IconButton
-                aria-label='Delete'
-                icon={<FaTrash />}
-                colorScheme='gray' // Choose an appropriate color
-                onClick={() => setIsOpenDelete(true)}
-                isDisabled={isButtonDisabled}
-              />
-            </Box>
+            {showLicenseTable && (
+              <Box>
+                <IconButton
+                  aria-label='Add'
+                  icon={<FaPlus />}
+                  colorScheme='gray' // Choose an appropriate color
+                  marginRight={1}
+                  onClick={() => setIsOpenAdd(true)}
+                />
+                <IconButton
+                  aria-label='Edit'
+                  icon={<FaEdit />}
+                  colorScheme='gray' // Choose an appropriate color
+                  marginRight={1}
+                  onClick={() => setIsOpenEdit(true)}
+                  isDisabled={isButtonDisabled}
+                />
+                <IconButton
+                  aria-label='Delete'
+                  icon={<FaTrash />}
+                  colorScheme='gray' // Choose an appropriate color
+                  onClick={() => setIsOpenDelete(true)}
+                  isDisabled={isButtonDisabled}
+                />
+              </Box>
+            )}
+            {showAntivirusTable && (
+              <Box>
+                {/* <IconButton
+                  aria-label='Add'
+                  icon={<FaPlus />}
+                  colorScheme='gray' // Choose an appropriate color
+                  marginRight={1}
+                  onClick={() => setIsOpenAdd(true)}
+                />
+                <IconButton
+                  aria-label='Edit'
+                  icon={<FaEdit />}
+                  colorScheme='gray' // Choose an appropriate color
+                  marginRight={1}
+                  onClick={() => setIsOpenEdit(true)}
+                  isDisabled={isButtonDisabled}
+                /> */}
+                <IconButton
+                  aria-label='Delete'
+                  icon={<FaTrash />}
+                  colorScheme='gray' // Choose an appropriate color
+                  onClick={() => setIsOpenDelete(true)}
+                  isDisabled={isButtonDisabled}
+                />
+              </Box>
+            )}
           </Flex>
         </ListItem>
         {showSoftwareTable && (
           <ListItem className={styles.list}>
             <TableContainer>
-              <Table variant='simple'>
+              <Table variant='striped' colorScheme='gray'>
                 <TableCaption>Total {data.length} softwares</TableCaption>
                 <Thead>
                   <Tr>
-                    <Th display='none'>Software ID</Th>
-                    <Th>Name</Th>
-                    <Th display='none'>Assets</Th>
-                    <Th>Publisher</Th>
-                    <Th>Versions</Th>
-                    <Th>Release</Th>
-                    <Th>Install Date</Th>
-                    <Th>Status</Th>
+                    <Th className={styles.cTh}>Name</Th>
+                    <Th className={styles.cTh}>Publisher</Th>
+                    <Th className={styles.cTh}>Versions</Th>
+                    <Th className={styles.cTh}>Release</Th>
+                    <Th className={styles.cTh}>Install Date</Th>
+                    <Th className={styles.cTh}>Status</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -319,14 +383,10 @@ function AssetDetailPage() {
                     <Tr
                       cursor={'pointer'}
                       key={item.softwareId}
-                      bg={
-                        selectedRow === item.softwareId ? 'green.100' : 'white'
-                      } // Change background color for selected rows
+                      color={selectedRow === item.softwareId ? 'red' : 'black'} // Change background color for selected rows
                       onClick={() => handleRowClick(item)}
                     >
-                      <Td display='none'>{item.softwareId}</Td>
                       <Td>{item.name}</Td>
-                      <Td display='none'>{item.deviceId}</Td>
                       <Td>{item.publisher}</Td>
                       <Td>{item.version}</Td>
                       <Td>{item.type}</Td>
@@ -339,60 +399,74 @@ function AssetDetailPage() {
             </TableContainer>
           </ListItem>
         )}
-        <ListItem className={styles.list}>
-          <Flex>
-            <Text fontSize='2xl'>Lisence Keys</Text>
-            <Spacer />
-            <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-              />
-              <IconButton
-                aria-label='Edit'
-                icon={<FaEdit />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                isDisabled={isButtonDisabled}
-              />
-              <IconButton
-                aria-label='Delete'
-                icon={<FaTrash />}
-                colorScheme='gray' // Choose an appropriate color
-                isDisabled={isButtonDisabled}
-              />
-            </Box>
-          </Flex>
-        </ListItem>
-        <ListItem className={styles.list}>
-          <Flex>
-            <Text fontSize='2xl'>Antivirus</Text>
-            <Spacer />
-            <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-              />
-              <IconButton
-                aria-label='Edit'
-                icon={<FaEdit />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                isDisabled={isButtonDisabled}
-              />
-              <IconButton
-                aria-label='Delete'
-                icon={<FaTrash />}
-                colorScheme='gray' // Choose an appropriate color
-                isDisabled={isButtonDisabled}
-              />
-            </Box>
-          </Flex>
-        </ListItem>
+        {showLicenseTable && (
+          <ListItem className={styles.list}>
+            <TableContainer>
+              <Table variant='striped' colorScheme='gray'>
+                <TableCaption>Total {data.length} licenses</TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th className={styles.cTh}>Software</Th>
+                    <Th className={styles.cTh}>License Key</Th>
+                    <Th className={styles.cTh}>Start Date</Th>
+                    <Th className={styles.cTh}>End Date</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {data.map((item) => (
+                    <Tr
+                      cursor={'pointer'}
+                      key={item.softwareId}
+                      color={selectedRow === item.softwareId ? 'red' : 'black'} // Change background color for selected rows
+                      onClick={() => handleRowClick(item)}
+                    >
+                      <Td>{item.name}</Td>
+                      <Td>{item.publisher}</Td>
+                      <Td>{item.version}</Td>
+                      <Td>{item.installDate}</Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </ListItem>
+        )}
+        {showAntivirusTable && (
+          <ListItem className={styles.list}>
+            <TableContainer>
+              <Table variant='striped' colorScheme='gray'>
+                {/* <TableCaption>Total {data.length} reports</TableCaption> */}
+                <Thead>
+                  <Tr>
+                    <Th className={styles.cTh}>Name</Th>
+                    <Th className={styles.cTh}>Publisher</Th>
+                    <Th className={styles.cTh}>Versions</Th>
+                    <Th className={styles.cTh}>Release</Th>
+                    <Th className={styles.cTh}>Install Date</Th>
+                    <Th className={styles.cTh}>Status</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {data.map((item) => (
+                    <Tr
+                      cursor={'pointer'}
+                      key={item.softwareId}
+                      color={selectedRow === item.softwareId ? 'red' : 'black'} // Change background color for selected rows
+                      onClick={() => handleRowClick(item)}
+                    >
+                      <Td>{item.name}</Td>
+                      <Td>{item.publisher}</Td>
+                      <Td>{item.version}</Td>
+                      <Td>{item.type}</Td>
+                      <Td>{item.installDate}</Td>
+                      <Td>{item.status ? 'Have Issues' : 'No Issues'}</Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </ListItem>
+        )}
       </List>
 
       <Modal //Modal edit software

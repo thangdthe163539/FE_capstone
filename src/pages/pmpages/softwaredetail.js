@@ -45,15 +45,12 @@ import { BACK_END_PORT } from '../../../env';
 import Header2 from '@/components/layouts/Header/index2';
 //
 const defaultData = {
-  accId: '',
   softwareId: '',
   deviceId: '',
   name: '',
   version: '',
-  release: '',
   publisher: '',
   type: '',
-  os: '',
   installDate: '',
   status: '',
 };
@@ -73,6 +70,15 @@ function SoftwarePage() {
       }
     }
   }, []);
+  //
+  let software = {};
+
+  try {
+    software = JSON.parse(localStorage.getItem('software'));
+    console.log(software);
+  } catch (error) {
+    console.error('Error saving data:', error);
+  }
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -114,55 +120,19 @@ function SoftwarePage() {
     }
   };
   //
-  const handleSaveAdd = async () => {
-    try {
-      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.post(
-        `${BACK_END_PORT}/api/v1/Software/CreateSW`,
-        {
-          //softwareId: formData.accId,
-          accId: formData.accId,
-          name: formData.name,
-          publisher: formData.publisher,
-          version: formData.version,
-          release: formData.release,
-          type: formData.type,
-          os: formData.os,
-          status: 1,
-          // deviceId: formData.deviceId,
-        },
-      );
-      console.log('Data saved:', response.data);
-      setIsOpenAdd(false); // Close the modal after successful save
-      setFormData(defaultData);
-      setSelectedRow(new Set());
-      // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user` +
-          account.accId,
-      );
-      setData(newDataResponse.data);
-    } catch (error) {
-      console.error('Error saving data:', error);
-    }
-  };
-  //
   const handleSaveEdit = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Software/UpdateSW` + formData2.softwareId,
-        {
-          accId: formData2.accId,
-          name: formData2.name,
-          publisher: formData2.publisher,
-          version: formData2.version,
-          release: formData2.release,
-          type: formData2.type,
-          os: formData2.os,
-          status: formData2.status,
-        },
-      );
+      const response = await axios.put(`${BACK_END_PORT}/api/v1/Software`, {
+        softwareId: formData2.softwareId,
+        name: formData2.name,
+        version: formData2.version,
+        publisher: formData2.publisher,
+        type: formData2.type,
+        installDate: formData2.installDate,
+        status: formData2.status,
+        deviceId: formData2.deviceId,
+      });
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
       setFormData2(defaultData);
@@ -186,11 +156,11 @@ function SoftwarePage() {
             account.accId,
         );
         setData(response.data); // Assuming the API returns an array of objects
-        // const response2 = await axios.get(
-        //   `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
-        //     account.accId,
-        // );
-        // setDeviceData(response2.data); // Assuming the API returns an array of objects
+        const response2 = await axios.get(
+          `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
+            account.accId,
+        );
+        setDeviceData(response2.data); // Assuming the API returns an array of objects
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -202,8 +172,7 @@ function SoftwarePage() {
   }, []);
   //
   useEffect(() => {
-    // if (data.length > 0 && deviceData.length > 0) {
-    if (data.length > 0) {
+    if (data.length > 0 && deviceData.length > 0) {
       const mergedData = data.map((software) => {
         const device = deviceData.find(
           (sw) => sw.deviceId === software.deviceId,
@@ -242,16 +211,10 @@ function SoftwarePage() {
     setSearchQuery(e.target.value);
   };
   //
-  const handleDetail = (item) => {
-    localStorage.setItem('software', JSON.stringify(item));
-    // console.log(localStorage.getItem('deviceId'));
-  };
-  //
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `${BACK_END_PORT}/api/v1/Software/DeleteSoftWareWith_key?softwareid=` +
-          formData2.softwareId,
+        `${BACK_END_PORT}/api/v1/Software?softwareid=` + formData2.softwareId,
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
       setSelectedRow(new Set());
@@ -282,103 +245,61 @@ function SoftwarePage() {
           <Link href='/pmpages/pmhome' className={styles.listitem}>
             Home
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Software Management
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>
+          <Link href='/pmpages/softwarelist' className={styles.listitem}>
+            Software Management
+          </Link>
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Software Detail
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Software Management</Text>
-            <Spacer />
-            <Input
-              type='text'
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              placeholder='Search'
-              w={300}
-              mr={1}
-            />
-            <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                onClick={() => (
-                  setFormData({
-                    ...formData,
-                    deviceId: deviceData[0].deviceId,
-                  }),
-                  setIsOpenAdd(true)
-                )}
-              />
-              <IconButton
-                aria-label='Edit'
-                icon={<FaEdit />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                onClick={() => setIsOpenEdit(true)}
-                isDisabled={isButtonDisabled}
-              />
-              <IconButton
-                aria-label='Delete'
-                icon={<FaTrash />}
-                colorScheme='gray' // Choose an appropriate color
-                onClick={() => setIsOpenDelete(true)}
-                isDisabled={isButtonDisabled}
-              />
-            </Box>
+            <Text fontSize='2xl'>Software Detail</Text>
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
-          <TableContainer>
-            <Table
-              variant='striped'
-              colorScheme='gray'
-              className={styles.cTable}
+          <Flex>
+            <Grid
+              templateRows='repeat(2, 1fr)'
+              templateColumns='repeat(6, 1fr)'
             >
-              <TableCaption>
-                Total {filteredSoftwareData.length} softwares
-              </TableCaption>
-              <Thead>
-                <Tr>
-                  <Th display='none'>Software ID</Th>
-                  <Th className={styles.cTh}>Name</Th>
-                  <Th className={styles.cTh}>Assets</Th>
-                  <Th className={styles.cTh}>Publisher</Th>
-                  <Th className={styles.cTh}>Versions</Th>
-                  <Th className={styles.cTh}>Release</Th>
-                  <Th className={styles.cTh}>Install Date</Th>
-                  <Th className={styles.cTh}>Status</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {filteredSoftwareData.map((item) => (
-                  <Tr
-                    _hover={{
-                      cursor: 'pointer',
-                    }}
-                    key={item.softwareId}
-                    color={selectedRow === item.softwareId ? 'red' : 'black'}
-                    onClick={() => handleRowClick(item)}
-                  >
-                    <Td className={styles.listitem}>
-                      <Link
-                        href={'/pmpages/softwaredetail'}
-                        onClick={() => handleDetail(item)}
-                      >
-                        {item.name}
-                      </Link>
-                    </Td>
-                    <Td>{item.deviceName}</Td>
-                    <Td>{item.publisher}</Td>
-                    <Td>{item.version}</Td>
-                    <Td>{item.type}</Td>
-                    <Td>{item.installDate}</Td>
-                    <Td>{item.status ? 'Have Issues' : 'No Issues'}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+              <GridItem rowSpan={1} colSpan={1}>
+                Name
+              </GridItem>
+              <GridItem rowGap={1} colSpan={1}>
+                {software.name}
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={1}>
+                Version
+              </GridItem>
+              <GridItem rowGap={1} colSpan={1}>
+                {software.version}
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={1}>
+                Operation System
+              </GridItem>
+              <GridItem rowGap={1} colSpan={1}>
+                {software.installDate}
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={1}>
+                Publisher
+              </GridItem>
+              <GridItem rowGap={1} colSpan={1}>
+                {software.publisher}
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={1}>
+                Release
+              </GridItem>
+              <GridItem rowGap={1} colSpan={1}>
+                {software.type}
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={1}>
+                Status
+              </GridItem>
+              <GridItem rowGap={1} colSpan={1}>
+                {software.status ? 'Have issues' : 'No issues'}
+              </GridItem>
+            </Grid>
+          </Flex>
         </ListItem>
       </List>
 

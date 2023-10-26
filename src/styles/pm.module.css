@@ -34,3 +34,14 @@
 .cTableCaption {
   position: top;
 }
+
+.text {
+  padding: 0 10px;
+  font-size: 22px;
+  background-color: rgb(237, 242, 247);
+  border: 1px solid rgb(153, 153, 152);
+}
+.text:hover {
+  /* text-decoration: underline; */
+  cursor: pointer;
+}
