@@ -44,12 +44,14 @@ function Header() {
         })
           .then((response) => response.json())
           .then((data) => {
-            const id = data.roleAccounts[0].roleId;
+            console.log(data);
+            const id = data.roleId;
+            console.log("khang");
             console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {
-              router.push('/pmpages/pmhome');
-              // router.push('adminpages/adminhome');
+              // router.push('/pmpages/pmhome');
+              router.push('adminpages/adminhome');
               //   router.push('/userpages/userhome');
             }
             else if (id == 2) {

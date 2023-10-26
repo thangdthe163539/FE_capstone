@@ -74,7 +74,8 @@ function UpdateUser() {
                 status: Boolean(isActive),
                 roleId: parseInt(role)
             };
-
+            console.log('adsfksdjf');
+            console.log(isActive);
             fetch(url, {
                 method: 'PUT',
                 headers: {
