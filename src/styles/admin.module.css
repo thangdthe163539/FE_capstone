@@ -1,0 +1,59 @@
+.userBoxM {
+    background-color: white;
+    width: auto;
+    height: 100%;
+    padding: 10px 20px;
+}
+
+.userListM {
+    height: 100%;
+    padding: 10px 0px;
+    align-items: center;
+    font-size: 18px;
+    border-bottom: 1px solid #c4c4c4;
+}
+
+.userHrM {
+    border-top: 1px solid #c4c4c4;
+    width: 100%;
+    margin-top: 0.5%;
+}
+
+.userTitle {
+    color: black;
+    margin-top: 0.2%;
+    width: 300px;
+    font-size: 30px;
+}
+
+.userStackM {
+    width: 100%;
+    margin-top: 0.2%;
+}
+
+.userSearchM {
+    margin-right: 0.3%;
+    width: 7%;
+    margin-top: 0.2%;
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+.userAddM {
+    width: 6%;
+    margin-top: 0.2%;
+}
+
+.userTextTotalM {
+    color: #4d9ffe;
+    margin-top: 2%;
+    margin-left: 0%;
+    font-size: 20px;
+}
+
+.alert{
+    width: 300px;
+    position: fixed;
+    top: 13%;
+    right: 1%;
+}

@@ -9,19 +9,18 @@ import {
     Spacer,
     Text,
     Td, InputRightAddon,
-    TableContainer, TableCaption,
-    Box, Input, Stack, InputGroup, InputLeftAddon, Button, Center
+    TableContainer,
+    Box, Input, Stack, InputGroup, Button, Center
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
-import { color } from 'framer-motion';
+import styles from '@/styles/admin.module.css';
 
 function UserManager() {
     const router = useRouter();
     const [userData, setUserData] = useState([]);
-
     const handleSearchByEmail = async () => {
         var email = document.getElementById('email').value;
 
@@ -64,8 +63,8 @@ function UserManager() {
         router.push('addUser');
     };
     console.log(userData);
-    return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
-        <List style={{ height: '100%', padding: '10px 0px', alignItems: 'center', fontSize: '18px', borderBottom: '1px solid #c4c4c4' }}>
+    return <Box className={styles.userBoxM}>
+        <List className={styles.userListM}>
             <ListItem>
                 <Link
                     href='/adminpages/adminhome'
@@ -76,35 +75,29 @@ function UserManager() {
                 </Link>
                 <ArrowForwardIcon margin={1} style={{ color: 'black', pointerEvents: 'none' }}></ArrowForwardIcon>User Management
             </ListItem>
-            <hr style={{ borderTop: '1px solid #c4c4c4', width: '100%', marginTop: '0.5%' }} />
+            <hr className={styles.userHrM} />
             <ListItem>
                 <Flex>
-                    <Text style={{ color: 'black', marginTop: '0.2%', width: '300px', fontSize: '30px' }}>User Management</Text>
-                    <Stack spacing={4} style={{ width: '100%', marginTop: '0.2%' }}>
+                    <Text className={styles.userTitle}>User Management</Text>
+                    <Stack spacing={4} className={styles.userStackM}>
                         <InputGroup size='lg' style={{ marginLeft: '65%' }}>
                             <Input id='email' placeholder='Email' style={{ marginRight: '0%', width: '20%', marginTop: '0.2%' }} />
-                            <InputRightAddon style={{
-                                marginRight: '0.3%',
-                                width: '7%',
-                                marginTop: '0.2%',
-                                transition: 'color 0.3s',
-                                cursor: 'pointer',
-                            }}
-                                children='Search'
-                                className="hover-effect" onClick={handleSearchByEmail}></InputRightAddon>
-                            <Button style={{ width: '6%', marginTop: '0.2%' }} children='Add' onClick={handleToAddUser} />
+                            <InputRightAddon className={styles.userSearchM} children='Search' onClick={handleSearchByEmail}></InputRightAddon>
+                            <Button className={styles.userAddM} children='Add' onClick={handleToAddUser} />
                         </InputGroup>
                     </Stack>
                     <Spacer></Spacer>
                 </Flex>
             </ListItem>
         </List>
+
         <TableContainer>
-            <Text style={{ color: '#4d9ffe', marginTop: '2%', marginLeft: '0%', fontSize: '20px' }}>Total {userData.length} user found : </Text>
+            <Text className={styles.userTextTotalM}>Total {userData.length} users found : </Text>
             <Center>
                 <Table variant='simple' style={{ marginTop: '2%', width: '90%' }}>
                     <Thead>
                         <Tr style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', backgroundColor: 'whitesmoke' }}>
+                            <Td>No</Td>
                             <Td>Name </Td>
                             <Td>Email</Td>
                             <Td>Active</Td>
@@ -112,10 +105,11 @@ function UserManager() {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {userData.map(user => (
+                        {userData.map((user, index) => (
                             <Tr key={user.id}>
-                                <Td><Button color={'blue'} variant='link' onClick={() => handleToUserDetails(user.email, user.roleName, user.roleId, user.status, user.name, user.accId)}>{user.name}</Button></Td>
-                                <Td style={{ width: '35%' }}>{user.email}</Td>
+                                <Td>{index + 1}</Td>
+                                <Td style={{width: '20%'}}><Button color={'blue'} variant='link' onClick={() => handleToUserDetails(user.email, user.roleName, user.roleId, user.status, user.name, user.accId)}>{user.name}</Button></Td>
+                                <Td style={{ width: '30%' }}>{user.email}</Td>
                                 <Td>{user.status ? 'true' : 'false'}</Td>
                                 <Td style={{ width: '15%' }}>{user.roleName}</Td>
                             </Tr>

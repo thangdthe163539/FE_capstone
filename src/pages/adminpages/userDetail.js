@@ -1,19 +1,26 @@
 import {
     Table, Text,
-    Thead, Checkbox,
+    Thead,
     Tbody,
     Tr,
-    Th,
     Td,
-    TableContainer, TableCaption,
-    Box, Center, Button
+    TableContainer,
+    Box, Center, Button, Flex
 } from '@chakra-ui/react'
+import {
+    Alert,
+    AlertIcon,
+}
+from '@chakra-ui/react'
 import { useRouter } from 'next/router';
+import React, { useState, useEffect } from 'react';
+import styles from '@/styles/admin.module.css';
 
 function UserDetail() {
     const router = useRouter();
     const { email, role, roleid, status, name, accid } = router.query;
-
+    const [isSuccess, setIsSuccess] = useState('');
+    const notificationTimeout = 2000;
     const handleBackToList = () => {
         router.push('userManager');
     };
@@ -24,33 +31,56 @@ function UserDetail() {
             method: 'DELETE',
         })
             .then(response => {
-                console.log(response);
                 if (response.ok) {
-                    showAlertWithTimeout('Delete success', 3000); // Hiển thị "Delete success" trong 3 giây
+                    setIsSuccess("true");
                 } else {
-                    showAlertWithTimeout('Delete failed', 3000); // Hiển thị "Delete failed" trong 3 giây
+                    setIsSuccess("false");
                 }
             })
             .catch(error => {
-                showAlertWithTimeout('Delete failed', 3000);
+                setIsSuccess("false");
                 console.error('Lỗi:', error);
             });
     };
 
-    function showAlertWithTimeout(message, timeout) {
-        alert(message);
-        setTimeout(function () {
-            window.close();
-        }, timeout);
-    }
 
-    const handleEdit = (name, email, status, role, roleid) => {
-        router.push(`updateUser?email=${email}&name=${name}&status=${status}&role=${role}&roleid=${roleid}`);
+    const handleEdit = (name, email, status, roleid) => {
+        router.push(`updateUser?email=${email}&name=${name}&status=${status}&roleid=${roleid}`);
     };
+
+    useEffect(() => {
+        if (isSuccess) {
+            const hideNotification = setTimeout(() => {
+                setIsSuccess('');
+            }, notificationTimeout);
+
+            return () => {
+                clearTimeout(hideNotification);
+            };
+        }
+    }, [isSuccess]);
+
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
-        <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%' }}>
-            User Details
-        </Text>
+        <Flex>
+            <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%' }}>
+                User Details
+            </Text>
+            <Text className={styles.alert}>
+                {isSuccess === 'true' && (
+                    <Alert status='success'>
+                        <AlertIcon />
+                        Delete Success!
+                    </Alert>
+                )}
+                {isSuccess === 'false' && (
+                    <Alert status='error'>
+                        <AlertIcon />
+                        Error processing your request.
+                    </Alert>
+                )}
+            </Text>
+        </Flex>
+
         <hr style={{ borderTop: '1px solid #c4c4c4', width: '100%', marginTop: '0.5%' }} />
         <TableContainer>
             <Center>
@@ -79,7 +109,7 @@ function UserDetail() {
             </Center>
         </TableContainer>
 
-        <Button style={{ marginLeft: '5%', marginTop: '5%' }} onClick={() => handleEdit(name, email, status, role, roleid)}>Edit</Button>
+        <Button style={{ marginLeft: '5%', marginTop: '5%' }} onClick={() => handleEdit(name, email, status, roleid)}>Edit</Button>
         <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleDelete}>Delete</Button>
         <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleBackToList}>Back to List</Button>
 

@@ -6,30 +6,40 @@ import {
     InputLeftAddon,
     Input, Button,
     TableContainer, TableCaption,
-    Box
+    Box,
+    Flex,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
-
+import styles from '@/styles/admin.module.css';
+import {
+    Alert,
+    AlertIcon,
+} from '@chakra-ui/react'
 function UpdateUser() {
     const router = useRouter();
-    const { name, email, status, role, roleid } = router.query;
+    const { name, email, status, roleid } = router.query;
     const [id, setId] = useState(null);
+    const [name1, setName] = useState('');
+    const [selectedOptionActive, setSelectedOptionActive] = useState('');
+    const [selectedOptionRole, setSelectedOptionRole] = useState('');
+    const [roles, setRoles] = useState([]);
+    const [isSuccess, setIsSuccess] = useState('');
+    const notificationTimeout = 2000;
+
     const handleBackToList = () => {
         router.push('userManager');
     };
-    const [name1, setName] = useState('');
+
+
     const handleNameChange = (event) => {
-        // Cập nhật biến `name` khi giá trị trong phần tử `<Input>` thay đổi
         setName(event.target.value);
     };
     useEffect(() => {
         setName(name);
     }, [name]);
 
-    const [selectedOptionActive, setSelectedOptionActive] = useState('');
-    const [selectedOptionRole, setSelectedOptionRole] = useState('');
-    const [roles, setRoles] = useState([]);
+
     useEffect(() => {
         const url = 'http://localhost:5001/api/roles/listRole';
         fetch(url, {
@@ -37,7 +47,7 @@ function UpdateUser() {
         })
             .then(response => response.json())
             .then(data => {
-                setRoles(data); // Lưu danh sách các roles vào state
+                setRoles(data);
             })
             .catch(error => {
                 console.error('Lỗi:', error);
@@ -64,7 +74,7 @@ function UpdateUser() {
             const url = `http://localhost:5001/api/v1/Account/Update_Accpunt${id}`;
 
             const email = document.getElementById('email').value;
-            const isActive = selectedOptionActive ? selectedOptionActive : status;
+            const isActive = selectedOptionActive !== '' ? selectedOptionActive === 'true' : status === 'true';
             const name = document.getElementById('name').value;
             const role = selectedOptionRole ? selectedOptionRole : roleid;
 
@@ -84,13 +94,13 @@ function UpdateUser() {
             })
                 .then(response => {
                     if (response.ok) {
-                        alert('Update success');
+                        setIsSuccess("true");
                     } else {
-                        alert('Update failed');
+                        setIsSuccess("false");
                     }
                 })
                 .catch(error => {
-                    alert('Update failed');
+                    setIsSuccess("false");
                     console.error('Lỗi:', error);
                 });
         } else {
@@ -99,10 +109,41 @@ function UpdateUser() {
 
     };
 
+    useEffect(() => {
+        if (isSuccess) {
+            const hideNotification = setTimeout(() => {
+                setIsSuccess('');
+            }, notificationTimeout);
+
+            return () => {
+                clearTimeout(hideNotification);
+            };
+        }
+    }, [isSuccess]);
+
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
-        <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%', backgroundColor: 'white', width: '50%' }}>
-            Update User
-        </Text>
+        <Flex>
+            <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%', backgroundColor: 'white', width: '50%' }}>
+                Update User
+
+            </Text>
+            <Text className={styles.alert}>
+                {isSuccess === 'true' && (
+                    <Alert status='success'>
+                        <AlertIcon />
+                        Update Success!
+                    </Alert>
+                )}
+                {isSuccess === 'false' && (
+                    <Alert status='error'>
+                        <AlertIcon />
+                        Error processing your request.
+                    </Alert>
+                )}
+            </Text>
+        </Flex>
+
+
         <hr style={{ borderTop: '1px solid #c4c4c4', width: '100%', marginTop: '0.5%' }} />
 
         <TableContainer>
@@ -120,7 +161,7 @@ function UpdateUser() {
                     <InputGroup size='lg'>
                         <InputLeftAddon children='Role ' style={{ width: '10%' }} />
                         <Select
-                            style={{ width: '25%'}}
+                            style={{ width: '25%' }}
                             value={selectedOptionRole}
                             onChange={(e) => setSelectedOptionRole(e.target.value)}
                             size='0%'

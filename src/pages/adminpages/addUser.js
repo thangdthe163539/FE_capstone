@@ -1,18 +1,26 @@
 import {
     Table, Text,
-    Thead, Checkbox,
+    Thead,
     Tbody, Select,
     Tr, InputGroup,
-    Stack, InputLeftAddon,
-    Td, Input, Button,
+    InputLeftAddon,
+    Input, Button,
     TableContainer, TableCaption,
-    Box, Center
+    Box, Flex
+} from '@chakra-ui/react'
+import {
+    Alert,
+    AlertIcon,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
+import styles from '@/styles/admin.module.css';
 
 function AddUser() {
     const router = useRouter();
+    const [isSuccess, setIsSuccess] = useState('');
+    const notificationTimeout = 2000;
+
     const handleBackToList = () => {
         router.push('userManager');
     };
@@ -62,28 +70,49 @@ function AddUser() {
             .then(response => {
                 console.log(response);
                 if (response.ok) {
-                    showAlertWithTimeout('Create success', 3000);
+                    setIsSuccess("true");
                 } else {
-                    showAlertWithTimeout('Create failed', 3000);
+                    setIsSuccess("false");
                 }
             })
             .catch(error => {
-                showAlertWithTimeout('Create failed', 3000);
+                setIsSuccess("false");
                 console.error('Lỗi:', error);
             });
     };
 
-    function showAlertWithTimeout(message, timeout) {
-        alert(message);
-        setTimeout(function () {
-            // Đóng thông báo sau một khoảng thời gian timeout (được tính bằng mili giây)
-            window.close();
-        }, timeout);
-    }
+    useEffect(() => {
+        if (isSuccess) {
+            const hideNotification = setTimeout(() => {
+                setIsSuccess('');
+            }, notificationTimeout);
+
+            return () => {
+                clearTimeout(hideNotification);
+            };
+        }
+    }, [isSuccess]);
+
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
-        <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%', backgroundColor: 'white', width: '50%' }}>
-            Add User
-        </Text>
+        <Flex>
+            <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%', backgroundColor: 'white', width: '50%' }}>
+                Add User
+            </Text>
+            <Text className={styles.alert}>
+                {isSuccess === 'true' && (
+                    <Alert status='success'>
+                        <AlertIcon />
+                        Add Success!
+                    </Alert>
+                )}
+                {isSuccess === 'false' && (
+                    <Alert status='error'>
+                        <AlertIcon />
+                        Error processing your request.
+                    </Alert>
+                )}
+            </Text>
+        </Flex>
         <hr style={{ borderTop: '1px solid #c4c4c4', width: '100%', marginTop: '0.5%' }} />
 
         <TableContainer>
@@ -124,7 +153,7 @@ function AddUser() {
                                 setSelectedOptionActive(e.target.value);
                             }}
                             size='8%'
-                        >   
+                        >
                             <option value='true'>Active</option>
                             <option value='false'>Inactive</option>
                         </Select>
