@@ -1,36 +1,50 @@
 .navbar {
-  background: #4d9ffe;
-  justify-content: space-between;
+  background: white;
   align-items: center;
-  padding: 10px;
+  position: fixed;
+  width: 100%;
+}
 
-  .navbarLogo {
-    color: #fff;
-    text-align: center;
-    font-family: Sanchez;
-    font-size: 40px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    flex-shrink: 0;
-    cursor: pointer;
-  }
+.logo {
+  background: white;
+  margin-left: 3%;
+}
 
-  .navbarItem {
-    color: #fff !important;
-    font-family: Roboto;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    flex-shrink: 0;
-    margin-left: 49px;
-  }
+.navbarLogo {
+  color: #344e74;
+  text-align: center;
+  font-family: Sanchez;
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  flex-shrink: 0;
+  cursor: pointer;
+  margin-right: 3%;
+}
 
-  .signInButton {
-    padding: 10px 20px;
-    flex-shrink: 0;
-    border-radius: 50px;
-    background: #0075ff;
-  }
+.navbarText {
+  color: #344e74;
+  text-align: center;
+  font-family: Sanchez;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  flex-shrink: 0;
+  cursor: pointer;
+  margin-left: 53%;
+  pointer-events: none;
+}
+
+.loggin {
+  color: rgb(232, 90, 90);
+  text-align: center;
+  font-family: Sanchez;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  flex-shrink: 0;
+  cursor: pointer;
 }

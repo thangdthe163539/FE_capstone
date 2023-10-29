@@ -1,73 +1,153 @@
 .homeBody {
-  text-align: center;
-  align-items: center;
-  margin: auto;
-  width: 100vw;
+  margin-top: 0px;
+  padding: 0 58px;
   height: 100vh;
-  display: flex;
+  /* background-color: #4d9ffe; */
+}
+
+.loginForm {
+  width: 493px;
+  height: 485px;
+  flex-shrink: 0;
+  border-radius: 25px;
+  border: 1px solid #0075ff;
+  background: #fff;
+  align-items: center;
+  justify-content: space-around;
+
+  .loginFormTitle {
+    text-align: center;
+  }
+
+  .title1 {
+    color: #000;
+    text-align: center;
+    font-family: Roboto;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .title2 {
+    color: #000;
+    font-family: Roboto;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .inputField {
+    border-radius: 50px;
+    border: 1px solid #0075ff;
+    background: #d9d9d9;
+    height: 51px;
+  }
+
+  .inputField::placeholder {
+    color: #464646;
+    font-family: Roboto;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .userName {
+    margin-bottom: 33px;
+  }
+
+  .passWord {
+    margin-bottom: 20px;
+  }
+
+  .forgetPassword {
+    color: #464646;
+    font-family: Arial;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-align: end;
+  }
+
+  .buttonSignIn {
+    width: 90%;
+    border-radius: 50px;
+    border: 1px solid #0075ff;
+    background: #0075ff;
+    color: #fff;
+    text-align: center;
+    font-family: Roboto;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+  .eyeIcon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+}
+
+.introduce {
   flex-direction: column;
-  justify-content: center;
-  background: rgb(31, 127, 204);
-  background: linear-gradient(
-    240deg,
-    rgb(13, 135, 216) 0%,
-    rgb(0, 35, 56) 100%
-  );
-}
-
-.homeContent {
-  height: 60vh;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.title1 {
-  font-size: 32px;
-  font-weight: bold;
-  z-index: 2;
-}
-.title2 {
-  font-size: 18px;
-  margin: 10px 0px;
-}
-
-#Banner {
-  width: 40vw;
-  /* background-image: url('https://png.pngtree.com/background/20210715/original/pngtree-background-blue-abstrack-picture-image_1294096.jpg'); */
-  background-image: url('https://static.vecteezy.com/system/resources/previews/000/673/018/large_2x/datacenter-server-room-cloud-storage-technology-and-big-data-processing-vector.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  color: white;
-  font-size: 24px;
-  position: relative;
-}
-
-.Layer {
-  background-color: rgba(0, 0, 0, 0.4);
-  position: absolute;
-  top: 0;
-  left: 0;
+  justify-content: space-between;
+  margin: 0 auto;
   width: 100%;
-  height: 100%;
-  z-index: 1;
 }
 
-#Link {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  font-size: 16px;
-  margin: 10px;
-  z-index: 2;
-}
-#Link:hover {
-  text-decoration: underline;
+.intro {
+  flex-direction: column;
+  width: 476px;
+  height: 176px;
+  flex-shrink: 0;
+  margin: 0 auto;
+  margin-top: 132px;
+
+  .title {
+    color: #fff;
+    font-family: Roboto;
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+  .detail {
+    color: #fff;
+    font-family: Roboto;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
 }
 
-#LoginForm {
-  width: 20vw;
-  background-color: white;
+.signUpText {
+  color: #fff;
+  font-family: Roboto;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-align: end;
+}
+
+.link {
+  color: #0029ff;
+  font-family: Roboto;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.dividerVertical {
+  width: 1px;
+  height: 706px;
+  background: #fff;
+  margin-right: 214px;
+  margin-left: 54px;
 }

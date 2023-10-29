@@ -259,10 +259,10 @@ function ReportPage() {
                       {item.status === 1
                         ? 'Unsolved'
                         : item.status === 2
-                        ? 'Solved'
-                        : item.status === 3
-                        ? 'Deleted'
-                        : 'Unknown'}
+                          ? 'Solved'
+                          : item.status === 3
+                            ? 'Deleted'
+                            : 'Unknown'}
                     </Td>
                   </Tr>
                 ))}
