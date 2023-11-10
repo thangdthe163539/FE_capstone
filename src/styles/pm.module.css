@@ -66,3 +66,9 @@
 .text2 {
   font-weight: bold;
 }
+.alert{
+  width: 300px;
+  position: fixed;
+  top: 10%;
+  right: 1%;
+}
