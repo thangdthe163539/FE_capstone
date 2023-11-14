@@ -66,16 +66,34 @@ function FeedBackDetailManagePage() {
         return `${year}-${month}-${day}`;
     };
 
-    const trimTextToWordCount = (text, wordCount) => {
+    //cut text descriptions
+    const trimTextToMaxWidth = (text, maxWidth) => {
         const words = text.split(' ');
-        const trimmedText = words.slice(0, wordCount).join(' ');
+
+        let currentWidth = 0;
+        let trimmedWords = [];
+
+        for (let i = 0; i < words.length; i++) {
+            const wordWidth = words[i].length * 7; 
+
+            if (currentWidth + wordWidth <= maxWidth) {
+                trimmedWords.push(words[i]);
+                currentWidth += wordWidth;
+            } else {
+                break;
+            }
+        }
+
+        const trimmedText = trimmedWords.join(' ');
+
         return (
             <span>
                 {trimmedText}
-                <span style={{ color: 'blue', fontSize: '15px' }}>{words.length > wordCount ? ' see more...' : ''}</span>
+                <span style={{ color: 'blue', fontSize: '15px' }}>{words.length > trimmedWords.length ? ' see more...' : ''}</span>
             </span>
         );
     };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -92,6 +110,31 @@ function FeedBackDetailManagePage() {
 
     const setDetails = (item) => {
         setDetail(item);
+    };
+
+    const handleSendMail = () => {
+        const url = `http://localhost:5001/api/Report/SendReportByEmail/${detail.reportId}`;
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'accept': '*/*',
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    setIsOpenDetail(false);
+                    setIsSuccess("true");
+                } else {
+                    setIsOpenDetail(false);
+                    setIsSuccess("false");
+                }
+            })
+            .catch(error => {
+                setIsOpenDetail(false);
+                setIsSuccess("false");
+                console.error('Lỗi:', error);
+            });
     };
 
     const handleUpdate = () => {
@@ -193,7 +236,7 @@ function FeedBackDetailManagePage() {
                         {isSuccess === 'true' && (
                             <Alert status='success'>
                                 <AlertIcon />
-                                Update Success!
+                                Your request successfully!
                             </Alert>
                         )}
                         {isSuccess === 'false' && (
@@ -238,7 +281,7 @@ function FeedBackDetailManagePage() {
                                                     handleAdd();
                                                     setDetails(item);
                                                 }} >
-                                                    {trimTextToWordCount(item.description, 6)}
+                                                    {trimTextToMaxWidth(item.description, 350)}
                                                 </Td>
                                                 <Td style={{ width: '15%', textAlign: 'center' }}>{item.start_Date}</Td>
                                                 <Td style={{ width: '15%', textAlign: 'center' }}>{item.end_Date}</Td>
@@ -322,6 +365,9 @@ function FeedBackDetailManagePage() {
                     <ModalFooter>
                         <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
                             Save
+                        </Button>
+                        <Button colorScheme='whatsapp' mr={3} onClick={handleSendMail}>
+                            Send Mail
                         </Button>
                         <Button onClick={() => (setIsOpenAdd(false))}
                         >

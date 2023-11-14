@@ -135,7 +135,7 @@ function UserDetail() {
                 {isSuccess === 'true' && (
                     <Alert status='success'>
                         <AlertIcon />
-                        Delete Success!
+                        Your request successfully!
                     </Alert>
                 )}
                 {isSuccess === 'false' && (

@@ -228,7 +228,7 @@ function FeedbackPage() {
                         {isSuccess === 'true' && (
                             <Alert status='success'>
                                 <AlertIcon />
-                                Add Success!
+                                Your request successfully!
                             </Alert>
                         )}
                         {isSuccess === 'false' && (

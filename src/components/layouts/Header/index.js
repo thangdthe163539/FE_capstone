@@ -50,9 +50,7 @@ function Header() {
             console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {
-              // router.push('/pmpages/pmhome');
               router.push('adminpages/adminhome');
-              //   router.push('/userpages/userhome');
             }
             else if (id == 2) {
               router.push('/pmpages/pmhome');

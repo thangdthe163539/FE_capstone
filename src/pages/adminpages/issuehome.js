@@ -82,16 +82,33 @@ function IssuePage() {
     };
 
     //cut text descriptions
-    const trimTextToWordCount = (text, wordCount) => {
+    const trimTextToMaxWidth = (text, maxWidth) => {
         const words = text.split(' ');
-        const trimmedText = words.slice(0, wordCount).join(' ');
+
+        let currentWidth = 0;
+        let trimmedWords = [];
+
+        for (let i = 0; i < words.length; i++) {
+            const wordWidth = words[i].length * 7; 
+
+            if (currentWidth + wordWidth <= maxWidth) {
+                trimmedWords.push(words[i]);
+                currentWidth += wordWidth;
+            } else {
+                break;
+            }
+        }
+
+        const trimmedText = trimmedWords.join(' ');
+
         return (
             <span>
                 {trimmedText}
-                <span style={{ color: 'blue', fontSize: '15px' }}>{words.length > wordCount ? ' see more...' : ''}</span>
+                <span style={{ color: 'blue', fontSize: '15px' }}>{words.length > trimmedWords.length ? ' see more...' : ''}</span>
             </span>
         );
     };
+
 
     useEffect(() => {
         const url = 'http://localhost:5001/api/Report/ReportsByType/issues';
@@ -191,6 +208,31 @@ function IssuePage() {
     };
     //End
 
+    const handleSendMail = () => {
+        const url = `http://localhost:5001/api/Report/SendReportByEmail/${detail.reportId}`;
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'accept': '*/*',
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    setIsOpenDetail(false);
+                    setIsSuccess("true");
+                } else {
+                    setIsOpenDetail(false);
+                    setIsSuccess("false");
+                }
+            })
+            .catch(error => {
+                setIsOpenDetail(false);
+                setIsSuccess("false");
+                console.error('Lỗi:', error);
+            });
+    };
+
     const handleUpdate = () => {
         const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
 
@@ -228,6 +270,7 @@ function IssuePage() {
                 }
             })
             .catch(error => {
+                setIsOpenDetail(false);
                 setIsSuccess("false");
                 console.error('Lỗi:', error);
             });
@@ -373,7 +416,10 @@ function IssuePage() {
                                                 {issue.title}
                                             </Button>
                                         </Td>
-                                        <Td style={{ width: '50px' }}>{trimTextToWordCount(issue.description.trim(), 6)}</Td>
+                                        <Td style={{ width: '50px' }} onClick={() => {
+                                                handleDetail();
+                                                setDetails(issue);
+                                            }}>{trimTextToMaxWidth(issue.description.trim(), 350)}</Td>
                                         <Td>{issue.start_Date}</Td>
                                         <Td>{issue.end_Date}</Td>
                                         <Td>{issue.status}</Td>
@@ -454,6 +500,9 @@ function IssuePage() {
                     <ModalFooter>
                         <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
                             Save
+                        </Button>
+                        <Button colorScheme='whatsapp' mr={3} onClick={handleSendMail}>
+                            Send Mail
                         </Button>
                         <Button onClick={() => (setIsOpenAdd(false))}
                         >
