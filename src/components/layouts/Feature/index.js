@@ -18,10 +18,10 @@ function Feature() {
                 <Box>
                     <Text className={`${styles.software}`}>Software</Text>
                     <Text className={`${styles.textSof}`}>
-                        <Text>Optimize the management of your software assets.</Text>
-                        <Text>With SoftTrack, you have the ability to effectively track </Text>
-                        <Text>and monitor software licenses, ensure regulatory compliance,</Text>
-                        <Text>and optimize costs across your organization.</Text>
+                        Optimize the management of your software assets.<br />
+                        With SoftTrack, you have the ability to effectively track <br />
+                        and monitor software licenses, ensure regulatory compliance,<br />
+                        and optimize costs across your organization.
                     </Text>
                     <Flex>
                         <UnorderedList className={`${styles.textList}`}>
@@ -46,10 +46,10 @@ function Feature() {
                 <Box style={{ marginLeft: "13%" }}>
                     <Text className={`${styles.software}`}>Device</Text>
                     <Text className={`${styles.textSof}`}>
-                        <Text>Device Management is an important part of organizing and navigating</Text>
-                        <Text>multiple devices within an organization or network. This is especially </Text>
-                        <Text>important in corporate environments, where security, operational</Text>
-                        <Text>efficiency, and IT infrastructure management need to be ensured.</Text>
+                        Device Management is an important part of organizing and navigating<br />
+                        multiple devices within an organization or network. This is especially <br />
+                        important in corporate environments, where security, operational<br />
+                        efficiency, and IT infrastructure management need to be ensured.
                     </Text>
                     <Flex className={`${styles.textList}`}>
                         <UnorderedList>
@@ -67,10 +67,10 @@ function Feature() {
                 <Box>
                     <Text className={`${styles.software}`}>Report/Issue-feedback</Text>
                     <Text className={`${styles.textSof}`}>
-                        <Text>An important aspect in building and maintaining a system or product</Text>
-                        <Text>that is stable and continuously improving. This entails the process of</Text>
-                        <Text>organizing, tracking and resolving reports of incidents or feedback</Text>
-                        <Text>from you.</Text>
+                        An important aspect in building and maintaining a system or product<br />
+                        that is stable and continuously improving. This entails the process of<br />
+                        organizing, tracking and resolving reports of incidents or feedback<br />
+                        from you.
                     </Text>
                     <Flex>
                         <UnorderedList className={`${styles.textList}`}>

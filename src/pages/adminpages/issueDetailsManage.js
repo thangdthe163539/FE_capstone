@@ -9,12 +9,13 @@ import {
     Tbody, ModalContent,
     Center, ModalHeader,
     Modal, ModalCloseButton,
-    Button, ModalBody,
+    Button, ModalBody, Image,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowForwardIcon } from '@chakra-ui/icons';
+import axios from 'axios';
+import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import styles from '@/styles/pm.module.css';
 import {
     Alert,
@@ -44,7 +45,109 @@ function IssueDetailManagePage() {
     const [description, setDescription] = useState('');
     const [title, setTitle] = useState('');
     const [Apps, setApps] = useState([]);
+    const [error, setError] = useState('');
+    const [image, setImage] = useState([]);
+    const [isZoomed, setIsZoomed] = useState(false);
+    const [zoomedIndex, setZoomedIndex] = useState(null);
+    const [isHovered, setIsHovered] = useState(null);
+    const allowedExtensions = ['jpg', 'png'];
+    //Image
+    const handleFileChangeU = (e) => {
+        const files = e.target.files;
 
+        if (files) {
+            const newImages = Array.from(files).map((file) => {
+                const extension = file.name.split('.').pop().toLowerCase();
+
+                if (allowedExtensions.includes(extension)) {
+                    const reader = new FileReader();
+
+                    reader.onload = () => {
+                        setImage((prevImages) => [
+                            ...prevImages,
+                            { fileName: file.name, dataURL: reader.result },
+                        ]);
+                        setError('');
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    setError('Invalid file type. Please select a JPG or PNG file.');
+                    return null;
+                }
+            });
+
+            // Giữ lại cả ảnh cũ và ảnh mới
+            const oldImages = image.filter((img) => img.dataURL);
+            setImage([...oldImages, ...newImages.filter(Boolean)]);
+        }
+    };
+
+    const handleRemoveImageU = (index) => {
+        setImage((prevImages) => {
+            const newImages = [...prevImages];
+            newImages.splice(index, 1);
+            return newImages;
+        });
+        setError('');
+    };
+
+    function dataURLtoBlob(dataURL) {
+        const parts = dataURL.split(';base64,');
+        const contentType = parts[0].split(':')[1];
+        const raw = window.atob(parts[1]);
+        const rawLength = raw.length;
+        const uInt8Array = new Uint8Array(rawLength);
+
+        for (let i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+
+        return new Blob([uInt8Array], { type: contentType });
+    }
+
+    useEffect(() => {
+        if (detail?.reportId) {
+            const url = `http://localhost:5001/api/v1/Image/list_Images_by_Report/${detail.reportId}`;
+
+            fetch(url, {
+                method: 'GET',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    setImage(data);
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                });
+        }
+    }, [detail?.reportId]);
+
+    const handleImageClick = (index) => {
+        setZoomedIndex(index);
+        setIsZoomed(true);
+    };
+
+    const handleZoomClose = () => {
+        setIsZoomed(false);
+        setZoomedIndex(null);
+    };
+
+    const handleImageMouseLeave = () => {
+        setIsHovered(null);
+    };
+
+    const handleImageMouseEnter = (index, event) => {
+        event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+        setIsHovered(index);
+    };
+
+    const handleDeleteClick = (index, event) => {
+        event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+        handleRemoveImageU(index);
+    };
+
+    //End
     const uniqueStatuses = [...new Set(issue.map((st) => st.status))];
 
     const sortedIssue = uniqueStatuses
@@ -73,7 +176,7 @@ function IssueDetailManagePage() {
         let trimmedWords = [];
 
         for (let i = 0; i < words.length; i++) {
-            const wordWidth = words[i].length * 7; 
+            const wordWidth = words[i].length * 7;
 
             if (currentWidth + wordWidth <= maxWidth) {
                 trimmedWords.push(words[i]);
@@ -122,23 +225,22 @@ function IssueDetailManagePage() {
         })
             .then(response => {
                 if (response.ok) {
-                    setIsOpenDetail(false);
+                    setIsOpenAdd(false);
                     setIsSuccess("true");
                 } else {
-                    setIsOpenDetail(false);
+                    setIsOpenAdd(false);
                     setIsSuccess("false");
                 }
             })
             .catch(error => {
-                setIsOpenDetail(false);
+                setIsOpenAdd(false);
                 setIsSuccess("false");
                 console.error('Lỗi:', error);
             });
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
-
         const endDate = document.getElementsByName('endDate')[0].value;
         const dateParts = endDate.split('-');
         let formattedDate = '';
@@ -148,34 +250,43 @@ function IssueDetailManagePage() {
             console.error('Ngày không hợp lệ.');
         }
 
-        const data = {
-            title: title.trim() === '' ? detail.title.trim() : title.trim(),
-            description: description.trim() === '' ? detail.description.trim() : description.trim(),
-            type: 'issues',
-            end_Date: formattedDate,
-            status: selectedOptionActive === '' ? detail.status : selectedOptionActive
-        };
-        fetch(url, {
-            method: 'PUT',
-            headers: {
-                'accept': '*/*',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => {
-                if (response.ok) {
-                    setIsSuccess("true");
-                    setIsOpenAdd(false);
-                } else {
-                    setIsSuccess("false");
-                    setIsOpenAdd(false);
-                }
-            })
-            .catch(error => {
-                setIsSuccess("false");
-                console.error('Lỗi:', error);
+        const fileObjects = image.map(image => {
+            // Tạo một Blob từ dataURL
+            if (image.dataURL) {
+                const blob = dataURLtoBlob(image.dataURL);
+                return new File([blob], image.fileName, { type: blob.type });
+            } else {
+                console.log(image.image1 + "----111");
+                return new File([new Blob()], image.fileName, { type: "image/jpeg" });
+                // Xử lý trường hợp khi dataURL không xác định
+            }
+        });
+        console.log(image + "dsd");
+        const formData = new FormData();
+        formData.append('AppId', detail.appId);
+        formData.append('Title', title.trim() === '' ? detail.title.trim() : title.trim());
+        formData.append('Description', description.trim() === '' ? detail.description.trim() : description.trim());
+        formData.append('Type', 'issues');
+        formData.append('Start_Date', formattedDate);
+        formData.append('End_Date', formattedDate);
+        formData.append('Status', selectedOptionActive === '' ? detail.status : selectedOptionActive);
+
+        fileObjects.forEach((file, index) => {
+            formData.append(`Images`, file);
+        });
+        try {
+            const response = await axios.put(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
+            setIsSuccess("true");
+            setIsOpenAdd(false);
+        } catch (error) {
+            setIsSuccess("false");
+            setIsOpenAdd(false);
+            console.error('Lỗi:', error);
+        }
     };
 
     useEffect(() => {
@@ -239,7 +350,7 @@ function IssueDetailManagePage() {
                             </Alert>
                         )}
                         {isSuccess === 'false' && (
-                            <Alert status='error'>
+                            <Alert status='error' style={{ width: '350px' }}>
                                 <AlertIcon />
                                 Error processing your request.
                             </Alert>
@@ -360,6 +471,75 @@ function IssueDetailManagePage() {
                                 minH={40}
                             />
                         </FormControl>
+                        <br />
+                        <Grid templateColumns='repeat(1, 1fr)' gap={8}>
+                            <GridItem>
+                                <Flex>
+                                    <FormLabel style={{ width: '50px' }}>Image</FormLabel>
+                                    <Input style={{ width: '300px', border: 'none', textAlign: 'center', height: '40px' }} id='file' type='file' onChange={handleFileChangeU} multiple />
+                                </Flex>
+                                <Box display="flex" flexWrap="wrap" gap={4}>
+                                    {image.map((image, index) => (
+                                        <Box
+                                            key={index}
+                                            position="relative"
+                                            maxW="100px"
+                                            maxH="200px"
+                                            overflow="hidden"
+                                            onClick={() => handleImageClick(index)}
+                                            onMouseEnter={(event) => handleImageMouseEnter(index, event)}
+                                            onMouseLeave={handleImageMouseLeave}
+                                        >
+                                            <Image
+                                                src={image.dataURL || `/images/${image.image1}`}
+                                                alt={`Selected Image ${index}`}
+                                                w="100%"
+                                                h="100%"
+                                                objectFit="cover"
+                                                _hover={{ cursor: 'pointer' }}
+                                            />
+                                            {isHovered === index && (
+                                                <>
+                                                    <DeleteIcon
+                                                        position="absolute"
+                                                        top="5px"
+                                                        color="black"
+                                                        right="5px"
+                                                        fontSize="15px"
+                                                        variant="ghost"
+                                                        onClick={(event) => handleDeleteClick(index, event)}
+                                                        _hover={{ color: 'black ' }}
+                                                    />
+                                                    <Text position="absolute" bottom="5px" left="5px" fontSize="10px" color="white">
+                                                        {image.fileName}
+                                                    </Text>
+                                                </>
+                                            )}
+                                        </Box>
+                                    ))}
+                                    {isZoomed && (
+                                        <div className="modal-overlay" onClick={handleZoomClose}>
+                                            <Modal isOpen={isZoomed} onClose={handleZoomClose} size="xl" isCentered>
+                                                <ModalOverlay />
+                                                <ModalContent>
+                                                    <ModalBody>
+                                                        <Box className="zoomed-image-container">
+                                                            <Image
+                                                                src={image[zoomedIndex]?.dataURL || `/images/${image[zoomedIndex]?.image1}`}
+                                                                alt={`${zoomedIndex}`}
+                                                            />
+                                                        </Box>
+                                                    </ModalBody>
+                                                </ModalContent>
+                                            </Modal>
+                                        </div>
+                                    )}
+                                </Box>
+                                {error && (
+                                    <Text color="red">{error}</Text>
+                                )}
+                            </GridItem>
+                        </Grid>
                     </ModalBody>
                     <ModalFooter>
                         <Button colorScheme='blue' mr={3} onClick={handleUpdate}>

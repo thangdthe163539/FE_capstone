@@ -3,14 +3,20 @@ import styles from '@/styles/Header.module.css';
 import Link from 'next/link';
 import { initializeApp } from 'firebase/app';
 import { useRouter } from 'next/router';
-
+import { useState, useEffect } from 'react';
 import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
 
+import {
+  Alert,
+  AlertIcon,
+} from '@chakra-ui/react'
+
 function Header() {
+  const [isSuccess, setIsSuccess] = useState('');
   const router = useRouter();
   // start config firebase - login gg
   const firebaseConfig = {
@@ -58,10 +64,11 @@ function Header() {
             else if (id == 3) {
               router.push('/userpages/userhome');
             } else {
-              router.push('home');
+              router.push('http://localhost:3000/');
             }
           })
           .catch((error) => {
+            setIsSuccess("false");
             console.error('Lỗi:', error);
           });
       })
@@ -81,9 +88,16 @@ function Header() {
         <Text className={`${styles.navbarText}`}>
           YOU ARE NOT LOGGED IN.
         </Text>
-        <Text style={{fontSize:'20px', textAlign: 'center', marginTop: '-0.5%', marginLeft: '0.5%', color: '#344e74'}}>(</Text>
+        <Text style={{ fontSize: '20px', textAlign: 'center', marginTop: '-0.5%', marginLeft: '0.5%', color: '#344e74' }}>(</Text>
         <Text onClick={handleGoogleLogin} className={`${styles.loggin}`}>LOGIN</Text>
-        <Text style={{fontSize:'20px', textAlign: 'center', marginTop: '-0.5%',color: '#344e74'}}>)</Text>
+        <Text style={{ fontSize: '20px', textAlign: 'center', marginTop: '-0.5%', color: '#344e74' }}>)</Text>
+        <Text style={{ paddingTop: '5px', position: 'fixed', right: '45%' }}>
+          {isSuccess === 'false' && (
+            <Text style={{color: 'black'}}>
+              Login failed. Please try again!
+            </Text>
+          )}
+        </Text>
       </Flex>
     </Box>
   );

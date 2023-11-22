@@ -21,11 +21,11 @@ function Footer() {
         </Text>
       </Flex>
       <Text className={`${styles.textAbout}`}>
-        <Text>SoftTrack is a cutting-edge Software Asset Management (SAM)</Text>
-        <Text>solution designed to streamline the management of your software assets.</Text>
-        <Text>With SoftTrack, you can effortlessly track, monitor, and optimize</Text>
-        <Text>your software licenses, ensuring compliance and cost efficiency </Text>
-        <Text>for your organization.</Text>
+        SoftTrack is a cutting-edge Software Asset Management (SAM)<br />
+        solution designed to streamline the management of your software assets.<br />
+        With SoftTrack, you can effortlessly track, monitor, and optimize<br />
+        your software licenses, ensuring compliance and cost efficiency <br />
+        for your organization.
       </Text>
       <Text className={`${styles.lastline}`}>SoftTrack Copyright © 2023 INDEPNET Development Team</Text>
     </Box>
