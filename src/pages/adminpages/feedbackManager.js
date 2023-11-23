@@ -14,7 +14,7 @@ import {
     Flex,
     Spacer,
     IconButton,
-    Textarea,
+    Textarea, Image,
 } from '@chakra-ui/react';
 import {
     Modal,
@@ -36,10 +36,10 @@ import {
     Alert,
     AlertIcon,
 } from '@chakra-ui/react'
-
+import axios from 'axios';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
-import { ArrowForwardIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import { FaPlus } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -72,6 +72,148 @@ function FeedBackPage() {
     const [selectedOptionActive, setSelectedOptionActive] = useState('');
     const [description, setDescription] = useState('');
     const [title, setTitle] = useState('');
+    const [imagesState, setImages] = useState([]);
+    const [error, setError] = useState('');
+    const [image, setImage] = useState([]);
+    const [isZoomed, setIsZoomed] = useState(false);
+    const [zoomedIndex, setZoomedIndex] = useState(null);
+    const [isHovered, setIsHovered] = useState(null);
+
+    const allowedExtensions = ['jpg', 'png'];
+    //Image
+    useEffect(() => {
+        if (detail?.reportId) {
+            const url = `http://localhost:5001/api/v1/Image/list_Images_by_Report/${detail.reportId}`;
+
+            fetch(url, {
+                method: 'GET',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    setImage(data);
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                });
+        }
+    }, [detail?.reportId]);
+
+    const handleFileChangeU = (e) => {
+        const files = e.target.files;
+
+        if (files) {
+            const newImages = Array.from(files).map((file) => {
+                const extension = file.name.split('.').pop().toLowerCase();
+
+                if (allowedExtensions.includes(extension)) {
+                    const reader = new FileReader();
+
+                    reader.onload = () => {
+                        setImage((prevImages) => [
+                            ...prevImages,
+                            { fileName: file.name, dataURL: reader.result },
+                        ]);
+                        setError('');
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    setError('Invalid file type. Please select a JPG or PNG file.');
+                    return null;
+                }
+            });
+
+            // Giữ lại cả ảnh cũ và thêm ảnh mới
+            setImage((prevImages) => [...prevImages.filter((img) => img.dataURL), ...newImages.filter(Boolean)]);
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const files = e.target.files;
+
+        if (files) {
+            const newImages = Array.from(files).map((file) => {
+                const extension = file.name.split('.').pop().toLowerCase();
+
+                if (allowedExtensions.includes(extension)) {
+                    const reader = new FileReader();
+
+                    reader.onload = () => {
+                        setImages((prevImages) => [...prevImages, { fileName: file.name, dataURL: reader.result }]);
+                        setError('');
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    setError('Invalid file type. Please select a JPG or PNG file.');
+                    return null;
+                }
+            });
+        }
+    };
+
+    const handleImageClick = (index) => {
+        setZoomedIndex(index);
+        setIsZoomed(true);
+    };
+
+    const handleZoomClose = () => {
+        setIsZoomed(false);
+        setZoomedIndex(null);
+    };
+
+    const handleImageMouseLeave = () => {
+        setIsHovered(null);
+    };
+
+    const handleImageMouseEnter = (index, event) => {
+        event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+        setIsHovered(index);
+    };
+
+    const handleRemoveImage = (index) => {
+        setImages((prevImages) => {
+            const newImages = [...prevImages];
+            newImages.splice(index, 1);
+            return newImages;
+        });
+        setError('');
+    };
+
+    const handleRemoveImageU = (index) => {
+        setImage((prevImages) => {
+            const newImages = [...prevImages];
+            newImages.splice(index, 1);
+            return newImages;
+        });
+        setError('');
+    };
+
+    const handleDeleteClick_Add = (index, event) => {
+        event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+        handleRemoveImage(index);
+    };
+
+    const handleDeleteClick = (index, event) => {
+        event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+        handleRemoveImageU(index);
+    };
+
+    function dataURLtoBlob(dataURL) {
+        const parts = dataURL.split(';base64,');
+        const contentType = parts[0].split(':')[1];
+        const raw = window.atob(parts[1]);
+        const rawLength = raw.length;
+        const uInt8Array = new Uint8Array(rawLength);
+
+        for (let i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+
+        return new Blob([uInt8Array], { type: contentType });
+    }
+
+    //End
 
     const handleSearchInputChange = (e) => {
         setSearchQuery(e.target.value);
@@ -89,7 +231,7 @@ function FeedBackPage() {
         let trimmedWords = [];
 
         for (let i = 0; i < words.length; i++) {
-            const wordWidth = words[i].length * 7; 
+            const wordWidth = words[i].length * 7;
 
             if (currentWidth + wordWidth <= maxWidth) {
                 trimmedWords.push(words[i]);
@@ -104,7 +246,7 @@ function FeedBackPage() {
         return (
             <span>
                 {trimmedText}
-                <span style={{ color: 'blue', fontSize: '15px' }}>{words.length > trimmedWords.length ? ' see more...' : ''}</span>
+                <span style={{ color: 'blue', fontSize: '15px' }}>{words.length > trimmedWords.length ? ' ...' : ''}</span>
             </span>
         );
     };
@@ -232,9 +374,9 @@ function FeedBackPage() {
             });
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
-
+    
         const endDate = document.getElementsByName('endDate')[0].value;
         const dateParts = endDate.split('-');
         let formattedDate = '';
@@ -243,38 +385,50 @@ function FeedBackPage() {
         } else {
             console.error('Ngày không hợp lệ.');
         }
-
-        const data = {
-            title: title.trim() === '' ? detail.title.trim() : title.trim(),
-            description: description.trim() === '' ? detail.description.trim() : description.trim(),
-            type: 'feedback',
-            end_Date: formattedDate,
-            status: selectedOptionActive === '' ? detail.status : selectedOptionActive
-        };
-        fetch(url, {
-            method: 'PUT',
-            headers: {
-                'accept': '*/*',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => {
-                if (response.ok) {
-                    setIsSuccess("true");
-                    setIsOpenDetail(false);
-                } else {
-                    setIsSuccess("false");
-                    setIsOpenDetail(false);
-                }
-            })
-            .catch(error => {
-                setIsSuccess("false");
-                console.error('Lỗi:', error);
+    
+        const fileObjects = await Promise.all(image.map(async (image) => {
+            // Tạo một Blob từ dataURL
+            if (image.dataURL) {
+                const blob = dataURLtoBlob(image.dataURL);
+                return new File([blob], image.fileName, { type: blob.type });
+            } else {
+                console.log(image.image1 + "----111");
+    
+                // Giữ nguyên ảnh khi dataURL không xác định
+                const fullImagePath = `/images/${image.image1}`;
+                const blob = await fetch(fullImagePath).then(res => res.blob());
+                return new File([blob], image.fileName, { type: blob.type });
+            }
+        }));
+        const formData = new FormData();
+        formData.append('AppId', detail.appId);
+        formData.append('Title', title.trim() === '' ? detail.title.trim() : title.trim());
+        formData.append('Description', description.trim() === '' ? detail.description.trim() : description.trim());
+        formData.append('Type', 'feedback');
+        formData.append('Start_Date', formattedDate);
+        formData.append('End_Date', formattedDate);
+        formData.append('Status', selectedOptionActive === '' ? detail.status : selectedOptionActive);
+    
+        fileObjects.forEach((file, index) => {
+            formData.append(`Images`, file);
+        });
+        try {
+            const response = await axios.put(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
+            setIsSuccess("true");
+            setIsOpenDetail(false);
+        } catch (error) {
+            setIsSuccess("false");
+            setIsOpenDetail(false);
+            console.error('Lỗi:', error);
+        }
     };
+    
 
-    const handleSaveAdd = () => {
+    const handleSaveAdd = async () => {
         const url = 'http://localhost:5001/api/Report/CreateReport';
 
         const Id = parseInt(appId);
@@ -288,37 +442,40 @@ function FeedBackPage() {
         } else {
             console.error('Ngày không hợp lệ.');
         }
-        console.log(appId);
-        const data = {
-            appId: Id,
-            title: title,
-            description: desc,
-            type: 'feedback',
-            end_Date: formattedDate,
-            status: 2
-        };
+        // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
+        const fileObjects = imagesState.map(image => {
+            // Tạo một Blob từ dataURL
+            const blob = dataURLtoBlob(image.dataURL);
+            // Tạo một File từ Blob
+            return new File([blob], image.fileName, { type: blob.type });
+            []
+        });
+        const formData = new FormData();
+        formData.append('AppId', Id);
+        formData.append('Title', title);
+        formData.append('Description', desc);
+        formData.append('Type', 'feedback');
+        formData.append('Start_Date', formattedDate);
+        formData.append('End_Date', formattedDate);
+        formData.append('Status', 2);
 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => {
-                if (response.ok) {
-                    setIsSuccess("true");
-                    setIsOpenAdd(false);
-                } else {
-                    setIsSuccess("false");
-                    setIsOpenAdd(false);
-                }
-            })
-            .catch(error => {
-                setIsSuccess("false");
-                setIsOpenAdd(false);
-                console.error('Lỗi:', error);
+        // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
+        fileObjects.forEach((file, index) => {
+            formData.append(`Images`, file);
+        });
+        try {
+            const response = await axios.post(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
+            setIsSuccess("true");
+            setIsOpenAdd(false);
+        } catch (error) {
+            setIsSuccess("false");
+            setIsOpenAdd(false);
+            console.error('Lỗi:', error);
+        }
     };
 
     useEffect(() => {
@@ -415,9 +572,9 @@ function FeedBackPage() {
                                             </Button>
                                         </Td>
                                         <Td style={{ width: '50px' }} onClick={() => {
-                                                handleDetail();
-                                                setDetails(issue);
-                                            }}  >{trimTextToMaxWidth(issue.description.trim(), 300)}</Td>
+                                            handleDetail();
+                                            setDetails(issue);
+                                        }}  >{trimTextToMaxWidth(issue.description.trim(), 300)}</Td>
                                         <Td>{issue.start_Date}</Td>
                                         <Td>{issue.end_Date}</Td>
                                         <Td>{issue.status}</Td>
@@ -438,7 +595,7 @@ function FeedBackPage() {
                 size='lg'
             >
                 <ModalOverlay />
-                <ModalContent maxW="800px">
+                <ModalContent maxW="1100px">
                     <ModalHeader>Update Feedback</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={8}>
@@ -494,6 +651,75 @@ function FeedBackPage() {
                                 minH={40}
                             />
                         </FormControl>
+                        <br />
+                        <Grid templateColumns='repeat(1, 1fr)' gap={8}>
+                            <GridItem>
+                                <Flex>
+                                    <FormLabel style={{ width: '50px' }}>Image</FormLabel>
+                                    <Input style={{ width: '300px', border: 'none', textAlign: 'center', height: '40px' }} id='file' type='file' onChange={handleFileChangeU} multiple />
+                                </Flex>
+                                <Box display="flex" flexWrap="wrap" gap={4}>
+                                    {image.map((image, index) => (
+                                        <Box
+                                            key={index}
+                                            position="relative"
+                                            maxW="100px"
+                                            maxH="200px"
+                                            overflow="hidden"
+                                            onClick={() => handleImageClick(index)}
+                                            onMouseEnter={(event) => handleImageMouseEnter(index, event)}
+                                            onMouseLeave={handleImageMouseLeave}
+                                        >
+                                            <Image
+                                                src={image.dataURL || `/images/${image.image1}`}
+                                                alt={`Selected Image ${index}`}
+                                                w="100%"
+                                                h="100%"
+                                                objectFit="cover"
+                                                _hover={{ cursor: 'pointer' }}
+                                            />
+                                            {isHovered === index && (
+                                                <>
+                                                    <DeleteIcon
+                                                        position="absolute"
+                                                        top="5px"
+                                                        color="black"
+                                                        right="5px"
+                                                        fontSize="15px"
+                                                        variant="ghost"
+                                                        onClick={(event) => handleDeleteClick(index, event)}
+                                                        _hover={{ color: 'black ' }}
+                                                    />
+                                                    <Text position="absolute" bottom="5px" left="5px" fontSize="10px" color="white">
+                                                        {image.fileName}
+                                                    </Text>
+                                                </>
+                                            )}
+                                        </Box>
+                                    ))}
+                                    {isZoomed && (
+                                        <div className="modal-overlay" onClick={handleZoomClose}>
+                                            <Modal isOpen={isZoomed} onClose={handleZoomClose} size="xl" isCentered>
+                                                <ModalOverlay />
+                                                <ModalContent>
+                                                    <ModalBody>
+                                                        <Box className="zoomed-image-container">
+                                                            <Image
+                                                                src={image[zoomedIndex]?.dataURL || `/images/${image[zoomedIndex]?.image1}`}
+                                                                alt={`${zoomedIndex}`}
+                                                            />
+                                                        </Box>
+                                                    </ModalBody>
+                                                </ModalContent>
+                                            </Modal>
+                                        </div>
+                                    )}
+                                </Box>
+                                {error && (
+                                    <Text color="red">{error}</Text>
+                                )}
+                            </GridItem>
+                        </Grid>
                     </ModalBody>
                     <ModalFooter>
                         <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
@@ -600,6 +826,82 @@ function FeedBackPage() {
                                 minH={40}
                             />
                         </FormControl>
+                        <br />
+                        <Grid templateColumns='repeat(1, 1fr)' gap={8}>
+                            <GridItem>
+                                <Flex>
+                                    <FormLabel style={{ width: '50px' }}>Image</FormLabel>
+                                    <Input
+                                        style={{ width: '300px', border: 'none', textAlign: 'center', height: '40px' }}
+                                        id='file'
+                                        type='file'
+                                        onChange={handleFileChange}
+                                        multiple
+                                    />
+                                </Flex>
+                                <Box display="flex" flexWrap="wrap" gap={4}>
+                                    {imagesState.map((image, index) => (
+                                        <Box
+                                            key={index}
+                                            position="relative"
+                                            maxW="100px"
+                                            maxH="200px"
+                                            overflow="hidden"
+                                            onClick={() => handleImageClick(index)}
+                                            onMouseEnter={(event) => handleImageMouseEnter(index, event)}
+                                            onMouseLeave={handleImageMouseLeave}
+                                        >
+                                            <Image
+                                                src={image.dataURL}
+                                                alt={`Selected Image ${index}`}
+                                                w="100%"
+                                                h="100%"
+                                                objectFit="cover"
+                                                _hover={{ cursor: 'pointer' }}
+                                            />
+                                            {isHovered === index && (
+                                                <>
+                                                    <DeleteIcon
+                                                        position="absolute"
+                                                        top="5px"
+                                                        color="black"
+                                                        right="5px"
+                                                        fontSize="15px"
+                                                        variant="ghost"
+                                                        onClick={(event) => handleDeleteClick_Add(index, event)}
+                                                        _hover={{ color: 'black' }}
+                                                    />
+                                                    <Text position="absolute" bottom="5px" left="5px" fontSize="10px" color="white">
+                                                        {image.fileName}
+                                                    </Text>
+                                                </>
+                                            )}
+                                        </Box>
+                                    ))}
+                                    {isZoomed && (
+                                        <div className="modal-overlay" onClick={handleZoomClose}>
+                                            <Modal isOpen={isZoomed} onClose={handleZoomClose} size="xl" isCentered>
+                                                <ModalOverlay />
+                                                <ModalContent>
+                                                    <ModalBody>
+                                                        <Box className="zoomed-image-container">
+                                                            <Image
+                                                                src={imagesState[zoomedIndex]?.dataURL}
+                                                                alt={`${zoomedIndex}`}
+                                                                w="100%"  // Thiết lập kích thước modal sao cho đủ lớn
+                                                                h="100%"
+                                                                objectFit="contain"
+                                                            />
+                                                        </Box>
+                                                    </ModalBody>
+                                                </ModalContent>
+                                            </Modal>
+                                        </div>
+                                    )}
+                                </Box>
+                                {error && <Text color="red">{error}</Text>}
+                            </GridItem>
+                        </Grid>
                     </ModalBody>
                     <ModalFooter>
                         <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>

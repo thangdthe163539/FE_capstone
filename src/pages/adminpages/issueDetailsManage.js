@@ -250,17 +250,20 @@ function IssueDetailManagePage() {
             console.error('Ngày không hợp lệ.');
         }
 
-        const fileObjects = image.map(image => {
+        const fileObjects = await Promise.all(image.map(async (image) => {
             // Tạo một Blob từ dataURL
             if (image.dataURL) {
                 const blob = dataURLtoBlob(image.dataURL);
                 return new File([blob], image.fileName, { type: blob.type });
             } else {
                 console.log(image.image1 + "----111");
-                return new File([new Blob()], image.fileName, { type: "image/jpeg" });
-                // Xử lý trường hợp khi dataURL không xác định
+    
+                // Giữ nguyên ảnh khi dataURL không xác định
+                const fullImagePath = `/images/${image.image1}`;
+                const blob = await fetch(fullImagePath).then(res => res.blob());
+                return new File([blob], image.fileName, { type: blob.type });
             }
-        });
+        }));
         console.log(image + "dsd");
         const formData = new FormData();
         formData.append('AppId', detail.appId);
@@ -416,7 +419,7 @@ function IssueDetailManagePage() {
                 size='lg'
             >
                 <ModalOverlay />
-                <ModalContent maxW="800px">
+                <ModalContent maxW="1100px">
                     <ModalHeader>Update Issue</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={8}>

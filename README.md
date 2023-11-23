@@ -9,4 +9,5 @@ P/: Nếu muốn chạy production thì phải chạy npm run build rồi chạy
 npm install
 install firebase@10.5.0
 npm install react-modal
+npm install react-paginate
 npm install antd @ant-design/icons
