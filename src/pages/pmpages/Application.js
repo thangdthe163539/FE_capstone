@@ -46,34 +46,40 @@ import Header2 from '@/components/layouts/Header/index2';
 //
 const defaultData = {
   accId: '',
-  softwareId: '',
+  appId: '',
   deviceId: '',
   name: '',
   version: '',
   release: '',
   publisher: '',
-  type: 'Web App',
   os: 'Window',
-  installDate: '',
+  osversion: '',
+  description: '',
+  download: '',
+  docs: '',
+  language: '',
+  db: '',
   status: '',
 };
 
 function SoftwarePage() {
   // console.log(BACK_END_PORT);
   const router = useRouter();
-  let account = null;
+  const [account, setAccount] = useState();
 
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
+
     if (storedAccount) {
-      account = JSON.parse(storedAccount);
-      defaultData.accId = account.accId;
-      if (!account || account == null) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
         // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
       }
     }
-  });
+  }, []);
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -103,12 +109,12 @@ function SoftwarePage() {
   const [selectedRow, setSelectedRow] = useState(new Set());
   const [isButtonDisabled, setButtonDisabled] = useState(true);
   const handleRowClick = (item) => {
-    if (selectedRow === item.softwareId) {
+    if (selectedRow === item.appId) {
       setSelectedRow(null); // Unselect the row if it's already selected
       setFormData2(defaultData);
       setButtonDisabled(true);
     } else {
-      setSelectedRow(item.softwareId);
+      setSelectedRow(item.appId);
       setFormData2(item);
       // console.log(formData2);
       setButtonDisabled(false);
@@ -119,15 +125,21 @@ function SoftwarePage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.post(
-        `${BACK_END_PORT}/api/v1/Software/CreateSW`,
+        `${BACK_END_PORT}/api/v1/App/CreateApp`,
         {
-          accId: formData.accId,
+          accId: account.accId,
           name: formData.name,
           publisher: formData.publisher,
           version: formData.version,
           release: formData.release,
           type: formData.type,
           os: formData.os,
+          osversion: formData.osversion,
+          description: formData.description,
+          download: formData.download,
+          docs: formData.docs,
+          language: formData.language,
+          db: formData.db,
           status: 1,
           // deviceId: formData.deviceId,
         },
@@ -138,8 +150,7 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
-          account.accId,
+        `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -151,15 +162,21 @@ function SoftwarePage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Software/UpdateSW` + formData2.softwareId,
+        `${BACK_END_PORT}/api/v1/App/UpdateApplication/` + formData2.appId,
         {
-          accId: formData2.accId,
+          // accId: account.accId,
           name: formData2.name,
           publisher: formData2.publisher,
           version: formData2.version,
           release: formData2.release,
           type: formData2.type,
           os: formData2.os,
+          osversion: formData2.osversion,
+          description: formData2.description,
+          download: formData2.download,
+          docs: formData2.docs,
+          language: formData2.language,
+          db: formData2.db,
           status: formData2.status,
         },
       );
@@ -169,8 +186,7 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
-          account.accId,
+        `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -182,8 +198,7 @@ function SoftwarePage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
-            account.accId,
+          `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
         );
         setData(response.data); // Assuming the API returns an array of objects
         // const response2 = await axios.get(
@@ -199,23 +214,35 @@ function SoftwarePage() {
     };
 
     fetchData();
-  }, []);
+  }, [account]);
   //
   useEffect(() => {
-    // if (data.length > 0 && deviceData.length > 0) {
-    if (data.length > 0) {
-      const mergedData = data.map((software) => {
-        const device = deviceData.find(
-          (sw) => sw.deviceId === software.deviceId,
+    const fetchData = async () => {
+      try {
+        const mergedData = await Promise.all(
+          data.map(async (software) => {
+            const response2 = await axios.get(
+              `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` +
+                software?.appId,
+            );
+            const count = response2.data.length;
+            return {
+              ...software,
+              assets: count || 0, // Use '0' if count is falsy (including undefined)
+            };
+          }),
         );
-        return {
-          ...software,
-          deviceName: device ? device.name : 'Unknown Device',
-        };
-      });
-      setSoftwareData(mergedData);
+        setSoftwareData(mergedData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    if (data.length > 0) {
+      fetchData();
     }
-  }, [data, deviceData]);
+  }, [data]);
+
   // Filter function to search for assets
   const filterAssets = () => {
     const query = searchQuery.toLowerCase();
@@ -245,16 +272,15 @@ function SoftwarePage() {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `${BACK_END_PORT}/api/v1/Software/DeleteSoftWareWith_key?softwareid=` +
-          formData2.softwareId,
+        `${BACK_END_PORT}/api/v1/App/DeleteAppWith_key?Appid=` +
+          formData2.appId,
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
       setSelectedRow(new Set());
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
-          account.accId,
+        `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
       );
       setData(newDataResponse.data);
       toast({
@@ -274,15 +300,16 @@ function SoftwarePage() {
     <Box className={styles.bodybox}>
       <List>
         <ListItem className={styles.list}>
-          <Link href='/pmpages/pmhome' className={styles.listitem}>
+          <Link href='/pmpages/PoHome' className={styles.listitem}>
             Home
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Software Management
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Application
+        </ListItem>
+        <ListItem className={styles.list}>
+          <Text fontSize='2xl'>Application</Text>
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Software Management</Text>
-            <Spacer />
             <Input
               type='text'
               value={searchQuery}
@@ -291,6 +318,7 @@ function SoftwarePage() {
               w={300}
               mr={1}
             />
+            <Spacer />
             <Box>
               <IconButton
                 aria-label='Add'
@@ -325,11 +353,17 @@ function SoftwarePage() {
               className={styles.cTable}
             >
               <TableCaption>
-                Total {filteredSoftwareData.length} softwares
+                Total{' '}
+                {
+                  filteredSoftwareData.filter(
+                    (item) => item.status === 1 || item.status === 2,
+                  ).length
+                }{' '}
+                softwares
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th display='none'>Software ID</Th>
+                  <Th className={styles.cTh}>No</Th>
                   <Th className={styles.cTh}>Name</Th>
                   <Th className={styles.cTh}>Assets</Th>
                   <Th className={styles.cTh}>Publisher</Th>
@@ -341,25 +375,26 @@ function SoftwarePage() {
               </Thead>
               <Tbody>
                 {filteredSoftwareData
-                  .filter((item) => item.status === 1 || item.status === 2)
-                  .map((item) => (
+                  // .filter((item) => item.status === 1 || item.status === 2)
+                  .map((item, index) => (
                     <Tr
                       _hover={{
                         cursor: 'pointer',
                       }}
-                      key={item.softwareId}
-                      color={selectedRow === item.softwareId ? 'red' : 'black'}
+                      key={item.appId}
+                      color={selectedRow === item.appId ? 'red' : 'black'}
                       onClick={() => handleRowClick(item)}
                     >
+                      <Td>{index + 1}</Td>
                       <Td className={styles.listitem}>
                         <Link
-                          href={'/pmpages/softwaredetail'}
+                          href={'/pmpages/ApplicationDetail'}
                           onClick={() => handleDetail(item)}
                         >
                           {item.name}
                         </Link>
                       </Td>
-                      <Td>{item.deviceName}</Td>
+                      <Td>{item.assets}</Td>
                       <Td>{item.publisher}</Td>
                       <Td>{item.version}</Td>
                       <Td>{item.release}</Td>
@@ -371,7 +406,7 @@ function SoftwarePage() {
                           ? 'Have issue'
                           : item.status === 3
                           ? 'Deleted'
-                          : 'Unknown'}
+                          : 'Active'}
                       </Td>
                     </Tr>
                   ))}
@@ -385,20 +420,14 @@ function SoftwarePage() {
         isOpen={isOpenEdit}
         onClose={() => setIsOpenEdit(false)}
         closeOnOverlayClick={false}
-        size='lg'
+        size='4x1'
       >
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Software</ModalHeader>
+        <ModalContent w='60vw'>
+          <ModalHeader>Edit Application</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-              <Input
-                name='softwareId'
-                value={formData2.softwareId}
-                onChange={handleInputChange2}
-                display='none'
-              />
+            <Grid templateColumns='repeat(3, 1fr)' gap={4}>
               <GridItem>
                 <FormControl>
                   <FormLabel>Name</FormLabel>
@@ -409,7 +438,15 @@ function SoftwarePage() {
                     required
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Publisher</FormLabel>
+                  <Input
+                    name='publisher'
+                    value={formData2.publisher}
+                    onChange={handleInputChange2}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
                   <FormLabel>Version</FormLabel>
                   <Input
                     name='version'
@@ -417,7 +454,7 @@ function SoftwarePage() {
                     onChange={handleInputChange2}
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl className={styles.formInput}>
                   <FormLabel>Release</FormLabel>
                   <Input
                     name='release'
@@ -428,25 +465,6 @@ function SoftwarePage() {
                 {/* Add more fields for the first column */}
               </GridItem>
               <GridItem>
-                <FormControl>
-                  <FormLabel>Publisher</FormLabel>
-                  <Input
-                    name='publisher'
-                    value={formData2.publisher}
-                    onChange={handleInputChange2}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Type</FormLabel>
-                  <Select
-                    name='type'
-                    value={formData2.type}
-                    onChange={handleInputChange2}
-                  >
-                    <option value='Web App'>Web App</option>
-                    <option value='Desktop App'>Desktop App</option>
-                  </Select>
-                </FormControl>
                 <FormControl>
                   <FormLabel>OS</FormLabel>
                   <Select
@@ -461,9 +479,71 @@ function SoftwarePage() {
                     <option value='iOS'>iOS</option>
                   </Select>
                 </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>OS Version</FormLabel>
+                  <Input
+                    name='osversion'
+                    value={formData2.osversion}
+                    onChange={handleInputChange2}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Download Link</FormLabel>
+                  <Input
+                    name='download'
+                    value={formData2.download}
+                    onChange={handleInputChange2}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Document Link</FormLabel>
+                  <Input
+                    name='docs'
+                    value={formData2.docs}
+                    onChange={handleInputChange2}
+                  />
+                </FormControl>
                 {/* Add more fields for the second column */}
               </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Type</FormLabel>
+                  <Select
+                    name='type'
+                    value={formData2.type}
+                    onChange={handleInputChange2}
+                  >
+                    <option value='Web App'>Web App</option>
+                    <option value='Desktop App'>Desktop App</option>
+                    <option value='Antivirus'>Antivirus</option>
+                  </Select>
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Programming</FormLabel>
+                  <Input
+                    name='language'
+                    value={formData2.language}
+                    onChange={handleInputChange2}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Database</FormLabel>
+                  <Input
+                    name='db'
+                    value={formData2.db}
+                    onChange={handleInputChange2}
+                  />
+                </FormControl>
+              </GridItem>
             </Grid>
+            <FormControl className={styles.formInput}>
+              <FormLabel>Note</FormLabel>
+              <Input
+                name='description'
+                value={formData2.description}
+                onChange={handleInputChange2}
+              />
+            </FormControl>
             {/* Additional fields can be added to the respective columns */}
           </ModalBody>
           <ModalFooter>
@@ -479,20 +559,14 @@ function SoftwarePage() {
         isOpen={isOpenAdd}
         onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
         closeOnOverlayClick={false}
-        size='lg'
+        size='4x2'
       >
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Create New Software</ModalHeader>
+        <ModalContent w='60ws'>
+          <ModalHeader>Create New Application</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-              <Input
-                name='softwareID'
-                value={formData.softwareId}
-                onChange={handleInputChange}
-                display='none'
-              />
+            <Grid templateColumns='repeat(3, 1fr)' gap={4}>
               <GridItem>
                 <FormControl>
                   <FormLabel>Name</FormLabel>
@@ -503,7 +577,15 @@ function SoftwarePage() {
                     required
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Publisher</FormLabel>
+                  <Input
+                    name='publisher'
+                    value={formData.publisher}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
                   <FormLabel>Version</FormLabel>
                   <Input
                     name='version'
@@ -511,7 +593,7 @@ function SoftwarePage() {
                     onChange={handleInputChange}
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl className={styles.formInput}>
                   <FormLabel>Release</FormLabel>
                   <Input
                     name='release'
@@ -522,25 +604,6 @@ function SoftwarePage() {
                 {/* Add more fields for the first column */}
               </GridItem>
               <GridItem>
-                <FormControl>
-                  <FormLabel>Publisher</FormLabel>
-                  <Input
-                    name='publisher'
-                    value={formData.publisher}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Type</FormLabel>
-                  <Select
-                    name='type'
-                    value={formData.type}
-                    onChange={handleInputChange}
-                  >
-                    <option value='Web app'>Web app</option>
-                    <option value='Desktop app'>Desktop app</option>
-                  </Select>
-                </FormControl>
                 <FormControl>
                   <FormLabel>OS</FormLabel>
                   <Select
@@ -555,9 +618,71 @@ function SoftwarePage() {
                     <option value='iOS'>iOS</option>
                   </Select>
                 </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>OS Version</FormLabel>
+                  <Input
+                    name='osversion'
+                    value={formData.osversion}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Download Link</FormLabel>
+                  <Input
+                    name='download'
+                    value={formData.download}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Document Link</FormLabel>
+                  <Input
+                    name='docs'
+                    value={formData.docs}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
                 {/* Add more fields for the second column */}
               </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Type</FormLabel>
+                  <Select
+                    name='type'
+                    value={formData.type}
+                    onChange={handleInputChange}
+                  >
+                    <option value='Web App'>Web App</option>
+                    <option value='Desktop App'>Desktop App</option>
+                    <option value='Antivirus'>Antivirus</option>
+                  </Select>
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Programming</FormLabel>
+                  <Input
+                    name='language'
+                    value={formData.language}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Database</FormLabel>
+                  <Input
+                    name='db'
+                    value={formData.db}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+              </GridItem>
             </Grid>
+            <FormControl className={styles.formInput}>
+              <FormLabel>Note</FormLabel>
+              <Input
+                name='description'
+                value={formData.description}
+                onChange={handleInputChange}
+              />
+            </FormControl>
             {/* Additional fields can be added to the respective columns */}
           </ModalBody>
           <ModalFooter>
@@ -579,7 +704,7 @@ function SoftwarePage() {
           <ModalHeader>Confirm Delete</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>Are you sure you want to delete this software?</Text>
+            <Text>Are you sure you want to delete this application?</Text>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme='red' mr={3} onClick={handleDelete}>

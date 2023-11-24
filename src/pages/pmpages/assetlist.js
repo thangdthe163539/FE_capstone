@@ -53,6 +53,8 @@ const defaultData = {
   gpu: '',
   ram: '',
   memory: '',
+  os: '',
+  version: '',
   ipAddress: '',
   manufacturer: '',
   model: '',
@@ -64,19 +66,8 @@ const defaultData = {
 function AssetsPage() {
   // console.log(BACK_END_PORT);
   const router = useRouter();
-  let account = null;
+  const [account, setAccount] = useState();
 
-  useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
-
-    if (storedAccount) {
-      account = JSON.parse(storedAccount);
-      if (!account || account == null) {
-        // router.push('http://localhost:3000');
-      }
-    }
-  });
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -123,6 +114,8 @@ function AssetsPage() {
           gpu: formData.gpu,
           ram: formData.ram,
           memory: formData.memory,
+          os: formData.os,
+          version: formData.version,
           ipAddress: formData.ipAddress,
           manufacturer: formData.manufacturer,
           model: formData.model,
@@ -145,40 +138,6 @@ function AssetsPage() {
       console.error('Error saving data:', error);
     }
   };
-  //
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
-            account.accId,
-        );
-        setData(response.data); // Assuming the API returns an array of objects
-        const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Account/ListAccount`,
-        );
-        setAccData(response2.data); // Assuming the API returns an array of objects
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-  useEffect(() => {
-    if (data.length > 0 && accData.length > 0) {
-      const mergedData = data.map((device) => {
-        const account = accData.find((acc) => acc.accId === device.accId);
-        return {
-          ...device,
-          accName: account ? account.account1 : 'Unknown Account',
-        };
-      });
-      setDeviceData(mergedData);
-    }
-  }, [data, accData]);
   // Filter function to search for assets
   const filterAssets = () => {
     const query = searchQuery.toLowerCase();
@@ -196,6 +155,7 @@ function AssetsPage() {
   };
 
   // Update filtered data whenever the search query changes
+
   useEffect(() => {
     filterAssets();
   }, [searchQuery, deviceData]);
@@ -244,6 +204,54 @@ function AssetsPage() {
       setLoading(false);
     }
   };
+  //
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
+  //
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
+            account.accId,
+        );
+        setData(response.data); // Assuming the API returns an array of objects
+        const response2 = await axios.get(
+          `${BACK_END_PORT}/api/v1/Account/ListAccount`,
+        );
+        setAccData(response2.data); // Assuming the API returns an array of objects
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [account]);
+  useEffect(() => {
+    if (data.length > 0 && accData.length > 0) {
+      const mergedData = data.map((device) => {
+        const account = accData.find((acc) => acc.accId === device.accId);
+        return {
+          ...device,
+          accName: account ? account?.account1 : 'Unknown Account',
+        };
+      });
+      setDeviceData(mergedData);
+    }
+  }, [data, accData]);
   //
   return (
     <Box className={styles.bodybox}>
@@ -304,16 +312,17 @@ function AssetsPage() {
               </TableCaption>
               <Thead>
                 <Tr>
+                  <Th className={styles.cTh}>No</Th>
                   <Th className={styles.cTh}>Name</Th>
                   <Th className={styles.cTh}>Manufacturer</Th>
-                  <Th className={styles.cTh}>Model</Th>
+                  <Th className={styles.cTh}>Modal</Th>
                   <Th className={styles.cTh}>Serial Number</Th>
                   <Th className={styles.cTh}>Last Successful Scan</Th>
                   <Th className={styles.cTh}>Status</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredDeviceData.map((item) => (
+                {filteredDeviceData.map((item, index) => (
                   <Tr
                     key={item.deviceId}
                     color={selectedRow === item.deviceId ? 'red' : 'black'}
@@ -322,6 +331,7 @@ function AssetsPage() {
                     }}
                     onClick={() => handleRowClick(item)}
                   >
+                    <Td>{index + 1}</Td>
                     <Td className={styles.listitem}>
                       <Link
                         href={'/pmpages/assetdetail'}
@@ -355,14 +365,14 @@ function AssetsPage() {
         isOpen={isOpenEdit}
         onClose={() => setIsOpenEdit(false)}
         closeOnOverlayClick={false}
-        size='lg'
+        size={'xl'}
       >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Asset</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+            <Grid templateColumns='repeat(3, 1fr)' gap={4}>
               <Input
                 name='deviceID'
                 value={formData.deviceId}
@@ -403,14 +413,6 @@ function AssetsPage() {
                     onChange={handleInputChange}
                   />
                 </FormControl>
-                <FormControl>
-                  <FormLabel>IP Address</FormLabel>
-                  <Input
-                    name='ipAddress'
-                    value={formData.ipAddress}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
                 {/* Add more fields for the first column */}
               </GridItem>
               <GridItem>
@@ -443,6 +445,32 @@ function AssetsPage() {
                   <Input
                     name='memory'
                     value={formData.memory}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Operation System</FormLabel>
+                  <Input
+                    name='os'
+                    value={formData.os}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Version</FormLabel>
+                  <Input
+                    name='version'
+                    value={formData.version}
+                    onChange={handleInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>IP Address</FormLabel>
+                  <Input
+                    name='ipAddress'
+                    value={formData.ipAddress}
                     onChange={handleInputChange}
                   />
                 </FormControl>

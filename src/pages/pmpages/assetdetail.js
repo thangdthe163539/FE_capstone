@@ -33,7 +33,10 @@ import {
   Select,
   Grid,
   GridItem,
+  Checkbox,
+  ScrollView,
 } from '@chakra-ui/react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import {
@@ -49,61 +52,80 @@ import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
 
 function AssetDetailPage() {
-  let defaultData = {
+  //
+  const defaultDataLicense = {
+    licenseId: '',
     softwareId: '',
-    deviceId: '',
+    assetId: '',
+    licenseKey: '',
+    startDate: '',
+    time: '',
+    status: '',
+  };
+  const defaultData = {
+    softwareId: '',
+    assetId: '',
     name: '',
     version: '',
+    release: '',
     publisher: '',
-    type: '',
-    installDate: '',
+    type: 'Desktop App',
+    os: 'Window',
     status: '',
   };
 
   const router = useRouter();
-  let device = null;
-
-  try {
-    device = JSON.parse(localStorage.getItem('device'));
-    if (!device || device == null) {
-      router.push('/pmpages/assetlist');
-    }
-  } catch (error) {
-    console.error('Error saving data:', error);
-  }
-  //
-  let account = null;
-
-  useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
-
-    if (storedAccount) {
-      account = JSON.parse(storedAccount);
-      if (!account || account == null) {
-        // router.push('http://localhost:3000');
-      }
-    }
-  });
-  // console.log(BACK_END_PORT);
-  //
+  const [device, setDevice] = useState();
+  const [account, setAccount] = useState();
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [formData, setFormData] = useState(defaultData);
-  const [formData2, setFormData2] = useState(defaultData);
+  const [formData1, setFormData1] = useState(defaultDataLicense);
+  const [formData2, setFormData2] = useState(defaultDataLicense);
+  const [formData3, setFormData3] = useState(defaultDataLicense);
   const [data, setData] = useState([]);
   const [dataLicense, setDataLicense] = useState([]);
-  const [softwareData, setSoftwareData] = useState([]);
+  const [listLicense, setListLicense] = useState([]);
+  const [listAllSoftware, setListAllSoftware] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showSoftwareTable, setShowSoftwareTable] = useState(true);
-  const [showLicenseTable, setShowLicenseTable] = useState(false);
-  const [showAntivirusTable, setShowAntivirusTable] = useState(false);
+  const [searchAppQuery, setSearchAppQuery] = useState('');
+  const [searchAddQuery, setSearchAddQuery] = useState('');
+  const [showModalTable, setShowModalTable] = useState(true);
+  const [showModalAdd, setShowModalAdd] = useState(false);
   const toast = useToast();
+  const [selectedRow1, setSelectedRow1] = useState(new Set());
+  const [selectedRow2, setSelectedRow2] = useState(new Set());
+  const [selectedRow3, setSelectedRow3] = useState(new Set());
+  const [isButtonDisabled1, setButtonDisabled1] = useState(true);
+  const [isButtonDisabled2, setButtonDisabled2] = useState(true);
+  const [isButtonDisabled3, setButtonDisabled3] = useState(true);
+  const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
+  const [selectedSoftware, setSelectedSoftware] = useState([]);
+
+  //
+  const [software, setSoftware] = useState();
+
+  useEffect(() => {
+    const data = localStorage.getItem('software');
+    if (data) {
+      const softwareDataDecode = JSON.parse(data);
+      if (!softwareDataDecode) {
+        // router.push('/pmpages/assetlist');
+      } else {
+        setSoftware(softwareDataDecode);
+      }
+    }
+  }, []);
   //
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    // console.log(formData);
+  };
+  const handleInputChange1 = (e) => {
+    const { name, value } = e.target;
+    setFormData1({ ...formData1, [name]: value });
     // console.log(formData);
   };
   const handleInputChange2 = (e) => {
@@ -111,47 +133,114 @@ function AssetDetailPage() {
     setFormData2({ ...formData2, [name]: value });
     // console.log(formData2);
   };
-  //
-  //
-  const [selectedRow, setSelectedRow] = useState(new Set());
-  const [isButtonDisabled, setButtonDisabled] = useState(true);
-  const handleRowClick = (item) => {
-    if (selectedRow === item.softwareId) {
-      setSelectedRow(null); // Unselect the row if it's already selected
-      setFormData2(defaultData);
-      setButtonDisabled(true);
+  const handleInputChange3 = (e) => {
+    const { name, value } = e.target;
+    setFormData3({ ...formData3, [name]: value });
+    // console.log(formData);
+  };
+  const handleSearchAppInputChange = (e) => {
+    setSearchAppQuery(e.target.value);
+  };
+  const handleSearchAddInputChange = (e) => {
+    setSearchAddQuery(e.target.value);
+  };
+  const handleRowClick1 = (item) => {
+    if (selectedRow1 === item.softwareId) {
+      setSelectedRow1(null); // Unselect the row if it's already selected
+      setFormData1(defaultDataLicense);
+      setButtonDisabled1(true);
     } else {
-      setSelectedRow(item.softwareId);
+      setSelectedRow1(item.softwareId);
+      setFormData1(item);
+      setButtonDisabled1(false);
+    }
+  };
+  const handleRowClick2 = (item) => {
+    if (selectedRow2 === item.licenseId) {
+      setSelectedRow2(null); // Unselect the row if it's already selected
+      setFormData2(defaultDataLicense);
+      setButtonDisabled2(true);
+    } else {
+      setSelectedRow2(item.licenseId);
       setFormData2(item);
-      setButtonDisabled(false);
+      setButtonDisabled2(false);
+    }
+  };
+  const handleRowClick3 = (item) => {
+    if (selectedRow3 === item.softwareId) {
+      setSelectedRow3(null); // Unselect the row if it's already selected
+      setFormData(defaultDataLicense);
+      setButtonDisabled3(true);
+    } else {
+      setSelectedRow3(item.softwareId);
+      setFormData(item);
+      setButtonDisabled3(false);
+    }
+  };
+  //
+  const handleSaveCreate = async () => {
+    try {
+      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const response = await axios.post(
+        `${BACK_END_PORT}/api/Device_Software/CreateLicense`,
+        {
+          assetId: device.assetId,
+          softwareId: formData.softwareId,
+          licenseKey: formData.licenseKey,
+          startDate: formData.startDate,
+          time: formData.time,
+          status: 1,
+        },
+      );
+      console.log('Data saved:', response.data);
+      setIsOpenAdd(false); // Close the modal after successful save
+      setFormData(defaultDataLicense);
+      setSelectedRow1(new Set());
+      // Reload new data for the table
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+          device.assetId,
+      );
+      setData(newDataResponse.data);
+      const response2 = await axios.get(
+        `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
+          device.assetId,
+      );
+      setDataLicense(response2.data);
+    } catch (error) {
+      console.error('Error saving data:', error);
     }
   };
   //
   const handleSaveAdd = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.post(`${BACK_END_PORT}/api/v1/Software`, {
-        //softwareId: formData.accId,
-        name: formData.name,
-        version: formData.version,
-        publisher: formData.publisher,
-        type: formData.type,
-        installDate: formData.installDate,
-        status: false,
-        deviceId: deviceID,
-      });
+      const response = await axios.post(
+        `${BACK_END_PORT}/api/Device_Software/CreateLicense`,
+        {
+          assetId: device.assetId,
+          softwareId: formData.softwareId,
+          licenseKey: formData.licenseKey,
+          startDate: formData.startDate,
+          time: formData.time,
+          status: 1,
+        },
+      );
       console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
-      setFormData(defaultData);
-      setSelectedRow(new Set());
+      setFormData(defaultDataLicense);
+      setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/GetSoftwareForAccountAndDevice?accountId=` +
-          account.accId +
-          `&deviceId=` +
-          device.deviceId,
+        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+          device.assetId,
       );
       setData(newDataResponse.data);
+      const response2 = await axios.get(
+        `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
+          device.assetId,
+      );
+      setDataLicense(response2.data);
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -160,84 +249,125 @@ function AssetDetailPage() {
   const handleSaveEdit = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.put(`${BACK_END_PORT}/api/v1/Software`, {
-        softwareId: formData2.softwareId,
-        name: formData2.name,
-        version: formData2.version,
-        publisher: formData2.publisher,
-        type: formData2.type,
-        installDate: formData2.installDate,
-        status: formData2.status,
-        deviceId: formData2.deviceId,
-      });
+      const response = await axios.put(
+        `${BACK_END_PORT}/api/License/UpdateLicense` + formData2.licenseId,
+        {
+          // assetId: device.assetId,
+          // softwareId: formData.softwareId,
+          // licenseId: formData2.licenseId,
+          licenseKey: formData2.licenseKey,
+          startDate: formData2.startDate,
+          time: formData2.time,
+          status: formData2.status,
+        },
+      );
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
-      setFormData2(defaultData);
-      setSelectedRow(new Set());
+      setFormData2(defaultDataLicense);
+      setSelectedRow2(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/GetSoftwareForAccountAndDevice?accountId=` +
-          account.accId +
-          `&deviceId=` +
-          device.deviceId,
+        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+          device.assetId,
       );
       setData(newDataResponse.data);
+      const response2 = await axios.get(
+        `${BACK_END_PORT}/api/License/list_licenses_by_device/` +
+          device.assetId,
+      );
+      setDataLicense(response2.data);
     } catch (error) {
       console.error('Error saving data:', error);
     }
   };
   //
   useEffect(() => {
+    const deviceData = localStorage.getItem('device');
+    if (deviceData) {
+      const deviceDataDecode = JSON.parse(deviceData);
+      if (!deviceDataDecode) {
+        router.push('/pmpages/assetlist');
+      } else {
+        setDevice(deviceDataDecode);
+      }
+    }
+  }, []);
+
+  //
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/GetSoftwareForAccountAndDevice?accountId=` +
-            account.accId +
-            `&deviceId=` +
-            device.deviceId,
+          `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+            device.assetId,
         );
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
-          `${BACK_END_PORT}/api/Lisence/list_licenses_by_device/` +
-            device.deviceId,
+          `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
+            device.assetId,
         );
         setDataLicense(response2.data);
+        const response3 = await axios.get(
+          `${BACK_END_PORT}/api/v1/Software/ListSoftwares`,
+        );
+        setListAllSoftware(response3.data);
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
       }
     };
-
-    fetchData();
-  }, []);
+    if (device?.assetId && account?.accId) {
+      fetchData();
+    }
+  }, [device, account]);
+  //
+  const softwareIdsInAsset = data?.map((software) => software?.softwareId);
   //
   useEffect(() => {
     if (data.length > 0 && dataLicense.length > 0) {
-      const mergedData = dataLicense.map((device) => {
-        const software = data.find((sw) => sw.softwareId === device.softwareId);
+      const mergedData = dataLicense.map((license) => {
+        const software = data.find(
+          (sw) => sw.softwareId === license.softwareId,
+        );
         return {
-          ...device,
-          name: software.name ? software.name : device.softwareId,
+          ...license,
+          name: software?.name ? software?.name : license.softwareId,
         };
       });
-      setSoftwareData(mergedData);
+      setListLicense(mergedData);
     }
   }, [data, dataLicense]);
   //
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `${BACK_END_PORT}/api/v1/Software?softwareid=` + formData2.softwareId,
+        `${BACK_END_PORT}/api/v1/Software/DeleteSoftWareWith_key?softwareid=` +
+          formData2.softwareId,
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
-      setSelectedRow(new Set());
+      setSelectedRow1(new Set());
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/v1/Software/GetSoftwareForAccountAndDevice?accountId=` +
           account.accId +
-          `&deviceId=` +
-          device.deviceId,
+          `&assetId=` +
+          device.assetId,
       );
       setData(newDataResponse.data);
       toast({
@@ -253,233 +383,371 @@ function AssetDetailPage() {
     }
   };
   //
+  const filterAssets = () => {
+    const query = searchAppQuery.toLowerCase();
+    const filteredData = data.filter((item) => {
+      const name = item.name.toLowerCase();
+      const publisher = item.publisher.toLowerCase();
+      return name.includes(query) || publisher.includes(query);
+    });
+    setFilteredSoftwareData(filteredData);
+  };
+
+  // Update filtered data whenever the search query changes
+
+  useEffect(() => {
+    filterAssets();
+  }, [searchAppQuery, data]);
+  //
   function calculateEndDate(startDate, months) {
-    // Parse the start date into a Date object
-    const startDateObj = new Date(startDate);
+    // Split the start date into day, month, and year
+    const [day, month, year] = startDate.split('/').map(Number);
+
+    // Create a Date object with the parsed values
+    const startDateObj = new Date(year, month - 1, day);
 
     // Calculate the end date by adding the specified number of months
     startDateObj.setMonth(startDateObj.getMonth() + months);
 
-    // Format the end date as "yyyy-mm-dd"
-    const year = startDateObj.getFullYear();
-    const month = String(startDateObj.getMonth() + 1).padStart(2, '0');
-    const day = String(startDateObj.getDate()).padStart(2, '0');
+    // Format the end date as "dd/mm/yyyy"
+    const endYear = startDateObj.getFullYear();
+    const endMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
+    const endDay = String(startDateObj.getDate()).padStart(2, '0');
 
-    const endDate = `${year}-${month}-${day}`;
+    const endDate = `${endDay}/${endMonth}/${endYear}`;
 
-    return endDate.toString();
+    return endDate;
   }
-  //
-  const text_select = {
-    backgroundColor: '#fff',
-    borderBottom: 'none',
-    color: '#4d9ffe',
-  };
-  const handleShowSoftware = async () => {
-    setShowSoftwareTable(true);
-    setShowAntivirusTable(false);
-    setShowLicenseTable(false);
-  };
-  const handleShowLicense = async () => {
-    setShowSoftwareTable(false);
-    setShowAntivirusTable(false);
-    setShowLicenseTable(true);
-  };
-  const handleShowAntivirus = async () => {
-    setShowSoftwareTable(false);
-    setShowAntivirusTable(true);
-    setShowLicenseTable(false);
-  };
+
   //
   return (
     <Box className={styles.bodybox}>
       <List>
         <ListItem className={styles.list}>
-          <Link href='/pmpages/pmhome' className={styles.listitem}>
+          <Link href='/pmpages/PoHome' className={styles.listitem}>
             Home
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>
-          <Link href='/pmpages/assetlist' className={styles.listitem}>
-            Assets Management
+          <Link href='/pmpages/Application' className={styles.listitem}>
+            Application
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Asset Detail
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>
+          <Link href='/pmpages/ApplicationDetail' className={styles.listitem}>
+            {software?.name}
+          </Link>
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>
+          {device?.name}
         </ListItem>
         <ListItem className={styles.list}>
-          <Text fontSize='2xl'>Asset Detail</Text>
+          <Text fontSize='2xl'>{device?.name}</Text>
         </ListItem>
-        <ListItem className={styles.list}>
-          <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
-            <Center>
-              <Box className={styles.card}>
-                <Text className={styles.text2}>Name</Text>
-                <Text className={styles.text2}>Manufacturer</Text>
-                <Text className={styles.text2}>Model</Text>
-                <Text className={styles.text2}>Serial Number</Text>
-              </Box>
-              <Box className={styles.card}>
-                <Text>{device.name}</Text>
-                <Text>{device.manufacturer}</Text>
-                <Text>{device.model}</Text>
-                <Text>{device.serialNumber}</Text>
-              </Box>
-              <Box className={styles.card}>
-                <Text className={styles.text2}>CPU</Text>
-                <Text className={styles.text2}>GPU</Text>
-                <Text className={styles.text2}>RAM</Text>
-                <Text className={styles.text2}>Memory</Text>
-              </Box>
-              <Box className={styles.card}>
-                <Text>{device.cpu}</Text>
-                <Text>{device.gpu}</Text>
-                <Text>{device.ram}GB</Text>
-                <Text>{device.memory}GB</Text>
-              </Box>
-              <Box className={styles.card}>
-                <Text className={styles.text2}>Last Successful Scan</Text>
-                <Text className={styles.text2}>Status</Text>
-              </Box>
-              <Box className={styles.card}>
-                <Text>{device.lastSuccesfullScan}</Text>
-                <Text>
-                  {device.status === 1
-                    ? 'Active'
-                    : device.status === 2
-                    ? 'Inactive'
-                    : device.status === 3
-                    ? 'Deleted'
-                    : 'Unknown'}
-                </Text>
-              </Box>
-            </Center>
-          </Box>
-        </ListItem>
-        <ListItem className={styles.list}>
-          <Flex>
-            <Text
-              className={styles.text}
-              // pl={0}
-              onClick={handleShowSoftware}
-              style={showSoftwareTable ? text_select : {}}
+        <Tabs>
+          <TabList>
+            <Tab
+              className={styles.tab}
+              _selected={{
+                color: '#4d9ffe',
+                borderBottom: '1px solid #4d9ffe',
+              }}
+            >
+              Hardware
+            </Tab>
+            <Tab
+              className={styles.tab}
+              _selected={{
+                color: '#4d9ffe',
+                borderBottom: '1px solid #4d9ffe',
+              }}
             >
               Software
-            </Text>
-            <Text
-              className={styles.text}
-              onClick={handleShowLicense}
-              style={showLicenseTable ? text_select : {}}
+            </Tab>
+            <Tab
+              className={styles.tab}
+              _selected={{
+                color: '#4d9ffe',
+                borderBottom: '1px solid #4d9ffe',
+              }}
             >
-              License Keys
-            </Text>
-            {/* <Text
-              className={styles.text}
-              onClick={handleShowAntivirus}
-              style={showAntivirusTable ? text_select : {}}
+              License
+            </Tab>
+            <Tab
+              className={styles.tab}
+              _selected={{
+                color: '#4d9ffe',
+                borderBottom: '1px solid #4d9ffe',
+              }}
             >
               Antivirus
-            </Text> */}
-          </Flex>
-        </ListItem>
-        {showSoftwareTable && (
-          <ListItem className={styles.list}>
-            <TableContainer>
-              <Table variant='striped' colorScheme='gray'>
-                <TableCaption>Total {data.length} softwares</TableCaption>
-                <Thead>
-                  <Tr>
-                    <Th className={styles.cTh}>Name</Th>
-                    <Th className={styles.cTh}>Publisher</Th>
-                    <Th className={styles.cTh}>Versions</Th>
-                    <Th className={styles.cTh}>Release</Th>
-                    <Th className={styles.cTh}>Install Date</Th>
-                    <Th className={styles.cTh}>Status</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {data.map((item) => (
-                    <Tr
-                      cursor={'pointer'}
-                      key={item.softwareId}
-                      color={selectedRow === item.softwareId ? 'red' : 'black'} // Change background color for selected rows
-                      onClick={() => handleRowClick(item)}
-                    >
-                      <Td>{item.name}</Td>
-                      <Td>{item.publisher}</Td>
-                      <Td>{item.version}</Td>
-                      <Td>{item.type}</Td>
-                      <Td>{item.installDate}</Td>
-                      <Td>{item.status ? 'Have Issues' : 'No Issues'}</Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </ListItem>
-        )}
-        {showLicenseTable && (
-          <ListItem className={styles.list}>
-            <TableContainer>
-              <Table variant='striped' colorScheme='gray'>
-                <TableCaption>
-                  Total {softwareData.length} licenses
-                </TableCaption>
-                <Thead>
-                  <Tr>
-                    <Th className={styles.cTh}>Software</Th>
-                    <Th className={styles.cTh}>License Key</Th>
-                    <Th className={styles.cTh}>Start Date</Th>
-                    <Th className={styles.cTh}>End Date</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {softwareData.map((item) => (
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
+                <TableContainer>
+                  <Table>
+                    <Tbody>
+                      <Tr className={styles.borderTop}>
+                        <Td className={styles.text2}>Name</Td>
+                        <Td className={styles.borderRight}>{device?.name}</Td>
+                        <Td className={styles.text2}>CPU</Td>
+                        <Td className={styles.borderRight}>{device?.cpu}</Td>
+                        <Td className={styles.text2}>Operation System</Td>
+                        <Td>{device?.os}</Td>
+                      </Tr>
+                      <Tr>
+                        <Td className={styles.text2}>Manufacturer</Td>
+                        <Td className={styles.borderRight}>
+                          {device?.manufacturer}
+                        </Td>
+                        <Td className={styles.text2}>GPU</Td>
+                        <Td className={styles.borderRight}>{device?.gpu}</Td>
+                        <Td className={styles.text2}>Version</Td>
+                        <Td>{device?.version}</Td>
+                      </Tr>
+                      <Tr>
+                        <Td className={styles.text2}>Model</Td>
+                        <Td className={styles.borderRight}>{device?.model}</Td>
+                        <Td className={styles.text2}>RAM</Td>
+                        <Td className={styles.borderRight}>{device?.ram} GB</Td>
+                        <Td className={styles.text2}>Last Updated</Td>
+                        <Td>{device?.lastSuccesfullScan}</Td>
+                      </Tr>
+                      <Tr>
+                        <Td className={styles.text2}>Serial Number</Td>
+                        <Td className={styles.borderRight}>
+                          {device?.serialNumber}
+                        </Td>
+                        <Td className={styles.text2}>Memory</Td>
+                        <Td className={styles.borderRight}>
+                          {device?.memory} GB
+                        </Td>
+                        <Td className={styles.text2}>Status</Td>
+                        <Td>
+                          {device?.status === 1
+                            ? 'Active'
+                            : device?.status === 2
+                            ? 'Inactive'
+                            : device?.status === 3
+                            ? 'Deleted'
+                            : 'Unknown'}
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            </TabPanel>
+            <TabPanel>
+              <ListItem className={styles.list} pt={0}>
+                <Flex>
+                  <Input
+                    type='text'
+                    value={searchAppQuery}
+                    onChange={handleSearchAppInputChange}
+                    placeholder='Search'
+                    w={300}
+                    mr={1}
+                  />
+                  <Spacer />
+                  <Box>
+                    <IconButton
+                      aria-label='Add'
+                      icon={<FaPlus />}
+                      colorScheme='gray' // Choose an appropriate color
+                      marginRight={1}
+                      onClick={() => setIsOpenAdd(true)}
+                    />
+                    <IconButton
+                      aria-label='Delete'
+                      icon={<FaTrash />}
+                      colorScheme='gray' // Choose an appropriate color
+                      onClick={() => setIsOpenDelete(true)}
+                      isDisabled={isButtonDisabled1}
+                    />
+                  </Box>
+                </Flex>
+              </ListItem>
+              <ListItem className={styles.list}>
+                <TableContainer>
+                  <Table variant='striped' colorScheme='gray'>
+                    <TableCaption>
+                      Total{' '}
+                      {
+                        filteredSoftwareData.filter(
+                          (item) =>
+                            item.type != 'Antivirus' && item.status != 3,
+                        ).length
+                      }{' '}
+                      softwares
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh}>No</Th>
+                        <Th className={styles.cTh}>Name</Th>
+                        <Th className={styles.cTh}>Publisher</Th>
+                        <Th className={styles.cTh}>Versions</Th>
+                        <Th className={styles.cTh}>Release</Th>
+                        <Th className={styles.cTh}>Type</Th>
+                        <Th className={styles.cTh}>Install Date</Th>
+                        {/* <Th className={styles.cTh}>Status</Th> */}
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {filteredSoftwareData
+                        .filter(
+                          (item) =>
+                            item.type != 'Antivirus' && item.status != 3,
+                        )
+                        .map((item, index) => (
+                          <Tr
+                            cursor={'pointer'}
+                            key={item.softwareId}
+                            color={
+                              selectedRow1 === item.softwareId ? 'red' : 'black'
+                            } // Change background color for selected rows
+                            onClick={() => handleRowClick1(item)}
+                          >
+                            <Td>{index + 1}</Td>
+                            <Td>{item.name}</Td>
+                            <Td>{item.publisher}</Td>
+                            <Td>{item.version}</Td>
+                            <Td>{item.release}</Td>
+                            <Td>{item.type}</Td>
+                            <Td>{item.installDate}</Td>
+                            {/* <Td>{item.status ? 'Have Issue' : 'No Issue'}</Td> */}
+                          </Tr>
+                        ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </ListItem>
+            </TabPanel>
+            <TabPanel>
+              <ListItem className={styles.list} pt={0}>
+                <Flex>
+                  <Input
+                    type='text'
+                    value={searchAppQuery}
+                    onChange={handleSearchAppInputChange}
+                    placeholder='Search'
+                    w={300}
+                    mr={1}
+                  />
+                  <Spacer />
+                  <Box>
+                    <IconButton
+                      aria-label='Edit'
+                      icon={<FaEdit />}
+                      colorScheme='gray' // Choose an appropriate color
+                      marginRight={1}
+                      onClick={() => setIsOpenEdit(true)}
+                      isDisabled={isButtonDisabled2}
+                    />
+                    <IconButton
+                      aria-label='Delete'
+                      icon={<FaTrash />}
+                      colorScheme='gray' // Choose an appropriate color
+                      onClick={() => setIsOpenDelete(true)}
+                      isDisabled={isButtonDisabled2}
+                    />
+                  </Box>
+                </Flex>
+              </ListItem>
+              <ListItem className={styles.list}>
+                <TableContainer>
+                  <Table
+                    variant='striped'
+                    colorScheme='gray'
+                    className={styles.cTable}
+                  >
+                    <TableCaption className={styles.cTableCaption}>
+                      Total {listLicense.length} licenses
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh}>No</Th>
+                        <Th className={styles.cTh}>Software</Th>
+                        <Th className={styles.cTh}>License Key</Th>
+                        <Th className={styles.cTh}>Start Date</Th>
+                        <Th className={styles.cTh}>End Date</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {listLicense.map((item, index) => (
+                        <Tr
+                          cursor={'pointer'}
+                          key={item.licenseId}
+                          color={
+                            selectedRow2 === item.licenseId ? 'red' : 'black'
+                          } // Change background color for selected rows
+                          onClick={() => handleRowClick2(item)}
+                        >
+                          <Td>{index + 1}</Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.licenseKey}</Td>
+                          <Td>{item.start_Date}</Td>
+                          <Td>
+                            {calculateEndDate(item.start_Date, item.time)}
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </ListItem>
+            </TabPanel>
+            <TabPanel>
+              <TableContainer>
+                <Table variant='striped' colorScheme='gray'>
+                  <TableCaption>
+                    Total{' '}
+                    {
+                      data.filter(
+                        (item) => item.type == 'Antivirus' && item.status != 3,
+                      ).length
+                    }{' '}
+                    antivirus
+                  </TableCaption>
+                  <Thead>
                     <Tr>
-                      <Td>{item.name}</Td>
-                      <Td>{item.lisenceKey}</Td>
-                      <Td>{item.startDate}</Td>
-                      <Td>{calculateEndDate(item.startDate, item.time)}</Td>
+                      <Th className={styles.cTh}>No</Th>
+                      <Th className={styles.cTh}>Name</Th>
+                      <Th className={styles.cTh}>Publisher</Th>
+                      <Th className={styles.cTh}>Versions</Th>
+                      <Th className={styles.cTh}>Release</Th>
+                      <Th className={styles.cTh}>Install Date</Th>
+                      {/* <Th className={styles.cTh}>Status</Th> */}
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </ListItem>
-        )}
-        {showAntivirusTable && (
-          <ListItem className={styles.list}>
-            <TableContainer>
-              <Table variant='striped' colorScheme='gray'>
-                {/* <TableCaption>Total {data.length} reports</TableCaption> */}
-                <Thead>
-                  <Tr>
-                    <Th className={styles.cTh}>Name</Th>
-                    <Th className={styles.cTh}>Publisher</Th>
-                    <Th className={styles.cTh}>Versions</Th>
-                    <Th className={styles.cTh}>Release</Th>
-                    <Th className={styles.cTh}>Install Date</Th>
-                    <Th className={styles.cTh}>Status</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {data.map((item) => (
-                    <Tr
-                      cursor={'pointer'}
-                      key={item.softwareId}
-                      color={selectedRow === item.softwareId ? 'red' : 'black'} // Change background color for selected rows
-                      onClick={() => handleRowClick(item)}
-                    >
-                      <Td>{item.name}</Td>
-                      <Td>{item.publisher}</Td>
-                      <Td>{item.version}</Td>
-                      <Td>{item.type}</Td>
-                      <Td>{item.installDate}</Td>
-                      <Td>{item.status ? 'Have Issues' : 'No Issues'}</Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </ListItem>
-        )}
+                  </Thead>
+                  <Tbody>
+                    {data
+                      .filter(
+                        (item) => item.type == 'Antivirus' && item.status != 3,
+                      )
+                      .map((item, index) => (
+                        <Tr
+                          cursor={'pointer'}
+                          key={item.softwareId}
+                          color={
+                            selectedRow1 === item.softwareId ? 'red' : 'black'
+                          } // Change background color for selected rows
+                          onClick={() => handleRowClick1(item)}
+                        >
+                          <Td>{index + 1}</Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.publisher}</Td>
+                          <Td>{item.version}</Td>
+                          <Td>{item.release}</Td>
+                          <Td>{item.installDate}</Td>
+                          {/* <Td>{item.status ? 'No Issues' : 'Have Issues'}</Td> */}
+                        </Tr>
+                      ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </List>
 
       <Modal //Modal edit software
@@ -490,72 +758,51 @@ function AssetDetailPage() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Edit Software</ModalHeader>
+          <ModalHeader>Edit License</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-              <Input
-                name='softwareId'
-                value={formData2.softwareId}
-                onChange={handleInputChange2}
-                display='none'
-              />
               <GridItem>
                 <FormControl>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Software</FormLabel>
                   <Input
-                    name='name'
-                    value={formData2.name}
+                    name='software'
+                    value={
+                      listAllSoftware.find(
+                        (item) => item.softwareId === formData2?.softwareId,
+                      )?.name
+                    }
+                    onChange={handleInputChange2}
+                    isDisabled
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>License Key</FormLabel>
+                  <Input
+                    name='licenseKey'
+                    value={formData2.licenseKey}
+                    onChange={handleInputChange2}
+                  />
+                </FormControl>
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Start Date</FormLabel>
+                  <Input
+                    name='startDate'
+                    value={formData2.start_Date}
                     onChange={handleInputChange2}
                     required
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Version</FormLabel>
+                  <FormLabel>Time</FormLabel>
                   <Input
-                    name='version'
-                    value={formData2.version}
+                    name='time'
+                    value={formData2.time}
                     onChange={handleInputChange2}
                   />
                 </FormControl>
-                <FormControl>
-                  <FormLabel>Release</FormLabel>
-                  <Input
-                    name='type'
-                    value={formData2.type}
-                    onChange={handleInputChange2}
-                  />
-                </FormControl>
-                {/* Add more fields for the first column */}
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Publisher</FormLabel>
-                  <Input
-                    name='publisher'
-                    value={formData2.publisher}
-                    onChange={handleInputChange2}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Install Date</FormLabel>
-                  <Input
-                    name='installDate'
-                    value={formData2.installDate}
-                    // onChange={handleInputChange}
-                    isDisabled={true}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Status</FormLabel>
-                  <Input
-                    name='status'
-                    value={formData2.status}
-                    // onChange={handleInputChange}
-                    isDisabled={true}
-                  />
-                </FormControl>
-                {/* Add more fields for the second column */}
               </GridItem>
             </Grid>
             {/* Additional fields can be added to the respective columns */}
@@ -569,84 +816,239 @@ function AssetDetailPage() {
         </ModalContent>
       </Modal>
 
-      <Modal // Modal add new software
+      <Modal // Modal add software
         isOpen={isOpenAdd}
-        onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
+        onClose={() => (
+          setIsOpenAdd(false), setShowModalAdd(false), setShowModalTable(true)
+        )}
         closeOnOverlayClick={false}
-        size='lg'
+        size='6xl'
       >
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add New Software</ModalHeader>
+        <ModalContent w='80vw'>
+          <ModalHeader>
+            {showModalAdd ? 'Create New Software' : 'Add Software'}
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-              <Input
-                name='softwareID'
-                value={formData.softwareId}
-                onChange={handleInputChange}
-                display='none'
-              />
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    name='name'
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Version</FormLabel>
-                  <Input
-                    name='version'
-                    value={formData.version}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Release</FormLabel>
-                  <Input
-                    name='type'
-                    value={formData.type}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                {/* Add more fields for the first column */}
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Publisher</FormLabel>
-                  <Input
-                    name='publisher'
-                    value={formData.publisher}
-                    onChange={handleInputChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Install Date</FormLabel>
-                  <Input
-                    name='installDate'
-                    value={formData.installDate}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </FormControl>
-                {/* Add more fields for the second column */}
-              </GridItem>
-            </Grid>
-            {/* Additional fields can be added to the respective columns */}
+            {showModalAdd ? (
+              <>
+                <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Name</FormLabel>
+                      <Input
+                        name='name'
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Version</FormLabel>
+                      <Input
+                        name='version'
+                        value={formData.version}
+                        onChange={handleInputChange}
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Release</FormLabel>
+                      <Input
+                        name='release'
+                        value={formData.release}
+                        onChange={handleInputChange}
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>License Key</FormLabel>
+                      <Input
+                        name='licenseKey'
+                        value={formData3.licenseKey}
+                        onChange={handleInputChange3}
+                      />
+                    </FormControl>
+
+                    {/* Add more fields for the first column */}
+                  </GridItem>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Publisher</FormLabel>
+                      <Input
+                        name='publisher'
+                        value={formData.publisher}
+                        onChange={handleInputChange}
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Type</FormLabel>
+                      <Select
+                        name='type'
+                        value={formData.type}
+                        onChange={handleInputChange}
+                      >
+                        <option value='Web app'>Web app</option>
+                        <option value='Desktop app'>Desktop app</option>
+                      </Select>
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>OS</FormLabel>
+                      <Select
+                        name='os'
+                        value={formData.os}
+                        onChange={handleInputChange}
+                      >
+                        <option value='Window'>Window</option>
+                        <option value='macOS'>macOS</option>
+                        <option value='Linux'>Linux</option>
+                        <option value='Android'>Android</option>
+                        <option value='iOS'>iOS</option>
+                      </Select>
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Start Date</FormLabel>
+                      <Input
+                        name='start_Date'
+                        value={formData3.start_Date}
+                        onChange={handleInputChange3}
+                        required
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel>Time</FormLabel>
+                      <Input
+                        name='time'
+                        value={formData3.time}
+                        onChange={handleInputChange3}
+                      />
+                    </FormControl>
+                    {/* Add more fields for the second column */}
+                  </GridItem>
+                </Grid>
+              </>
+            ) : showModalTable ? (
+              <TableContainer>
+                <Table variant='simple'>
+                  <Thead>
+                    <Tr>
+                      <Th className={styles.cTh}>#</Th>
+                      <Th className={styles.cTh}>Name</Th>
+                      <Th className={styles.cTh}>Publisher</Th>
+                      <Th className={styles.cTh}>Versions</Th>
+                      <Th className={styles.cTh}>Release</Th>
+                      <Th className={styles.cTh}>Type</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {listAllSoftware
+                      .filter(
+                        (item) => !softwareIdsInAsset.includes(item.softwareId),
+                      )
+                      .filter((item) => item.status != 3)
+                      .map((item) => (
+                        <Tr key={item.softwareId}>
+                          <Td>
+                            <Button
+                              onClick={() => (
+                                setShowModalTable(false), setFormData1(item)
+                              )}
+                            >
+                              Add
+                            </Button>
+                          </Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.publisher}</Td>
+                          <Td>{item.version}</Td>
+                          <Td>{item.release}</Td>
+                          <Td>{item.type}</Td>
+                        </Tr>
+                      ))}
+                    <Tr>
+                      <Td colSpan='6'>
+                        <Center>
+                          <Button
+                            w='100%'
+                            bgColor='white'
+                            border='1px solid gray'
+                            onClick={() => setShowModalAdd(true)}
+                          >
+                            Create new software
+                          </Button>
+                        </Center>
+                      </Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            ) : (
+              <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>Software</FormLabel>
+                    <Input
+                      name='softwareId'
+                      value={formData1.name}
+                      onChange={handleInputChange1}
+                      disabled
+                    ></Input>
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>License Key</FormLabel>
+                    <Input
+                      name='licenseKey'
+                      value={formData1.licenseKey}
+                      onChange={handleInputChange1}
+                    />
+                  </FormControl>
+                </GridItem>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>Start Date</FormLabel>
+                    <Input
+                      name='start_Date'
+                      value={formData1.start_Date}
+                      onChange={handleInputChange1}
+                      required
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>Time</FormLabel>
+                    <Input
+                      name='time'
+                      value={formData1.time}
+                      onChange={handleInputChange1}
+                    />
+                  </FormControl>
+                </GridItem>
+              </Grid>
+            )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
-              Save
-            </Button>
-            <Button
-              onClick={() => (setIsOpenAdd(false), setFormData(defaultData))}
-            >
-              Cancel
-            </Button>
+            {showModalAdd ? (
+              <>
+                <Button colorScheme='blue' mr={3} onClick={handleSaveCreate}>
+                  Save
+                </Button>
+                <Button
+                  onClick={() => (
+                    setShowModalAdd(false), setShowModalTable(true)
+                  )}
+                >
+                  Back
+                </Button>
+              </>
+            ) : showModalTable ? (
+              <>
+                <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
+              </>
+            ) : (
+              <>
+                <Button mr={3} colorScheme='blue' onClick={handleSaveAdd}>
+                  Save
+                </Button>
+                <Button onClick={() => setShowModalTable(true)}>Back</Button>
+              </>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>

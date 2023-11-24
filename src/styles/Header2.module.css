@@ -28,10 +28,15 @@
     padding: 10px;
   }
 
-  .signInButton {
-    padding: 10px 20px;
-    flex-shrink: 0;
-    border-radius: 50px;
-    background: #0075ff;
+  .menuButton {
+    background-color: #4d9ffe;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+  }
+  .menuButton:hover {
+    background-color: #4d9ffe;
+    border: none;
+    color: rgb(1, 101, 252);
   }
 }

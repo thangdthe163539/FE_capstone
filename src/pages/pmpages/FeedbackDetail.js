@@ -110,9 +110,9 @@ function ReportPage(title) {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.reportId,
+        `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.softwareId,
         {
-          // softwareId: formData.softwareId,
+          softwareId: formData.softwareId,
           description: formData.description,
           type: formData.type,
           startDate: formData.startDate,
@@ -142,17 +142,17 @@ function ReportPage(title) {
             Home
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>
-          <Link href='/pmpages/Issue' className={styles.listitem}>
-            Issue
+          <Link href='/pmpages/Feedback' className={styles.listitem}>
+            Feedback
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>
-          <Link href='/pmpages/ListIssue' className={styles.listitem}>
-            List Issue
+          <Link href='/pmpages/ListFeedback' className={styles.listitem}>
+            List Feedback
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue Detail
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback Detail
         </ListItem>
         <ListItem className={styles.list}>
-          <Text fontSize='2xl'>Issue Detail</Text>
+          <Text fontSize='2xl'>Feedback Detail</Text>
         </ListItem>
         <ListItem className={styles.list}>
           <Flex direction='row' width='100%' justify='space-between'>
@@ -189,6 +189,7 @@ function ReportPage(title) {
               </Text>
             </Flex>
           </Flex>
+
           <Box>
             <Flex>
               <Text className={`${styles.text1} ${styles.text2}`}>Title: </Text>

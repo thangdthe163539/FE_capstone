@@ -46,7 +46,7 @@ import { BACK_END_PORT } from '../../../env';
 import Header2 from '@/components/layouts/Header/index2';
 //
 const defaultData = {
-  softwareId: '',
+  appId: '',
   deviceId: '',
   name: '',
   version: '',
@@ -56,21 +56,40 @@ const defaultData = {
   status: '',
 };
 
-function ReportPage() {
+function FeedbackPage() {
   // console.log(BACK_END_PORT);
   const router = useRouter();
-  let account = null;
+  const [account, setAccount] = useState();
 
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
+
     if (storedAccount) {
-      account = JSON.parse(storedAccount);
-      if (!account || account == null) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
         // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
       }
     }
-  });
+  }, []);
+  const [software, setSoftware] = useState();
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedSoftware = localStorage.getItem('software');
+
+    if (storedSoftware) {
+      const softwareDataDecode = JSON.parse(storedSoftware);
+      if (!softwareDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setSoftware(softwareDataDecode);
+      }
+    }
+  }, []);
+  //
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -90,13 +109,13 @@ function ReportPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/Report/list_reports_by_account/` +
-            account.accId,
+          `${BACK_END_PORT}/api/Report/GetReportsForAppAndType/` +
+            software.appId +
+            `/Feedback`,
         );
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_software_by_user/` +
-            account.accId,
+          `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
         );
         setSoftwareData(response2.data); // Assuming the API returns an array of objects
 
@@ -108,17 +127,15 @@ function ReportPage() {
     };
 
     fetchData();
-  }, []);
+  }, [account]);
   //
   useEffect(() => {
     if (data.length > 0 && softwareData.length > 0) {
       const mergedData = data.map((report) => {
-        const software = softwareData.find(
-          (sw) => sw.softwareId === report.softwareId,
-        );
+        const software = softwareData.find((sw) => sw.appId === report.appId);
         return {
           ...report,
-          name: software.name ? software.name : report.softwareId,
+          name: software.name ? software.name : report.appId,
         };
       });
       setReportData(mergedData);
@@ -135,7 +152,29 @@ function ReportPage() {
     });
     setFilteredReportData(filteredData);
   };
-
+  const handleStatusChange = async (item, e) => {
+    try {
+      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const response = await axios.put(
+        `${BACK_END_PORT}/api/Report/UpdateReport/` + item.reportId,
+        {
+          // appId: item.appId,
+          description: item.description,
+          type: item.type,
+          // startDate: item.startDate,
+          endDate: item.endDate,
+          status: e.target.value,
+        },
+      );
+      console.log('Data saved:', response.data);
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/Report/GetReportsForSoftware/` + software.appId,
+      );
+      setData(newDataResponse.data);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
   // Update filtered data whenever the search query changes
   useEffect(() => {
     filterAssets();
@@ -155,14 +194,18 @@ function ReportPage() {
     <Box className={styles.bodybox}>
       <List>
         <ListItem className={styles.list}>
-          <Link href='/pmpages/pmhome' className={styles.listitem}>
+          <Link href='/pmpages/PoHome' className={styles.listitem}>
             Home
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Reports Management
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>
+          <Link href='/pmpages/Feedback' className={styles.listitem}>
+            Feedback
+          </Link>
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>List Feedback
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Reports Management</Text>
+            <Text fontSize='2xl'>List Feedback</Text>
             <Spacer />
             <Input
               type='text'
@@ -182,10 +225,16 @@ function ReportPage() {
               className={styles.cTable}
             >
               <TableCaption>
-                Total {filteredReportData.length} reports
+                Total{' '}
+                {
+                  filteredReportData.filter((item) => item.type === 'Feedback')
+                    .length
+                }{' '}
+                reports
               </TableCaption>
               <Thead>
                 <Tr>
+                  <Th className={styles.cTh}>No</Th>
                   <Th className={styles.cTh}>Software</Th>
                   <Th className={styles.cTh}>Type</Th>
                   <Th className={styles.cTh}>Start Date</Th>
@@ -194,31 +243,37 @@ function ReportPage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredReportData.map((item) => (
-                  <Tr>
-                    <Td display='none'>{item.reportId}</Td>
-                    <Td className={styles.listitem}>
-                      <Link
-                        href={'/pmpages/reportdetail'}
-                        onClick={() => handleDetail(item)}
-                      >
-                        {item.name}
-                      </Link>
-                    </Td>
-                    <Td>{item.type}</Td>
-                    <Td>{item.startDate}</Td>
-                    <Td>{item.endDate}</Td>
-                    <Td>
-                      {item.status === 1
-                        ? 'Unsolved'
-                        : item.status === 2
-                        ? 'Solved'
-                        : item.status === 3
-                        ? 'Deleted'
-                        : 'Unknown'}
-                    </Td>
-                  </Tr>
-                ))}
+                {filteredReportData
+                  .filter((item) => item.type === 'Feedback')
+                  .map((item, index) => (
+                    <Tr>
+                      <Td display='none'>{item.reportId}</Td>
+                      <Td>{index + 1}</Td>
+                      <Td className={styles.listitem}>
+                        <Link
+                          href={'/pmpages/FeedbackDetail'}
+                          onClick={() => handleDetail(item)}
+                        >
+                          {item.name}
+                        </Link>
+                      </Td>
+                      <Td>{item.type}</Td>
+                      <Td>{item.start_Date}</Td>
+                      <Td>{item.end_Date}</Td>
+                      <Td>
+                        <Select
+                          name='status'
+                          value={item?.status}
+                          onChange={(e) => handleStatusChange(item, e)} // Add onChange handler
+                          border='none'
+                        >
+                          <option value='1'>Unsolved</option>
+                          <option value='2'>Solved</option>
+                          <option value='3'>Deleted</option>
+                        </Select>
+                      </Td>
+                    </Tr>
+                  ))}
               </Tbody>
             </Table>
           </TableContainer>
@@ -228,4 +283,4 @@ function ReportPage() {
   );
 }
 
-export default ReportPage;
+export default FeedbackPage;

@@ -1,4 +1,15 @@
-import { Box, Flex, Button, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Button,
+  Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  background,
+} from '@chakra-ui/react';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import styles from '@/styles/Header2.module.css';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -29,20 +40,25 @@ function Header2() {
           <Link href={'/'}>SoftTrack</Link>
         </Text>
         <Flex>
-          {account2 && account2.name != null ? (
-            <Text className={styles.navbarItem}>
-              {account2.roleName}: {account2.name}
-            </Text>
-          ) : null}
-          <Button
-            fontSize={'sm'}
-            fontWeight={400}
-            variant={'link'}
-            onClick={handleLogout}
-            className={`${styles.navbarItem} ${styles.signInButton}`}
-          >
-            LOG OUT
-          </Button>
+          <Menu>
+            {account2 && account2.name != null ? (
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                className={styles.menuButton}
+                _active={{
+                  bg: '#4d9ffe',
+                  border: 'none',
+                  color: '#fff',
+                }}
+              >
+                {account2.roleName}: {account2.name}
+              </MenuButton>
+            ) : null}
+            <MenuList>
+              <MenuItem onClick={handleLogout}>LOG OUT</MenuItem>
+            </MenuList>
+          </Menu>
         </Flex>
       </Flex>
     </Box>

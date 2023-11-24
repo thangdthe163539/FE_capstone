@@ -12,18 +12,18 @@ function PmHome() {
     <Box className={styles.bodybox}>
       <List>
         <ListItem className={styles.list}>
-          <Link href='/pmpages/assetlist' className={styles.listitem}>
-            Assets Management
+          <Link href='/pmpages/Application' className={styles.listitem}>
+            Application
           </Link>
         </ListItem>
         <ListItem className={styles.list}>
-          <Link href='/pmpages/softwarelist' className={styles.listitem}>
-            Softwares Management
+          <Link href='/pmpages/Issue' className={styles.listitem}>
+            Issue
           </Link>
         </ListItem>
         <ListItem className={styles.list}>
-          <Link href='/pmpages/reportlist' className={styles.listitem}>
-            Reports Management
+          <Link href='/pmpages/Feedback' className={styles.listitem}>
+            Feedback
           </Link>
         </ListItem>
       </List>
