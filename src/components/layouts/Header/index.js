@@ -5,8 +5,20 @@ import { initializeApp } from 'firebase/app';
 import { useRouter } from 'next/router';
 
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useState, useEffect } from 'react';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
+
+import {
+  Alert,
+  AlertIcon,
+} from '@chakra-ui/react'
 
 function Header() {
+  const [isSuccess, setIsSuccess] = useState('');
   const router = useRouter();
   // start config firebase - login gg
   const firebaseConfig = {
@@ -46,7 +58,6 @@ function Header() {
             console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {
-              // router.push('/pmpages/pmhome');
               router.push('adminpages/adminhome');
               //   router.push('/userpages/userhome');
             } else if (id == 2) {
@@ -54,10 +65,11 @@ function Header() {
             } else if (id == 3) {
               router.push('/userpages/userhome');
             } else {
-              router.push('home');
+              router.push('http://localhost:3000/');
             }
           })
           .catch((error) => {
+            setIsSuccess("false");
             console.error('Lỗi:', error);
           });
       })

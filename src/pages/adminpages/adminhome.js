@@ -12,8 +12,13 @@ function ADHomePage() {
           </Link>
         </ListItem>
         <ListItem className={styles.list}>
-          <Link className={styles.listitem} href='/adminpages/reportlist'>
-            Reports Management
+          <Link className={styles.listitem} href='/adminpages/issuehome'>
+            Issue Management
+          </Link>
+        </ListItem>
+        <ListItem className={styles.list}>
+          <Link className={styles.listitem} href='/adminpages/feedbackManager'>
+            Feedback Management
           </Link>
         </ListItem>
       </List>

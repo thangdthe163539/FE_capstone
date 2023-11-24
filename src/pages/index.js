@@ -25,10 +25,9 @@ function SignInPage() {
       <Text style={{ letterSpacing: '5px', fontSize: '20px', color: 'white', marginLeft: '4%', marginTop: '1%' }} >Your Software Asset Management Solution!</Text>
       <Image style={{ paddingLeft: '55%', marginTop: '-10%', height: '400px' }} boxSize='' src='image2.png' alt='Dan Abramov' />
       <Text style={{ letterSpacing: '1px', fontSize: '15px', color: 'white', marginTop: "-17%", marginLeft: '4%' }}>
-        <Text>Advanced software asset management solution</Text>
-        <Text>that helps you track, control, and optimize software licenses</Text>
-        <Text> with ease, ensuring compliance and cost efficiency for your organization.</Text>
-        <Text></Text>
+        Advanced software asset management solution<br/>
+        that helps you track, control, and optimize software licenses<br/>
+        with ease, ensuring compliance and cost efficiency for your organization.
       </Text>
     </Box>
   );

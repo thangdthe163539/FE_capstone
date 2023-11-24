@@ -1,17 +1,17 @@
 import {
-    Table, Text,
-    Thead,
-    Tbody,
-    Tr,
-    Td,
-    TableContainer,
+    Table, Text, ModalBody,
+    Thead, Modal, Grid, Select,
+    Tbody, ModalOverlay, ModalFooter,
+    Tr, ModalContent, FormLabel, Input,
+    Td, ModalHeader, GridItem,
+    TableContainer, ModalCloseButton,
     Box, Center, Button, Flex
 } from '@chakra-ui/react'
 import {
     Alert,
     AlertIcon,
 }
-from '@chakra-ui/react'
+    from '@chakra-ui/react'
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import styles from '@/styles/admin.module.css';
@@ -19,8 +19,35 @@ import styles from '@/styles/admin.module.css';
 function UserDetail() {
     const router = useRouter();
     const { email, role, roleid, status, name, accid } = router.query;
+    const [isOpenUD, setIsOpenUD] = useState(false);
+    const [selectedOptionActive, setSelectedOptionActive] = useState('');
+    const [selectedOptionRole, setSelectedOptionRole] = useState('');
+    const [roles, setRoles] = useState([]);
     const [isSuccess, setIsSuccess] = useState('');
     const notificationTimeout = 2000;
+    const [name1, setName] = useState('');
+
+    const handleNameChange = (event) => {
+        setName(event.target.value);
+    };
+    useEffect(() => {
+        setName(name);
+    }, [name]);
+
+    useEffect(() => {
+        const url = 'http://localhost:5001/api/roles/listRole';
+        fetch(url, {
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(data => {
+                setRoles(data);
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+            });
+    }, []);
+
     const handleBackToList = () => {
         router.push('userManager');
     };
@@ -43,15 +70,54 @@ function UserDetail() {
             });
     };
 
+    const handleUpdateUser = () => {
+        if (accid) {
+            const url = `http://localhost:5001/api/v1/Account/Update_Accpunt${accid}`;
 
-    const handleEdit = (name, email, status, roleid) => {
-        router.push(`updateUser?email=${email}&name=${name}&status=${status}&roleid=${roleid}`);
+            const email = document.getElementById('email1').value;
+            const isActive = selectedOptionActive ? selectedOptionActive : status;
+            const name = document.getElementById('name').value;
+            const role = selectedOptionRole ? selectedOptionRole : roleid;
+
+            const data = {
+                name: name,
+                email: email,
+                status: parseInt(isActive),
+                roleId: parseInt(role)
+            };
+
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        setIsSuccess("true");
+                        setIsOpenUD(false)
+                    } else {
+                        setIsSuccess("false");
+                        setIsOpenUD(false)
+                    }
+                })
+                .catch(error => {
+                    setIsSuccess("false");
+                    setIsOpenUD(false)
+                    console.error('Lỗi:', error);
+                });
+        } else {
+            alert('Update failed(id)');
+        }
+
     };
 
     useEffect(() => {
         if (isSuccess) {
             const hideNotification = setTimeout(() => {
                 setIsSuccess('');
+                router.push('userManager');
             }, notificationTimeout);
 
             return () => {
@@ -69,7 +135,7 @@ function UserDetail() {
                 {isSuccess === 'true' && (
                     <Alert status='success'>
                         <AlertIcon />
-                        Delete Success!
+                        Your request successfully!
                     </Alert>
                 )}
                 {isSuccess === 'false' && (
@@ -87,7 +153,7 @@ function UserDetail() {
                 <Table variant='simple' style={{ marginTop: '5%', backgroundColor: 'white', width: '90%' }}>
                     <Thead>
                         <Tr>
-                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '200px' }}>Name</Td>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '50px' }}>Name</Td>
                             <Td>{name}</Td>
                         </Tr>
                         <Tr>
@@ -98,7 +164,7 @@ function UserDetail() {
                     <Tbody>
                         <Tr>
                             <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez' }}>Active</Td>
-                            <Td>{status}</Td>
+                            <Td>{status == 1 ? 'Active' : status == 3 ? 'InActive' : ''}</Td>
                         </Tr>
                         <Tr>
                             <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez' }}>Role Name</Td>
@@ -109,10 +175,88 @@ function UserDetail() {
             </Center>
         </TableContainer>
 
-        <Button style={{ marginLeft: '5%', marginTop: '5%' }} onClick={() => handleEdit(name, email, status, roleid)}>Edit</Button>
+        <Button style={{ marginLeft: '5%', marginTop: '5%' }} onClick={() => setIsOpenUD(true)}>Edit</Button>
         <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleDelete}>Delete</Button>
         <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleBackToList}>Back to List</Button>
-
+        <Modal
+            isOpen={isOpenUD}
+            onClose={() => (setIsOpenUD(false))}
+            closeOnOverlayClick={false}
+            size='lg'
+        >
+            <ModalOverlay />
+            <ModalContent maxW="800px">
+                <ModalHeader>Update User</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody pb={8}>
+                    <Grid templateColumns='repeat(2, 1fr)' gap={8}>
+                        <GridItem colSpan={1}>
+                            <Flex alignItems="center">
+                                <FormLabel style={{ width: '50px' }}>Email</FormLabel>
+                                <Input id='email1' value={email} readOnly />
+                            </Flex>
+                        </GridItem>
+                        <GridItem colSpan={1}>
+                            <Flex alignItems="center">
+                                <FormLabel style={{ width: '50px' }}>Role</FormLabel>
+                                <Select
+                                    value={selectedOptionRole}
+                                    onChange={(e) => setSelectedOptionRole(e.target.value)}
+                                >
+                                    {roles
+                                        .sort((a, b) => (a.roleId == roleid ? -1 : b.roleId == roleid ? 1 : 0))
+                                        .map(role1 => (
+                                            <option key={role1.roleId} value={role1.roleId}>
+                                                {role1.name}
+                                            </option>
+                                        ))}
+                                </Select>
+                            </Flex>
+                        </GridItem>
+                    </Grid>
+                    <Grid templateColumns='repeat(2, 1fr)' gap={8} style={{ marginTop: '10px' }}>
+                        <GridItem colSpan={1}>
+                            <Flex alignItems="center">
+                                <FormLabel style={{ width: '50px' }}>Name</FormLabel>
+                                <Input id='name' value={name1} placeholder='' onChange={handleNameChange} />
+                            </Flex>
+                        </GridItem>
+                        <GridItem colSpan={1}>
+                            <Flex alignItems="center">
+                                <FormLabel>Active</FormLabel>
+                                <Select
+                                    value={selectedOptionActive}
+                                    onChange={(e) => {
+                                        setSelectedOptionActive(e.target.value);
+                                    }}
+                                >
+                                    {status == 1 && (
+                                        <>
+                                            <option value={1}>Active</option>
+                                            <option value={3}>InActive</option>
+                                        </>
+                                    )}
+                                    {status == 3 && (
+                                        <>
+                                            <option value={3}>InActive</option>
+                                            <option value={1}>Active</option>
+                                        </>
+                                    )}
+                                </Select>
+                            </Flex>
+                        </GridItem>
+                    </Grid>
+                </ModalBody>
+                <ModalFooter>
+                    <Button colorScheme='blue' mr={3} onClick={handleUpdateUser}>
+                        Save
+                    </Button>
+                    <Button onClick={() => (setIsOpenUD(false))}>
+                        Cancel
+                    </Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
     </Box>;
 }
 
