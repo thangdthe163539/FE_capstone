@@ -16,8 +16,11 @@ import {
   IconButton,
   Icon,
   useToast,
+  Image,
   Center,
 } from '@chakra-ui/react';
+import {  DeleteIcon } from '@chakra-ui/icons';
+
 import {
   Modal,
   ModalOverlay,
@@ -107,18 +110,29 @@ function ReportPage(title) {
         endDate: currentDate, // Empty string
       });
     }
+    const submitData = new FormData();
+
     try {
+      let appId;
+      const localStorageData = localStorage.getItem('software');
+      if (localStorageData) {
+        appId = JSON.parse(localStorageData)?.appId;
+      }
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      fileObjects.forEach((file) => {
+        submitData.append(`Images`, file);
+      });
+      submitData.append('AppId', appId);
+      submitData.append('Title', formData?.title);
+      submitData.append('Description', formData?.description);
+      submitData.append('Type', formData?.type);
+      submitData.append('Start_Date', formData?.start_date);
+      submitData.append('End_Date', formData?.end_date);
+      submitData.append('Status', formData?.status);
+      console.log(submitData);
       const response = await axios.put(
         `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.reportId,
-        {
-          // softwareId: formData.softwareId,
-          description: formData.description,
-          type: formData.type,
-          startDate: formData.startDate,
-          endDate: formData.endDate,
-          status: formData.status,
-        },
+        submitData,
       );
       console.log('Data saved:', response.data);
       toast({
@@ -128,12 +142,137 @@ function ReportPage(title) {
         duration: 3000, // Duration in milliseconds
         isClosable: true,
       });
-      router.push('/pmpages/reportlist');
+      router.push('/pmpages/ListIssue');
     } catch (error) {
       console.error('Error saving data:', error);
     }
   };
-  console.log(title);
+  
+  const allowedExtensions = ['jpg', 'png'];
+  const [image, setImage] = useState([]);
+  
+  const [isHovered, setIsHovered] = useState(null);
+  const [error, setError] = useState('');
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomedIndex, setZoomedIndex] = useState(null);
+  const handleImageClick = (index) => {
+    setZoomedIndex(index);
+    setIsZoomed(true);
+  };
+  const handleZoomClose = () => {
+    setIsZoomed(false);
+    setZoomedIndex(null);
+  };
+  
+  const [imagesState, setImages] = useState([]);
+
+  console.log(imagesState)
+   const handleImageMouseLeave = () => {
+     setIsHovered(null);
+   };
+   function dataURLtoBlob(dataURL) {
+     const parts = dataURL.split(';base64,');
+     const contentType = parts[0].split(':')[1];
+     const raw = window.atob(parts[1]);
+     const rawLength = raw.length;
+     const uInt8Array = new Uint8Array(rawLength);
+
+     for (let i = 0; i < rawLength; ++i) {
+       uInt8Array[i] = raw.charCodeAt(i);
+     }
+
+     return new Blob([uInt8Array], { type: contentType });
+   }
+
+  const fileObjects = imagesState.map((image) => {
+    // Tạo một Blob từ dataURL
+    const blob = dataURLtoBlob(image.dataURL);
+    // Tạo một File từ Blob
+    return new File([blob], image.fileName, { type: blob.type });
+    [];
+  });
+
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+
+    if (files) {
+      const newImages = Array.from(files).map((file) => {
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (allowedExtensions.includes(extension)) {
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            setImages((prevImages) => [
+              ...prevImages,
+              { fileName: file.name, dataURL: reader.result },
+            ]);
+            setError('');
+          };
+
+          reader.readAsDataURL(file);
+        } else {
+          setError('Invalid file type. Please select a JPG or PNG file.');
+          return null;
+        }
+      });
+    }
+  };
+
+  const handleImageMouseEnter = (index, event) => {
+    event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+    setIsHovered(index);
+  };
+
+  const handleFileChangeU = (e) => {
+    const files = e.target.files;
+
+    if (files) {
+      const newImages = Array.from(files).map((file) => {
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (allowedExtensions.includes(extension)) {
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            setImage((prevImages) => [
+              ...prevImages,
+              { fileName: file.name, dataURL: reader.result },
+            ]);
+            setError('');
+          };
+
+          reader.readAsDataURL(file);
+        } else {
+          setError('Invalid file type. Please select a JPG or PNG file.');
+          return null;
+        }
+      });
+
+      // Giữ lại cả ảnh cũ và thêm ảnh mới
+      setImage((prevImages) => [
+        ...prevImages.filter((img) => img.dataURL),
+        ...newImages.filter(Boolean),
+      ]);
+    }
+  };
+  useEffect(() => {
+    if (formData?.reportId) {
+      const url = `http://localhost:5001/api/v1/Image/list_Images_by_Report/${formData?.reportId}`;
+
+      fetch(url, {
+        method: 'GET',
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setImage(data);
+        })
+        .catch((error) => {
+          console.error('Lỗi:', error);
+        });
+    }
+  }, [formData]);
+  console.log(formData);
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -206,6 +345,137 @@ function ReportPage(title) {
               />
             </FormControl>
           </Box>
+          <Flex>
+            <FormLabel style={{ width: '50px' }}>Image</FormLabel>
+            <Input
+              style={{
+                width: '300px',
+                border: 'none',
+                textAlign: 'center',
+                height: '40px',
+              }}
+              id='file'
+              type='file'
+              onChange={handleFileChange}
+              multiple
+            />
+          </Flex>
+          <Box display='flex' flexWrap='wrap' gap={4}>
+            {!imagesState.length && image.map((image, index) => (
+              <Box
+                key={index}
+                position='relative'
+                maxW='100px'
+                maxH='200px'
+                overflow='hidden'
+                onClick={() => handleImageClick(index)}
+                onMouseEnter={(event) => handleImageMouseEnter(index, event)}
+                onMouseLeave={handleImageMouseLeave}
+              >
+                <Image
+                  src={image.dataURL || `/images/${image.image1}`}
+                  alt={`Selected Image ${index}`}
+                  w='100%'
+                  h='100%'
+                  objectFit='cover'
+                  _hover={{ cursor: 'pointer' }}
+                />
+                {isHovered === index && (
+                  <>
+                    <DeleteIcon
+                      position='absolute'
+                      top='5px'
+                      color='black'
+                      right='5px'
+                      fontSize='15px'
+                      variant='ghost'
+                      onClick={(event) => handleDeleteClick(index, event)}
+                      _hover={{ color: 'black ' }}
+                    />
+                    <Text
+                      position='absolute'
+                      bottom='5px'
+                      left='5px'
+                      fontSize='10px'
+                      color='white'
+                    >
+                      {image.fileName}
+                    </Text>
+                  </>
+                )}
+              </Box>
+            ))}
+            {imagesState.map((image, index) => (
+              <Box
+                key={index}
+                position='relative'
+                maxW='100px'
+                maxH='200px'
+                overflow='hidden'
+                onClick={() => handleImageClick(index)}
+                onMouseEnter={(event) => handleImageMouseEnter(index, event)}
+                onMouseLeave={handleImageMouseLeave}
+              >
+                <Image
+                  src={image.dataURL || `/images/${image.image1}`}
+                  alt={`Selected Image ${index}`}
+                  w='100%'
+                  h='100%'
+                  objectFit='cover'
+                  _hover={{ cursor: 'pointer' }}
+                />
+                {isHovered === index && (
+                  <>
+                    <DeleteIcon
+                      position='absolute'
+                      top='5px'
+                      color='black'
+                      right='5px'
+                      fontSize='15px'
+                      variant='ghost'
+                      onClick={(event) => handleDeleteClick_Add(index, event)}
+                      _hover={{ color: 'black' }}
+                    />
+                    <Text
+                      position='absolute'
+                      bottom='5px'
+                      left='5px'
+                      fontSize='10px'
+                      color='white'
+                    >
+                      {image.fileName}
+                    </Text>
+                  </>
+                )}
+              </Box>
+            ))}
+            {isZoomed && (
+              <div className='modal-overlay' onClick={handleZoomClose}>
+                <Modal
+                  isOpen={isZoomed}
+                  onClose={handleZoomClose}
+                  size='xl'
+                  isCentered
+                >
+                  <ModalOverlay />
+                  <ModalContent>
+                    <ModalBody>
+                      <Box className='zoomed-image-container'>
+                        <Image
+                          src={imagesState[zoomedIndex]?.dataURL}
+                          alt={`${zoomedIndex}`}
+                          w='100%' // Thiết lập kích thước modal sao cho đủ lớn
+                          h='100%'
+                          objectFit='contain'
+                        />
+                      </Box>
+                    </ModalBody>
+                  </ModalContent>
+                </Modal>
+              </div>
+            )}
+          </Box>
+          {error && <Text color='red'>{error}</Text>}
         </ListItem>
         <Button mt={2} onClick={handleSaveEdit}>
           Save
@@ -216,3 +486,4 @@ function ReportPage(title) {
 }
 
 export default ReportPage;
+ 

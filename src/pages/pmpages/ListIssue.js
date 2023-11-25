@@ -44,6 +44,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
 import Header2 from '@/components/layouts/Header/index2';
+import PaginationCustom from '@/components/pagination';
 //
 const defaultData = {
   appId: '',
@@ -102,6 +103,33 @@ function SecurityPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredReportData, setFilteredReportData] = useState([]);
+  const [dynamicFilteredReportData, setDynamicFilteredReportData] = useState(
+    [],
+  );
+  //pagination
+  const itemPerPage = 8;
+  const [dynamicList, setDynamicList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  // filteredIssueData;
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (dynamicFilteredReportData[i]) {
+        newList.push(dynamicFilteredReportData[i]);
+      }
+    }
+    setDynamicList(newList);
+  };
+  const totalPages = dynamicFilteredReportData
+    ? dynamicFilteredReportData?.length
+    : 0;
+
+  useEffect(() => {
+    if (dynamicFilteredReportData.length) {
+      handleChangePage(1);
+    }
+  }, [dynamicFilteredReportData]);
   const toast = useToast();
   //
   //
@@ -151,6 +179,11 @@ function SecurityPage() {
       return name.includes(query) || type.includes(query);
     });
     setFilteredReportData(filteredData);
+    setDynamicFilteredReportData(
+      filteredData.filter(
+        (item) => item.type === 'Issue' || item.type === 'Risk',
+      ),
+    );
   };
 
   // Update filtered data whenever the search query changes
@@ -229,13 +262,18 @@ function SecurityPage() {
               className={styles.cTable}
             >
               <TableCaption>
-                Total{' '}
-                {
-                  filteredReportData.filter(
-                    (item) => item.type === 'Issue' || item.type === 'Risk',
-                  ).length
-                }{' '}
-                reports
+                <Flex alignItems={'center'} justifyContent={'space-between'}>
+                  <Text>
+                    Show {dynamicList.length}/{dynamicFilteredReportData.length}{' '}
+                    reports
+                  </Text>{' '}
+                  <PaginationCustom
+                    current={currentPage}
+                    onChange={handleChangePage}
+                    total={totalPages}
+                    pageSize={itemPerPage}
+                  />
+                </Flex>
               </TableCaption>
               <Thead>
                 <Tr>
@@ -248,39 +286,35 @@ function SecurityPage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredReportData
-                  .filter(
-                    (item) => item.type === 'Issue' || item.type === 'Risk',
-                  )
-                  .map((item, index) => (
-                    <Tr key={item.reportId}>
-                      <Td display='none'>{item.reportId}</Td>
-                      <Td>{index + 1}</Td>
-                      <Td className={styles.listitem}>
-                        <Link
-                          href={'/pmpages/IssueDetail'}
-                          onClick={() => handleDetail(item)}
-                        >
-                          {item.name}
-                        </Link>
-                      </Td>
-                      <Td>{item.title}</Td>
-                      <Td>{item.start_Date}</Td>
-                      <Td>{item.end_Date}</Td>
-                      <Td>
-                        <Select
-                          name='status'
-                          value={item?.status}
-                          onChange={(e) => handleStatusChange(item, e)} // Add onChange handler
-                          border='none'
-                        >
-                          <option value='1'>Unsolved</option>
-                          <option value='2'>Solved</option>
-                          <option value='3'>Deleted</option>
-                        </Select>
-                      </Td>
-                    </Tr>
-                  ))}
+                {dynamicList.map((item, index) => (
+                  <Tr key={item.reportId}>
+                    <Td display='none'>{item.reportId}</Td>
+                    <Td>{index + 1}</Td>
+                    <Td className={styles.listitem}>
+                      <Link
+                        href={'/pmpages/IssueDetail'}
+                        onClick={() => handleDetail(item)}
+                      >
+                        {item.name}
+                      </Link>
+                    </Td>
+                    <Td>{item.title}</Td>
+                    <Td>{item.start_Date}</Td>
+                    <Td>{item.end_Date}</Td>
+                    <Td>
+                      <Select
+                        name='status'
+                        value={item?.status}
+                        onChange={(e) => handleStatusChange(item, e)} // Add onChange handler
+                        border='none'
+                      >
+                        <option value='1'>Unsolved</option>
+                        <option value='2'>Solved</option>
+                        <option value='3'>Deleted</option>
+                      </Select>
+                    </Td>
+                  </Tr>
+                ))}
               </Tbody>
             </Table>
           </TableContainer>

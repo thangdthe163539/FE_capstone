@@ -43,6 +43,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
 import Header2 from '@/components/layouts/Header/index2';
+import PaginationCustom from '@/components/pagination';
 //
 const defaultData = {
   accId: '',
@@ -91,6 +92,8 @@ function SoftwarePage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
+  const [dynamicFilteredSoftwareData, setDynamicFilteredSoftwareData] =
+    useState([]);
   const toast = useToast();
   //
   //
@@ -108,6 +111,31 @@ function SoftwarePage() {
       setButtonDisabled(false);
     }
   };
+
+  //pagination
+  const itemPerPage = 8;
+  const [dynamicList, setDynamicList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  // filteredIssueData;
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (dynamicFilteredSoftwareData[i]) {
+        newList.push(dynamicFilteredSoftwareData[i]);
+      }
+    }
+    setDynamicList(newList);
+  };
+  const totalPages = dynamicFilteredSoftwareData
+    ? dynamicFilteredSoftwareData?.length
+    : 0;
+
+  useEffect(() => {
+    if (dynamicFilteredSoftwareData.length) {
+      handleChangePage(1);
+    }
+  }, [dynamicFilteredSoftwareData]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -175,6 +203,9 @@ function SoftwarePage() {
       return name.includes(query) || publisher.includes(query);
     });
     setFilteredSoftwareData(filteredData);
+     setDynamicFilteredSoftwareData(
+       filteredData.filter((item) => item.status === 1 || item.status === 2),
+     );
   };
 
   // Update filtered data whenever the search query changes
@@ -225,13 +256,18 @@ function SoftwarePage() {
               className={styles.cTable}
             >
               <TableCaption>
-                Total{' '}
-                {
-                  filteredSoftwareData.filter(
-                    (item) => item.status === 1 || item.status === 2,
-                  ).length
-                }{' '}
-                softwares
+                <Flex alignItems={'center'} justifyContent={'space-between'}>
+                  <Text>
+                    Show {dynamicList.length}/
+                    {dynamicFilteredSoftwareData.length} softwares
+                  </Text>{' '}
+                  <PaginationCustom
+                    current={currentPage}
+                    onChange={handleChangePage}
+                    total={totalPages}
+                    pageSize={itemPerPage}
+                  />
+                </Flex>
               </TableCaption>
               <Thead>
                 <Tr>
@@ -245,8 +281,7 @@ function SoftwarePage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredSoftwareData
-                  .filter((item) => item.status === 1 || item.status === 2)
+                {dynamicList
                   .map((item, index) => (
                     <Tr
                       _hover={{

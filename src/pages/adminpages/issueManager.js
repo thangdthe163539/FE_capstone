@@ -32,10 +32,7 @@ import {
   GridItem,
   Image,
 } from '@chakra-ui/react';
-import {
-  Alert,
-  AlertIcon,
-} from '@chakra-ui/react'
+import { Alert, AlertIcon } from '@chakra-ui/react';
 import axios from 'axios';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
@@ -43,6 +40,7 @@ import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import { FaPlus } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import PaginationCustom from '@/components/pagination';
 
 const defaultData = {
   reportId: '',
@@ -61,6 +59,7 @@ function IssuePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchQueryTb, setSearchQueryTb] = useState('');
   const [filteredAppData, setfilteredAppData] = useState([]);
+  const [dynamicFilteredAppData, setDynamicFilteredAppData] = useState([]);
   const [filteredAppAddData, setfilteredAppAddData] = useState([]);
   const [Apps, setApps] = useState([]);
   const [Issues, setIssues] = useState([]);
@@ -74,6 +73,26 @@ function IssuePage() {
   const [isHovered, setIsHovered] = useState(null);
   const notificationTimeout = 2000;
   const allowedExtensions = ['jpg', 'png'];
+
+
+  //pagination
+  const itemPerPage = 8;
+  const [dynamicList, setDynamicList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  // filteredIssueData;
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (dynamicFilteredAppData[i]) {
+        newList.push(dynamicFilteredAppData[i]);
+      }
+    }
+    setDynamicList(newList);
+  };
+  const totalPages = dynamicFilteredAppData ? dynamicFilteredAppData?.length : 0;
+
+
   //image
   const handleFileChange = (e) => {
     const files = e.target.files;
@@ -86,7 +105,10 @@ function IssuePage() {
           const reader = new FileReader();
 
           reader.onload = () => {
-            setImages((prevImages) => [...prevImages, { fileName: file.name, dataURL: reader.result }]);
+            setImages((prevImages) => [
+              ...prevImages,
+              { fileName: file.name, dataURL: reader.result },
+            ]);
             setError('');
           };
 
@@ -141,14 +163,11 @@ function IssuePage() {
     setIsHovered(index);
   };
 
-
   const handleDeleteClick_Add = (index, event) => {
     event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
     handleRemoveImage(index);
   };
   //End
-
-
 
   const handleIssuerDetails = (appId) => {
     router.push(`issueDetailsManage?appId=${appId}`);
@@ -163,30 +182,31 @@ function IssuePage() {
   };
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/Report/ReportsByType/issues';
+    const url = 'http://localhost:5001/api/Report/ReportsByType/Issue';
     fetch(url, {
       method: 'GET',
     })
-      .then(response => response.json())
-      .then(data => {
-        setIssues(data);
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          setIssues(data);
+        }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Lỗi:', error);
       });
   }, []);
-
 
   useEffect(() => {
     const url = 'http://localhost:5001/api/v1/App/ListApps';
     fetch(url, {
       method: 'GET',
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         setApps(data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Lỗi:', error);
       });
   }, []);
@@ -196,12 +216,10 @@ function IssuePage() {
     setFormData({ ...formData, [name]: value });
   };
 
-
   const countIssue = (appId) => {
-    const occurrences = Issues.filter(item => item.appId === appId);
+    const occurrences = Issues.filter((item) => item.appId === appId);
     return occurrences.length;
   };
-
 
   //lọc
   const filteApp = () => {
@@ -213,11 +231,26 @@ function IssuePage() {
       const release = item.release.toLowerCase();
       const os = item.os.toLowerCase();
       const osversion = item.osversion.toLowerCase();
-      return name.includes(query) || publisher.includes(query) || version.includes(query) || release.includes(query) || os.includes(query) || osversion.includes(query);
+      return (
+        name.includes(query) ||
+        publisher.includes(query) ||
+        version.includes(query) ||
+        release.includes(query) ||
+        os.includes(query) ||
+        osversion.includes(query)
+      );
     });
     setfilteredAppData(filteredData);
+    setDynamicFilteredAppData(
+      filteredData.filter((item) => countIssue(item.appId) !== 0),
+    );
   };
 
+  useEffect(() => {
+    if (dynamicFilteredAppData.length) {
+      handleChangePage(1);
+    }
+  }, [dynamicFilteredAppData]);
 
   useEffect(() => {
     filteApp();
@@ -229,7 +262,9 @@ function IssuePage() {
       const name = item.name.toLowerCase();
       const os = item.os.toLowerCase();
       const version = item.osversion.toLowerCase();
-      return name.includes(query) || os.includes(query) || version.includes(query);
+      return (
+        name.includes(query) || os.includes(query) || version.includes(query)
+      );
     });
     setfilteredAppAddData(filteredData);
   };
@@ -255,12 +290,12 @@ function IssuePage() {
     }
 
     // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
-    const fileObjects = imagesState.map(image => {
+    const fileObjects = imagesState.map((image) => {
       // Tạo một Blob từ dataURL
       const blob = dataURLtoBlob(image.dataURL);
       // Tạo một File từ Blob
       return new File([blob], image.fileName, { type: blob.type });
-      []
+      [];
     });
     // Sử dụng FormData để chứa dữ liệu và file
     const formData = new FormData();
@@ -282,10 +317,10 @@ function IssuePage() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setIsSuccess("true");
+      setIsSuccess('true');
       setIsOpenAdd(false);
     } catch (error) {
-      setIsSuccess("false");
+      setIsSuccess('false');
       setIsOpenAdd(false);
       console.error('Lỗi:', error);
     }
@@ -329,9 +364,15 @@ function IssuePage() {
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Issues Management -  <Link href='/adminpages/issuehome' style={{ color: '#4d9ffe', textDecoration: 'none' }}>
-              List Issues
-            </Link></Text>
+            <Text fontSize='2xl'>
+              Issues Management -{' '}
+              <Link
+                href='/adminpages/issuehome'
+                style={{ color: '#4d9ffe', textDecoration: 'none' }}
+              >
+                List Issues
+              </Link>
+            </Text>
             <Spacer />
             <Input
               type='text'
@@ -360,7 +401,22 @@ function IssuePage() {
               className={styles.cTable}
             >
               <TableCaption>
-                Total {filteredAppData.reduce((total, app) => total + countIssue(app.appId), 0)} issues
+                <Flex alignItems={'center'} justifyContent={'space-between'}>
+                  <Text>
+                    Total{' '}
+                    {filteredAppData.reduce(
+                      (total, app) => total + countIssue(app.appId),
+                      0,
+                    )}{' '}
+                    reports
+                  </Text>{' '}
+                  <PaginationCustom
+                    current={currentPage}
+                    onChange={handleChangePage}
+                    total={totalPages}
+                    pageSize={itemPerPage}
+                  />
+                </Flex>
               </TableCaption>
               <Thead>
                 <Tr>
@@ -375,24 +431,29 @@ function IssuePage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredAppData.map((app, index) => (
-                  countIssue(app.appId) !== 0 && (
-                    <Tr key={app.id}>
-                      <Td>{index + 1}</Td>
-                      <Td>
-                        <Button color={'blue'} variant='link' onClick={() => handleIssuerDetails(app.appId)}>
-                          {app.name.trim()}
-                        </Button>
-                      </Td>
-                      <Td>{app.release.trim()}</Td>
-                      <Td>{app.os.trim()}</Td>
-                      <Td>{app.osversion.trim()}</Td>
-                      <Td>{app.publisher.trim()}</Td>
-                      <Td>Active</Td>
-                      <Td>{countIssue(app.appId)}</Td>
-                    </Tr>
-                  )
-                ))}
+                {dynamicList.map(
+                  (app, index) =>
+                    countIssue(app.appId) !== 0 && (
+                      <Tr key={app.id}>
+                        <Td>{index + 1}</Td>
+                        <Td>
+                          <Button
+                            color={'blue'}
+                            variant='link'
+                            onClick={() => handleIssuerDetails(app.appId)}
+                          >
+                            {app.name.trim()}
+                          </Button>
+                        </Td>
+                        <Td>{app.release.trim()}</Td>
+                        <Td>{app.os.trim()}</Td>
+                        <Td>{app.osversion.trim()}</Td>
+                        <Td>{app.publisher.trim()}</Td>
+                        <Td>Active</Td>
+                        <Td>{countIssue(app.appId)}</Td>
+                      </Tr>
+                    ),
+                )}
               </Tbody>
             </Table>
           </TableContainer>
@@ -405,7 +466,7 @@ function IssuePage() {
         size='lg'
       >
         <ModalOverlay />
-        <ModalContent maxW="1100px">
+        <ModalContent maxW='1100px'>
           <ModalHeader>Create New Issue</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
@@ -417,9 +478,18 @@ function IssuePage() {
                   onChange={handleInputChange}
                   display='none'
                 />
-                <Flex alignItems="center">
-                  <FormLabel style={{ marginRight: '1rem' }}>Application</FormLabel>
-                  <div style={{ position: 'relative', display: 'inline-block', backgroundColor: 'whitesmoke', width: '300px' }}>
+                <Flex alignItems='center'>
+                  <FormLabel style={{ marginRight: '1rem' }}>
+                    Application
+                  </FormLabel>
+                  <div
+                    style={{
+                      position: 'relative',
+                      display: 'inline-block',
+                      backgroundColor: 'whitesmoke',
+                      width: '300px',
+                    }}
+                  >
                     <Input
                       type='text'
                       style={{ backgroundColor: 'whitesmoke, width: 270px' }}
@@ -433,26 +503,31 @@ function IssuePage() {
                       mr={1}
                     />
                     {showOptions && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        width: '300px',
-                        border: '2px solid whitesmoke',
-                        background: '#fff',
-                        zIndex: 1,
-                        borderRadius: '5px'
-                      }}>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          width: '300px',
+                          border: '2px solid whitesmoke',
+                          background: '#fff',
+                          zIndex: 1,
+                          borderRadius: '5px',
+                        }}
+                      >
                         {filteredAppAddData.map((app) => (
                           <div
                             key={app.appId}
                             style={{ padding: '8px', cursor: 'pointer' }}
                             onClick={() => {
-                              setSearchQuery(`${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`);
+                              setSearchQuery(
+                                `${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`,
+                              );
                               setAppId(app.appId);
                             }}
                           >
-                            {app.name.trim()} - {app.os.trim()} - {app.osversion.trim()}
+                            {app.name.trim()} - {app.os.trim()} -{' '}
+                            {app.osversion.trim()}
                           </div>
                         ))}
                       </div>
@@ -461,18 +536,24 @@ function IssuePage() {
                 </Flex>
               </GridItem>
               <GridItem colSpan={1}>
-                <Flex alignItems="center">
+                <Flex alignItems='center'>
                   <FormLabel>Title</FormLabel>
-                  <Input id='title' placeholder='Title' style={{ backgroundColor: 'whitesmoke' }}
+                  <Input
+                    id='title'
+                    placeholder='Title'
+                    style={{ backgroundColor: 'whitesmoke' }}
                   />
                 </Flex>
               </GridItem>
               <GridItem colSpan={1}>
-                <Flex alignItems="center">
+                <Flex alignItems='center'>
                   <FormLabel>EndDate</FormLabel>
                   <Input
-                    style={{ marginLeft: '-7px', backgroundColor: 'whitesmoke' }}
-                    type="date"
+                    style={{
+                      marginLeft: '-7px',
+                      backgroundColor: 'whitesmoke',
+                    }}
+                    type='date'
                     name='endDate'
                     onChange={handleInputChange}
                   />
@@ -494,46 +575,61 @@ function IssuePage() {
                 <Flex>
                   <FormLabel style={{ width: '50px' }}>Image</FormLabel>
                   <Input
-                    style={{ width: '300px', border: 'none', textAlign: 'center', height: '40px' }}
+                    style={{
+                      width: '300px',
+                      border: 'none',
+                      textAlign: 'center',
+                      height: '40px',
+                    }}
                     id='file'
                     type='file'
                     onChange={handleFileChange}
                     multiple
                   />
                 </Flex>
-                <Box display="flex" flexWrap="wrap" gap={4}>
+                <Box display='flex' flexWrap='wrap' gap={4}>
                   {imagesState.map((image, index) => (
                     <Box
                       key={index}
-                      position="relative"
-                      maxW="100px"
-                      maxH="200px"
-                      overflow="hidden"
+                      position='relative'
+                      maxW='100px'
+                      maxH='200px'
+                      overflow='hidden'
                       onClick={() => handleImageClick(index)}
-                      onMouseEnter={(event) => handleImageMouseEnter(index, event)}
+                      onMouseEnter={(event) =>
+                        handleImageMouseEnter(index, event)
+                      }
                       onMouseLeave={handleImageMouseLeave}
                     >
                       <Image
                         src={image.dataURL}
                         alt={`Selected Image ${index}`}
-                        w="100%"
-                        h="100%"
-                        objectFit="cover"
+                        w='100%'
+                        h='100%'
+                        objectFit='cover'
                         _hover={{ cursor: 'pointer' }}
                       />
                       {isHovered === index && (
                         <>
                           <DeleteIcon
-                            position="absolute"
-                            top="5px"
-                            color="black"
-                            right="5px"
-                            fontSize="15px"
-                            variant="ghost"
-                            onClick={(event) => handleDeleteClick_Add(index, event)}
+                            position='absolute'
+                            top='5px'
+                            color='black'
+                            right='5px'
+                            fontSize='15px'
+                            variant='ghost'
+                            onClick={(event) =>
+                              handleDeleteClick_Add(index, event)
+                            }
                             _hover={{ color: 'black' }}
                           />
-                          <Text position="absolute" bottom="5px" left="5px" fontSize="10px" color="white">
+                          <Text
+                            position='absolute'
+                            bottom='5px'
+                            left='5px'
+                            fontSize='10px'
+                            color='white'
+                          >
                             {image.fileName}
                           </Text>
                         </>
@@ -541,18 +637,23 @@ function IssuePage() {
                     </Box>
                   ))}
                   {isZoomed && (
-                    <div className="modal-overlay" onClick={handleZoomClose}>
-                      <Modal isOpen={isZoomed} onClose={handleZoomClose} size="xl" isCentered>
+                    <div className='modal-overlay' onClick={handleZoomClose}>
+                      <Modal
+                        isOpen={isZoomed}
+                        onClose={handleZoomClose}
+                        size='xl'
+                        isCentered
+                      >
                         <ModalOverlay />
                         <ModalContent>
                           <ModalBody>
-                            <Box className="zoomed-image-container">
+                            <Box className='zoomed-image-container'>
                               <Image
                                 src={imagesState[zoomedIndex]?.dataURL}
                                 alt={`${zoomedIndex}`}
-                                w="100%"  // Thiết lập kích thước modal sao cho đủ lớn
-                                h="100%"
-                                objectFit="contain"
+                                w='100%' // Thiết lập kích thước modal sao cho đủ lớn
+                                h='100%'
+                                objectFit='contain'
                               />
                             </Box>
                           </ModalBody>
@@ -561,7 +662,7 @@ function IssuePage() {
                     </div>
                   )}
                 </Box>
-                {error && <Text color="red">{error}</Text>}
+                {error && <Text color='red'>{error}</Text>}
               </GridItem>
             </Grid>
           </ModalBody>

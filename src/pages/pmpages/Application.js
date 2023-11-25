@@ -42,7 +42,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
-import Header2 from '@/components/layouts/Header/index2';
 //
 const defaultData = {
   accId: '',
@@ -232,7 +231,8 @@ function SoftwarePage() {
             };
           }),
         );
-        setSoftwareData(mergedData);
+        console.log(mergedData)
+        // setSoftwareData(mergedData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -242,6 +242,8 @@ function SoftwarePage() {
       fetchData();
     }
   }, [data]);
+
+  console.log(softwareData)
 
   // Filter function to search for assets
   const filterAssets = () => {
