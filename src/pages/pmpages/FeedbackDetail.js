@@ -110,9 +110,9 @@ function ReportPage(title) {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.softwareId,
+        `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.appId,
         {
-          softwareId: formData.softwareId,
+          appId: formData.appId,
           description: formData.description,
           type: formData.type,
           startDate: formData.startDate,

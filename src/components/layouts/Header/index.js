@@ -3,8 +3,6 @@ import styles from '@/styles/Header.module.css';
 import Link from 'next/link';
 import { initializeApp } from 'firebase/app';
 import { useRouter } from 'next/router';
-
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useState, useEffect } from 'react';
 import {
   getAuth,

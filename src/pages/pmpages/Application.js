@@ -52,6 +52,7 @@ const defaultData = {
   version: '',
   release: '',
   publisher: '',
+  type: '',
   os: 'Window',
   osversion: '',
   description: '',
@@ -401,9 +402,9 @@ function SoftwarePage() {
                       <Td>{item.type}</Td>
                       <Td>
                         {item.status === 1
-                          ? 'No issue'
+                          ? 'Active'
                           : item.status === 2
-                          ? 'Have issue'
+                          ? 'Inactive'
                           : item.status === 3
                           ? 'Deleted'
                           : 'Active'}
@@ -515,7 +516,6 @@ function SoftwarePage() {
                   >
                     <option value='Web App'>Web App</option>
                     <option value='Desktop App'>Desktop App</option>
-                    <option value='Antivirus'>Antivirus</option>
                   </Select>
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -654,7 +654,6 @@ function SoftwarePage() {
                   >
                     <option value='Web App'>Web App</option>
                     <option value='Desktop App'>Desktop App</option>
-                    <option value='Antivirus'>Antivirus</option>
                   </Select>
                 </FormControl>
                 <FormControl className={styles.formInput}>

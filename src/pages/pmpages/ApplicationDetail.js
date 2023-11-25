@@ -147,8 +147,8 @@ function SoftwarePage() {
   };
   const handleInputChange4 = (e) => {
     const { name, value } = e.target;
-    setFormData4({ ...formData4, [name]: value });
-    // console.log(formData2);
+    setFormData1({ ...formData1, [name]: value });
+    console.log(formData1);
   };
   //
   const handleFileChange = (e) => {
@@ -163,7 +163,7 @@ function SoftwarePage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Asset/UpdateAsset/` + formData.assetId,
+        `${BACK_END_PORT}/api/v1/Asset/CreateAsset`,
         {
           name: formData.name,
           cpu: formData.cpu,
@@ -177,7 +177,7 @@ function SoftwarePage() {
           model: formData.model,
           serialNumber: formData.serialNumber,
           lastSuccessfullScan: formData.lastSuccessfullScan,
-          status: formData.status,
+          status: 1,
         },
       );
       console.log('Data saved:', response.data);
@@ -197,61 +197,26 @@ function SoftwarePage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Device/UpdateDeviceWith` + formData.deviceId,
+        `${BACK_END_PORT}/api/v1/Asset/UpdateAsset/` + formData2.assetId,
         {
-          name: formData.name,
-          cpu: formData.cpu,
-          gpu: formData.gpu,
-          ram: formData.ram,
-          memory: formData.memory,
-          os: formData.os,
-          version: formData.version,
-          ipAddress: formData.ipAddress,
-          manufacturer: formData.manufacturer,
-          model: formData.model,
-          serialNumber: formData.serialNumber,
-          lastSuccessfullScan: formData.lastSuccessfullScan,
-          status: formData.status,
+          name: formData2.name,
+          cpu: formData2.cpu,
+          gpu: formData2.gpu,
+          ram: formData2.ram,
+          memory: formData2.memory,
+          os: formData2.os,
+          version: formData2.version,
+          ipAddress: formData2.ipAddress,
+          manufacturer: formData2.manufacturer,
+          model: formData2.model,
+          serialNumber: formData2.serialNumber,
+          lastSuccessfullScan: formData2.lastSuccessfullScan,
+          status: formData2.status,
         },
       );
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
-      setFormData(defaultData);
-      setSelectedRow(new Set());
-      // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
-          account.accId,
-      );
-      setData(newDataResponse.data);
-    } catch (error) {
-      console.error('Error saving data:', error);
-    }
-  };
-  const handleSaveAddLi = async () => {
-    try {
-      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Asset/UpdateAsset/` + formData.assetId,
-        {
-          name: formData.name,
-          cpu: formData.cpu,
-          gpu: formData.gpu,
-          ram: formData.ram,
-          memory: formData.memory,
-          os: formData.os,
-          version: formData.version,
-          ipAddress: formData.ipAddress,
-          manufacturer: formData.manufacturer,
-          model: formData.model,
-          serialNumber: formData.serialNumber,
-          lastSuccessfullScan: formData.lastSuccessfullScan,
-          status: formData.status,
-        },
-      );
-      console.log('Data saved:', response.data);
-      setIsOpenEdit(false); // Close the modal after successful save
-      setFormData(defaultData);
+      setFormData2(defaultData);
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
@@ -262,39 +227,114 @@ function SoftwarePage() {
       console.error('Error saving data:', error);
     }
   };
+  const handleDelete = async () => {
+    try {
+      await axios.delete(
+        `${BACK_END_PORT}/api/Asset_App/DeleteAssetApplication/` +
+          formData2.assetId +
+          `/` +
+          software.appId,
+      );
+      setIsOpenDelete(false); // Close the "Confirm Delete" modal
+      setSelectedRow(new Set());
+
+      // Reload the data for the table after deletion
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + software?.appId,
+      );
+      setData(newDataResponse.data);
+      toast({
+        title: 'Asset Deleted',
+        description: 'The asset has been successfully deleted.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setLoading(false);
+    }
+  };
+  const handleSaveAddLi = async () => {
+    try {
+      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const response = await axios.post(
+        `${BACK_END_PORT}/api/v1/Library/CreateLibrary`,
+        {
+          appId: software.appId,
+          name: formData3.name,
+          publisher: formData3.publisher,
+          libraryKey: formData3.libraryKey,
+          start_Date: formData3.start_Date,
+          time: formData3.time,
+          status: 1,
+        },
+      );
+      console.log('Data saved:', response.data);
+      setIsOpenAddLi(false); // Close the modal after successful save
+      setFormData3(defaultData2);
+      setSelectedRow1(new Set());
+      // Reload new data for the table
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Library/ListLibrariesByApp/` + software?.appId,
+      );
+      setLibraryData(newDataResponse.data);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
   const handleSaveEditLi = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Device/UpdateDeviceWith` + formData.deviceId,
+        `${BACK_END_PORT}/api/v1/Library/UpdateLibrary/` + formData1.libraryId,
         {
-          name: formData.name,
-          cpu: formData.cpu,
-          gpu: formData.gpu,
-          ram: formData.ram,
-          memory: formData.memory,
-          os: formData.os,
-          version: formData.version,
-          ipAddress: formData.ipAddress,
-          manufacturer: formData.manufacturer,
-          model: formData.model,
-          serialNumber: formData.serialNumber,
-          lastSuccessfullScan: formData.lastSuccessfullScan,
-          status: formData.status,
+          appId: software.appId,
+          name: formData1.name,
+          publisher: formData1.publisher,
+          libraryKey: formData1.libraryKey,
+          start_Date: formData1.start_Date,
+          time: formData1.time,
+          status: formData1.status,
         },
       );
       console.log('Data saved:', response.data);
-      setIsOpenEdit(false); // Close the modal after successful save
-      setFormData(defaultData);
-      setSelectedRow(new Set());
+      setIsOpenEditLi(false); // Close the modal after successful save
+      setFormData1(defaultData2);
+      setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
-          account.accId,
+        `${BACK_END_PORT}/api/v1/Library/ListLibrariesByApp/` + software?.appId,
       );
-      setData(newDataResponse.data);
+      setLibraryData(newDataResponse.data);
     } catch (error) {
       console.error('Error saving data:', error);
+    }
+  };
+  const handleDeleteLi = async () => {
+    try {
+      await axios.delete(
+        `${BACK_END_PORT}/api/v1/Library/DeleteLibraryWith_key?libraryId=` +
+          formData1?.libraryId,
+      );
+      setIsOpenDeleteLi(false); // Close the "Confirm Delete" modal
+      setSelectedRow1(new Set());
+
+      // Reload the data for the table after deletion
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Library/ListLibrariesByApp/` + software?.appId,
+      );
+      setLibraryData(newDataResponse.data);
+      toast({
+        title: 'License Deleted',
+        description: 'The asset has been successfully deleted.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setLoading(false);
     }
   };
   //
@@ -317,6 +357,8 @@ function SoftwarePage() {
     } else {
       setSelectedRow1(item.libraryId);
       setFormData1(item);
+      // const formatDate = convertDateFormat(formData1.start_Date);
+      // setFormData1({ ...formData1, 'start_Date': formatDate });
       setButtonDisabled1(false);
     }
   };
@@ -434,6 +476,14 @@ function SoftwarePage() {
     const endDate = `${endDay}/${endMonth}/${endYear}`;
 
     return endDate;
+  }
+  function convertDateFormat(inputDate) {
+    // Split the input date string into day, month, and year
+    const parts = inputDate.split('/');
+
+    // Rearrange the parts to the desired format (yyyy/mm/dd)
+    const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+    return formattedDate;
   }
   //
   return (
@@ -612,9 +662,12 @@ function SoftwarePage() {
                   >
                     <TableCaption className={styles.cTableCaption}>
                       Total{' '}
-                      {filteredDeviceData.length < 2
-                        ? filteredDeviceData.length + ' asset'
-                        : filteredDeviceData.length + ' assets'}
+                      {filteredDeviceData.filter((item) => item.status != 3)
+                        .length < 2
+                        ? filteredDeviceData.filter((item) => item.status != 3)
+                            .length + ' asset'
+                        : filteredDeviceData.filter((item) => item.status != 3)
+                            .length + ' assets'}
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -628,36 +681,40 @@ function SoftwarePage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredDeviceData.map((item, index) => (
-                        <Tr
-                          key={item.assetId}
-                          color={selectedRow === item.assetId ? 'red' : 'black'}
-                          onClick={() => handleRowClick(item)}
-                        >
-                          <Td>{index + 1}</Td>
-                          <Td className={styles.listitem}>
-                            <Link
-                              href={'/pmpages/AssetDetail'}
-                              onClick={() => handleDetail(item)}
-                            >
-                              {item.name}
-                            </Link>
-                          </Td>
-                          <Td>{item.manufacturer}</Td>
-                          <Td>{item.model}</Td>
-                          <Td>{item.serialNumber}</Td>
-                          <Td>{item.lastSuccesfullScan}</Td>
-                          <Td>
-                            {item.status === 1
-                              ? 'Active'
-                              : item.status === 2
-                              ? 'Inactive'
-                              : item.status === 3
-                              ? 'Deleted'
-                              : 'Unknown'}
-                          </Td>
-                        </Tr>
-                      ))}
+                      {filteredDeviceData
+                        .filter((item) => item.status != 3)
+                        .map((item, index) => (
+                          <Tr
+                            key={item.assetId}
+                            color={
+                              selectedRow === item.assetId ? 'red' : 'black'
+                            }
+                            onClick={() => handleRowClick(item)}
+                          >
+                            <Td>{index + 1}</Td>
+                            <Td className={styles.listitem}>
+                              <Link
+                                href={'/pmpages/AssetDetail'}
+                                onClick={() => handleDetail(item)}
+                              >
+                                {item.name}
+                              </Link>
+                            </Td>
+                            <Td>{item.manufacturer}</Td>
+                            <Td>{item.model}</Td>
+                            <Td>{item.serialNumber}</Td>
+                            <Td>{item.lastSuccesfullScan}</Td>
+                            <Td>
+                              {item.status === 1
+                                ? 'Active'
+                                : item.status === 2
+                                ? 'Inactive'
+                                : item.status === 3
+                                ? 'Deleted'
+                                : 'Unknown'}
+                            </Td>
+                          </Tr>
+                        ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -710,9 +767,12 @@ function SoftwarePage() {
                   >
                     <TableCaption className={styles.cTableCaption}>
                       Total{' '}
-                      {filteredLibraryData.length < 2
-                        ? filteredLibraryData.length + ' license'
-                        : filteredLibraryData.length + ' licenses'}
+                      {filteredLibraryData.filter((item) => item.status != 3)
+                        .length < 2
+                        ? filteredLibraryData.filter((item) => item.status != 3)
+                            .length + ' license'
+                        : filteredLibraryData.filter((item) => item.status != 3)
+                            .length + ' licenses'}
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -725,25 +785,27 @@ function SoftwarePage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredLibraryData.map((item, index) => (
-                        <Tr
-                          cursor={'pointer'}
-                          key={item.libraryId}
-                          color={
-                            selectedRow1 === item.libraryId ? 'red' : 'black'
-                          }
-                          onClick={() => handleRowClick1(item)}
-                        >
-                          <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.publisher}</Td>
-                          <Td>{item.libraryKey}</Td>
-                          <Td>{item.start_Date}</Td>
-                          <Td>
-                            {calculateEndDate(item.start_Date, item.time)}
-                          </Td>
-                        </Tr>
-                      ))}
+                      {filteredLibraryData
+                        .filter((item) => item.status != 3)
+                        .map((item, index) => (
+                          <Tr
+                            cursor={'pointer'}
+                            key={item.libraryId}
+                            color={
+                              selectedRow1 === item.libraryId ? 'red' : 'black'
+                            }
+                            onClick={() => handleRowClick1(item)}
+                          >
+                            <Td>{index + 1}</Td>
+                            <Td>{item.name}</Td>
+                            <Td>{item.publisher}</Td>
+                            <Td>{item.libraryKey}</Td>
+                            <Td>{item.start_Date}</Td>
+                            <Td>
+                              {calculateEndDate(item.start_Date, item.time)}
+                            </Td>
+                          </Tr>
+                        ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -916,6 +978,7 @@ function SoftwarePage() {
                     name='start_Date'
                     value={formData3.start_Date}
                     onChange={handleInputChange3}
+                    type='date'
                     required
                   />
                 </FormControl>
@@ -935,7 +998,7 @@ function SoftwarePage() {
             <Button colorScheme='blue' mr={3} onClick={handleSaveAddLi}>
               Save
             </Button>
-            <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
+            <Button onClick={() => setIsOpenAddLi(false)}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -988,6 +1051,7 @@ function SoftwarePage() {
                     name='start_Date'
                     value={formData1.start_Date}
                     onChange={handleInputChange4}
+                    type='date'
                     required
                   />
                 </FormControl>
@@ -1025,8 +1089,8 @@ function SoftwarePage() {
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={4}>
               <Input
-                name='deviceID'
-                value={formData2.deviceId}
+                name='assetId'
+                value={formData2.assetId}
                 onChange={handleInputChange}
                 display='none'
               />
@@ -1146,7 +1210,7 @@ function SoftwarePage() {
               >
                 <option value='1'>Active</option>
                 <option value='2'>Inactive</option>
-                <option value='3'>Deleted</option>
+                {/* <option value='3'>Deleted</option> */}
               </Select>
             </FormControl>
           </ModalBody>
@@ -1155,6 +1219,46 @@ function SoftwarePage() {
               Save
             </Button>
             <Button onClick={() => setIsOpenEdit(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal //modal delete
+        isOpen={isOpenDelete}
+        onClose={() => setIsOpenDelete(false)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Are you sure you want to delete this asset?</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme='red' mr={3} onClick={handleDelete}>
+              Delete
+            </Button>
+            <Button onClick={() => setIsOpenDelete(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal //modal delete
+        isOpen={isOpenDeleteLi}
+        onClose={() => setIsOpenDeleteLi(false)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Are you sure you want to delete this license?</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme='red' mr={3} onClick={handleDeleteLi}>
+              Delete
+            </Button>
+            <Button onClick={() => setIsOpenDeleteLi(false)}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

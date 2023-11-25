@@ -539,7 +539,8 @@ function AssetsPage() {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
+      <Modal //modal delete
+       isOpen={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Confirm Delete</ModalHeader>
