@@ -4,16 +4,9 @@ import Link from 'next/link';
 import { initializeApp } from 'firebase/app';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
-import {
-  Alert,
-  AlertIcon,
-} from '@chakra-ui/react'
+import { Alert, AlertIcon } from '@chakra-ui/react';
 
 function Header() {
   const [isSuccess, setIsSuccess] = useState('');
@@ -52,8 +45,8 @@ function Header() {
           .then((data) => {
             console.log(data);
             const id = data.roleId;
-            console.log('khang');
-            console.log(id);
+            // console.log('khang');
+            // console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {
               router.push('adminpages/adminhome');
@@ -67,7 +60,7 @@ function Header() {
             }
           })
           .catch((error) => {
-            setIsSuccess("false");
+            setIsSuccess('false');
             console.error('Lỗi:', error);
           });
       })

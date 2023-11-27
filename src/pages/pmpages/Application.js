@@ -42,7 +42,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
-import Header2 from '@/components/layouts/Header/index2';
 //
 const defaultData = {
   accId: '',
@@ -222,17 +221,26 @@ function SoftwarePage() {
       try {
         const mergedData = await Promise.all(
           data.map(async (software) => {
-            const response2 = await axios.get(
-              `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` +
-                software?.appId,
-            );
-            const count = response2.data.length;
-            return {
-              ...software,
-              assets: count || 0, // Use '0' if count is falsy (including undefined)
-            };
+            try {
+              const response2 = await axios.get(
+                `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` +
+                  software?.appId,
+              );
+              const count = response2.data.length;
+              return {
+                ...software,
+                assets: count || 0, // Use '0' if count is falsy (including undefined)
+              };
+            } catch (error) {
+              console.log(error);
+              return {
+                ...software,
+                assets: 0, // Use '0' if count is falsy (including undefined)
+              };
+            }
           }),
         );
+        // console.log(mergedData)
         setSoftwareData(mergedData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -243,6 +251,8 @@ function SoftwarePage() {
       fetchData();
     }
   }, [data]);
+
+  // console.log(softwareData)
 
   // Filter function to search for assets
   const filterAssets = () => {

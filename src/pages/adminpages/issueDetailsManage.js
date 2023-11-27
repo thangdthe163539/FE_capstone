@@ -28,6 +28,7 @@ import {
   Button,
   ModalBody,
   Image,
+  TableCaption,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -36,6 +37,7 @@ import axios from 'axios';
 import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import styles from '@/styles/pm.module.css';
 import { Alert, AlertIcon } from '@chakra-ui/react';
+import PaginationCustom from '@/components/pagination';
 
 const defaultData = {
   reportId: '',
@@ -65,6 +67,23 @@ function IssueDetailManagePage() {
   const [zoomedIndex, setZoomedIndex] = useState(null);
   const [isHovered, setIsHovered] = useState(null);
   const allowedExtensions = ['jpg', 'png'];
+
+  //pagination
+  const itemPerPage = 8;
+  const [dynamicList, setDynamicList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  // filteredIssueData;
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (issue[i]) {
+        newList.push(issue[i]);
+      }
+    }
+    setDynamicList(newList);
+  };
+  const totalPages = issue ? issue?.length : 0;
   //Image
   const handleFileChangeU = (e) => {
     const files = e.target.files;
@@ -137,6 +156,12 @@ function IssueDetailManagePage() {
     }
   }, [detail?.reportId]);
 
+  useEffect(() => {
+    if (issue.length) {
+      handleChangePage(1);
+    }
+  }, [issue]);
+
   const handleImageClick = (index) => {
     setZoomedIndex(index);
     setIsZoomed(true);
@@ -162,10 +187,7 @@ function IssueDetailManagePage() {
   };
 
   //End
-  console.log(issue);
-  const uniqueStatuses = [
-    ...new Set(issue ? issue.map((st) => st.status) : [1]),
-  ];
+  const uniqueStatuses = [...new Set(issue.map((st) => st.status))];
 
   const sortedIssue = uniqueStatuses.sort((a, b) =>
     a === detail?.status ? -1 : b === detail?.status ? 1 : 0,
@@ -173,14 +195,30 @@ function IssueDetailManagePage() {
 
   const defaultStatuses = [1, 2, 3, 4];
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 1:
+        return 'Unsolve';
+      case 2:
+        return 'Solved';
+      case 3:
+        return 'Deleted';
+      case 4:
+        return 'Cancel';
+      default:
+        return '';
+    }
+  };
+
+  const selectedLabels = sortedIssue.map((status) => getStatusLabel(status));
+
   const defaultOptions = defaultStatuses
-    .filter((status) => !sortedIssue.includes(status))
+    .filter((status) => !selectedLabels.includes(getStatusLabel(status)))
     .map((status) => (
       <option key={status} value={status}>
-        {status}
+        {getStatusLabel(status)}
       </option>
     ));
-
   //convert to show update
   const convertToISODate = (dateString) => {
     const [day, month, year] = dateString.split('/');
@@ -210,7 +248,7 @@ function IssueDetailManagePage() {
       <span>
         {trimmedText}
         <span style={{ color: 'blue', fontSize: '15px' }}>
-          {words.length > trimmedWords.length ? ' see more...' : ''}
+          {words.length > trimmedWords.length ? ' ...' : ''}
         </span>
       </span>
     );
@@ -298,7 +336,7 @@ function IssueDetailManagePage() {
         ? detail.description.trim()
         : description.trim(),
     );
-    formData.append('Type', 'issues');
+    formData.append('Type', 'issue');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
     formData.append(
@@ -339,18 +377,22 @@ function IssueDetailManagePage() {
   }, []);
 
   useEffect(() => {
-    const url = `http://localhost:5001/api/Report/GetReportsForAppAndType/${appId}/issues`;
-    fetch(url, {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setIssue(data);
+    const url = `http://localhost:5001/api/Report/GetReportsForAppAndType/${appId}/Issue`;
+    if (appId) {
+      fetch(url, {
+        method: 'GET',
       })
-      .catch((error) => {
-        console.error('Lỗi:', error);
-      });
-  }, []);
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status !== 400) {
+            setIssue(data);
+          }
+        })
+        .catch((error) => {
+          console.error('Lỗi:', error);
+        });
+    }
+  }, [appId]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -364,6 +406,7 @@ function IssueDetailManagePage() {
       };
     }
   }, [isSuccess]);
+
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -395,7 +438,7 @@ function IssueDetailManagePage() {
         </ListItem>
 
         <Flex>
-          <Text fontSize='35px'>
+          <Text fontSize='28px'>
             <strong>
               {Apps.find((appItem) => appItem.appId == appId)?.name} -{' '}
               {Apps.find((appItem) => appItem.appId == appId)?.os} -{' '}
@@ -404,7 +447,7 @@ function IssueDetailManagePage() {
           </Text>
         </Flex>
         <Flex>
-          <Text fontSize='30px'>Total {issue.length} issue found :</Text>
+          <Text fontSize='20px'>Total {issue.length} issue found :</Text>
         </Flex>
         <ListItem className={styles.list}>
           <Center>
@@ -415,6 +458,14 @@ function IssueDetailManagePage() {
                   colorScheme='gray'
                   className={styles.cTable}
                 >
+                  <TableCaption>
+                    <PaginationCustom
+                      current={currentPage}
+                      onChange={handleChangePage}
+                      total={totalPages}
+                      pageSize={itemPerPage}
+                    />
+                  </TableCaption>
                   <Thead>
                     <Tr>
                       <Th style={{ width: '5%' }} className={styles.cTh}>
@@ -453,11 +504,12 @@ function IssueDetailManagePage() {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {issue.map((item, index) => (
+                    {dynamicList.map((item, index) => (
                       <Tr key={index}>
                         <Td style={{ width: '5%' }}>{index + 1}</Td>
                         <Td
                           style={{ width: '5%', color: 'blue' }}
+                          cursor={'pointer'}
                           onClick={() => {
                             handleAdd();
                             setDetails(item);
@@ -481,7 +533,15 @@ function IssueDetailManagePage() {
                           {item.end_Date}
                         </Td>
                         <Td style={{ width: '15%', textAlign: 'center' }}>
-                          {item.status}
+                          {item.status === 1
+                            ? 'Unsolve'
+                            : item.status === 2
+                            ? 'Solved '
+                            : item.status === 3
+                            ? 'Deleted '
+                            : item.status === 4
+                            ? 'Cancel '
+                            : ''}
                         </Td>
                       </Tr>
                     ))}
@@ -527,7 +587,15 @@ function IssueDetailManagePage() {
                   >
                     {sortedIssue.map((status) => (
                       <option key={status} value={status}>
-                        {status}
+                        {status === 1
+                          ? 'Unsolve'
+                          : status === 2
+                          ? 'Solved'
+                          : status === 3
+                          ? 'Deleted'
+                          : status === 4
+                          ? 'Cancel'
+                          : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}

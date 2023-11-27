@@ -44,10 +44,11 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
 import Header2 from '@/components/layouts/Header/index2';
+import PaginationCustom from '@/components/pagination';
 //
 const defaultData = {
   appId: '',
-  deviceId: '',
+  assetId: '',
   name: '',
   version: '',
   publisher: '',
@@ -102,6 +103,33 @@ function SecurityPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredReportData, setFilteredReportData] = useState([]);
+  const [dynamicFilteredReportData, setDynamicFilteredReportData] = useState(
+    [],
+  );
+  //pagination
+  const itemPerPage = 6;
+  const [dynamicList, setDynamicList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  // filteredIssueData;
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (dynamicFilteredReportData[i]) {
+        newList.push(dynamicFilteredReportData[i]);
+      }
+    }
+    setDynamicList(newList);
+  };
+  const totalPages = dynamicFilteredReportData
+    ? dynamicFilteredReportData?.length
+    : 0;
+
+  useEffect(() => {
+    if (dynamicFilteredReportData.length) {
+      handleChangePage(1);
+    }
+  }, [dynamicFilteredReportData]);
   const toast = useToast();
   //
   //
@@ -151,35 +179,93 @@ function SecurityPage() {
       return name.includes(query) || type.includes(query);
     });
     setFilteredReportData(filteredData);
+    setDynamicFilteredReportData(
+      filteredData.filter((item) => item.type === 'Issue'),
+    );
+  };
+  // Function to get the current date and set it for the endDate field
+  const getCurrentDateString = () => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   // Update filtered data whenever the search query changes
   useEffect(() => {
     filterAssets();
   }, [searchQuery, reportData]);
+  //
+  const [imagesState, setImages] = useState([]);
+
+  // console.log(imagesState);
+  function dataURLtoBlob(dataURL) {
+    const parts = dataURL.split(';base64,');
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+
+    for (let i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    return new Blob([uInt8Array], { type: contentType });
+  }
+
+  const fileObjects = imagesState.map((image) => {
+    // Tạo một Blob từ dataURL
+    const blob = dataURLtoBlob(image.dataURL);
+    // Tạo một File từ Blob
+    return new File([blob], image.fileName, { type: blob.type });
+    [];
+  });
 
   //
   const handleStatusChange = async (item, e) => {
+    setFormData(item);
+    console.log(formData);
+    // if (formData.status === 1) {
+    //   // If status is 1, set endDate to an empty string
+    //   setFormData({
+    //     ...formData,
+    //     endDate: null, // Empty string
+    //   });
+    // } else {
+    //   // If status is not 1, set endDate to the current date
+    //   const currentDate = getCurrentDateString();
+    //   setFormData({
+    //     ...formData,
+    //     endDate: currentDate, // Empty string
+    //   });
+    // }
+    const submitData = new FormData();
     try {
+      fileObjects.forEach((file) => {
+        submitData.append(`Images`, file);
+      });
+      submitData.append('AppId', formData?.appId);
+      submitData.append('Title', formData?.title);
+      submitData.append('Description', formData?.description);
+      submitData.append('Type', formData?.type);
+      submitData.append('Start_Date', formData?.start_Date);
+      submitData.append('End_Date', formData?.end_Date);
+      submitData.append('Status', e.target.value);
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/Report/UpdateReport/` + item.reportId,
-        {
-          // appId: item.appId,
-          description: item.description,
-          type: item.type,
-          // startDate: item.startDate,
-          endDate: item.endDate.toString(),
-          status: e.target.value,
-        },
+        `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.appId,
+        submitData,
       );
       console.log('Data saved:', response.data);
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/Report/GetReportsForAppAndType/` +
-          software.appId +
-          `/Issue`,
-      );
-      setData(newDataResponse.data);
+      toast({
+        title: 'Edit Report',
+        description: 'The report has been successfully edited.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
+      router.push('/pmpages/ListIssue');
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -191,7 +277,7 @@ function SecurityPage() {
   //
   const handleDetail = (item) => {
     localStorage.setItem('report', JSON.stringify(item));
-    // console.log(localStorage.getItem('deviceId'));
+    // console.log(localStorage.getItem('assetId'));
   };
   //
   return (
@@ -229,18 +315,23 @@ function SecurityPage() {
               className={styles.cTable}
             >
               <TableCaption>
-                Total{' '}
-                {
-                  filteredReportData.filter(
-                    (item) => item.type === 'Issue' || item.type === 'Risk',
-                  ).length
-                }{' '}
-                reports
+                <Flex alignItems={'center'} justifyContent={'space-between'}>
+                  <Text>
+                    Show {dynamicList.length}/{dynamicFilteredReportData.length}{' '}
+                    reports
+                  </Text>{' '}
+                  <PaginationCustom
+                    current={currentPage}
+                    onChange={handleChangePage}
+                    total={totalPages}
+                    pageSize={itemPerPage}
+                  />
+                </Flex>
               </TableCaption>
               <Thead>
                 <Tr>
                   <Th className={styles.cTh}>No</Th>
-                  <Th className={styles.cTh}>Software</Th>
+                  <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Title</Th>
                   <Th className={styles.cTh}>Start Date</Th>
                   <Th className={styles.cTh}>End Date</Th>
@@ -248,39 +339,35 @@ function SecurityPage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredReportData
-                  .filter(
-                    (item) => item.type === 'Issue' || item.type === 'Risk',
-                  )
-                  .map((item, index) => (
-                    <Tr key={item.reportId}>
-                      <Td display='none'>{item.reportId}</Td>
-                      <Td>{index + 1}</Td>
-                      <Td className={styles.listitem}>
-                        <Link
-                          href={'/pmpages/IssueDetail'}
-                          onClick={() => handleDetail(item)}
-                        >
-                          {item.name}
-                        </Link>
-                      </Td>
-                      <Td>{item.title}</Td>
-                      <Td>{item.start_Date}</Td>
-                      <Td>{item.end_Date}</Td>
-                      <Td>
-                        <Select
-                          name='status'
-                          value={item?.status}
-                          onChange={(e) => handleStatusChange(item, e)} // Add onChange handler
-                          border='none'
-                        >
-                          <option value='1'>Unsolved</option>
-                          <option value='2'>Solved</option>
-                          <option value='3'>Deleted</option>
-                        </Select>
-                      </Td>
-                    </Tr>
-                  ))}
+                {dynamicList.map((item, index) => (
+                  <Tr key={item.reportId}>
+                    <Td display='none'>{item.reportId}</Td>
+                    <Td>{index + 1}</Td>
+                    <Td className={styles.listitem}>
+                      <Link
+                        href={'/pmpages/IssueDetail'}
+                        onClick={() => handleDetail(item)}
+                      >
+                        {item.name}
+                      </Link>
+                    </Td>
+                    <Td>{item.title}</Td>
+                    <Td>{item.start_Date}</Td>
+                    <Td>{item.end_Date}</Td>
+                    <Td>
+                      <Select
+                        name='status'
+                        value={item?.status}
+                        onChange={(e) => handleStatusChange(item, e)} // Add onChange handler
+                        border='none'
+                      >
+                        <option value='1'>Unsolved</option>
+                        <option value='2'>Solved</option>
+                        <option value='3'>Deleted</option>
+                      </Select>
+                    </Td>
+                  </Tr>
+                ))}
               </Tbody>
             </Table>
           </TableContainer>

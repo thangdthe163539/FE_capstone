@@ -112,7 +112,6 @@ function SoftwarePage() {
   const [formData2, setFormData2] = useState(defaultData);
   const [formData3, setFormData3] = useState(defaultData2);
   const [formData4, setFormData4] = useState(defaultData2);
-  const [data, setData] = useState([]);
   const [feedbackData, setFeedbackData] = useState([]);
   const [deviceData, setDeviceData] = useState([]);
   const [softwareData, setSoftwareData] = useState([]);
@@ -162,6 +161,12 @@ function SoftwarePage() {
   const handleSaveAdd = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const curDate = new Date();
+      const currentDateOnly = new Date(
+        curDate.getFullYear(),
+        curDate.getMonth(),
+        curDate.getDate(),
+      );
       const response = await axios.put(
         `${BACK_END_PORT}/api/v1/Asset/CreateAsset`,
         {
@@ -176,7 +181,7 @@ function SoftwarePage() {
           manufacturer: formData.manufacturer,
           model: formData.model,
           serialNumber: formData.serialNumber,
-          lastSuccessfullScan: formData.lastSuccessfullScan,
+          lastSuccesfullScan: currentDateOnly,
           status: 1,
         },
       );
@@ -188,7 +193,7 @@ function SoftwarePage() {
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + software?.appId,
       );
-      setData(newDataResponse.data);
+      setDeviceData(newDataResponse.data);
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -196,6 +201,7 @@ function SoftwarePage() {
   const handleSaveEditAsset = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const curDate = new Date();
       const response = await axios.put(
         `${BACK_END_PORT}/api/v1/Asset/UpdateAsset/` + formData2.assetId,
         {
@@ -207,22 +213,24 @@ function SoftwarePage() {
           os: formData2.os,
           version: formData2.version,
           ipAddress: formData2.ipAddress,
+          bandwidth: formData2.bandwidth,
           manufacturer: formData2.manufacturer,
           model: formData2.model,
           serialNumber: formData2.serialNumber,
-          lastSuccessfullScan: formData2.lastSuccessfullScan,
+          lastSuccesfullScan: curDate,
           status: formData2.status,
         },
       );
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
       setFormData2(defaultData);
+      setButtonDisabled(true);
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + software?.appId,
       );
-      setData(newDataResponse.data);
+      setDeviceData(newDataResponse.data);
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -237,12 +245,13 @@ function SoftwarePage() {
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
       setSelectedRow(new Set());
+      setButtonDisabled(true);
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + software?.appId,
       );
-      setData(newDataResponse.data);
+      setDeviceData(newDataResponse.data);
       toast({
         title: 'Asset Deleted',
         description: 'The asset has been successfully deleted.',
@@ -273,6 +282,7 @@ function SoftwarePage() {
       console.log('Data saved:', response.data);
       setIsOpenAddLi(false); // Close the modal after successful save
       setFormData3(defaultData2);
+      setButtonDisabled1(true);
       setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
@@ -300,6 +310,7 @@ function SoftwarePage() {
       );
       console.log('Data saved:', response.data);
       setIsOpenEditLi(false); // Close the modal after successful save
+      setButtonDisabled1(true);
       setFormData1(defaultData2);
       setSelectedRow1(new Set());
       // Reload new data for the table
@@ -477,14 +488,13 @@ function SoftwarePage() {
 
     return endDate;
   }
-  function convertDateFormat(inputDate) {
-    // Split the input date string into day, month, and year
-    const parts = inputDate.split('/');
-
-    // Rearrange the parts to the desired format (yyyy/mm/dd)
-    const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-    return formattedDate;
-  }
+  const convertToISODate = (dateString) => {
+    if (dateString) {
+      const [day, month, year] = dateString.split('/');
+      return `${year}-${month}-${day}`;
+    }
+    return null; // or handle the case where dateString is undefined
+  };
   //
   return (
     <Box className={styles.bodybox}>
@@ -1049,7 +1059,7 @@ function SoftwarePage() {
                   <FormLabel>Start Date</FormLabel>
                   <Input
                     name='start_Date'
-                    value={formData1.start_Date}
+                    value={convertToISODate(formData1.start_Date)}
                     onChange={handleInputChange4}
                     type='date'
                     required
@@ -1091,7 +1101,7 @@ function SoftwarePage() {
               <Input
                 name='assetId'
                 value={formData2.assetId}
-                onChange={handleInputChange}
+                onChange={handleInputChange2}
                 display='none'
               />
               <GridItem>
@@ -1100,7 +1110,7 @@ function SoftwarePage() {
                   <Input
                     name='name'
                     value={formData2.name}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                     required
                   />
                 </FormControl>
@@ -1109,7 +1119,7 @@ function SoftwarePage() {
                   <Input
                     name='manufacturer'
                     value={formData2.manufacturer}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1117,7 +1127,7 @@ function SoftwarePage() {
                   <Input
                     name='model'
                     value={formData2.model}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1125,7 +1135,7 @@ function SoftwarePage() {
                   <Input
                     name='serialNumber'
                     value={formData2.serialNumber}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 {/* Add more fields for the first column */}
@@ -1136,7 +1146,7 @@ function SoftwarePage() {
                   <Input
                     name='cpu'
                     value={formData2.cpu}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1144,7 +1154,7 @@ function SoftwarePage() {
                   <Input
                     name='gpu'
                     value={formData2.gpu}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1152,7 +1162,7 @@ function SoftwarePage() {
                   <Input
                     name='ram'
                     value={formData2.ram}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1160,7 +1170,7 @@ function SoftwarePage() {
                   <Input
                     name='memory'
                     value={formData2.memory}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
               </GridItem>
@@ -1170,7 +1180,7 @@ function SoftwarePage() {
                   <Input
                     name='os'
                     value={formData2.os}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1178,7 +1188,7 @@ function SoftwarePage() {
                   <Input
                     name='version'
                     value={formData2.version}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1186,7 +1196,7 @@ function SoftwarePage() {
                   <Input
                     name='ipAddress'
                     value={formData2.ipAddress}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1194,7 +1204,7 @@ function SoftwarePage() {
                   <Input
                     name='bandwidth'
                     value={formData2.bandwidth}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange2}
                   />
                 </FormControl>
                 {/* Add more fields for the second column */}
@@ -1206,7 +1216,7 @@ function SoftwarePage() {
               <Select
                 name='status'
                 value={formData2.status}
-                onChange={handleInputChange}
+                onChange={handleInputChange2}
               >
                 <option value='1'>Active</option>
                 <option value='2'>Inactive</option>

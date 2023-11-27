@@ -53,25 +53,22 @@ import { BACK_END_PORT } from '../../../env';
 
 function AssetDetailPage() {
   //
-  const defaultDataLicense = {
+  const defaultData = {
     licenseId: '',
     softwareId: '',
     assetId: '',
     licenseKey: '',
     startDate: '',
     time: '',
-    status: '',
-  };
-  const defaultData = {
-    softwareId: '',
-    assetId: '',
+    status_License: '',
     name: '',
     version: '',
     release: '',
+    installDate: '',
     publisher: '',
     type: 'Desktop App',
     os: 'Window',
-    status: '',
+    status_AssetSoftware: '',
   };
 
   const router = useRouter();
@@ -81,9 +78,9 @@ function AssetDetailPage() {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [formData, setFormData] = useState(defaultData);
-  const [formData1, setFormData1] = useState(defaultDataLicense);
-  const [formData2, setFormData2] = useState(defaultDataLicense);
-  const [formData3, setFormData3] = useState(defaultDataLicense);
+  const [formData1, setFormData1] = useState(defaultData);
+  const [formData2, setFormData2] = useState(defaultData);
+  const [formData3, setFormData3] = useState(defaultData);
   const [data, setData] = useState([]);
   const [dataLicense, setDataLicense] = useState([]);
   const [listLicense, setListLicense] = useState([]);
@@ -147,7 +144,7 @@ function AssetDetailPage() {
   const handleRowClick1 = (item) => {
     if (selectedRow1 === item.softwareId) {
       setSelectedRow1(null); // Unselect the row if it's already selected
-      setFormData1(defaultDataLicense);
+      setFormData1(defaultData);
       setButtonDisabled1(true);
     } else {
       setSelectedRow1(item.softwareId);
@@ -158,7 +155,7 @@ function AssetDetailPage() {
   const handleRowClick2 = (item) => {
     if (selectedRow2 === item.licenseId) {
       setSelectedRow2(null); // Unselect the row if it's already selected
-      setFormData2(defaultDataLicense);
+      setFormData2(defaultData);
       setButtonDisabled2(true);
     } else {
       setSelectedRow2(item.licenseId);
@@ -169,7 +166,7 @@ function AssetDetailPage() {
   const handleRowClick3 = (item) => {
     if (selectedRow3 === item.softwareId) {
       setSelectedRow3(null); // Unselect the row if it's already selected
-      setFormData(defaultDataLicense);
+      setFormData(defaultData);
       setButtonDisabled3(true);
     } else {
       setSelectedRow3(item.softwareId);
@@ -181,20 +178,37 @@ function AssetDetailPage() {
   const handleSaveCreate = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const curDate = new Date();
+      const currentDateOnly = new Date(
+        curDate.getFullYear(),
+        curDate.getMonth(),
+        curDate.getDate(),
+      );
+      const formattedStartDate = formatDate(formData.start_Date);
       const response = await axios.post(
-        `${BACK_END_PORT}/api/Device_Software/CreateLicense`,
+        `${BACK_END_PORT}/api/Software_Asset/CreateWithHaveLicenseAndSoftware`,
         {
           assetId: device.assetId,
-          softwareId: formData.softwareId,
+          name: formData.name,
+          publisher: formData.publisher,
+          version: formData.version,
+          release: formData.release,
+          type: formData.type,
+          os: formData.os,
+          installDate: currentDateOnly,
           licenseKey: formData.licenseKey,
-          startDate: formData.startDate,
+          start_Date: formattedStartDate,
           time: formData.time,
-          status: 1,
+          status_License: 1,
+          status_Software: 1,
+          status_AssetSoftware: 1,
         },
       );
       console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
-      setFormData(defaultDataLicense);
+      setShowModalAdd(false);
+      setShowModalTable(true);
+      setFormData(defaultData);
       setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
@@ -215,20 +229,30 @@ function AssetDetailPage() {
   const handleSaveAdd = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const curDate = new Date();
+      const currentDateOnly = new Date(
+        curDate.getFullYear(),
+        curDate.getMonth(),
+        curDate.getDate(),
+      );
       const response = await axios.post(
-        `${BACK_END_PORT}/api/Device_Software/CreateLicense`,
+        `${BACK_END_PORT}/api/Software_Asset/CreateWithHaveLicense`,
         {
           assetId: device.assetId,
-          softwareId: formData.softwareId,
-          licenseKey: formData.licenseKey,
-          startDate: formData.startDate,
-          time: formData.time,
-          status: 1,
+          softwareId: formData1.softwareId,
+          installDate: currentDateOnly,
+          status_AssetSoftware: 1,
+          licenseKey: formData1.licenseKey,
+          start_Date: formatDate(formData1.start_Date),
+          time: formData1.time,
+          status_License: 1,
         },
       );
       console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
-      setFormData(defaultDataLicense);
+      setShowModalAdd(false);
+      setShowModalTable(true);
+      setFormData(defaultData);
       setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
@@ -263,7 +287,7 @@ function AssetDetailPage() {
       );
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
-      setFormData2(defaultDataLicense);
+      setFormData2(defaultData);
       setSelectedRow2(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
@@ -356,20 +380,25 @@ function AssetDetailPage() {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `${BACK_END_PORT}/api/v1/Software/DeleteSoftWareWith_key?softwareid=` +
-          formData2.softwareId,
+        `${BACK_END_PORT}/api/Software_Asset/DeleteAssetSoftware/` +
+          device.assetId +
+          `/` +
+          formData1.softwareId,
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
       setSelectedRow1(new Set());
 
       // Reload the data for the table after deletion
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/GetSoftwareForAccountAndDevice?accountId=` +
-          account.accId +
-          `&assetId=` +
+      const response = await axios.get(
+        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
           device.assetId,
       );
-      setData(newDataResponse.data);
+      setData(response.data); // Assuming the API returns an array of objects
+      const response2 = await axios.get(
+        `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
+          device.assetId,
+      );
+      setDataLicense(response2.data);
       toast({
         title: 'Software Deleted',
         description: 'The software has been successfully deleted.',
@@ -385,11 +414,13 @@ function AssetDetailPage() {
   //
   const filterAssets = () => {
     const query = searchAppQuery.toLowerCase();
-    const filteredData = data.filter((item) => {
-      const name = item.name.toLowerCase();
-      const publisher = item.publisher.toLowerCase();
-      return name.includes(query) || publisher.includes(query);
-    });
+    const filteredData = data
+      .filter((item) => item.type != 'Antivirus' && item.status != 3)
+      .filter((item) => {
+        const name = item?.name.toLowerCase();
+        const publisher = item?.publisher.toLowerCase();
+        return name.includes(query) || publisher.includes(query);
+      });
     setFilteredSoftwareData(filteredData);
   };
 
@@ -418,6 +449,20 @@ function AssetDetailPage() {
 
     return endDate;
   }
+  const convertToISODate = (dateString) => {
+    if (dateString) {
+      const [day, month, year] = dateString.split('/');
+      return `${year}-${month}-${day}`;
+    }
+    return null; // or handle the case where dateString is undefined
+  };
+  const formatDate = (dateString) => {
+    if (dateString) {
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    }
+    return null; // or handle the case where dateString is undefined
+  };
 
   //
   return (
@@ -643,13 +688,13 @@ function AssetDetailPage() {
                       onClick={() => setIsOpenEdit(true)}
                       isDisabled={isButtonDisabled2}
                     />
-                    <IconButton
+                    {/* <IconButton
                       aria-label='Delete'
                       icon={<FaTrash />}
                       colorScheme='gray' // Choose an appropriate color
                       onClick={() => setIsOpenDelete(true)}
                       isDisabled={isButtonDisabled2}
-                    />
+                    /> */}
                   </Box>
                 </Flex>
               </ListItem>
@@ -750,7 +795,7 @@ function AssetDetailPage() {
         </Tabs>
       </List>
 
-      <Modal //Modal edit software
+      <Modal //Modal edit license
         isOpen={isOpenEdit}
         onClose={() => setIsOpenEdit(false)}
         closeOnOverlayClick={false}
@@ -790,8 +835,9 @@ function AssetDetailPage() {
                   <FormLabel>Start Date</FormLabel>
                   <Input
                     name='startDate'
-                    value={formData2.start_Date}
+                    value={convertToISODate(formData2.start_Date)}
                     onChange={handleInputChange2}
+                    type='date'
                     required
                   />
                 </FormControl>
@@ -864,8 +910,8 @@ function AssetDetailPage() {
                       <FormLabel>License Key</FormLabel>
                       <Input
                         name='licenseKey'
-                        value={formData3.licenseKey}
-                        onChange={handleInputChange3}
+                        value={formData.licenseKey}
+                        onChange={handleInputChange}
                       />
                     </FormControl>
 
@@ -909,8 +955,9 @@ function AssetDetailPage() {
                       <FormLabel>Start Date</FormLabel>
                       <Input
                         name='start_Date'
-                        value={formData3.start_Date}
-                        onChange={handleInputChange3}
+                        value={formData.start_Date}
+                        onChange={handleInputChange}
+                        type='date'
                         required
                       />
                     </FormControl>
@@ -918,8 +965,8 @@ function AssetDetailPage() {
                       <FormLabel>Time</FormLabel>
                       <Input
                         name='time'
-                        value={formData3.time}
-                        onChange={handleInputChange3}
+                        value={formData.time}
+                        onChange={handleInputChange}
                       />
                     </FormControl>
                     {/* Add more fields for the second column */}
@@ -1008,6 +1055,7 @@ function AssetDetailPage() {
                       name='start_Date'
                       value={formData1.start_Date}
                       onChange={handleInputChange1}
+                      type='date'
                       required
                     />
                   </FormControl>
@@ -1053,7 +1101,10 @@ function AssetDetailPage() {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
+      <Modal // modal delete software
+        isOpen={isOpenDelete}
+        onClose={() => setIsOpenDelete(false)}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Confirm Delete</ModalHeader>

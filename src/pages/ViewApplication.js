@@ -34,6 +34,7 @@ import {
   Select,
   Grid,
   GridItem,
+  Textarea,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { VStack, HStack, Image } from '@chakra-ui/react';
@@ -64,6 +65,12 @@ function ApplicationPage() {
   const [formData, setFormData] = useState(defaultData);
   const [selectedApp, setSelectedApp] = useState(defaultData);
   const [isShowFeedback, setIsShowFeedback] = useState(false);
+  const [imagesState, setImages] = useState([]);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomedIndex, setZoomedIndex] = useState(null);
+  const [error, setError] = useState('');
+  const [image, setImage] = useState([]);
+  const [isHovered, setIsHovered] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -86,36 +93,54 @@ function ApplicationPage() {
     fetchData();
   }, []);
 
-  const handleSave = async () => {
+  const handleSaveAdd = async () => {
+    const url = 'http://localhost:5001/api/Report/CreateReport';
+
+    const Id = parseInt(selectedApp.appId);
+    const desc = document.getElementById('description').value;
+    const title = document.getElementById('title').value;
+    const endDate = document.getElementsByName('endDate')[0].value;
+    const dateParts = endDate.split('-');
+    let formattedDate = '';
+    if (dateParts.length === 3) {
+      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+    } else {
+      console.error('Ngày không hợp lệ.');
+    }
+    // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
+    const fileObjects = imagesState.map((image) => {
+      // Tạo một Blob từ dataURL
+      const blob = dataURLtoBlob(image.dataURL);
+      // Tạo một File từ Blob
+      return new File([blob], image.fileName, { type: blob.type });
+      [];
+    });
+    const formData = new FormData();
+    formData.append('AppId', Id);
+    formData.append('Title', title);
+    formData.append('Description', desc);
+    formData.append('Type', 'Feedback');
+    formData.append('Start_Date', formattedDate);
+    formData.append('End_Date', formattedDate);
+    formData.append('Status', 1);
+
+    // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
+    fileObjects.forEach((file, index) => {
+      formData.append(`Images`, file);
+    });
     try {
-      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.post(
-        `${BACK_END_PORT}/api/Report/CreateReport`,
-        {
-          assetId: device.assetId,
-          softwareId: formData.softwareId,
-          licenseKey: formData.licenseKey,
-          startDate: formData.startDate,
-          time: formData.time,
-          status: 1,
+      const response = await axios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
         },
-      );
-      console.log('Data saved:', response.data);
-      setIsOpenAdd(false); // Close the modal after successful save
-      setFormData(defaultDataLicense);
-      setSelectedRow1(new Set());
-      // Reload new data for the table
-      // const newDataResponse = await axios.get(
-      //   `${BACK_END_PORT}/api/v1/App/ListApps`,
-      // );
-      // setData(newDataResponse.data);
-      // const response2 = await axios.get(
-      //   `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
-      //     device.assetId,
-      // );
-      // setDataLicense(response2.data);
+      });
+      setIsShowFeedback(false);
+      setSelectedApp(defaultData);
+      setImages([]);
     } catch (error) {
-      console.error('Error saving data:', error);
+      setImages([]);
+      setIsShowFeedback(false);
+      console.error('Lỗi:', error);
     }
   };
 
@@ -124,6 +149,80 @@ function ApplicationPage() {
     setFormData({ ...formData, [name]: value });
     // console.log(formData);
   };
+
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+
+    if (files) {
+      const newImages = Array.from(files).map((file) => {
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (allowedExtensions.includes(extension)) {
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            setImages((prevImages) => [
+              ...prevImages,
+              { fileName: file.name, dataURL: reader.result },
+            ]);
+            setError('');
+          };
+
+          reader.readAsDataURL(file);
+        } else {
+          setError('Invalid file type. Please select a JPG or PNG file.');
+          return null;
+        }
+      });
+    }
+  };
+  const allowedExtensions = ['jpg', 'png'];
+
+  const handleImageClick = (index) => {
+    setZoomedIndex(index);
+    setIsZoomed(true);
+  };
+
+  const handleZoomClose = () => {
+    setIsZoomed(false);
+    setZoomedIndex(null);
+  };
+
+  const handleImageMouseLeave = () => {
+    setIsHovered(null);
+  };
+
+  const handleImageMouseEnter = (index, event) => {
+    event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+    setIsHovered(index);
+  };
+
+  const handleRemoveImage = (index) => {
+    setImages((prevImages) => {
+      const newImages = [...prevImages];
+      newImages.splice(index, 1);
+      return newImages;
+    });
+    setError('');
+  };
+  const handleDeleteClick_Add = (index, event) => {
+    event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+    handleRemoveImage(index);
+  };
+  function dataURLtoBlob(dataURL) {
+    const parts = dataURL.split(';base64,');
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+
+    for (let i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    return new Blob([uInt8Array], { type: contentType });
+  }
+
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -206,56 +305,184 @@ function ApplicationPage() {
           </Center>
         </ListItem>
       </List>
-      <Modal // Modal add new asset
+      <Modal
         isOpen={isShowFeedback}
-        onClose={() => setIsShowFeedback(false)}
+        onClose={() => (setIsShowFeedback(false), setFormData(defaultData))}
         closeOnOverlayClick={false}
         size='lg'
       >
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add New Asset</ModalHeader>
+        <ModalContent maxW='1100px'>
+          <ModalHeader>Send New Feedback</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    name='name'
-                    value={selectedApp.name}
-                    onChange={handleInputChange}
-                    disabled
-                  />
-                </FormControl>
+            <Grid templateColumns='repeat(3, 1fr)' gap={8}>
+              <GridItem colSpan={1}>
+                <Flex alignItems='center'>
+                  <FormLabel style={{ marginRight: '1rem' }}>
+                    Application
+                  </FormLabel>
+                  <div
+                    style={{
+                      position: 'relative',
+                      display: 'inline-block',
+                      backgroundColor: 'whitesmoke',
+                      width: '300px',
+                    }}
+                  >
+                    <Input
+                      type='text'
+                      style={{ backgroundColor: 'whitesmoke, width: 270px' }}
+                      value={selectedApp.name}
+                      w={300}
+                      mr={1}
+                      disabled
+                    />
+                  </div>
+                </Flex>
               </GridItem>
-              <GridItem>
-                <FormControl>
+              <GridItem colSpan={1}>
+                <Flex alignItems='center'>
                   <FormLabel>Title</FormLabel>
                   <Input
-                    name='title'
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    required
+                    id='title'
+                    placeholder='Title'
+                    style={{ backgroundColor: 'whitesmoke' }}
                   />
-                </FormControl>
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={1}>
+                <Flex alignItems='center'>
+                  <FormLabel>EndDate</FormLabel>
+                  <Input
+                    style={{
+                      marginLeft: '-7px',
+                      backgroundColor: 'whitesmoke',
+                    }}
+                    type='date'
+                    name='endDate'
+                    onChange={handleInputChange}
+                  />
+                </Flex>
               </GridItem>
             </Grid>
-            <FormControl>
+            <FormControl mt={4}>
               <FormLabel>Description</FormLabel>
-              <Input
-                name='description'
-                value={formData.description}
-                onChange={handleInputChange}
-                required
+              <Textarea
+                id='description'
+                placeholder='Description...'
+                width='100%'
+                minH={40}
               />
             </FormControl>
+            <br />
+            <Grid templateColumns='repeat(1, 1fr)' gap={8}>
+              <GridItem>
+                <Flex>
+                  <FormLabel style={{ width: '50px' }}>Image</FormLabel>
+                  <Input
+                    style={{
+                      width: '300px',
+                      border: 'none',
+                      textAlign: 'center',
+                      height: '40px',
+                    }}
+                    id='file'
+                    type='file'
+                    onChange={handleFileChange}
+                    multiple
+                  />
+                </Flex>
+                <Box display='flex' flexWrap='wrap' gap={4}>
+                  {imagesState.map((image, index) => (
+                    <Box
+                      key={index}
+                      position='relative'
+                      maxW='100px'
+                      maxH='200px'
+                      overflow='hidden'
+                      onClick={() => handleImageClick(index)}
+                      onMouseEnter={(event) =>
+                        handleImageMouseEnter(index, event)
+                      }
+                      onMouseLeave={handleImageMouseLeave}
+                    >
+                      <Image
+                        src={image.dataURL}
+                        alt={`Selected Image ${index}`}
+                        w='100%'
+                        h='100%'
+                        objectFit='cover'
+                        _hover={{ cursor: 'pointer' }}
+                      />
+                      {isHovered === index && (
+                        <>
+                          <DeleteIcon
+                            position='absolute'
+                            top='5px'
+                            color='black'
+                            right='5px'
+                            fontSize='15px'
+                            variant='ghost'
+                            onClick={(event) =>
+                              handleDeleteClick_Add(index, event)
+                            }
+                            _hover={{ color: 'black' }}
+                          />
+                          <Text
+                            position='absolute'
+                            bottom='5px'
+                            left='5px'
+                            fontSize='10px'
+                            color='white'
+                          >
+                            {image.fileName}
+                          </Text>
+                        </>
+                      )}
+                    </Box>
+                  ))}
+                  {isZoomed && (
+                    <div className='modal-overlay' onClick={handleZoomClose}>
+                      <Modal
+                        isOpen={isZoomed}
+                        onClose={handleZoomClose}
+                        size='xl'
+                        isCentered
+                      >
+                        <ModalOverlay />
+                        <ModalContent>
+                          <ModalBody>
+                            <Box className='zoomed-image-container'>
+                              <Image
+                                src={imagesState[zoomedIndex]?.dataURL}
+                                alt={`${zoomedIndex}`}
+                                w='100%' // Thiết lập kích thước modal sao cho đủ lớn
+                                h='100%'
+                                objectFit='contain'
+                              />
+                            </Box>
+                          </ModalBody>
+                        </ModalContent>
+                      </Modal>
+                    </div>
+                  )}
+                </Box>
+                {error && <Text color='red'>{error}</Text>}
+              </GridItem>
+            </Grid>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSave}>
+            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
               Save
             </Button>
-            <Button onClick={() => setIsShowFeedback(false)}>Cancel</Button>
+            <Button
+              onClick={() => (
+                setIsShowFeedback(false), setFormData(defaultData)
+              )}
+            >
+              Cancel
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

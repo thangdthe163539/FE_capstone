@@ -40,6 +40,7 @@ import styles from '@/styles/pm.module.css';
 import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import { FaPlus } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
+import Pagination from '@/components/pagination';
 const defaultData = {
   reportId: '',
   softwareId: '',
@@ -194,14 +195,16 @@ function IssuePage() {
   };
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/Report/ReportsByType/issue';
+    const url = 'http://localhost:5001/api/Report/ReportsByType/Issue';
     fetch(url, {
       method: 'GET',
     })
       .then((response) => response.json())
       .then((data) => {
-        const filteredData = data.filter((item) => item.status !== 3);
-        setIssues(filteredData);
+        if (data) {
+          const filteredData = data.filter((item) => item.status !== -1 && item.status !== 3 && item.status !== 4  && item.status !== 2);
+          setIssues(filteredData);
+        }
       })
       .catch((error) => {
         console.error('Lỗi:', error);
@@ -227,6 +230,24 @@ function IssuePage() {
     setFormData({ ...formData, [name]: value });
   };
 
+  //pagination
+
+  const itemPerPage = 8;
+  const [dynamicList, setDynamicList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  // filteredIssueData;
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredIssueData[i]) {
+        newList.push(filteredIssueData[i]);
+      }
+    }
+    setDynamicList(newList);
+  };
+  const totalPages = filteredIssueData ? filteredIssueData?.length : 0;
+
   //lọc
   const filteIssue = () => {
     const query = searchQueryTb.toLowerCase();
@@ -243,6 +264,12 @@ function IssuePage() {
   useEffect(() => {
     filteIssue();
   }, [searchQueryTb, Issues]);
+
+  useEffect(() => {
+    if (filteredIssueData.length) {
+      handleChangePage(1);
+    }
+  }, [filteredIssueData]);
 
   const filteApp = () => {
     const query = searchQuery.toLowerCase();
@@ -279,11 +306,28 @@ function IssuePage() {
 
   const defaultStatuses = [1, 2, 3, 4];
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 1:
+        return 'Unsolve';
+      case 2:
+        return 'Solved';
+      case 3:
+        return 'Deleted';
+      case 4:
+        return 'Cancel';
+      default:
+        return '';
+    }
+  };
+  
+  const selectedLabels = sortedIssue.map((status) => getStatusLabel(status));
+  
   const defaultOptions = defaultStatuses
-    .filter((status) => !sortedIssue.includes(status))
+    .filter((status) => !selectedLabels.includes(getStatusLabel(status)))
     .map((status) => (
       <option key={status} value={status}>
-        {status}
+        {getStatusLabel(status)}
       </option>
     ));
 
@@ -356,7 +400,7 @@ function IssuePage() {
         ? detail.description.trim()
         : description.trim(),
     );
-    formData.append('Type', 'issues');
+    formData.append('Type', 'issue');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
     formData.append(
@@ -425,7 +469,7 @@ function IssuePage() {
     formData.append('AppId', Id);
     formData.append('Title', title);
     formData.append('Description', desc);
-    formData.append('Type', 'issue');
+    formData.append('Type', 'Issue');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
     formData.append('Status', 1);
@@ -570,7 +614,15 @@ function IssuePage() {
               className={styles.cTable}
             >
               <TableCaption>
-                Total {filteredIssueData.length} reports
+                <Flex alignItems={'center'} justifyContent={'space-between'}>
+                  <Text>Show {dynamicList.length}/{filteredIssueData.length} reports</Text>{' '}
+                  <Pagination
+                    current={currentPage}
+                    onChange={handleChangePage}
+                    total={totalPages}
+                    pageSize={itemPerPage}
+                  />
+                </Flex>
               </TableCaption>
               <Thead>
                 <Tr>
@@ -581,12 +633,12 @@ function IssuePage() {
                   </Th>
                   <Th className={styles.cTh}>Start Date</Th>
                   <Th className={styles.cTh}>End Date</Th>
-                  <Th className={styles.cTh}>Status</Th>
+                  {/* <Th className={styles.cTh}>Status</Th> */}
                   <Th className={styles.cTh}>Application</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredIssueData.map((issue, index) => (
+                {dynamicList?.map((issue, index) => (
                   <Tr key={issue.id}>
                     <Td>{index + 1}</Td>
                     <Td style={{ width: '200px' }}>
@@ -612,7 +664,13 @@ function IssuePage() {
                     </Td>
                     <Td>{issue.start_Date}</Td>
                     <Td>{issue.end_Date}</Td>
-                    <Td>{issue.status}</Td>
+                    {/* <Td>
+                      {issue.status === 1 ? 'Unsolved ' :
+                        issue.status === 2 ? 'Solved ' :
+                          issue.status === 3 ? 'Deleted ' :
+                            issue.status === 4 ? 'Cancel ' :
+                              'Unknown Status'}
+                    </Td> */}
                     <Td>
                       {
                         Apps.find((appItem) => appItem.appId === issue.appId)
@@ -654,7 +712,7 @@ function IssuePage() {
                   >
                     {sortedIssue.map((status) => (
                       <option key={status} value={status}>
-                        {status}
+                         {status === 1 ? 'Unsolve' : status === 2 ? 'Solved' : status === 3 ? 'Deleted' : status === 4 ? 'Cancel' : 'Unknow' }
                       </option>
                     ))}
                     {defaultOptions}

@@ -44,6 +44,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
 import Header2 from '@/components/layouts/Header/index2';
+import PaginationCustom from '@/components/pagination';
 //
 const defaultData = {
   appId: '',
@@ -102,7 +103,35 @@ function FeedbackPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredReportData, setFilteredReportData] = useState([]);
+  const [dynamicFilteredReportData, setDynamicFilteredReportData] = useState(
+    [],
+  );
   const toast = useToast();
+
+  //pagination
+  const itemPerPage = 8;
+  const [dynamicList, setDynamicList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  // filteredIssueData;
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (dynamicFilteredReportData[i]) {
+        newList.push(dynamicFilteredReportData[i]);
+      }
+    }
+    setDynamicList(newList);
+  };
+  const totalPages = dynamicFilteredReportData
+    ? dynamicFilteredReportData?.length
+    : 0;
+
+  useEffect(() => {
+    if (dynamicFilteredReportData.length) {
+      handleChangePage(1);
+    }
+  }, [dynamicFilteredReportData]);
   //
   //
   useEffect(() => {
@@ -151,6 +180,9 @@ function FeedbackPage() {
       return name.includes(query) || type.includes(query);
     });
     setFilteredReportData(filteredData);
+    setDynamicFilteredReportData(
+      filteredData.filter((item) => item.type === 'Feedback'),
+    );
   };
   const handleStatusChange = async (item, e) => {
     try {
@@ -225,55 +257,59 @@ function FeedbackPage() {
               className={styles.cTable}
             >
               <TableCaption>
-                Total{' '}
-                {
-                  filteredReportData.filter((item) => item.type === 'Feedback')
-                    .length
-                }{' '}
-                reports
+                <Flex alignItems={'center'} justifyContent={'space-between'}>
+                  <Text>
+                    Show {dynamicList.length}/{dynamicFilteredReportData.length}{' '}
+                    reports
+                  </Text>{' '}
+                  <PaginationCustom
+                    current={currentPage}
+                    onChange={handleChangePage}
+                    total={totalPages}
+                    pageSize={itemPerPage}
+                  />
+                </Flex>
               </TableCaption>
               <Thead>
                 <Tr>
                   <Th className={styles.cTh}>No</Th>
                   <Th className={styles.cTh}>Software</Th>
-                  <Th className={styles.cTh}>Type</Th>
+                  <Th className={styles.cTh}>Title</Th>
                   <Th className={styles.cTh}>Start Date</Th>
                   <Th className={styles.cTh}>End Date</Th>
                   <Th className={styles.cTh}>Status</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredReportData
-                  .filter((item) => item.type === 'Feedback')
-                  .map((item, index) => (
-                    <Tr>
-                      <Td display='none'>{item.reportId}</Td>
-                      <Td>{index + 1}</Td>
-                      <Td className={styles.listitem}>
-                        <Link
-                          href={'/pmpages/FeedbackDetail'}
-                          onClick={() => handleDetail(item)}
-                        >
-                          {item.name}
-                        </Link>
-                      </Td>
-                      <Td>{item.type}</Td>
-                      <Td>{item.start_Date}</Td>
-                      <Td>{item.end_Date}</Td>
-                      <Td>
-                        <Select
-                          name='status'
-                          value={item?.status}
-                          onChange={(e) => handleStatusChange(item, e)} // Add onChange handler
-                          border='none'
-                        >
-                          <option value='1'>Unsolved</option>
-                          <option value='2'>Solved</option>
-                          <option value='3'>Deleted</option>
-                        </Select>
-                      </Td>
-                    </Tr>
-                  ))}
+                {dynamicFilteredReportData.map((item, index) => (
+                  <Tr>
+                    <Td display='none'>{item.reportId}</Td>
+                    <Td>{index + 1}</Td>
+                    <Td className={styles.listitem}>
+                      <Link
+                        href={'/pmpages/FeedbackDetail'}
+                        onClick={() => handleDetail(item)}
+                      >
+                        {item.name}
+                      </Link>
+                    </Td>
+                    <Td>{item.title}</Td>
+                    <Td>{item.start_Date}</Td>
+                    <Td>{item.end_Date}</Td>
+                    <Td>
+                      <Select
+                        name='status'
+                        value={item?.status}
+                        onChange={(e) => handleStatusChange(item, e)} // Add onChange handler
+                        border='none'
+                      >
+                        <option value='1'>Unsolved</option>
+                        <option value='2'>Solved</option>
+                        <option value='3'>Deleted</option>
+                      </Select>
+                    </Td>
+                  </Tr>
+                ))}
               </Tbody>
             </Table>
           </TableContainer>
