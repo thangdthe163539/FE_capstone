@@ -501,7 +501,7 @@ function IssuePage() {
       .then((response) => response.json())
       .then((data) => {
         if (data) {
-          const filteredData = data.filter((item) => item.status !== -1 && item.status !== 3 && item.status !== 4 && item.status !== 2);
+          const filteredData = data.filter((item) => item.status === 1);
           setIssues(filteredData);
         }
       })

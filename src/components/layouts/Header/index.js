@@ -79,7 +79,7 @@ function Header() {
         <Text className={`${styles.navbarLogo}`}>
           <Link href={'/'}>SoftTrack</Link>
         </Text>
-        <Text className={`${styles.navbarText}`}>YOU ARE NOT LOGGED IN.</Text>
+        <Text className={`${styles.navbarText}`}>You are not logged in.</Text>
         <Text
           style={{
             fontSize: '20px',
