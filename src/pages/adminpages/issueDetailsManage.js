@@ -579,7 +579,7 @@ function IssueDetailManagePage() {
                 <Flex alignItems='center'>
                   <FormLabel>Status</FormLabel>
                   <Select
-                    style={{ backgroundColor: 'whitesmoke' }}
+                    style={{ backgroundColor: 'white' }}
                     value={selectedOptionActive}
                     onChange={(e) => {
                       setSelectedOptionActive(e.target.value);
@@ -608,7 +608,7 @@ function IssueDetailManagePage() {
                   <Input
                     id='title'
                     defaultValue={detail?.title.trim()}
-                    style={{ backgroundColor: 'whitesmoke' }}
+                    style={{ backgroundColor: 'white' }}
                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </Flex>
@@ -619,7 +619,7 @@ function IssueDetailManagePage() {
                   <Input
                     style={{
                       marginLeft: '-7px',
-                      backgroundColor: 'whitesmoke',
+                      backgroundColor: 'white',
                     }}
                     type='date'
                     name='endDate'
