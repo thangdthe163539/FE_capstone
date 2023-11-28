@@ -319,7 +319,7 @@ function UserManager() {
             </Thead>
             <Tbody>
               {dynamicList.map((user, index) => (
-                <Tr key={user.id}>
+                <Tr key={user.accId}>
                   <Td style={{ width: '5%' }}>{index + 1}</Td>
                   <Td style={{ width: '20%' }}>
                     <Button

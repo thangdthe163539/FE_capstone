@@ -425,7 +425,7 @@ function IssuePage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {dynamicList?.map(
+                {dynamicList.map(
                   (app, index) =>
                     countIssue(app.appId) !== 0 && (
                       <Tr key={app.id}>

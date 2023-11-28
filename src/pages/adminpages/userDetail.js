@@ -129,7 +129,7 @@ function UserDetail() {
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
         <Flex>
             <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%' }}>
-                User details
+                User detail 
             </Text>
             <Text className={styles.alert}>
                 {isSuccess === 'true' && (

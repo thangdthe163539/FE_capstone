@@ -447,7 +447,7 @@ function IssueDetailManagePage() {
           </Text>
         </Flex>
         <Flex>
-          <Text fontSize='20px'>Total {issue.length} issue(s) found :</Text>
+          <Text fontSize='20px'>Total {issue.length} issue(s) found:</Text>
         </Flex>
         <ListItem className={styles.list}>
           <Center>
@@ -567,7 +567,7 @@ function IssueDetailManagePage() {
       >
         <ModalOverlay />
         <ModalContent maxW='1100px'>
-          <ModalHeader>Update Issue</ModalHeader>
+          <ModalHeader>Update issue</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid
@@ -615,7 +615,7 @@ function IssueDetailManagePage() {
               </GridItem>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
-                  <FormLabel>EndDate</FormLabel>
+                  <FormLabel>Deadline</FormLabel>
                   <Input
                     style={{
                       marginLeft: '-7px',

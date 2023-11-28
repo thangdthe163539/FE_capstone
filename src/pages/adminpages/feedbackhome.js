@@ -63,7 +63,7 @@ function FeedbackPage() {
   const [dynamicFilteredAppData, setDynamicFilteredAppData] = useState([]);
   const [Apps, setApps] = useState([]);
   const [Issues, setIssues] = useState([]);
-  const [isSuccess, setIsSuccess] = useState('');
+  // const [isSuccess, setIsSuccess] = useState('');
   // const [showOptions, setShowOptions] = useState(false);
   // const [appId, setAppId] = useState('');
   const notificationTimeout = 2000;
@@ -310,18 +310,18 @@ function FeedbackPage() {
   //   }
   // };
 
-  useEffect(() => {
-    if (isSuccess) {
-      const hideNotification = setTimeout(() => {
-        setIsSuccess('');
-        window.location.reload();
-      }, notificationTimeout);
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     const hideNotification = setTimeout(() => {
+  //       setIsSuccess('');
+  //       window.location.reload();
+  //     }, notificationTimeout);
 
-      return () => {
-        clearTimeout(hideNotification);
-      };
-    }
-  }, [isSuccess]);
+  //     return () => {
+  //       clearTimeout(hideNotification);
+  //     };
+  //   }
+  // }, [isSuccess]);
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -330,7 +330,7 @@ function FeedbackPage() {
             Home
           </Link>
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback management
-          <Text className={styles.alert}>
+          {/* <Text className={styles.alert}>
             {isSuccess === 'true' && (
               <Alert status='success'>
                 <AlertIcon />
@@ -343,7 +343,7 @@ function FeedbackPage() {
                 Error processing your request.
               </Alert>
             )}
-          </Text>
+          </Text> */}
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
@@ -417,10 +417,10 @@ function FeedbackPage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {dynamicList?.map(
+                {dynamicList.map(
                   (app, index) =>
                     countIssue(app.appId) !== 0 && (
-                      <Tr key={app.id}>
+                      <Tr key={app.appId}>
                         <Td style={{width:'5%'}}>{index + 1}</Td>
                         <Td>
                           <Button
