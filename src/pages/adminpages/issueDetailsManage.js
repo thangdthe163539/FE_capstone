@@ -69,7 +69,7 @@ function IssueDetailManagePage() {
   const allowedExtensions = ['jpg', 'png'];
 
   //pagination
-  const itemPerPage = 8;
+  const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -417,9 +417,9 @@ function IssueDetailManagePage() {
             </Link>
             <ArrowForwardIcon margin={1}></ArrowForwardIcon>
             <Link href='/adminpages/issueManager' className={styles.listitem}>
-              Issue Management
+              Issue management
             </Link>
-            <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue Details
+            <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue detail
           </Flex>
           <Text className={styles.alert}>
             {isSuccess === 'true' && (
@@ -447,7 +447,7 @@ function IssueDetailManagePage() {
           </Text>
         </Flex>
         <Flex>
-          <Text fontSize='20px'>Total {issue.length} issue found :</Text>
+          <Text fontSize='20px'>Total {issue.length} issue(s) found :</Text>
         </Flex>
         <ListItem className={styles.list}>
           <Center>
@@ -493,7 +493,7 @@ function IssueDetailManagePage() {
                         style={{ width: '5%', textAlign: 'center' }}
                         className={styles.cTh}
                       >
-                        EndDate
+                        Deadline
                       </Th>
                       <Th
                         style={{ width: '5%', textAlign: 'center' }}

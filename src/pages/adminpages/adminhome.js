@@ -1,6 +1,7 @@
-import { Box, ListItem, List } from '@chakra-ui/react';
+import { Box, ListItem, List, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
+import { Flex } from 'antd';
 
 function ADHomePage() {
   return (
@@ -8,18 +9,21 @@ function ADHomePage() {
       <List>
         <ListItem className={styles.list}>
           <Link className={styles.listitem} href='/adminpages/userManager'>
-            Users Management
+            User Management
           </Link>
         </ListItem>
         <ListItem className={styles.list}>
-          <Link className={styles.listitem} href='/adminpages/issuehome'>
-            Issue Management
-          </Link>
+            <Link className={styles.listitem} href='/adminpages/feedbackManager'>
+              Feedback Management
+            </Link>
         </ListItem>
         <ListItem className={styles.list}>
-          <Link className={styles.listitem} href='/adminpages/feedbackManager'>
-            Feedback Management
-          </Link>
+          <Flex style={{ fontSize: '18px' }}>
+            <Link className={styles.listitem} href='/adminpages/issuehome'>
+              Issue Management
+            </Link>
+            <Text style={{ marginLeft: '5px' }}>(These are errors posted by admins asking product owners to fix)</Text>
+          </Flex>
         </ListItem>
       </List>
     </Box>

@@ -13,7 +13,7 @@ function Footer() {
         </Text>
 
         <Text className={`${styles.contact}`}>
-          Any Question
+          Any question 
         </Text>
         <Button className={`${styles.buttonContact}`} colorScheme='blue'>CONTACT US</Button>
         <Text className={`${styles.about}`}>

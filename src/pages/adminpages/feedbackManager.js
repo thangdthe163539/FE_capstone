@@ -1,6 +1,6 @@
 import {
-  Box,
-  ListItem,
+  Box,InputGroup,
+  ListItem,InputLeftAddon ,
   List,
   Text,
   Table,
@@ -15,7 +15,7 @@ import {
   Spacer,
   IconButton,
   Textarea,
-  Image,
+  Image,Center
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -65,13 +65,13 @@ function FeedBackPage() {
   const [Apps, setApps] = useState([]);
   const [isSuccess, setIsSuccess] = useState('');
   const notificationTimeout = 2000;
-  const [showOptions, setShowOptions] = useState(false);
-  const [appId, setAppId] = useState('');
+  // const [showOptions, setShowOptions] = useState(false);
+  // const [appId, setAppId] = useState('');
   const [detail, setDetail] = useState(null);
   const [selectedOptionActive, setSelectedOptionActive] = useState('');
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
-  const [imagesState, setImages] = useState([]);
+  // const [imagesState, setImages] = useState([]);
   const [error, setError] = useState('');
   const [image, setImage] = useState([]);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -81,7 +81,7 @@ function FeedBackPage() {
   const allowedExtensions = ['jpg', 'png'];
 
   //pagination
-  const itemPerPage = 6;
+  const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -152,32 +152,32 @@ function FeedBackPage() {
     }
   };
 
-  const handleFileChange = (e) => {
-    const files = e.target.files;
+  // const handleFileChange = (e) => {
+  //   const files = e.target.files;
 
-    if (files) {
-      const newImages = Array.from(files).map((file) => {
-        const extension = file.name.split('.').pop().toLowerCase();
+  //   if (files) {
+  //     const newImages = Array.from(files).map((file) => {
+  //       const extension = file.name.split('.').pop().toLowerCase();
 
-        if (allowedExtensions.includes(extension)) {
-          const reader = new FileReader();
+  //       if (allowedExtensions.includes(extension)) {
+  //         const reader = new FileReader();
 
-          reader.onload = () => {
-            setImages((prevImages) => [
-              ...prevImages,
-              { fileName: file.name, dataURL: reader.result },
-            ]);
-            setError('');
-          };
+  //         reader.onload = () => {
+  //           setImages((prevImages) => [
+  //             ...prevImages,
+  //             { fileName: file.name, dataURL: reader.result },
+  //           ]);
+  //           setError('');
+  //         };
 
-          reader.readAsDataURL(file);
-        } else {
-          setError('Invalid file type. Please select a JPG or PNG file.');
-          return null;
-        }
-      });
-    }
-  };
+  //         reader.readAsDataURL(file);
+  //       } else {
+  //         setError('Invalid file type. Please select a JPG or PNG file.');
+  //         return null;
+  //       }
+  //     });
+  //   }
+  // };
 
   const handleImageClick = (index) => {
     setZoomedIndex(index);
@@ -198,14 +198,14 @@ function FeedBackPage() {
     setIsHovered(index);
   };
 
-  const handleRemoveImage = (index) => {
-    setImages((prevImages) => {
-      const newImages = [...prevImages];
-      newImages.splice(index, 1);
-      return newImages;
-    });
-    setError('');
-  };
+  // const handleRemoveImage = (index) => {
+  //   setImages((prevImages) => {
+  //     const newImages = [...prevImages];
+  //     newImages.splice(index, 1);
+  //     return newImages;
+  //   });
+  //   setError('');
+  // };
 
   const handleRemoveImageU = (index) => {
     setImage((prevImages) => {
@@ -216,10 +216,10 @@ function FeedBackPage() {
     setError('');
   };
 
-  const handleDeleteClick_Add = (index, event) => {
-    event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
-    handleRemoveImage(index);
-  };
+  // const handleDeleteClick_Add = (index, event) => {
+  //   event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+  //   handleRemoveImage(index);
+  // };
 
   const handleDeleteClick = (index, event) => {
     event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
@@ -242,9 +242,9 @@ function FeedBackPage() {
 
   //End
 
-  const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  // const handleSearchInputChange = (e) => {
+  //   setSearchQuery(e.target.value);
+  // };
 
   const handleSearchTbInputChange = (e) => {
     setSearchQueryTb(e.target.value);
@@ -280,26 +280,26 @@ function FeedBackPage() {
     );
   };
 
-  useEffect(() => {
-    const url = 'http://localhost:5001/api/Report/ReportsByType/Feedback';
-    fetch(url, {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const filteredData = data.filter(
-          (item) =>
-            item.status !== -1 &&
-            item.status !== 3 &&
-            item.status !== 4 &&
-            item.status !== 2,
-        );
-        setIssues(filteredData);
-      })
-      .catch((error) => {
-        console.error('Lỗi:', error);
-      });
-  }, []);
+  // useEffect(() => {
+  //   const url = 'http://localhost:5001/api/Report/ReportsByType/Feedback';
+  //   fetch(url, {
+  //     method: 'GET',
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       const filteredData = data.filter(
+  //         (item) =>
+  //           item.status !== -1 &&
+  //           item.status !== 3 &&
+  //           item.status !== 4 &&
+  //           item.status !== 2,
+  //       );
+  //       setIssues(filteredData);
+  //     })
+  //     .catch((error) => {
+  //       console.error('Lỗi:', error);
+  //     });
+  // }, []);
 
   useEffect(() => {
     const url = 'http://localhost:5001/api/v1/App/ListApps';
@@ -337,22 +337,22 @@ function FeedBackPage() {
     filteIssue();
   }, [searchQueryTb, Issues]);
 
-  const filteApp = () => {
-    const query = searchQuery.toLowerCase();
-    const filteredData = Apps.filter((item) => {
-      const name = item.name.toLowerCase();
-      const os = item.os.toLowerCase();
-      const version = item.osversion.toLowerCase();
-      return (
-        name.includes(query) || os.includes(query) || version.includes(query)
-      );
-    });
-    setfilteredAppData(filteredData);
-  };
+  // const filteApp = () => {
+  //   const query = searchQuery.toLowerCase();
+  //   const filteredData = Apps.filter((item) => {
+  //     const name = item.name.toLowerCase();
+  //     const os = item.os.toLowerCase();
+  //     const version = item.osversion.toLowerCase();
+  //     return (
+  //       name.includes(query) || os.includes(query) || version.includes(query)
+  //     );
+  //   });
+  //   setfilteredAppData(filteredData);
+  // };
 
-  useEffect(() => {
-    filteApp();
-  }, [searchQuery, Issues]);
+  // useEffect(() => {
+  //   filteApp();
+  // }, [searchQuery, Issues]);
   //end
 
   //detail
@@ -494,61 +494,85 @@ function FeedBackPage() {
     }
   };
 
-  const handleSaveAdd = async () => {
-    const url = 'http://localhost:5001/api/Report/CreateReport';
+  // const handleSaveAdd = async () => {
+  //   const url = 'http://localhost:5001/api/Report/CreateReport';
 
-    const Id = parseInt(appId);
-    const desc = document.getElementById('description').value;
-    const title = document.getElementById('title').value;
-    const endDate = document.getElementsByName('endDate')[0].value;
-    const dateParts = endDate.split('-');
-    let formattedDate = '';
-    if (dateParts.length === 3) {
-      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-    } else {
-      console.error('Ngày không hợp lệ.');
-    }
-    // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
-    const fileObjects = imagesState.map((image) => {
-      // Tạo một Blob từ dataURL
-      const blob = dataURLtoBlob(image.dataURL);
-      // Tạo một File từ Blob
-      return new File([blob], image.fileName, { type: blob.type });
-      [];
-    });
-    const formData = new FormData();
-    formData.append('AppId', Id);
-    formData.append('Title', title);
-    formData.append('Description', desc);
-    formData.append('Type', 'Feedback');
-    formData.append('Start_Date', formattedDate);
-    formData.append('End_Date', formattedDate);
-    formData.append('Status', 1);
+  //   const Id = parseInt(appId);
+  //   const desc = document.getElementById('description').value;
+  //   const title = document.getElementById('title').value;
+  //   const endDate = document.getElementsByName('endDate')[0].value;
+  //   const dateParts = endDate.split('-');
+  //   let formattedDate = '';
+  //   if (dateParts.length === 3) {
+  //     formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+  //   } else {
+  //     console.error('Ngày không hợp lệ.');
+  //   }
+  //   // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
+  //   const fileObjects = imagesState.map((image) => {
+  //     // Tạo một Blob từ dataURL
+  //     const blob = dataURLtoBlob(image.dataURL);
+  //     // Tạo một File từ Blob
+  //     return new File([blob], image.fileName, { type: blob.type });
+  //     [];
+  //   });
+  //   const formData = new FormData();
+  //   formData.append('AppId', Id);
+  //   formData.append('Title', title);
+  //   formData.append('Description', desc);
+  //   formData.append('Type', 'Feedback');
+  //   formData.append('Start_Date', formattedDate);
+  //   formData.append('End_Date', formattedDate);
+  //   formData.append('Status', 1);
 
-    // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
-    fileObjects.forEach((file, index) => {
-      formData.append(`Images`, file);
-    });
-    try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+  //   // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
+  //   fileObjects.forEach((file, index) => {
+  //     formData.append(`Images`, file);
+  //   });
+  //   try {
+  //     const response = await axios.post(url, formData, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //     });
+  //     setIsSuccess('true');
+  //     setIsOpenAdd(false);
+  //   } catch (error) {
+  //     setIsSuccess('false');
+  //     setIsOpenAdd(false);
+  //     console.error('Lỗi:', error);
+  //   }
+  // };
+  const fetchDataAndUpdateState = () => {
+    const url = 'http://localhost:5001/api/Report/ReportsByType/Feedback';
+    fetch(url, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const filteredData = data.filter(
+          (item) =>
+            item.status !== -1 &&
+            item.status !== 3 &&
+            item.status !== 4 &&
+            item.status !== 2,
+        );
+        setIssues(filteredData);
+      })
+      .catch((error) => {
+        console.error('Lỗi:', error);
       });
-      setIsSuccess('true');
-      setIsOpenAdd(false);
-    } catch (error) {
-      setIsSuccess('false');
-      setIsOpenAdd(false);
-      console.error('Lỗi:', error);
-    }
   };
+
+  useEffect(() => {
+    fetchDataAndUpdateState();
+  }, []);
 
   useEffect(() => {
     if (isSuccess) {
       const hideNotification = setTimeout(() => {
         setIsSuccess('');
-        window.location.reload();
+        fetchDataAndUpdateState();
       }, notificationTimeout);
 
       return () => {
@@ -556,6 +580,7 @@ function FeedBackPage() {
       };
     }
   }, [isSuccess]);
+
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -563,7 +588,7 @@ function FeedBackPage() {
           <Link href='/adminpages/adminhome' className={styles.listitem}>
             Home
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback Management
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback management
           <Text className={styles.alert}>
             {isSuccess === 'true' && (
               <Alert status='success'>
@@ -572,7 +597,7 @@ function FeedBackPage() {
               </Alert>
             )}
             {isSuccess === 'false' && (
-              <Alert status='error' style={{ width: '350px' }}>
+              <Alert status='error' style={{ width: '320px' }}>
                 <AlertIcon />
                 Error processing your request.
               </Alert>
@@ -582,16 +607,21 @@ function FeedBackPage() {
         <ListItem className={styles.list}>
           <Flex>
             <Text fontSize='2xl'>
-              Feedback Management -{' '}
+              Feedback management -{' '}
               <Link
                 href='/adminpages/feedbackhome'
                 style={{ color: '#4d9ffe', textDecoration: 'none' }}
               >
-                Overview
+                List all feedback
               </Link>
             </Text>
             <Spacer />
-            <Input
+            <InputGroup style={{ paddingTop: '', width: '35%' }}>
+              <InputLeftAddon 
+                pointerEvents="none"
+                children='Title - Application'
+              />
+               <Input style={{width:'100%'}}
               type='text'
               value={searchQueryTb}
               onChange={handleSearchTbInputChange}
@@ -599,7 +629,8 @@ function FeedBackPage() {
               w={300}
               mr={1}
             />
-            <Box>
+            </InputGroup>
+            {/* <Box>
               <IconButton
                 aria-label='Add'
                 icon={<FaPlus />}
@@ -607,11 +638,12 @@ function FeedBackPage() {
                 marginRight={1}
                 onClick={() => setIsOpenAdd(true)}
               />
-            </Box>
+            </Box> */}
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
+          <Center><Text fontSize={30} mb={2}>List open feedback</Text></Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -620,7 +652,7 @@ function FeedBackPage() {
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
-                    Show {dynamicList.length}/{filteredIssueData.length} reports
+                    Show {dynamicList.length}/{filteredIssueData.length} result(s)    
                   </Text>{' '}
                   <Pagination
                     current={currentPage}
@@ -637,17 +669,18 @@ function FeedBackPage() {
                   <Th style={{ textAlign: 'center' }} className={styles.cTh}>
                     Description
                   </Th>
-                  <Th className={styles.cTh}>Start Date</Th>
-                  <Th className={styles.cTh}>End Date</Th>
-                  {/* <Th className={styles.cTh}>Status</Th> */}
                   <Th className={styles.cTh}>Application</Th>
+                  <Th className={styles.cTh}>Start Date</Th>
+                  <Th className={styles.cTh}>Deadline</Th>
+                  {/* <Th className={styles.cTh}>Status</Th> */}
+                  
                 </Tr>
               </Thead>
               <Tbody>
                 {dynamicList.map((issue, index) => (
                   <Tr key={issue.id}>
-                    <Td>{index + 1}</Td>
-                    <Td style={{ width: '150px' }}>
+                    <Td style={{ width: '5%' }}>{index + 1}</Td>
+                    <Td>
                       <Button
                         color={'blue'}
                         variant='link'
@@ -660,27 +693,28 @@ function FeedBackPage() {
                       </Button>
                     </Td>
                     <Td
-                      style={{ width: '50px' }}
+                      style={{width:'45%'}}
                       onClick={() => {
                         handleDetail();
                         setDetails(issue);
                       }}
                     >
-                      {trimTextToMaxWidth(issue.description.trim(), 300)}
+                      {trimTextToMaxWidth(issue.description.trim(), 400)}
                     </Td>
-                    <Td>{issue.start_Date}</Td>
-                    <Td>{issue.end_Date}</Td>
-                    {/* <Td>{issue.status === 1 ? 'Unsolved ' :
-                      issue.status === 2 ? 'Solved ' :
-                        issue.status === 3 ? 'Deleted ' :
-                          issue.status === 4 ? 'Cancel ' :
-                            'Unknown Status'}</Td> */}
                     <Td>
                       {
                         Apps.find((appItem) => appItem.appId === issue.appId)
                           ?.name
                       }
                     </Td>
+                    <Td style={{ width: '10%' }}>{issue.start_Date}</Td>
+                    <Td style={{ width: '7%' }}>{issue.end_Date}</Td>
+                    {/* <Td>{issue.status === 1 ? 'Unsolved ' :
+                      issue.status === 2 ? 'Solved ' :
+                        issue.status === 3 ? 'Deleted ' :
+                          issue.status === 4 ? 'Cancel ' :
+                            'Unknown Status'}</Td> */}
+                    
                   </Tr>
                 ))}
               </Tbody>
@@ -697,7 +731,7 @@ function FeedBackPage() {
       >
         <ModalOverlay />
         <ModalContent maxW='1100px'>
-          <ModalHeader>Update Feedback</ModalHeader>
+          <ModalHeader>Update feedback</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid
@@ -709,7 +743,7 @@ function FeedBackPage() {
                 <Flex alignItems='center'>
                   <FormLabel>Status</FormLabel>
                   <Select
-                    style={{ backgroundColor: 'whitesmoke' }}
+                    style={{ backgroundColor: 'white' }}
                     value={selectedOptionActive}
                     onChange={(e) => {
                       setSelectedOptionActive(e.target.value);
@@ -737,7 +771,7 @@ function FeedBackPage() {
                   <FormLabel>Title</FormLabel>
                   <Input
                     id='title'
-                    style={{ backgroundColor: 'whitesmoke' }}
+                    style={{ backgroundColor: 'white' }}
                     defaultValue={detail?.title.trim()}
                     onChange={(e) => setTitle(e.target.value)}
                   />
@@ -745,11 +779,11 @@ function FeedBackPage() {
               </GridItem>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
-                  <FormLabel>EndDate</FormLabel>
+                  <FormLabel>Deadline</FormLabel>
                   <Input
                     style={{
                       marginLeft: '-7px',
-                      backgroundColor: 'whitesmoke',
+                      backgroundColor: 'white',
                     }}
                     type='date'
                     name='endDate'
@@ -873,12 +907,12 @@ function FeedBackPage() {
             <Button colorScheme='whatsapp' mr={3} onClick={handleSendMail}>
               Send Mail
             </Button>
-            <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
+            <Button onClick={() => setIsOpenDetail(false)}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
 
-      <Modal
+      {/* <Modal
         isOpen={isOpenAdd}
         onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
         closeOnOverlayClick={false}
@@ -1096,7 +1130,7 @@ function FeedBackPage() {
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </Modal> */}
     </Box>
   );
 }

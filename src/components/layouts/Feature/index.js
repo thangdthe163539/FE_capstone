@@ -13,7 +13,7 @@ import { Image } from '@chakra-ui/react'
 function Feature() {
     return (
         <Box>
-            <Text className={`${styles.title}`}>SoftTrack Features</Text>
+            <Text className={`${styles.title}`}>SoftTrack features</Text>
             <Flex className={`${styles.formSof}`} color='white'>
                 <Box>
                     <Text className={`${styles.software}`}>Software</Text>

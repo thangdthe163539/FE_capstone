@@ -379,7 +379,24 @@ function FeedBackDetailManagePage() {
       });
   }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const url = `http://localhost:5001/api/Report/GetReportsForAppAndType/${appId}/feedback`;
+  //   if (appId) {
+  //     fetch(url, {
+  //       method: 'GET',
+  //     })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log(data.status);
+  //         setIssue(data);
+  //       })
+  //       .catch((error) => {
+  //         console.error('Lỗi:', error);
+  //       });
+  //   }
+  // }, [appId]);
+
+  const fetchDataAndUpdateState = () => {
     const url = `http://localhost:5001/api/Report/GetReportsForAppAndType/${appId}/feedback`;
     if (appId) {
       fetch(url, {
@@ -394,13 +411,17 @@ function FeedBackDetailManagePage() {
           console.error('Lỗi:', error);
         });
     }
-  }, [appId]);
+  };
+
+  useEffect(() => {
+    fetchDataAndUpdateState();
+  }, []);
 
   useEffect(() => {
     if (isSuccess) {
       const hideNotification = setTimeout(() => {
         setIsSuccess('');
-        // router.push('feedbackhome');
+        fetchDataAndUpdateState();
       }, notificationTimeout);
 
       return () => {
@@ -418,12 +439,12 @@ function FeedBackDetailManagePage() {
             </Link>
             <ArrowForwardIcon margin={1}></ArrowForwardIcon>
             <Link
-              href='/adminpages/feedbackManager'
+              href='/adminpages/feedbackhome'
               className={styles.listitem}
             >
-              Feedback Management
+              Feedback management
             </Link>
-            <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback Details
+            <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback detail
           </Flex>
           <Text className={styles.alert}>
             {isSuccess === 'true' && (
@@ -451,7 +472,7 @@ function FeedBackDetailManagePage() {
           </Text>
         </Flex>
         <Flex>
-          <Text fontSize='20px'>Total {issue.length} feedback found :</Text>
+          <Text fontSize='20px'>Total {issue.length} feedback(s) found:</Text>
         </Flex>
         <ListItem className={styles.list}>
           <Center>
@@ -499,7 +520,7 @@ function FeedBackDetailManagePage() {
                         style={{ width: '5%', textAlign: 'center' }}
                         className={styles.cTh}
                       >
-                        EndDate
+                        Deadline
                       </Th>
                       <Th
                         style={{ width: '5%', textAlign: 'center' }}
@@ -571,7 +592,7 @@ function FeedBackDetailManagePage() {
       >
         <ModalOverlay />
         <ModalContent maxW='1100px'>
-          <ModalHeader>Update Feedback</ModalHeader>
+          <ModalHeader>Update feedback</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid
@@ -583,7 +604,7 @@ function FeedBackDetailManagePage() {
                 <Flex alignItems='center'>
                   <FormLabel>Status</FormLabel>
                   <Select
-                    style={{ backgroundColor: 'whitesmoke' }}
+                    style={{ backgroundColor: 'white' }}
                     value={selectedOptionActive}
                     onChange={(e) => {
                       setSelectedOptionActive(e.target.value);
@@ -612,18 +633,18 @@ function FeedBackDetailManagePage() {
                   <Input
                     id='title'
                     defaultValue={detail?.title.trim()}
-                    style={{ backgroundColor: 'whitesmoke' }}
+                    style={{ backgroundColor: 'white' }}
                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </Flex>
               </GridItem>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
-                  <FormLabel>EndDate</FormLabel>
+                  <FormLabel>Deadline</FormLabel>
                   <Input
                     style={{
                       marginLeft: '-7px',
-                      backgroundColor: 'whitesmoke',
+                      backgroundColor: 'white',
                     }}
                     type='date'
                     name='endDate'

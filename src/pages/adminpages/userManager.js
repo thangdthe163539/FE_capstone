@@ -31,13 +31,13 @@ import {
   Stack,
   InputGroup,
   Button,
-  Center,
+  Center, InputLeftElement,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Pagination from '@/components/pagination';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowForwardIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon, EmailIcon } from '@chakra-ui/icons';
 import styles from '@/styles/admin.module.css';
 import { FaPlus } from 'react-icons/fa';
 function UserManager() {
@@ -52,7 +52,7 @@ function UserManager() {
   const [searchQueryTb, setSearchQueryTb] = useState('');
   const notificationTimeout = 2000;
 
-  const itemPerPage = 4;
+  const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -81,9 +81,8 @@ function UserManager() {
   const filteAcc = () => {
     const query = searchQueryTb.toLowerCase();
     const filteredData = userData.filter((item) => {
-      const name = item.name.toLowerCase();
       const email = item.email.toLowerCase();
-      return name.includes(query) || email.includes(query);
+      return email.includes(query);
     });
     setFilteredAccData(filteredData);
   };
@@ -195,7 +194,7 @@ function UserManager() {
     if (isSuccess) {
       const hideNotification = setTimeout(() => {
         setIsSuccess('');
-        // window.location.reload();
+        handleSearchByEmail();
       }, notificationTimeout);
 
       return () => {
@@ -219,7 +218,7 @@ function UserManager() {
             margin={1}
             style={{ color: 'black', pointerEvents: 'none' }}
           ></ArrowForwardIcon>
-          User Management
+          User management
           <Text className={styles.alert1}>
             {isSuccess === 'true' && (
               <Alert status='success'>
@@ -239,17 +238,28 @@ function UserManager() {
         <hr className={styles.userHrM} />
         <ListItem>
           <Flex>
-            <Text style={{ width: '1100px' }} className={styles.userTitle}>
-              User Management
+            <Text style={{ width: '80vw' }} className={styles.userTitle}>
+              User management
             </Text>
-
-            <Input
-              id='email'
-              value={searchQueryTb}
-              onChange={handleSearchTbInputChange}
-              placeholder='Email'
-              style={{ marginRight: '0%', width: '20%', marginTop: '0.7%' }}
-            />
+            <InputGroup style={{ paddingTop: '0.6%', width: '25%' }}>
+              <InputLeftElement
+                pointerEvents="none"
+                children={<EmailIcon color="gray.300" boxSize={5} />}
+                style={{
+                  position: 'absolute',
+                  top: '60%',
+                  transform: 'translateY(-50%)',
+                  left: '2px',
+                }}
+              />
+              <Input
+                id='email'
+                value={searchQueryTb}
+                onChange={handleSearchTbInputChange}
+                placeholder='Email'
+                style={{ marginRight: '0%', width: '100%', marginTop: '0.7%' }}
+              />
+            </InputGroup>
             <Button
               style={{ marginTop: '0.7%' }}
               className={styles.userSearchM}
@@ -267,29 +277,21 @@ function UserManager() {
                 onClick={() => setIsOpenAdd(true)}
               />
             </Box>
-            {/* <Stack spacing={1} className={styles.userStackM}>
-                      <InputGroup size='lg' style={{ marginLeft: '65%' }}>
-                          <Input id='email' value={searchQueryTb}
-                              onChange={handleSearchTbInputChange} placeholder='Email' style={{ marginRight: '0%', width: '20%', marginTop: '0.2%' }} />
-                          <InputRightAddon className={styles.userSearchM} children='Search' onClick={handleSearchByEmail}></InputRightAddon>
-                          <Button className={styles.userAddM} children='Add' onClick={() => setIsOpenAdd(true)} />
-                      </InputGroup>
-                  </Stack> */}
             <Spacer></Spacer>
           </Flex>
         </ListItem>
       </List>
 
       <TableContainer>
-        <Text className={styles.userTextTotalM}>
-          Total {filteredAccData.length} users found :{' '}
+        <Text fontSize='20px' marginTop={2}>
+          Total {filteredAccData.length} user(s) found:{' '}
         </Text>
         <Center>
-          <Table variant='simple' style={{ marginTop: '2%', width: '90%' }}>
+          <Table variant='simple' style={{ marginTop: '2%', width: '80%' }}>
             <TableCaption>
               <Flex alignItems={'center'} justifyContent={'space-between'}>
                 <Text>
-                  Show {dynamicList.length}/{filteredAccData.length} reports
+                  Show {dynamicList.length}/{filteredAccData.length} result(s)
                 </Text>{' '}
                 <Pagination
                   current={currentPage}
@@ -311,14 +313,14 @@ function UserManager() {
                 <Td>No</Td>
                 <Td>Name </Td>
                 <Td>Email</Td>
-                <Td>Active</Td>
                 <Td>Role</Td>
+                <Td>Active</Td>
               </Tr>
             </Thead>
             <Tbody>
               {dynamicList.map((user, index) => (
                 <Tr key={user.id}>
-                  <Td>{index + 1}</Td>
+                  <Td style={{ width: '5%' }}>{index + 1}</Td>
                   <Td style={{ width: '20%' }}>
                     <Button
                       color={'blue'}
@@ -337,17 +339,17 @@ function UserManager() {
                       {user.name}
                     </Button>
                   </Td>
-                  <Td style={{ width: '30%' }}>{user.email}</Td>
-                  <Td>
+                  <Td style={{ width: '32%' }}>{user.email}</Td>
+                  <Td style={{ width: '25%' }}>{user.roleName}</Td>
+                  <Td style={{ width: '10%' }}>
                     {user.status === 1
                       ? 'Active'
                       : user.status === 2
-                      ? 'Inactive'
-                      : user.status === 3
-                      ? 'Locked'
-                      : 'Deleted'}
+                        ? 'Inactive'
+                        : user.status === 3
+                          ? 'Locked'
+                          : 'Deleted'}
                   </Td>
-                  <Td style={{ width: '15%' }}>{user.roleName}</Td>
                 </Tr>
               ))}
             </Tbody>
@@ -362,21 +364,21 @@ function UserManager() {
         size='lg'
       >
         <ModalOverlay />
-        <ModalContent maxW='800px'>
-          <ModalHeader>Create New User</ModalHeader>
+        <ModalContent maxW='50%'>
+          <ModalHeader>Create new user</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(2, 1fr)' gap={8}>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
-                  <FormLabel style={{ width: '50px' }}>Email</FormLabel>
-                  <Input id='email1' />
+                  <FormLabel style={{ width: '15%' }}>Email</FormLabel>
+                  <Input id='email1'  autoComplete="off"/>
                 </Flex>
               </GridItem>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
-                  <FormLabel style={{ width: '50px' }}>Role</FormLabel>
-                  <Select
+                  <FormLabel style={{ width: '15%' }}>Role</FormLabel>
+                  <Select 
                     value={selectedOptionRole}
                     onChange={(e) => setSelectedOptionRole(e.target.value)}
                   >
@@ -396,8 +398,8 @@ function UserManager() {
             >
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
-                  <FormLabel style={{ width: '50px' }}>Name</FormLabel>
-                  <Input id='name' />
+                  <FormLabel style={{ width: '15%' }}>Name</FormLabel>
+                  <Input id='name'  autoComplete="off"/>
                 </Flex>
               </GridItem>
               <GridItem colSpan={1}>

@@ -14,7 +14,7 @@ import {
   Flex,
   Spacer,
   IconButton,
-  Textarea,
+  Textarea, InputGroup, InputLeftAddon, Center
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -76,7 +76,7 @@ function IssuePage() {
 
 
   //pagination
-  const itemPerPage = 8;
+  const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -182,22 +182,6 @@ function IssuePage() {
   };
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/Report/ReportsByType/Issue';
-    fetch(url, {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data) {
-          setIssues(data);
-        }
-      })
-      .catch((error) => {
-        console.error('Lỗi:', error);
-      });
-  }, []);
-
-  useEffect(() => {
     const url = 'http://localhost:5001/api/v1/App/ListApps';
     fetch(url, {
       method: 'GET',
@@ -226,18 +210,8 @@ function IssuePage() {
     const query = searchQueryTb.toLowerCase();
     const filteredData = Apps.filter((item) => {
       const name = item.name.toLowerCase();
-      const publisher = item.publisher.toLowerCase();
-      const version = item.version.toLowerCase();
-      const release = item.release.toLowerCase();
-      const os = item.os.toLowerCase();
-      const osversion = item.osversion.toLowerCase();
       return (
-        name.includes(query) ||
-        publisher.includes(query) ||
-        version.includes(query) ||
-        release.includes(query) ||
-        os.includes(query) ||
-        osversion.includes(query)
+        name.includes(query)
       );
     });
     setfilteredAppData(filteredData);
@@ -325,14 +299,32 @@ function IssuePage() {
       console.error('Lỗi:', error);
     }
   };
+  const fetchDataAndUpdateState = () => {
+    const url = 'http://localhost:5001/api/Report/ReportsByType/Issue';
+    fetch(url, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          setIssues(data);
+        }
+      })
+      .catch((error) => {
+        console.error('Lỗi:', error);
+      });
+  };
+
+  useEffect(() => {
+    fetchDataAndUpdateState();
+  }, []);
 
   useEffect(() => {
     if (isSuccess) {
       const hideNotification = setTimeout(() => {
         setIsSuccess('');
-        // window.location.reload();
+        fetchDataAndUpdateState();
       }, notificationTimeout);
-
       return () => {
         clearTimeout(hideNotification);
       };
@@ -346,7 +338,7 @@ function IssuePage() {
           <Link href='/adminpages/adminhome' className={styles.listitem}>
             Home
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issues Management
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue management
           <Text className={styles.alert}>
             {isSuccess === 'true' && (
               <Alert status='success'>
@@ -365,23 +357,29 @@ function IssuePage() {
         <ListItem className={styles.list}>
           <Flex>
             <Text fontSize='2xl'>
-              Issues Management -{' '}
+              Issue management -{' '}
               <Link
                 href='/adminpages/issuehome'
                 style={{ color: '#4d9ffe', textDecoration: 'none' }}
               >
-                List Issues
+                List open issue
               </Link>
             </Text>
             <Spacer />
-            <Input
-              type='text'
-              value={searchQueryTb}
-              onChange={handleSearchTbInputChange}
-              placeholder='Search'
-              w={300}
-              mr={1}
-            />
+            <InputGroup style={{ paddingTop: '', width: '35%' }}>
+              <InputLeftAddon
+                pointerEvents="none"
+                children='Application'
+              />
+              <Input style={{ width: '100%' }}
+                type='text'
+                value={searchQueryTb}
+                onChange={handleSearchTbInputChange}
+                placeholder='Search'
+                w={300}
+                mr={1}
+              />
+            </InputGroup>
             <Box>
               <IconButton
                 aria-label='Add'
@@ -395,6 +393,7 @@ function IssuePage() {
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
+            <Center><Text fontSize={30} mb={2}>List all issue</Text></Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -403,12 +402,7 @@ function IssuePage() {
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
-                    Total{' '}
-                    {filteredAppData.reduce(
-                      (total, app) => total + countIssue(app.appId),
-                      0,
-                    )}{' '}
-                    reports
+                    Show {dynamicList.length}/{filteredAppData.length} result(s)
                   </Text>{' '}
                   <PaginationCustom
                     current={currentPage}
@@ -431,11 +425,11 @@ function IssuePage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {dynamicList.map(
+                {dynamicList?.map(
                   (app, index) =>
                     countIssue(app.appId) !== 0 && (
                       <Tr key={app.id}>
-                        <Td>{index + 1}</Td>
+                        <Td style={{width:'5%'}}>{index + 1}</Td>
                         <Td>
                           <Button
                             color={'blue'}
@@ -467,7 +461,7 @@ function IssuePage() {
       >
         <ModalOverlay />
         <ModalContent maxW='1100px'>
-          <ModalHeader>Create New Issue</ModalHeader>
+          <ModalHeader>Create new issue</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={8}>
@@ -486,7 +480,7 @@ function IssuePage() {
                     style={{
                       position: 'relative',
                       display: 'inline-block',
-                      backgroundColor: 'whitesmoke',
+                      backgroundColor: 'white',
                       width: '300px',
                     }}
                   >
@@ -541,17 +535,17 @@ function IssuePage() {
                   <Input
                     id='title'
                     placeholder='Title'
-                    style={{ backgroundColor: 'whitesmoke' }}
+                    style={{ backgroundColor: 'white' }}
                   />
                 </Flex>
               </GridItem>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
-                  <FormLabel>EndDate</FormLabel>
+                  <FormLabel>Deadline</FormLabel>
                   <Input
                     style={{
                       marginLeft: '-7px',
-                      backgroundColor: 'whitesmoke',
+                      backgroundColor: 'white',
                     }}
                     type='date'
                     name='endDate'

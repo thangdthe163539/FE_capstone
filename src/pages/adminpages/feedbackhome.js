@@ -11,8 +11,8 @@ import {
   Td,
   TableCaption,
   TableContainer,
-  Flex,
-  Spacer,
+  Flex,Center,InputLeftAddon,
+  Spacer,InputGroup ,
   IconButton,
   Textarea,
   Image,
@@ -54,27 +54,27 @@ const defaultData = {
 
 function FeedbackPage() {
   const router = useRouter();
-  const [isOpenAdd, setIsOpenAdd] = useState(false);
-  const [formData, setFormData] = useState(defaultData);
-  const [searchQuery, setSearchQuery] = useState('');
+  // const [isOpenAdd, setIsOpenAdd] = useState(false);
+  // const [formData, setFormData] = useState(defaultData);
+  // const [searchQuery, setSearchQuery] = useState('');
   const [searchQueryTb, setSearchQueryTb] = useState('');
   const [filteredAppData, setfilteredAppData] = useState([]);
-  const [filteredAppAddData, setfilteredAppAddData] = useState([]);
+  // const [filteredAppAddData, setfilteredAppAddData] = useState([]);
   const [dynamicFilteredAppData, setDynamicFilteredAppData] = useState([]);
   const [Apps, setApps] = useState([]);
   const [Issues, setIssues] = useState([]);
   const [isSuccess, setIsSuccess] = useState('');
-  const [showOptions, setShowOptions] = useState(false);
-  const [appId, setAppId] = useState('');
+  // const [showOptions, setShowOptions] = useState(false);
+  // const [appId, setAppId] = useState('');
   const notificationTimeout = 2000;
-  const [imagesState, setImages] = useState([]);
-  const [error, setError] = useState('');
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomedIndex, setZoomedIndex] = useState(null);
-  const [isHovered, setIsHovered] = useState(null);
+  // const [imagesState, setImages] = useState([]);
+  // const [error, setError] = useState('');
+  // const [isZoomed, setIsZoomed] = useState(false);
+  // const [zoomedIndex, setZoomedIndex] = useState(null);
+  // const [isHovered, setIsHovered] = useState(null);
 
   //pagination
-  const itemPerPage = 8;
+  const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -99,90 +99,90 @@ function FeedbackPage() {
   }, [dynamicFilteredAppData]);
   //
 
-  const allowedExtensions = ['jpg', 'png'];
+  // const allowedExtensions = ['jpg', 'png'];
   //Image
-  const handleFileChange = (e) => {
-    const files = e.target.files;
+  // const handleFileChange = (e) => {
+  //   const files = e.target.files;
 
-    if (files) {
-      const newImages = Array.from(files).map((file) => {
-        const extension = file.name.split('.').pop().toLowerCase();
+  //   if (files) {
+  //     const newImages = Array.from(files).map((file) => {
+  //       const extension = file.name.split('.').pop().toLowerCase();
 
-        if (allowedExtensions.includes(extension)) {
-          const reader = new FileReader();
+  //       if (allowedExtensions.includes(extension)) {
+  //         const reader = new FileReader();
 
-          reader.onload = () => {
-            setImages((prevImages) => [
-              ...prevImages,
-              { fileName: file.name, dataURL: reader.result },
-            ]);
-            setError('');
-          };
+  //         reader.onload = () => {
+  //           setImages((prevImages) => [
+  //             ...prevImages,
+  //             { fileName: file.name, dataURL: reader.result },
+  //           ]);
+  //           setError('');
+  //         };
 
-          reader.readAsDataURL(file);
-        } else {
-          setError('Invalid file type. Please select a JPG or PNG file.');
-          return null;
-        }
-      });
-    }
-  };
+  //         reader.readAsDataURL(file);
+  //       } else {
+  //         setError('Invalid file type. Please select a JPG or PNG file.');
+  //         return null;
+  //       }
+  //     });
+  //   }
+  // };
 
-  const handleImageClick = (index) => {
-    setZoomedIndex(index);
-    setIsZoomed(true);
-  };
+  // const handleImageClick = (index) => {
+  //   setZoomedIndex(index);
+  //   setIsZoomed(true);
+  // };
 
-  const handleZoomClose = () => {
-    setIsZoomed(false);
-    setZoomedIndex(null);
-  };
+  // const handleZoomClose = () => {
+  //   setIsZoomed(false);
+  //   setZoomedIndex(null);
+  // };
 
-  const handleImageMouseLeave = () => {
-    setIsHovered(null);
-  };
+  // const handleImageMouseLeave = () => {
+  //   setIsHovered(null);
+  // };
 
-  const handleImageMouseEnter = (index, event) => {
-    event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
-    setIsHovered(index);
-  };
+  // const handleImageMouseEnter = (index, event) => {
+  //   event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+  //   setIsHovered(index);
+  // };
 
-  const handleRemoveImage = (index) => {
-    setImages((prevImages) => {
-      const newImages = [...prevImages];
-      newImages.splice(index, 1);
-      return newImages;
-    });
-    setError('');
-  };
+  // const handleRemoveImage = (index) => {
+  //   setImages((prevImages) => {
+  //     const newImages = [...prevImages];
+  //     newImages.splice(index, 1);
+  //     return newImages;
+  //   });
+  //   setError('');
+  // };
 
-  const handleDeleteClick_Add = (index, event) => {
-    event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
-    handleRemoveImage(index);
-  };
+  // const handleDeleteClick_Add = (index, event) => {
+  //   event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+  //   handleRemoveImage(index);
+  // };
 
-  function dataURLtoBlob(dataURL) {
-    const parts = dataURL.split(';base64,');
-    const contentType = parts[0].split(':')[1];
-    const raw = window.atob(parts[1]);
-    const rawLength = raw.length;
-    const uInt8Array = new Uint8Array(rawLength);
+  // function dataURLtoBlob(dataURL) {
+  //   const parts = dataURL.split(';base64,');
+  //   const contentType = parts[0].split(':')[1];
+  //   const raw = window.atob(parts[1]);
+  //   const rawLength = raw.length;
+  //   const uInt8Array = new Uint8Array(rawLength);
 
-    for (let i = 0; i < rawLength; ++i) {
-      uInt8Array[i] = raw.charCodeAt(i);
-    }
+  //   for (let i = 0; i < rawLength; ++i) {
+  //     uInt8Array[i] = raw.charCodeAt(i);
+  //   }
 
-    return new Blob([uInt8Array], { type: contentType });
-  }
+  //   return new Blob([uInt8Array], { type: contentType });
+  // }
   //End
 
   const handleIssuerDetails = (appId) => {
     router.push(`feedbackDetails?appId=${appId}`);
   };
 
-  const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  // const handleSearchInputChange = (e) => {
+  //   setSearchQuery(e.target.value);
+  // };
 
   const handleSearchTbInputChange = (e) => {
     setSearchQueryTb(e.target.value);
@@ -216,10 +216,10 @@ function FeedbackPage() {
       });
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData({ ...formData, [name]: value });
+  // };
 
   const countIssue = (appId) => {
     const occurrences = Issues.filter((item) => item.appId === appId);
@@ -231,18 +231,8 @@ function FeedbackPage() {
     const query = searchQueryTb.toLowerCase();
     const filteredData = Apps.filter((item) => {
       const name = item.name.toLowerCase();
-      const publisher = item.publisher.toLowerCase();
-      const version = item.version.toLowerCase();
-      const release = item.release.toLowerCase();
-      const os = item.os.toLowerCase();
-      const osversion = item.osversion.toLowerCase();
       return (
-        name.includes(query) ||
-        publisher.includes(query) ||
-        version.includes(query) ||
-        release.includes(query) ||
-        os.includes(query) ||
-        osversion.includes(query)
+        name.includes(query) 
       );
     });
     setfilteredAppData(filteredData);
@@ -255,72 +245,70 @@ function FeedbackPage() {
     filteApp();
   }, [searchQueryTb, Apps]);
 
-  const filteAppAdd = () => {
-    const query = searchQuery.toLowerCase();
-    const filteredData = Apps.filter((item) => {
-      const name = item.name.toLowerCase();
-      const os = item.os.toLowerCase();
-      const version = item.osversion.toLowerCase();
-      return (
-        name.includes(query) || os.includes(query) || version.includes(query)
-      );
-    });
-    setfilteredAppAddData(filteredData);
-  };
+  // const filteAppAdd = () => {
+  //   const query = searchQuery.toLowerCase();
+  //   const filteredData = Apps.filter((item) => {
+  //     const name = item.name.toLowerCase();
+  //     return (
+  //       name.includes(query)
+  //     );
+  //   });
+  //   setfilteredAppAddData(filteredData);
+  // };
 
-  useEffect(() => {
-    filteAppAdd();
-  }, [searchQuery, Apps]);
+  // useEffect(() => {
+  //   filteAppAdd();
+  // }, [searchQuery, Apps]);
   //END
 
-  const handleSaveAdd = async () => {
-    const url = 'http://localhost:5001/api/Report/CreateReport';
+  // const handleSaveAdd = async () => {
+  //   const url = 'http://localhost:5001/api/Report/CreateReport';
 
-    const Id = parseInt(appId);
-    const desc = document.getElementById('description').value;
-    const title = document.getElementById('title').value;
-    const endDate = document.getElementsByName('endDate')[0].value;
-    const dateParts = endDate.split('-');
-    let formattedDate = '';
-    if (dateParts.length === 3) {
-      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-    } else {
-      console.error('Ngày không hợp lệ.');
-    }
-    const fileObjects = imagesState.map((image) => {
-      // Tạo một Blob từ dataURL
-      const blob = dataURLtoBlob(image.dataURL);
-      // Tạo một File từ Blob
-      return new File([blob], image.fileName, { type: blob.type });
-      [];
-    });
-    const formData = new FormData();
-    formData.append('AppId', Id);
-    formData.append('Title', title);
-    formData.append('Description', desc);
-    formData.append('Type', 'feedback');
-    formData.append('Start_Date', formattedDate);
-    formData.append('End_Date', formattedDate);
-    formData.append('Status', 1);
+  //   const Id = parseInt(appId);
+  //   const desc = document.getElementById('description').value;
+  //   const title = document.getElementById('title').value;
+  //   const endDate = document.getElementsByName('endDate')[0].value;
+  //   const dateParts = endDate.split('-');
+  //   let formattedDate = '';
+  //   if (dateParts.length === 3) {
+  //     formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+  //   } else {
+  //     console.error('Ngày không hợp lệ.');
+  //   }
+  //   const fileObjects = imagesState.map((image) => {
+  //     // Tạo một Blob từ dataURL
+  //     const blob = dataURLtoBlob(image.dataURL);
+  //     // Tạo một File từ Blob
+  //     return new File([blob], image.fileName, { type: blob.type });
+  //     [];
+  //   });
+  //   const formData = new FormData();
+  //   formData.append('AppId', Id);
+  //   formData.append('Title', title);
+  //   formData.append('Description', desc);
+  //   formData.append('Type', 'feedback');
+  //   formData.append('Start_Date', formattedDate);
+  //   formData.append('End_Date', formattedDate);
+  //   formData.append('Status', 1);
 
-    // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
-    fileObjects.forEach((file, index) => {
-      formData.append(`Images`, file);
-    });
-    try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setIsSuccess('true');
-      setIsOpenAdd(false);
-    } catch (error) {
-      setIsSuccess('false');
-      setIsOpenAdd(false);
-      console.error('Lỗi:', error);
-    }
-  };
+  //   // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
+  //   fileObjects.forEach((file, index) => {
+  //     formData.append(`Images`, file);
+  //   });
+  //   try {
+  //     const response = await axios.post(url, formData, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //     });
+  //     setIsSuccess('true');
+  //     setIsOpenAdd(false);
+  //   } catch (error) {
+  //     setIsSuccess('false');
+  //     setIsOpenAdd(false);
+  //     console.error('Lỗi:', error);
+  //   }
+  // };
 
   useEffect(() => {
     if (isSuccess) {
@@ -341,7 +329,7 @@ function FeedbackPage() {
           <Link href='/adminpages/adminhome' className={styles.listitem}>
             Home
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback Management
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback management
           <Text className={styles.alert}>
             {isSuccess === 'true' && (
               <Alert status='success'>
@@ -360,16 +348,22 @@ function FeedbackPage() {
         <ListItem className={styles.list}>
           <Flex>
             <Text fontSize='2xl'>
-              Feedback Management -{' '}
+              Feedback management -{' '}
               <Link
                 href='/adminpages/feedbackManager'
                 style={{ color: '#4d9ffe', textDecoration: 'none' }}
               >
-                List Feedbacks
+                List open feedback
               </Link>
             </Text>
             <Spacer />
-            <Input
+            <InputGroup style={{ paddingTop: '', width: '35%' }}>
+              <InputLeftAddon
+                pointerEvents="none"
+                children='Application'
+              />
+              <Input
+              style={{width:'100%'}}
               type='text'
               value={searchQueryTb}
               onChange={handleSearchTbInputChange}
@@ -377,7 +371,8 @@ function FeedbackPage() {
               w={300}
               mr={1}
             />
-            <Box>
+            </InputGroup>
+            {/* <Box>
               <IconButton
                 aria-label='Add'
                 icon={<FaPlus />}
@@ -385,11 +380,12 @@ function FeedbackPage() {
                 marginRight={1}
                 onClick={() => setIsOpenAdd(true)}
               />
-            </Box>
+            </Box> */}
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
+          <Center><Text fontSize={30} mb={2}>List all feedback</Text></Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -398,12 +394,7 @@ function FeedbackPage() {
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
-                    Total{' '}
-                    {filteredAppData.reduce(
-                      (total, app) => total + countIssue(app.appId),
-                      0,
-                    )}{' '}
-                    reports
+                  Show {dynamicList.length}/{filteredAppData.length} result(s)
                   </Text>{' '}
                   <Pagination
                     current={currentPage}
@@ -426,11 +417,11 @@ function FeedbackPage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {dynamicList.map(
+                {dynamicList?.map(
                   (app, index) =>
                     countIssue(app.appId) !== 0 && (
                       <Tr key={app.id}>
-                        <Td>{index + 1}</Td>
+                        <Td style={{width:'5%'}}>{index + 1}</Td>
                         <Td>
                           <Button
                             color={'blue'}
@@ -454,7 +445,7 @@ function FeedbackPage() {
           </TableContainer>
         </ListItem>
       </List>
-      <Modal
+      {/* <Modal
         isOpen={isOpenAdd}
         onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
         closeOnOverlayClick={false}
@@ -462,7 +453,7 @@ function FeedbackPage() {
       >
         <ModalOverlay />
         <ModalContent maxW='1100px'>
-          <ModalHeader>Create New Feedback</ModalHeader>
+          <ModalHeader>Create new feedback</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={8}>
@@ -672,7 +663,7 @@ function FeedbackPage() {
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </Modal> */}
     </Box>
   );
 }
