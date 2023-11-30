@@ -165,7 +165,7 @@ function UserDetail() {
             </Flex>
 
             <Flex mb={10}>
-                <Text style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '8%' }}>Role Name:</Text>
+                <Text style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '8%' }}>Role name:</Text>
                 <Text>{role}</Text>
             </Flex>
         </div>
