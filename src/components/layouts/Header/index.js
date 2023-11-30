@@ -89,7 +89,7 @@ function Header() {
           You are not logged in.
         </Text>
         <Text style={{ fontSize: '20px', textAlign: 'center', marginTop: '-0.5%', marginLeft: '0.5%', color: '#344e74' }}>(</Text>
-        <Text onClick={handleGoogleLogin} className={`${styles.loggin}`}>LOGIN</Text>
+        <Text onClick={handleGoogleLogin} className={`${styles.loggin}`}>Login</Text>
         <Text style={{ fontSize: '20px', textAlign: 'center', marginTop: '-0.5%', color: '#344e74' }}>)</Text>
         <Text style={{ paddingTop: '5px', position: 'fixed', right: '45%' }}>
           {isSuccess === 'false' && (

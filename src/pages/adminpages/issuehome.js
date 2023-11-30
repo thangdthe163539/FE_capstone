@@ -13,7 +13,7 @@ import {
   TableContainer,
   Flex,
   Spacer,
-  IconButton, Center ,InputLeftAddon,
+  IconButton, Center, InputLeftAddon,
   Textarea, InputGroup,
 } from '@chakra-ui/react';
 import {
@@ -117,7 +117,7 @@ function IssuePage() {
 
           reader.onload = () => {
             setImage((prevImages) => [
-              ...prevImages,
+              ...(Array.isArray(prevImages) ? prevImages : []), // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
               { fileName: file.name, dataURL: reader.result },
             ]);
             setError('');
@@ -130,9 +130,11 @@ function IssuePage() {
         }
       });
 
-      // Giữ lại cả ảnh cũ và thêm ảnh mới
+      // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
       setImage((prevImages) => [
-        ...prevImages.filter((img) => img.dataURL),
+        ...(Array.isArray(prevImages) ? prevImages : []).filter(
+          (img) => img && img.dataURL
+        ),
         ...newImages.filter(Boolean),
       ]);
     }
@@ -355,22 +357,7 @@ function IssuePage() {
     } else {
       console.error('Ngày không hợp lệ.');
     }
-    const fileObjects = await Promise.all(
-      image.map(async (image) => {
-        // Tạo một Blob từ dataURL
-        if (image.dataURL) {
-          const blob = dataURLtoBlob(image.dataURL);
-          return new File([blob], image.fileName, { type: blob.type });
-        } else {
-          console.log(image.image1 + '----111');
 
-          // Giữ nguyên ảnh khi dataURL không xác định
-          const fullImagePath = `/images/${image.image1}`;
-          const blob = await fetch(fullImagePath).then((res) => res.blob());
-          return new File([blob], image.fileName, { type: blob.type });
-        }
-      }),
-    );
     const formData = new FormData();
     formData.append('AppId', detail.appId);
     formData.append(
@@ -391,9 +378,30 @@ function IssuePage() {
       selectedOptionActive === '' ? detail.status : selectedOptionActive,
     );
 
-    fileObjects.forEach((file, index) => {
-      formData.append(`Images`, file);
-    });
+
+    if (Array.isArray(image) && image.length !== 0) {
+      const fileObjects = await Promise.all(
+        image.map(async (image) => {
+          // Tạo một Blob từ dataURL
+          if (image.dataURL) {
+            const blob = dataURLtoBlob(image.dataURL);
+            return new File([blob], image.fileName, { type: blob.type });
+          } else {
+
+            // Giữ nguyên ảnh khi dataURL không xác định
+            const fullImagePath = `/images/${image.image1}`;
+            const blob = await fetch(fullImagePath).then((res) => res.blob());
+            return new File([blob], image.fileName, { type: blob.type });
+          }
+        }),
+      );
+      fileObjects.forEach((file, index) => {
+        formData.append(`Images`, file);
+      });
+    } else {
+      formData.append(`Images`, " ");
+    }
+
     try {
       const response = await axios.put(url, formData, {
         headers: {
@@ -556,7 +564,7 @@ function IssuePage() {
     handleRemoveImage(index);
   };
 
-  
+
 
   return (
     <Box className={styles.bodybox}>
@@ -594,11 +602,11 @@ function IssuePage() {
             </Text>
             <Spacer />
             <InputGroup style={{ paddingTop: '', width: '35%' }}>
-              <InputLeftAddon 
+              <InputLeftAddon
                 pointerEvents="none"
                 children='Title - Application'
               />
-              <Input style={{width:'100%'}}
+              <Input style={{ width: '100%' }}
                 type='text'
                 value={searchQueryTb}
                 onChange={handleSearchTbInputChange}
@@ -620,7 +628,7 @@ function IssuePage() {
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
-          <Center><Text fontSize={30} mb={2}>List open issue</Text></Center>
+            <Center><Text fontSize={30} mb={2}>List open issue</Text></Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -665,7 +673,7 @@ function IssuePage() {
                         {issue.title}
                       </Button>
                     </Td>
-                    <Td style={{width:'45%'}}
+                    <Td style={{ width: '45%' }}
                       onClick={() => {
                         handleDetail();
                         setDetails(issue);
@@ -780,79 +788,80 @@ function IssuePage() {
                     multiple
                   />
                 </Flex>
-                <Box display='flex' flexWrap='wrap' gap={4}>
-                  {image.map((image, index) => (
-                    <Box
-                      key={index}
-                      position='relative'
-                      maxW='100px'
-                      maxH='200px'
-                      overflow='hidden'
-                      onClick={() => handleImageClick(index)}
-                      onMouseEnter={(event) =>
-                        handleImageMouseEnter(index, event)
-                      }
-                      onMouseLeave={handleImageMouseLeave}
-                    >
-                      <Image
-                        src={image.dataURL || `/images/${image.image1}`}
-                        alt={`Selected Image ${index}`}
-                        w='100%'
-                        h='100%'
-                        objectFit='cover'
-                        _hover={{ cursor: 'pointer' }}
-                      />
-                      {isHovered === index && (
-                        <>
-                          <DeleteIcon
-                            position='absolute'
-                            top='5px'
-                            color='black'
-                            right='5px'
-                            fontSize='15px'
-                            variant='ghost'
-                            onClick={(event) => handleDeleteClick(index, event)}
-                            _hover={{ color: 'black ' }}
-                          />
-                          <Text
-                            position='absolute'
-                            bottom='5px'
-                            left='5px'
-                            fontSize='10px'
-                            color='white'
-                          >
-                            {image.fileName}
-                          </Text>
-                        </>
-                      )}
-                    </Box>
-                  ))}
-                  {isZoomed && (
-                    <div className='modal-overlay' onClick={handleZoomClose}>
-                      <Modal
-                        isOpen={isZoomed}
-                        onClose={handleZoomClose}
-                        size='xl'
-                        isCentered
+                {Array.isArray(image) && image.length !== 0 && (
+                  <Box display='flex' flexWrap='wrap' gap={4}>
+                    {image.map((image, index) => (
+                      <Box
+                        key={index}
+                        position='relative'
+                        maxW='100px'
+                        maxH='200px'
+                        overflow='hidden'
+                        onClick={() => handleImageClick(index)}
+                        onMouseEnter={(event) =>
+                          handleImageMouseEnter(index, event)
+                        }
+                        onMouseLeave={handleImageMouseLeave}
                       >
-                        <ModalOverlay />
-                        <ModalContent>
-                          <ModalBody>
-                            <Box className='zoomed-image-container'>
-                              <Image
-                                src={
-                                  image[zoomedIndex]?.dataURL ||
-                                  `/images/${image[zoomedIndex]?.image1}`
-                                }
-                                alt={`${zoomedIndex}`}
-                              />
-                            </Box>
-                          </ModalBody>
-                        </ModalContent>
-                      </Modal>
-                    </div>
-                  )}
-                </Box>
+                        <Image
+                          src={image.dataURL || `/images/${image.image1}`}
+                          alt={`Selected Image ${index}`}
+                          w='100%'
+                          h='100%'
+                          objectFit='cover'
+                          _hover={{ cursor: 'pointer' }}
+                        />
+                        {isHovered === index && (
+                          <>
+                            <DeleteIcon
+                              position='absolute'
+                              top='5px'
+                              color='black'
+                              right='5px'
+                              fontSize='15px'
+                              variant='ghost'
+                              onClick={(event) => handleDeleteClick(index, event)}
+                              _hover={{ color: 'black ' }}
+                            />
+                            <Text
+                              position='absolute'
+                              bottom='5px'
+                              left='5px'
+                              fontSize='10px'
+                              color='white'
+                            >
+                              {image.fileName}
+                            </Text>
+                          </>
+                        )}
+                      </Box>
+                    ))}
+                    {isZoomed && (
+                      <div className='modal-overlay' onClick={handleZoomClose}>
+                        <Modal
+                          isOpen={isZoomed}
+                          onClose={handleZoomClose}
+                          size='xl'
+                          isCentered
+                        >
+                          <ModalOverlay />
+                          <ModalContent>
+                            <ModalBody>
+                              <Box className='zoomed-image-container'>
+                                <Image
+                                  src={
+                                    image[zoomedIndex]?.dataURL ||
+                                    `/images/${image[zoomedIndex]?.image1}`
+                                  }
+                                  alt={`${zoomedIndex}`}
+                                />
+                              </Box>
+                            </ModalBody>
+                          </ModalContent>
+                        </Modal>
+                      </div>
+                    )}
+                  </Box>)}
                 {error && <Text color='red'>{error}</Text>}
               </GridItem>
             </Grid>
@@ -886,12 +895,6 @@ function IssuePage() {
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={8}>
               <GridItem colSpan={1}>
-                <Input
-                  name='softwareID'
-                  value={formData.softwareId}
-                  onChange={handleInputChange}
-                  display='none'
-                />
                 <Flex alignItems='center'>
                   <FormLabel style={{ marginRight: '1rem' }}>
                     Application

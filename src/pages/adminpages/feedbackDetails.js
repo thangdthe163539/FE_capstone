@@ -33,7 +33,7 @@ import {
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowForwardIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import styles from '@/styles/pm.module.css';
 import { Alert, AlertIcon } from '@chakra-ui/react';
 import axios from 'axios';
@@ -104,7 +104,7 @@ function FeedBackDetailManagePage() {
 
           reader.onload = () => {
             setImage((prevImages) => [
-              ...prevImages,
+              ...(Array.isArray(prevImages) ? prevImages : []), // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
               { fileName: file.name, dataURL: reader.result },
             ]);
             setError('');
@@ -117,13 +117,16 @@ function FeedBackDetailManagePage() {
         }
       });
 
-      // Giữ lại cả ảnh cũ và thêm ảnh mới
+      // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
       setImage((prevImages) => [
-        ...prevImages.filter((img) => img.dataURL),
+        ...(Array.isArray(prevImages) ? prevImages : []).filter(
+          (img) => img && img.dataURL
+        ),
         ...newImages.filter(Boolean),
       ]);
     }
   };
+
 
   const handleImageClick = (index) => {
     setZoomedIndex(index);
@@ -295,22 +298,6 @@ function FeedBackDetailManagePage() {
       console.error('Ngày không hợp lệ.');
     }
 
-    const fileObjects = await Promise.all(
-      image.map(async (image) => {
-        // Tạo một Blob từ dataURL
-        if (image.dataURL) {
-          const blob = dataURLtoBlob(image.dataURL);
-          return new File([blob], image.fileName, { type: blob.type });
-        } else {
-          console.log(image.image1 + '----111');
-
-          // Giữ nguyên ảnh khi dataURL không xác định
-          const fullImagePath = `/images/${image.image1}`;
-          const blob = await fetch(fullImagePath).then((res) => res.blob());
-          return new File([blob], image.fileName, { type: blob.type });
-        }
-      }),
-    );
     const formData = new FormData();
     formData.append('AppId', detail.appId);
     formData.append(
@@ -330,10 +317,28 @@ function FeedBackDetailManagePage() {
       'Status',
       selectedOptionActive === '' ? detail.status : selectedOptionActive,
     );
+    if (Array.isArray(image) && image.length !== 0) {
+      const fileObjects = await Promise.all(
+        image.map(async (image) => {
+          if (image.dataURL) {
+            const blob = dataURLtoBlob(image.dataURL);
+            return new File([blob], image.fileName, { type: blob.type });
+          } else {
+            console.log(image.image1 + '----111');
 
-    fileObjects.forEach((file, index) => {
-      formData.append(`Images`, file);
-    });
+            const fullImagePath = `/images/${image.image1}`;
+            const blob = await fetch(fullImagePath).then((res) => res.blob());
+            return new File([blob], image.fileName, { type: blob.type });
+          }
+        }),
+      );
+
+      fileObjects.forEach((file, index) => {
+        formData.append(`Images`, file);
+      });
+    }else{
+      formData.append(`Images`," ");
+    }
     try {
       const response = await axios.put(url, formData, {
         headers: {
@@ -348,6 +353,7 @@ function FeedBackDetailManagePage() {
       console.error('Lỗi:', error);
     }
   };
+
 
   useEffect(() => {
     if (detail?.reportId) {
@@ -365,6 +371,7 @@ function FeedBackDetailManagePage() {
         });
     }
   }, [detail?.reportId]);
+
   useEffect(() => {
     const url = 'http://localhost:5001/api/v1/App/ListApps';
     fetch(url, {
@@ -429,6 +436,7 @@ function FeedBackDetailManagePage() {
       };
     }
   }, [isSuccess]);
+
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -562,12 +570,12 @@ function FeedBackDetailManagePage() {
                           {item.status === 1
                             ? 'Unsolved '
                             : item.status === 2
-                            ? 'Solved '
-                            : item.status === 3
-                            ? 'Deleted '
-                            : item.status === 4
-                            ? 'Cancel '
-                            : 'Unknown Status'}
+                              ? 'Solved '
+                              : item.status === 3
+                                ? 'Deleted '
+                                : item.status === 4
+                                  ? 'Cancel '
+                                  : 'Unknown Status'}
                         </Td>
                       </Tr>
                     ))}
@@ -615,12 +623,12 @@ function FeedBackDetailManagePage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                          ? 'Solved'
-                          : status === 3
-                          ? 'Deleted'
-                          : status === 4
-                          ? 'Cancel'
-                          : 'Unknow'}
+                            ? 'Solved'
+                            : status === 3
+                              ? 'Deleted'
+                              : status === 4
+                                ? 'Cancel'
+                                : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}
@@ -684,79 +692,80 @@ function FeedBackDetailManagePage() {
                     multiple
                   />
                 </Flex>
-                <Box display='flex' flexWrap='wrap' gap={4}>
-                  {image.map((image, index) => (
-                    <Box
-                      key={index}
-                      position='relative'
-                      maxW='100px'
-                      maxH='200px'
-                      overflow='hidden'
-                      onClick={() => handleImageClick(index)}
-                      onMouseEnter={(event) =>
-                        handleImageMouseEnter(index, event)
-                      }
-                      onMouseLeave={handleImageMouseLeave}
-                    >
-                      <Image
-                        src={image.dataURL || `/images/${image.image1}`}
-                        alt={`Selected Image ${index}`}
-                        w='100%'
-                        h='100%'
-                        objectFit='cover'
-                        _hover={{ cursor: 'pointer' }}
-                      />
-                      {isHovered === index && (
-                        <>
-                          <DeleteIcon
-                            position='absolute'
-                            top='5px'
-                            color='black'
-                            right='5px'
-                            fontSize='15px'
-                            variant='ghost'
-                            onClick={(event) => handleDeleteClick(index, event)}
-                            _hover={{ color: 'black ' }}
-                          />
-                          <Text
-                            position='absolute'
-                            bottom='5px'
-                            left='5px'
-                            fontSize='10px'
-                            color='white'
-                          >
-                            {image.fileName}
-                          </Text>
-                        </>
-                      )}
-                    </Box>
-                  ))}
-                  {isZoomed && (
-                    <div className='modal-overlay' onClick={handleZoomClose}>
-                      <Modal
-                        isOpen={isZoomed}
-                        onClose={handleZoomClose}
-                        size='xl'
-                        isCentered
+                {Array.isArray(image) && image.length !== 0 && (
+                  <Box display='flex' flexWrap='wrap' gap={4}>
+                    {image.map((image, index) => (
+                      <Box
+                        key={index}
+                        position='relative'
+                        maxW='100px'
+                        maxH='200px'
+                        overflow='hidden'
+                        onClick={() => handleImageClick(index)}
+                        onMouseEnter={(event) =>
+                          handleImageMouseEnter(index, event)
+                        }
+                        onMouseLeave={handleImageMouseLeave}
                       >
-                        <ModalOverlay />
-                        <ModalContent>
-                          <ModalBody>
-                            <Box className='zoomed-image-container'>
-                              <Image
-                                src={
-                                  image[zoomedIndex]?.dataURL ||
-                                  `/images/${image[zoomedIndex]?.image1}`
-                                }
-                                alt={`${zoomedIndex}`}
-                              />
-                            </Box>
-                          </ModalBody>
-                        </ModalContent>
-                      </Modal>
-                    </div>
-                  )}
-                </Box>
+                        <Image
+                          src={image.dataURL || `/images/${image.image1}`}
+                          alt={`Selected Image ${index}`}
+                          w='100%'
+                          h='100%'
+                          objectFit='cover'
+                          _hover={{ cursor: 'pointer' }}
+                        />
+                        {isHovered === index && (
+                          <>
+                            <DeleteIcon
+                              position='absolute'
+                              top='5px'
+                              color='black'
+                              right='5px'
+                              fontSize='15px'
+                              variant='ghost'
+                              onClick={(event) => handleDeleteClick(index, event)}
+                              _hover={{ color: 'black ' }}
+                            />
+                            <Text
+                              position='absolute'
+                              bottom='5px'
+                              left='5px'
+                              fontSize='10px'
+                              color='white'
+                            >
+                              {image.fileName}
+                            </Text>
+                          </>
+                        )}
+                      </Box>
+                    ))}
+                    {isZoomed && (
+                      <div className='modal-overlay' onClick={handleZoomClose}>
+                        <Modal
+                          isOpen={isZoomed}
+                          onClose={handleZoomClose}
+                          size='xl'
+                          isCentered
+                        >
+                          <ModalOverlay />
+                          <ModalContent>
+                            <ModalBody>
+                              <Box className='zoomed-image-container'>
+                                <Image
+                                  src={
+                                    image[zoomedIndex]?.dataURL ||
+                                    `/images/${image[zoomedIndex]?.image1}`
+                                  }
+                                  alt={`${zoomedIndex}`}
+                                />
+                              </Box>
+                            </ModalBody>
+                          </ModalContent>
+                        </Modal>
+                      </div>
+                    )}
+                  </Box>)}
                 {error && <Text color='red'>{error}</Text>}
               </GridItem>
             </Grid>

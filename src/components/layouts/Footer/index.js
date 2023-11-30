@@ -15,7 +15,13 @@ function Footer() {
         <Text className={`${styles.contact}`}>
           Any question 
         </Text>
-        <Button className={`${styles.buttonContact}`} colorScheme='blue'>CONTACT US</Button>
+        <Text style={{marginTop: '6%', marginLeft:'-10.6%'}}>
+          Phone number: 0974-421-458
+        </Text>
+        <Text style={{marginTop: '8%', marginLeft:'-14%'}}>
+         Email: khangdt01001@gmail.com
+        </Text>
+        {/* <Button className={`${styles.buttonContact}`} colorScheme='blue'>CONTACT US</Button> */}
         <Text className={`${styles.about}`}>
           About SoftTrack
         </Text>
