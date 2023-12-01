@@ -13,7 +13,7 @@ import {
   TableContainer,
   Flex,
   Spacer,
-  IconButton, Center ,InputLeftAddon,
+  IconButton, Center, InputLeftAddon,
   Textarea, InputGroup,
 } from '@chakra-ui/react';
 import {
@@ -37,9 +37,10 @@ import { Alert, AlertIcon } from '@chakra-ui/react';
 import axios from 'axios';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
-import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon, DeleteIcon, RepeatIcon } from '@chakra-ui/icons';
 import { FaPlus } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
+import React from 'react';
 import Pagination from '@/components/pagination';
 const defaultData = {
   reportId: '',
@@ -56,28 +57,32 @@ function IssuePage() {
   const [isOpenDetail, setIsOpenDetail] = useState(false);
   const [formData, setFormData] = useState(defaultData);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuerySof, setSearchQuerySof] = useState('');
   const [searchQueryTb, setSearchQueryTb] = useState('');
   const [filteredAppData, setfilteredAppData] = useState([]);
+  const [filteredAppDataSof, setfilteredAppDataSof] = useState([]);
   const [filteredIssueData, setFilteredIssueData] = useState([]);
   const [Issues, setIssues] = useState([]);
   const [Apps, setApps] = useState([]);
   const [isSuccess, setIsSuccess] = useState('');
   const notificationTimeout = 2000;
   const [showOptions, setShowOptions] = useState(false);
+  const [showOptionsSof, setShowOptionsSof] = useState(false);
   const [appId, setAppId] = useState('');
   const [detail, setDetail] = useState(null);
   const [selectedOptionActive, setSelectedOptionActive] = useState('');
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
+  const [os, setOs] = useState('');
+  const [osversion, setOsversion] = useState('');
   const [imagesState, setImages] = useState([]);
   const [error, setError] = useState('');
   const [image, setImage] = useState([]);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomedIndex, setZoomedIndex] = useState(null);
   const [isHovered, setIsHovered] = useState(null);
-
+  const [mode, setMode] = useState('Application');
   const allowedExtensions = ['jpg', 'png'];
-
   const handleFileChange = (e) => {
     const files = e.target.files;
 
@@ -117,7 +122,7 @@ function IssuePage() {
 
           reader.onload = () => {
             setImage((prevImages) => [
-              ...prevImages,
+              ...(Array.isArray(prevImages) ? prevImages : []), // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
               { fileName: file.name, dataURL: reader.result },
             ]);
             setError('');
@@ -130,9 +135,11 @@ function IssuePage() {
         }
       });
 
-      // Giữ lại cả ảnh cũ và thêm ảnh mới
+      // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
       setImage((prevImages) => [
-        ...prevImages.filter((img) => img.dataURL),
+        ...(Array.isArray(prevImages) ? prevImages : []).filter(
+          (img) => img && img.dataURL
+        ),
         ...newImages.filter(Boolean),
       ]);
     }
@@ -158,6 +165,10 @@ function IssuePage() {
 
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleSearchInputChangeSof = (e) => {
+    setSearchQuerySof(e.target.value);
   };
 
   const handleSearchTbInputChange = (e) => {
@@ -267,9 +278,41 @@ function IssuePage() {
     setfilteredAppData(filteredData);
   };
 
+  const filteAppSof = () => {
+    const query = searchQuerySof.toLowerCase();
+
+    // Sử dụng Set để theo dõi các giá trị đã xuất hiện
+    const uniqueValues = new Set();
+
+    const filteredData = Apps.filter((item) => {
+      const os = item.os.toLowerCase();
+      const version = item.osversion.toLowerCase();
+
+      // Tạo một khóa duy nhất từ os và version
+      const key = `${os}-${version}`;
+
+      // Nếu giá trị đã tồn tại, bỏ qua
+      if (uniqueValues.has(key)) {
+        return false;
+      }
+
+      // Nếu không, thêm vào Set và giữ lại
+      uniqueValues.add(key);
+      return os.includes(query) || version.includes(query);
+    });
+
+    setfilteredAppDataSof(filteredData);
+  };
+
+
   useEffect(() => {
     filteApp();
-  }, [searchQuery, Issues]);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    filteAppSof();
+  }, [searchQuerySof]);
+
   //end
 
   //detail
@@ -355,22 +398,7 @@ function IssuePage() {
     } else {
       console.error('Ngày không hợp lệ.');
     }
-    const fileObjects = await Promise.all(
-      image.map(async (image) => {
-        // Tạo một Blob từ dataURL
-        if (image.dataURL) {
-          const blob = dataURLtoBlob(image.dataURL);
-          return new File([blob], image.fileName, { type: blob.type });
-        } else {
-          console.log(image.image1 + '----111');
 
-          // Giữ nguyên ảnh khi dataURL không xác định
-          const fullImagePath = `/images/${image.image1}`;
-          const blob = await fetch(fullImagePath).then((res) => res.blob());
-          return new File([blob], image.fileName, { type: blob.type });
-        }
-      }),
-    );
     const formData = new FormData();
     formData.append('AppId', detail.appId);
     formData.append(
@@ -391,9 +419,30 @@ function IssuePage() {
       selectedOptionActive === '' ? detail.status : selectedOptionActive,
     );
 
-    fileObjects.forEach((file, index) => {
-      formData.append(`Images`, file);
-    });
+
+    if (Array.isArray(image) && image.length !== 0) {
+      const fileObjects = await Promise.all(
+        image.map(async (image) => {
+          // Tạo một Blob từ dataURL
+          if (image.dataURL) {
+            const blob = dataURLtoBlob(image.dataURL);
+            return new File([blob], image.fileName, { type: blob.type });
+          } else {
+
+            // Giữ nguyên ảnh khi dataURL không xác định
+            const fullImagePath = `/images/${image.image1}`;
+            const blob = await fetch(fullImagePath).then((res) => res.blob());
+            return new File([blob], image.fileName, { type: blob.type });
+          }
+        }),
+      );
+      fileObjects.forEach((file, index) => {
+        formData.append(`Images`, file);
+      });
+    } else {
+      formData.append(`Images`, " ");
+    }
+
     try {
       const response = await axios.put(url, formData, {
         headers: {
@@ -450,6 +499,59 @@ function IssuePage() {
     // Sử dụng FormData để chứa dữ liệu và file
     const formData = new FormData();
     formData.append('AppId', Id);
+    formData.append('Title', title);
+    formData.append('Description', desc);
+    formData.append('Type', 'Issue');
+    formData.append('Start_Date', formattedDate);
+    formData.append('End_Date', formattedDate);
+    formData.append('Status', 1);
+
+    // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
+    fileObjects.forEach((file, index) => {
+      formData.append(`Images`, file);
+    });
+    try {
+      const response = await axios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setIsSuccess('true');
+      setIsOpenAdd(false);
+    } catch (error) {
+      setIsSuccess('false');
+      setIsOpenAdd(false);
+      console.error('Lỗi:', error);
+    }
+  };
+
+  const handleSaveAddMul = async () => {
+    const url = 'http://localhost:5001/api/Report/CreateReport_os';
+
+    const desc = document.getElementById('description').value;
+    const title = document.getElementById('title').value;
+    const endDate = document.getElementsByName('endDate')[0].value;
+    const dateParts = endDate.split('-');
+    let formattedDate = '';
+    if (dateParts.length === 3) {
+      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+    } else {
+      console.error('Ngày không hợp lệ.');
+      return; // Nếu ngày không hợp lệ, thoát khỏi hàm
+    }
+
+    // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
+    const fileObjects = imagesState.map((image) => {
+      // Tạo một Blob từ dataURL
+      const blob = dataURLtoBlob(image.dataURL);
+      // Tạo một File từ Blob
+      return new File([blob], image.fileName, { type: blob.type });
+      [];
+    });
+    // Sử dụng FormData để chứa dữ liệu và file
+    const formData = new FormData();
+    formData.append('Os', os);
+    formData.append('OsVersion', osversion);
     formData.append('Title', title);
     formData.append('Description', desc);
     formData.append('Type', 'Issue');
@@ -556,7 +658,9 @@ function IssuePage() {
     handleRemoveImage(index);
   };
 
-  
+  const toggleMode = () => {
+    setMode((prevMode) => (prevMode === 'Application' ? 'Software' : 'Application'));
+  };
 
   return (
     <Box className={styles.bodybox}>
@@ -594,11 +698,11 @@ function IssuePage() {
             </Text>
             <Spacer />
             <InputGroup style={{ paddingTop: '', width: '35%' }}>
-              <InputLeftAddon 
+              <InputLeftAddon
                 pointerEvents="none"
                 children='Title - Application'
               />
-              <Input style={{width:'100%'}}
+              <Input style={{ width: '100%' }}
                 type='text'
                 value={searchQueryTb}
                 onChange={handleSearchTbInputChange}
@@ -620,7 +724,7 @@ function IssuePage() {
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
-          <Center><Text fontSize={30} mb={2}>List open issue</Text></Center>
+            <Center><Text fontSize={30} mb={2}>List open issue</Text></Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -665,7 +769,7 @@ function IssuePage() {
                         {issue.title}
                       </Button>
                     </Td>
-                    <Td style={{width:'45%'}}
+                    <Td style={{ width: '45%' }}
                       onClick={() => {
                         handleDetail();
                         setDetails(issue);
@@ -780,79 +884,80 @@ function IssuePage() {
                     multiple
                   />
                 </Flex>
-                <Box display='flex' flexWrap='wrap' gap={4}>
-                  {image.map((image, index) => (
-                    <Box
-                      key={index}
-                      position='relative'
-                      maxW='100px'
-                      maxH='200px'
-                      overflow='hidden'
-                      onClick={() => handleImageClick(index)}
-                      onMouseEnter={(event) =>
-                        handleImageMouseEnter(index, event)
-                      }
-                      onMouseLeave={handleImageMouseLeave}
-                    >
-                      <Image
-                        src={image.dataURL || `/images/${image.image1}`}
-                        alt={`Selected Image ${index}`}
-                        w='100%'
-                        h='100%'
-                        objectFit='cover'
-                        _hover={{ cursor: 'pointer' }}
-                      />
-                      {isHovered === index && (
-                        <>
-                          <DeleteIcon
-                            position='absolute'
-                            top='5px'
-                            color='black'
-                            right='5px'
-                            fontSize='15px'
-                            variant='ghost'
-                            onClick={(event) => handleDeleteClick(index, event)}
-                            _hover={{ color: 'black ' }}
-                          />
-                          <Text
-                            position='absolute'
-                            bottom='5px'
-                            left='5px'
-                            fontSize='10px'
-                            color='white'
-                          >
-                            {image.fileName}
-                          </Text>
-                        </>
-                      )}
-                    </Box>
-                  ))}
-                  {isZoomed && (
-                    <div className='modal-overlay' onClick={handleZoomClose}>
-                      <Modal
-                        isOpen={isZoomed}
-                        onClose={handleZoomClose}
-                        size='xl'
-                        isCentered
+                {Array.isArray(image) && image.length !== 0 && (
+                  <Box display='flex' flexWrap='wrap' gap={4}>
+                    {image.map((image, index) => (
+                      <Box
+                        key={index}
+                        position='relative'
+                        maxW='100px'
+                        maxH='200px'
+                        overflow='hidden'
+                        onClick={() => handleImageClick(index)}
+                        onMouseEnter={(event) =>
+                          handleImageMouseEnter(index, event)
+                        }
+                        onMouseLeave={handleImageMouseLeave}
                       >
-                        <ModalOverlay />
-                        <ModalContent>
-                          <ModalBody>
-                            <Box className='zoomed-image-container'>
-                              <Image
-                                src={
-                                  image[zoomedIndex]?.dataURL ||
-                                  `/images/${image[zoomedIndex]?.image1}`
-                                }
-                                alt={`${zoomedIndex}`}
-                              />
-                            </Box>
-                          </ModalBody>
-                        </ModalContent>
-                      </Modal>
-                    </div>
-                  )}
-                </Box>
+                        <Image
+                          src={image.dataURL || `/images/${image.image1}`}
+                          alt={`Selected Image ${index}`}
+                          w='100%'
+                          h='100%'
+                          objectFit='cover'
+                          _hover={{ cursor: 'pointer' }}
+                        />
+                        {isHovered === index && (
+                          <>
+                            <DeleteIcon
+                              position='absolute'
+                              top='5px'
+                              color='black'
+                              right='5px'
+                              fontSize='15px'
+                              variant='ghost'
+                              onClick={(event) => handleDeleteClick(index, event)}
+                              _hover={{ color: 'black ' }}
+                            />
+                            <Text
+                              position='absolute'
+                              bottom='5px'
+                              left='5px'
+                              fontSize='10px'
+                              color='white'
+                            >
+                              {image.fileName}
+                            </Text>
+                          </>
+                        )}
+                      </Box>
+                    ))}
+                    {isZoomed && (
+                      <div className='modal-overlay' onClick={handleZoomClose}>
+                        <Modal
+                          isOpen={isZoomed}
+                          onClose={handleZoomClose}
+                          size='xl'
+                          isCentered
+                        >
+                          <ModalOverlay />
+                          <ModalContent>
+                            <ModalBody>
+                              <Box className='zoomed-image-container'>
+                                <Image
+                                  src={
+                                    image[zoomedIndex]?.dataURL ||
+                                    `/images/${image[zoomedIndex]?.image1}`
+                                  }
+                                  alt={`${zoomedIndex}`}
+                                />
+                              </Box>
+                            </ModalBody>
+                          </ModalContent>
+                        </Modal>
+                      </div>
+                    )}
+                  </Box>)}
                 {error && <Text color='red'>{error}</Text>}
               </GridItem>
             </Grid>
@@ -886,16 +991,11 @@ function IssuePage() {
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={8}>
               <GridItem colSpan={1}>
-                <Input
-                  name='softwareID'
-                  value={formData.softwareId}
-                  onChange={handleInputChange}
-                  display='none'
-                />
                 <Flex alignItems='center'>
-                  <FormLabel style={{ marginRight: '1rem' }}>
-                    Application
+                  <FormLabel>
+                    {mode}
                   </FormLabel>
+                  <RepeatIcon onClick={toggleMode} style={{ marginRight: '1rem' }} boxSize={4} color="blue.500"></RepeatIcon>
                   <div
                     style={{
                       position: 'relative',
@@ -904,47 +1004,95 @@ function IssuePage() {
                       width: '300px',
                     }}
                   >
-                    <Input
-                      type='text'
-                      style={{ backgroundColor: 'whitesmoke, width: 270px' }}
-                      value={searchQuery}
-                      onChange={(e) => {
-                        handleSearchInputChange(e);
-                        setShowOptions(e.target.value !== '');
-                      }}
-                      placeholder='Name - Os - Version'
-                      w={300}
-                      mr={1}
-                    />
-                    {showOptions && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: 0,
-                          width: '300px',
-                          border: '2px solid whitesmoke',
-                          background: '#fff',
-                          zIndex: 1,
-                          borderRadius: '5px',
-                        }}
-                      >
-                        {filteredAppData.map((app) => (
+                    {mode === 'Application' ? (
+                      <React.Fragment>
+                        <Input
+                          type='text'
+                          style={{ backgroundColor: 'white', width: '270px' }}
+                          value={searchQuery}
+                          onChange={(e) => {
+                            handleSearchInputChange(e);
+                            setShowOptions(e.target.value !== '');
+                          }}
+                          placeholder={'Name - Os - Version'}
+                          w={300}
+                          mr={1}
+                        />
+                        {showOptions && (
                           <div
-                            key={app.appId}
-                            style={{ padding: '8px', cursor: 'pointer' }}
-                            onClick={() => {
-                              setSearchQuery(
-                                `${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`,
-                              );
-                              setAppId(app.appId);
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              width: '300px',
+                              border: '2px solid whitesmoke',
+                              background: '#fff',
+                              zIndex: 1,
+                              borderRadius: '5px',
                             }}
                           >
-                            {app.name.trim()} - {app.os.trim()} -{' '}
-                            {app.osversion.trim()}
+                            {filteredAppData.map((app) => (
+                              <div
+                                key={app.appId}
+                                style={{ padding: '8px', cursor: 'pointer' }}
+                                onClick={() => {
+                                  setSearchQuery(
+                                    `${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`
+                                  );
+                                  setAppId(app.appId);
+                                }}
+                              >
+                                {app.name.trim()} - {app.os.trim()} - {app.osversion.trim()}
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        )}
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <Input
+                          type='text'
+                          style={{ backgroundColor: 'white', width: '270px' }}
+                          value={searchQuerySof}
+                          onChange={(e) => {
+                            handleSearchInputChangeSof(e);
+                            setShowOptionsSof(e.target.value !== '');
+                          }}
+                          placeholder={'Os - Version'}
+                          w={300}
+                          mr={1}
+                        />
+                        {showOptionsSof && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              width: '300px',
+                              border: '2px solid whitesmoke',
+                              background: '#fff',
+                              zIndex: 1,
+                              borderRadius: '5px',
+                            }}
+                          >
+                            {filteredAppDataSof.map((app) => (
+                              <div
+                                key={app.appId}
+                                style={{ padding: '8px', cursor: 'pointer' }}
+                                onClick={() => {
+                                  setSearchQuerySof(
+                                    `${app.os.trim()} - ${app.osversion.trim()}`
+                                  );
+                                  setOs(app.os.trim());
+                                  setOsversion(app.osversion.trim());
+                                }}
+                              >
+                                {app.os.trim()} - {app.osversion.trim()}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </React.Fragment>
                     )}
                   </div>
                 </Flex>
@@ -1081,7 +1229,7 @@ function IssuePage() {
             </Grid>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
+            <Button colorScheme='blue' mr={3} onClick={mode === 'Application' ? handleSaveAdd : handleSaveAddMul}>
               Save
             </Button>
             <Button

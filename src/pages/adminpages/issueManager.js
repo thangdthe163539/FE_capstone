@@ -36,10 +36,11 @@ import { Alert, AlertIcon } from '@chakra-ui/react';
 import axios from 'axios';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
-import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon, DeleteIcon, RepeatIcon } from '@chakra-ui/icons';
 import { FaPlus } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import React from 'react';
 import PaginationCustom from '@/components/pagination';
 
 const defaultData = {
@@ -61,6 +62,9 @@ function IssuePage() {
   const [filteredAppData, setfilteredAppData] = useState([]);
   const [dynamicFilteredAppData, setDynamicFilteredAppData] = useState([]);
   const [filteredAppAddData, setfilteredAppAddData] = useState([]);
+  const [searchQuerySof, setSearchQuerySof] = useState('');
+  const [filteredAppDataSof, setfilteredAppDataSof] = useState([]);
+  const [showOptionsSof, setShowOptionsSof] = useState(false);
   const [Apps, setApps] = useState([]);
   const [Issues, setIssues] = useState([]);
   const [isSuccess, setIsSuccess] = useState('');
@@ -73,8 +77,40 @@ function IssuePage() {
   const [isHovered, setIsHovered] = useState(null);
   const notificationTimeout = 2000;
   const allowedExtensions = ['jpg', 'png'];
+  const [mode, setMode] = useState('Application');
+  const toggleMode = () => {
+    setMode((prevMode) => (prevMode === 'Application' ? 'Software' : 'Application'));
+  };
 
+  const filteAppSof = () => {
+    const query = searchQuerySof.toLowerCase();
 
+    // Sử dụng Set để theo dõi các giá trị đã xuất hiện
+    const uniqueValues = new Set();
+
+    const filteredData = Apps.filter((item) => {
+      const os = item.os.toLowerCase();
+      const version = item.osversion.toLowerCase();
+
+      // Tạo một khóa duy nhất từ os và version
+      const key = `${os}-${version}`;
+
+      // Nếu giá trị đã tồn tại, bỏ qua
+      if (uniqueValues.has(key)) {
+        return false;
+      }
+
+      // Nếu không, thêm vào Set và giữ lại
+      uniqueValues.add(key);
+      return os.includes(query) || version.includes(query);
+    });
+
+    setfilteredAppDataSof(filteredData);
+  };
+
+  useEffect(() => {
+    filteAppSof();
+  }, [searchQuerySof]);
   //pagination
   const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
@@ -202,6 +238,7 @@ function IssuePage() {
 
   const countIssue = (appId) => {
     const occurrences = Issues.filter((item) => item.appId === appId);
+    console.log(occurrences.length + "---issue by appId = " + appId);
     return occurrences.length;
   };
 
@@ -248,6 +285,63 @@ function IssuePage() {
   }, [searchQuery, Apps]);
   //END
 
+  const [os, setOs] = useState('');
+  const [osversion, setOsversion] = useState('');
+  const handleSaveAddMul = async () => {
+    const url = 'http://localhost:5001/api/Report/CreateReport_os';
+
+    const desc = document.getElementById('description').value;
+    const title = document.getElementById('title').value;
+    const endDate = document.getElementsByName('endDate')[0].value;
+    const dateParts = endDate.split('-');
+    let formattedDate = '';
+    if (dateParts.length === 3) {
+      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+    } else {
+      console.error('Ngày không hợp lệ.');
+      return; // Nếu ngày không hợp lệ, thoát khỏi hàm
+    }
+
+    // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
+    const fileObjects = imagesState.map((image) => {
+      // Tạo một Blob từ dataURL
+      const blob = dataURLtoBlob(image.dataURL);
+      // Tạo một File từ Blob
+      return new File([blob], image.fileName, { type: blob.type });
+      [];
+    });
+    // Sử dụng FormData để chứa dữ liệu và file
+    const formData = new FormData();
+    formData.append('Os', os);
+    formData.append('OsVersion', osversion);
+    formData.append('Title', title);
+    formData.append('Description', desc);
+    formData.append('Type', 'Issue');
+    formData.append('Start_Date', formattedDate);
+    formData.append('End_Date', formattedDate);
+    formData.append('Status', 1);
+
+    // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
+    fileObjects.forEach((file, index) => {
+      formData.append(`Images`, file);
+    });
+    try {
+      const response = await axios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setIsSuccess('true');
+      setIsOpenAdd(false);
+    } catch (error) {
+      setIsSuccess('false');
+      setIsOpenAdd(false);
+      console.error('Lỗi:', error);
+    }
+  };
+  const handleSearchInputChangeSof = (e) => {
+    setSearchQuerySof(e.target.value);
+  };
   const handleSaveAdd = async () => {
     const url = 'http://localhost:5001/api/Report/CreateReport';
 
@@ -429,7 +523,7 @@ function IssuePage() {
                   (app, index) =>
                     countIssue(app.appId) !== 0 && (
                       <Tr key={app.id}>
-                        <Td style={{width:'5%'}}>{index + 1}</Td>
+                        <Td style={{ width: '5%' }}>{index + 1}</Td>
                         <Td>
                           <Button
                             color={'blue'}
@@ -474,8 +568,9 @@ function IssuePage() {
                 />
                 <Flex alignItems='center'>
                   <FormLabel style={{ marginRight: '1rem' }}>
-                    Application
+                    {mode}
                   </FormLabel>
+                  <RepeatIcon onClick={toggleMode} style={{ marginRight: '1rem' }} boxSize={4} color="blue.500"></RepeatIcon>
                   <div
                     style={{
                       position: 'relative',
@@ -484,47 +579,95 @@ function IssuePage() {
                       width: '300px',
                     }}
                   >
-                    <Input
-                      type='text'
-                      style={{ backgroundColor: 'whitesmoke, width: 270px' }}
-                      value={searchQuery}
-                      onChange={(e) => {
-                        handleSearchInputChange(e);
-                        setShowOptions(e.target.value !== '');
-                      }}
-                      placeholder='Name - Os - Version'
-                      w={300}
-                      mr={1}
-                    />
-                    {showOptions && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: 0,
-                          width: '300px',
-                          border: '2px solid whitesmoke',
-                          background: '#fff',
-                          zIndex: 1,
-                          borderRadius: '5px',
-                        }}
-                      >
-                        {filteredAppAddData.map((app) => (
+                    {mode === 'Application' ? (
+                      <React.Fragment>
+                        <Input
+                          type='text'
+                          style={{ backgroundColor: 'white', width: '270px' }}
+                          value={searchQuery}
+                          onChange={(e) => {
+                            handleSearchInputChange(e);
+                            setShowOptions(e.target.value !== '');
+                          }}
+                          placeholder={'Name - Os - Version'}
+                          w={300}
+                          mr={1}
+                        />
+                        {showOptions && (
                           <div
-                            key={app.appId}
-                            style={{ padding: '8px', cursor: 'pointer' }}
-                            onClick={() => {
-                              setSearchQuery(
-                                `${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`,
-                              );
-                              setAppId(app.appId);
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              width: '300px',
+                              border: '2px solid whitesmoke',
+                              background: '#fff',
+                              zIndex: 1,
+                              borderRadius: '5px',
                             }}
                           >
-                            {app.name.trim()} - {app.os.trim()} -{' '}
-                            {app.osversion.trim()}
+                            {filteredAppData.map((app) => (
+                              <div
+                                key={app.appId}
+                                style={{ padding: '8px', cursor: 'pointer' }}
+                                onClick={() => {
+                                  setSearchQuery(
+                                    `${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`
+                                  );
+                                  setAppId(app.appId);
+                                }}
+                              >
+                                {app.name.trim()} - {app.os.trim()} - {app.osversion.trim()}
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        )}
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <Input
+                          type='text'
+                          style={{ backgroundColor: 'white', width: '270px' }}
+                          value={searchQuerySof}
+                          onChange={(e) => {
+                            handleSearchInputChangeSof(e);
+                            setShowOptionsSof(e.target.value !== '');
+                          }}
+                          placeholder={'Os - Version'}
+                          w={300}
+                          mr={1}
+                        />
+                        {showOptionsSof && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              width: '300px',
+                              border: '2px solid whitesmoke',
+                              background: '#fff',
+                              zIndex: 1,
+                              borderRadius: '5px',
+                            }}
+                          >
+                            {filteredAppDataSof.map((app) => (
+                              <div
+                                key={app.appId}
+                                style={{ padding: '8px', cursor: 'pointer' }}
+                                onClick={() => {
+                                  setSearchQuerySof(
+                                    `${app.os.trim()} - ${app.osversion.trim()}`
+                                  );
+                                  setOs(app.os.trim());
+                                  setOsversion(app.osversion.trim());
+                                }}
+                              >
+                                {app.os.trim()} - {app.osversion.trim()}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </React.Fragment>
                     )}
                   </div>
                 </Flex>
@@ -661,7 +804,7 @@ function IssuePage() {
             </Grid>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
+            <Button colorScheme='blue' mr={3} onClick={mode === 'Application' ? handleSaveAdd : handleSaveAddMul}>
               Save
             </Button>
             <Button
