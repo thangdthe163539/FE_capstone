@@ -323,7 +323,7 @@ function IssueDetailManagePage() {
         ? detail.description.trim()
         : description.trim(),
     );
-    formData.append('Type', 'issue');
+    formData.append('Type', 'Issue');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
     formData.append(

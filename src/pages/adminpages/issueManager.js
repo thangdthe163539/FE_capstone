@@ -370,7 +370,7 @@ function IssuePage() {
     formData.append('AppId', Id);
     formData.append('Title', title);
     formData.append('Description', desc);
-    formData.append('Type', 'issue');
+    formData.append('Type', 'Issue');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
     formData.append('Status', 2);
