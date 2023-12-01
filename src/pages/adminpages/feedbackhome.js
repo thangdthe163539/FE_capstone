@@ -222,7 +222,7 @@ function FeedbackPage() {
   // };
 
   const countIssue = (appId) => {
-    const occurrences = Issues.filter((item) => item.appId == appId);
+    const occurrences = Issues.filter((item) => item.appId === appId);
     console.log(occurrences.length + "---issue by appId = " + appId);
     return occurrences.length;
   };
@@ -238,7 +238,7 @@ function FeedbackPage() {
     });
     setfilteredAppData(filteredData);
     setDynamicFilteredAppData(
-      filteredData.filter((item) => countIssue(item.appId) != 0),
+      filteredData.filter((item) => countIssue(item.appId) !== 0),
     );
   };
 
@@ -420,7 +420,8 @@ function FeedbackPage() {
               <Tbody>
                 {dynamicList.map(
                   (app, index) =>
-                    countIssue(app.appId) != 0 && (
+                    countIssue(app.appId) !== 0 && 
+                    (
                       <Tr key={app.appId}>
                         <Td style={{width:'5%'}}>{index + 1}</Td>
                         <Td>
