@@ -17,6 +17,8 @@ import {
   useDisclosure,
   Icon,
   useToast,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -204,8 +206,7 @@ function SoftwarePage() {
     const query = searchQuery.toLowerCase();
     const filteredData = softwareData.filter((item) => {
       const name = item.name.toLowerCase();
-      const publisher = item.publisher.toLowerCase();
-      return name.includes(query) || publisher.includes(query);
+      return name.includes(query);
     });
     setFilteredSoftwareData(filteredData);
     setDynamicFilteredSoftwareData(
@@ -242,14 +243,19 @@ function SoftwarePage() {
           <Flex>
             <Text fontSize='2xl'>Issue</Text>
             <Spacer />
-            <Input
-              type='text'
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              placeholder='Search'
-              w={300}
-              mr={1}
-            />
+            <Box>
+              <InputGroup>
+                <InputLeftAddon children='Search' />
+                <Input
+                  type='text'
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  placeholder='name'
+                  w={300}
+                  mr={1}
+                />
+              </InputGroup>
+            </Box>
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>

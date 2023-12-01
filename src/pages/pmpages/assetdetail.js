@@ -17,6 +17,8 @@ import {
   Icon,
   useToast,
   Center,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -75,6 +77,7 @@ function AssetDetailPage() {
   const [device, setDevice] = useState();
   const [account, setAccount] = useState();
   const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [isOpenEditLi, setIsOpenEditLi] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [formData, setFormData] = useState(defaultData);
@@ -90,6 +93,7 @@ function AssetDetailPage() {
   const [searchAddQuery, setSearchAddQuery] = useState('');
   const [showModalTable, setShowModalTable] = useState(true);
   const [showModalAdd, setShowModalAdd] = useState(false);
+  const [showEditAsset, setShowEditAsset] = useState(true);
   const toast = useToast();
   const [selectedRow1, setSelectedRow1] = useState(new Set());
   const [selectedRow2, setSelectedRow2] = useState(new Set());
@@ -98,6 +102,7 @@ function AssetDetailPage() {
   const [isButtonDisabled2, setButtonDisabled2] = useState(true);
   const [isButtonDisabled3, setButtonDisabled3] = useState(true);
   const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
+  const [filteredAllSoftwareData, setFilteredAllSoftwareData] = useState([]);
   const [selectedSoftware, setSelectedSoftware] = useState([]);
 
   //
@@ -111,6 +116,17 @@ function AssetDetailPage() {
         // router.push('/pmpages/assetlist');
       } else {
         setSoftware(softwareDataDecode);
+      }
+    }
+  }, []);
+  useEffect(() => {
+    const deviceData = localStorage.getItem('device');
+    if (deviceData) {
+      const deviceDataDecode = JSON.parse(deviceData);
+      if (!deviceDataDecode) {
+        // router.push('/pmpages/assetlist');
+      } else {
+        setDevice(deviceDataDecode);
       }
     }
   }, []);
@@ -131,6 +147,11 @@ function AssetDetailPage() {
     // console.log(formData2);
   };
   const handleInputChange3 = (e) => {
+    const { name, value } = e.target;
+    setFormData3({ ...formData3, [name]: value });
+    // console.log(formData);
+  };
+  const handleInputChange4 = (e) => {
     const { name, value } = e.target;
     setFormData3({ ...formData3, [name]: value });
     // console.log(formData);
@@ -174,7 +195,8 @@ function AssetDetailPage() {
       setButtonDisabled3(false);
     }
   };
-  //
+
+  //all button handle
   const handleSaveCreate = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
@@ -286,7 +308,7 @@ function AssetDetailPage() {
         },
       );
       console.log('Data saved:', response.data);
-      setIsOpenEdit(false); // Close the modal after successful save
+      setIsOpenEditLi(false); // Close the modal after successful save
       setFormData2(defaultData);
       setSelectedRow2(new Set());
       // Reload new data for the table
@@ -296,7 +318,7 @@ function AssetDetailPage() {
       );
       setData(newDataResponse.data);
       const response2 = await axios.get(
-        `${BACK_END_PORT}/api/License/list_licenses_by_device/` +
+        `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
           device.assetId,
       );
       setDataLicense(response2.data);
@@ -304,78 +326,6 @@ function AssetDetailPage() {
       console.error('Error saving data:', error);
     }
   };
-  //
-  useEffect(() => {
-    const deviceData = localStorage.getItem('device');
-    if (deviceData) {
-      const deviceDataDecode = JSON.parse(deviceData);
-      if (!deviceDataDecode) {
-        router.push('/pmpages/assetlist');
-      } else {
-        setDevice(deviceDataDecode);
-      }
-    }
-  }, []);
-
-  //
-
-  useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
-
-    if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        setAccount(accountDataDecode);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
-            device.assetId,
-        );
-        setData(response.data); // Assuming the API returns an array of objects
-        const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
-            device.assetId,
-        );
-        setDataLicense(response2.data);
-        const response3 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/ListSoftwares`,
-        );
-        setListAllSoftware(response3.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      }
-    };
-    if (device?.assetId && account?.accId) {
-      fetchData();
-    }
-  }, [device, account]);
-  //
-  const softwareIdsInAsset = data?.map((software) => software?.softwareId);
-  //
-  useEffect(() => {
-    if (data.length > 0 && dataLicense.length > 0) {
-      const mergedData = dataLicense.map((license) => {
-        const software = data.find(
-          (sw) => sw.softwareId === license.softwareId,
-        );
-        return {
-          ...license,
-          name: software?.name ? software?.name : license.softwareId,
-        };
-      });
-      setListLicense(mergedData);
-    }
-  }, [data, dataLicense]);
   //
   const handleDelete = async () => {
     try {
@@ -412,6 +362,105 @@ function AssetDetailPage() {
     }
   };
   //
+  const handleEditSoftware = async () => {
+    try {
+      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const response = await axios.put(
+        `${BACK_END_PORT}/api/v1/Software/UpdateSoftware/` +
+          formData1.softwareId,
+        {
+          name: formData1.name,
+          publisher: formData1.publisher,
+          version: formData1.version,
+          release: formData1.release,
+          type: formData1.type,
+          os: formData1.os,
+          status: formData1.status,
+        },
+      );
+      console.log('Data saved:', response.data);
+      setIsOpenEdit(false); // Close the modal after successful save
+      setFormData1(defaultData);
+      setSelectedRow1(new Set());
+      // Reload new data for the table
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+          device.assetId,
+      );
+      setData(newDataResponse.data);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
+  //End button handle
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        try {
+          const response = await axios.get(
+            `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+              device.assetId,
+          );
+          setData(response.data); // Assuming the API returns an array of objects
+        } catch (error) {
+          setData([]);
+        }
+        try {
+          const response2 = await axios.get(
+            `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
+              device.assetId,
+          );
+          setDataLicense(response2.data);
+        } catch (error) {
+          setDataLicense([]);
+        }
+        const response3 = await axios.get(
+          `${BACK_END_PORT}/api/v1/Software/ListSoftwares`,
+        );
+        setListAllSoftware(response3.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
+    if (device?.assetId && account?.accId) {
+      fetchData();
+    }
+  }, [device, account]);
+  //
+  const softwareIdsInAsset = data?.map((software) => software?.softwareId);
+  //
+  useEffect(() => {
+    if (data.length > 0 && dataLicense.length > 0) {
+      const mergedData = dataLicense.map((license) => {
+        const software = data.find(
+          (sw) => sw.softwareId === license.softwareId,
+        );
+        return {
+          ...license,
+          name: software?.name ? software?.name : license.softwareId,
+        };
+      });
+      setListLicense(mergedData);
+    }
+  }, [data, dataLicense]);
+  //
+
+  // filter search asset data
   const filterAssets = () => {
     const query = searchAppQuery.toLowerCase();
     const filteredData = data
@@ -423,12 +472,26 @@ function AssetDetailPage() {
       });
     setFilteredSoftwareData(filteredData);
   };
-
   // Update filtered data whenever the search query changes
-
   useEffect(() => {
     filterAssets();
   }, [searchAppQuery, data]);
+  // filter search add asset data
+  const filterAssets1 = () => {
+    const query = searchAddQuery.toLowerCase();
+    const filteredData = listAllSoftware
+      .filter((item) => item.status != 3)
+      .filter((item) => {
+        const name = item?.name.toLowerCase();
+        const publisher = item?.publisher.toLowerCase();
+        return name.includes(query) || publisher.includes(query);
+      });
+    setFilteredAllSoftwareData(filteredData);
+  };
+  // Update filtered data whenever the search query changes
+  useEffect(() => {
+    filterAssets1();
+  }, [isOpenAdd, searchAddQuery, data]);
   //
   function calculateEndDate(startDate, months) {
     // Split the start date into day, month, and year
@@ -527,72 +590,221 @@ function AssetDetailPage() {
           </TabList>
           <TabPanels>
             <TabPanel>
-              <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
-                <TableContainer>
-                  <Table>
-                    <Tbody>
-                      <Tr className={styles.borderTop}>
-                        <Td className={styles.text2}>Name</Td>
-                        <Td className={styles.borderRight}>{device?.name}</Td>
-                        <Td className={styles.text2}>CPU</Td>
-                        <Td className={styles.borderRight}>{device?.cpu}</Td>
-                        <Td className={styles.text2}>Operation System</Td>
-                        <Td>{device?.os}</Td>
-                      </Tr>
-                      <Tr>
-                        <Td className={styles.text2}>Manufacturer</Td>
-                        <Td className={styles.borderRight}>
-                          {device?.manufacturer}
-                        </Td>
-                        <Td className={styles.text2}>GPU</Td>
-                        <Td className={styles.borderRight}>{device?.gpu}</Td>
-                        <Td className={styles.text2}>Version</Td>
-                        <Td>{device?.version}</Td>
-                      </Tr>
-                      <Tr>
-                        <Td className={styles.text2}>Model</Td>
-                        <Td className={styles.borderRight}>{device?.model}</Td>
-                        <Td className={styles.text2}>RAM</Td>
-                        <Td className={styles.borderRight}>{device?.ram} GB</Td>
-                        <Td className={styles.text2}>Last Updated</Td>
-                        <Td>{device?.lastSuccesfullScan}</Td>
-                      </Tr>
-                      <Tr>
-                        <Td className={styles.text2}>Serial Number</Td>
-                        <Td className={styles.borderRight}>
-                          {device?.serialNumber}
-                        </Td>
-                        <Td className={styles.text2}>Memory</Td>
-                        <Td className={styles.borderRight}>
-                          {device?.memory} GB
-                        </Td>
-                        <Td className={styles.text2}>Status</Td>
-                        <Td>
-                          {device?.status === 1
-                            ? 'Active'
-                            : device?.status === 2
-                            ? 'Inactive'
-                            : device?.status === 3
-                            ? 'Deleted'
-                            : 'Unknown'}
-                        </Td>
-                      </Tr>
-                    </Tbody>
-                  </Table>
-                </TableContainer>
-              </Box>
+              {showEditAsset ? (
+                <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
+                  <TableContainer>
+                    <Table>
+                      <Tbody>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>Name</Td>
+                          <Td className={styles.borderRight}>{device?.name}</Td>
+                          <Td className={styles.text2}>CPU</Td>
+                          <Td className={styles.borderRight}>{device?.cpu}</Td>
+                          <Td className={styles.text2}>Operation System</Td>
+                          <Td>{device?.os}</Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Manufacturer</Td>
+                          <Td className={styles.borderRight}>
+                            {device?.manufacturer}
+                          </Td>
+                          <Td className={styles.text2}>GPU</Td>
+                          <Td className={styles.borderRight}>{device?.gpu}</Td>
+                          <Td className={styles.text2}>Version</Td>
+                          <Td>{device?.version}</Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Model</Td>
+                          <Td className={styles.borderRight}>
+                            {device?.model}
+                          </Td>
+                          <Td className={styles.text2}>RAM</Td>
+                          <Td className={styles.borderRight}>
+                            {device?.ram} GB
+                          </Td>
+                          <Td className={styles.text2}>Last Updated</Td>
+                          <Td>{device?.lastSuccesfullScan}</Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Serial Number</Td>
+                          <Td className={styles.borderRight}>
+                            {device?.serialNumber}
+                          </Td>
+                          <Td className={styles.text2}>Memory</Td>
+                          <Td className={styles.borderRight}>
+                            {device?.memory} GB
+                          </Td>
+                          <Td className={styles.text2}>Status</Td>
+                          <Td>
+                            {device?.status === 1
+                              ? 'Active'
+                              : device?.status === 2
+                              ? 'Inactive'
+                              : device?.status === 3
+                              ? 'Deleted'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </TableContainer>
+                  <Button
+                    colorScheme='gray'
+                    mt={3}
+                    onClick={() => setShowEditAsset(false)}
+                  >
+                    Edit
+                  </Button>
+                </Box>
+              ) : (
+                <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
+                  <TableContainer>
+                    <Table>
+                      <Tbody>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>Name</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              value={device?.name}
+                              name='name'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>CPU</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              value={device?.cpu}
+                              name='cpu'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Operation System</Td>
+                          <Td>
+                            <Input
+                              value={device?.os}
+                              name='os'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Manufacturer</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              value={device?.manufacturer}
+                              name='manufacturer'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>GPU</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              value={device?.gpu}
+                              name='gpu'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Version</Td>
+                          <Td>
+                            <Input
+                              value={device?.version}
+                              name='version'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Model</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              value={device?.model}
+                              name='model'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>RAM</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              value={device?.ram}
+                              name='ram'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Last Updated</Td>
+                          <Td>
+                            <Input
+                              value={device?.lastSuccesfullScan}
+                              name='lastSuccesfullScan'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Serial Number</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              value={device?.serialNumber}
+                              name='serialNumber'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Memory</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              value={device?.memory}
+                              name='memory'
+                              onChange={handleInputChange4}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Status</Td>
+                          <Td>
+                            <Select
+                              name='status'
+                              value={device?.status}
+                              onChange={handleInputChange4}
+                            >
+                              <option value='1'>Active</option>
+                              <option value='2'>Inactive</option>
+                            </Select>
+                          </Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </TableContainer>
+                  <Button
+                    colorScheme='blue'
+                    mt={3}
+                    mr={2}
+                    // onClick={handleEditApp}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    colorScheme='gray'
+                    mt={3}
+                    onClick={() => setShowEditAsset(true)}
+                  >
+                    Back
+                  </Button>
+                </Box>
+              )}
             </TabPanel>
             <TabPanel>
               <ListItem className={styles.list} pt={0}>
                 <Flex>
-                  <Input
-                    type='text'
-                    value={searchAppQuery}
-                    onChange={handleSearchAppInputChange}
-                    placeholder='Search'
-                    w={300}
-                    mr={1}
-                  />
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Search' />
+                      <Input
+                        type='text'
+                        value={searchAppQuery}
+                        onChange={handleSearchAppInputChange}
+                        placeholder='name - publisher'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                  </Box>
                   <Spacer />
                   <Box>
                     <IconButton
@@ -601,6 +813,14 @@ function AssetDetailPage() {
                       colorScheme='gray' // Choose an appropriate color
                       marginRight={1}
                       onClick={() => setIsOpenAdd(true)}
+                    />
+                    <IconButton
+                      aria-label='Edit'
+                      icon={<FaEdit />}
+                      colorScheme='gray' // Choose an appropriate color
+                      marginRight={1}
+                      onClick={() => setIsOpenEdit(true)}
+                      isDisabled={isButtonDisabled1}
                     />
                     <IconButton
                       aria-label='Delete'
@@ -670,14 +890,19 @@ function AssetDetailPage() {
             <TabPanel>
               <ListItem className={styles.list} pt={0}>
                 <Flex>
-                  <Input
-                    type='text'
-                    value={searchAppQuery}
-                    onChange={handleSearchAppInputChange}
-                    placeholder='Search'
-                    w={300}
-                    mr={1}
-                  />
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Search' />
+                      <Input
+                        type='text'
+                        value={searchAppQuery}
+                        onChange={handleSearchAppInputChange}
+                        placeholder='software'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                  </Box>
                   <Spacer />
                   <Box>
                     <IconButton
@@ -685,16 +910,9 @@ function AssetDetailPage() {
                       icon={<FaEdit />}
                       colorScheme='gray' // Choose an appropriate color
                       marginRight={1}
-                      onClick={() => setIsOpenEdit(true)}
+                      onClick={() => setIsOpenEditLi(true)}
                       isDisabled={isButtonDisabled2}
                     />
-                    {/* <IconButton
-                      aria-label='Delete'
-                      icon={<FaTrash />}
-                      colorScheme='gray' // Choose an appropriate color
-                      onClick={() => setIsOpenDelete(true)}
-                      isDisabled={isButtonDisabled2}
-                    /> */}
                   </Box>
                 </Flex>
               </ListItem>
@@ -796,8 +1014,8 @@ function AssetDetailPage() {
       </List>
 
       <Modal //Modal edit license
-        isOpen={isOpenEdit}
-        onClose={() => setIsOpenEdit(false)}
+        isOpen={isOpenEditLi}
+        onClose={() => setIsOpenEditLi(false)}
         closeOnOverlayClick={false}
         size='lg'
       >
@@ -821,7 +1039,7 @@ function AssetDetailPage() {
                     isDisabled
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl className={styles.formInput}>
                   <FormLabel>License Key</FormLabel>
                   <Input
                     name='licenseKey'
@@ -841,7 +1059,7 @@ function AssetDetailPage() {
                     required
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl className={styles.formInput}>
                   <FormLabel>Time</FormLabel>
                   <Input
                     name='time'
@@ -857,7 +1075,7 @@ function AssetDetailPage() {
             <Button colorScheme='blue' mr={3} onClick={handleSaveEdit}>
               Save
             </Button>
-            <Button onClick={() => setIsOpenEdit(false)}>Cancel</Button>
+            <Button onClick={() => setIsOpenEditLi(false)}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -871,7 +1089,9 @@ function AssetDetailPage() {
         size='6xl'
       >
         <ModalOverlay />
-        <ModalContent w='80vw'>
+        <ModalContent
+          w={showModalAdd ? '40vw' : showModalTable ? '100vw' : '40vw'}
+        >
           <ModalHeader>
             {showModalAdd ? 'Create New Software' : 'Add Software'}
           </ModalHeader>
@@ -890,7 +1110,7 @@ function AssetDetailPage() {
                         required
                       />
                     </FormControl>
-                    <FormControl>
+                    <FormControl className={styles.formInput}>
                       <FormLabel>Version</FormLabel>
                       <Input
                         name='version'
@@ -898,7 +1118,7 @@ function AssetDetailPage() {
                         onChange={handleInputChange}
                       />
                     </FormControl>
-                    <FormControl>
+                    <FormControl className={styles.formInput}>
                       <FormLabel>Release</FormLabel>
                       <Input
                         name='release'
@@ -906,7 +1126,7 @@ function AssetDetailPage() {
                         onChange={handleInputChange}
                       />
                     </FormControl>
-                    <FormControl>
+                    <FormControl className={styles.formInput}>
                       <FormLabel>License Key</FormLabel>
                       <Input
                         name='licenseKey'
@@ -914,7 +1134,6 @@ function AssetDetailPage() {
                         onChange={handleInputChange}
                       />
                     </FormControl>
-
                     {/* Add more fields for the first column */}
                   </GridItem>
                   <GridItem>
@@ -926,7 +1145,7 @@ function AssetDetailPage() {
                         onChange={handleInputChange}
                       />
                     </FormControl>
-                    <FormControl>
+                    <FormControl className={styles.formInput}>
                       <FormLabel>Type</FormLabel>
                       <Select
                         name='type'
@@ -937,7 +1156,7 @@ function AssetDetailPage() {
                         <option value='Desktop app'>Desktop app</option>
                       </Select>
                     </FormControl>
-                    <FormControl>
+                    <FormControl className={styles.formInput}>
                       <FormLabel>OS</FormLabel>
                       <Select
                         name='os'
@@ -951,7 +1170,7 @@ function AssetDetailPage() {
                         <option value='iOS'>iOS</option>
                       </Select>
                     </FormControl>
-                    <FormControl>
+                    <FormControl className={styles.formInput}>
                       <FormLabel>Start Date</FormLabel>
                       <Input
                         name='start_Date'
@@ -961,7 +1180,7 @@ function AssetDetailPage() {
                         required
                       />
                     </FormControl>
-                    <FormControl>
+                    <FormControl className={styles.formInput}>
                       <FormLabel>Time</FormLabel>
                       <Input
                         name='time'
@@ -974,59 +1193,75 @@ function AssetDetailPage() {
                 </Grid>
               </>
             ) : showModalTable ? (
-              <TableContainer>
-                <Table variant='simple'>
-                  <Thead>
-                    <Tr>
-                      <Th className={styles.cTh}>#</Th>
-                      <Th className={styles.cTh}>Name</Th>
-                      <Th className={styles.cTh}>Publisher</Th>
-                      <Th className={styles.cTh}>Versions</Th>
-                      <Th className={styles.cTh}>Release</Th>
-                      <Th className={styles.cTh}>Type</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {listAllSoftware
-                      .filter(
-                        (item) => !softwareIdsInAsset.includes(item.softwareId),
-                      )
-                      .filter((item) => item.status != 3)
-                      .map((item) => (
-                        <Tr key={item.softwareId}>
-                          <Td>
+              <Box>
+                <Box ml={6} mb={4}>
+                  <InputGroup>
+                    <InputLeftAddon children='Search' />
+                    <Input
+                      type='text'
+                      value={searchAddQuery}
+                      onChange={handleSearchAddInputChange}
+                      placeholder='name - publisher'
+                      w={300}
+                      mr={1}
+                    />
+                  </InputGroup>
+                </Box>
+                <TableContainer>
+                  <Table variant='simple'>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh}>#</Th>
+                        <Th className={styles.cTh}>Name</Th>
+                        <Th className={styles.cTh}>Publisher</Th>
+                        <Th className={styles.cTh}>Versions</Th>
+                        <Th className={styles.cTh}>Release</Th>
+                        <Th className={styles.cTh}>Type</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {filteredAllSoftwareData
+                        .filter(
+                          (item) =>
+                            !softwareIdsInAsset.includes(item.softwareId),
+                        )
+                        .filter((item) => item.status != 3)
+                        .map((item) => (
+                          <Tr key={item.softwareId}>
+                            <Td>
+                              <Button
+                                onClick={() => (
+                                  setShowModalTable(false), setFormData1(item)
+                                )}
+                              >
+                                Add
+                              </Button>
+                            </Td>
+                            <Td>{item.name}</Td>
+                            <Td>{item.publisher}</Td>
+                            <Td>{item.version}</Td>
+                            <Td>{item.release}</Td>
+                            <Td>{item.type}</Td>
+                          </Tr>
+                        ))}
+                      <Tr>
+                        <Td colSpan='6'>
+                          <Center>
                             <Button
-                              onClick={() => (
-                                setShowModalTable(false), setFormData1(item)
-                              )}
+                              w='100%'
+                              bgColor='white'
+                              border='1px solid gray'
+                              onClick={() => setShowModalAdd(true)}
                             >
-                              Add
+                              Create new software
                             </Button>
-                          </Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.publisher}</Td>
-                          <Td>{item.version}</Td>
-                          <Td>{item.release}</Td>
-                          <Td>{item.type}</Td>
-                        </Tr>
-                      ))}
-                    <Tr>
-                      <Td colSpan='6'>
-                        <Center>
-                          <Button
-                            w='100%'
-                            bgColor='white'
-                            border='1px solid gray'
-                            onClick={() => setShowModalAdd(true)}
-                          >
-                            Create new software
-                          </Button>
-                        </Center>
-                      </Td>
-                    </Tr>
-                  </Tbody>
-                </Table>
-              </TableContainer>
+                          </Center>
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </Box>
             ) : (
               <Grid templateColumns='repeat(2, 1fr)' gap={4}>
                 <GridItem>
@@ -1039,7 +1274,7 @@ function AssetDetailPage() {
                       disabled
                     ></Input>
                   </FormControl>
-                  <FormControl>
+                  <FormControl className={styles.formInput}>
                     <FormLabel>License Key</FormLabel>
                     <Input
                       name='licenseKey'
@@ -1059,7 +1294,7 @@ function AssetDetailPage() {
                       required
                     />
                   </FormControl>
-                  <FormControl>
+                  <FormControl className={styles.formInput}>
                     <FormLabel>Time</FormLabel>
                     <Input
                       name='time'
@@ -1097,6 +1332,93 @@ function AssetDetailPage() {
                 <Button onClick={() => setShowModalTable(true)}>Back</Button>
               </>
             )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal // Modal edit library
+        isOpen={isOpenEdit}
+        onClose={() => setIsOpenEdit(false)}
+        closeOnOverlayClick={false}
+        size='lg'
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Software</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={8}>
+            <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Name</FormLabel>
+                  <Input
+                    name='name'
+                    value={formData1.name}
+                    onChange={handleInputChange1}
+                    required
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Version</FormLabel>
+                  <Input
+                    name='version'
+                    value={formData1.version}
+                    onChange={handleInputChange1}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Release</FormLabel>
+                  <Input
+                    name='release'
+                    value={formData1.release}
+                    onChange={handleInputChange1}
+                  />
+                </FormControl>
+                {/* Add more fields for the first column */}
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Publisher</FormLabel>
+                  <Input
+                    name='publisher'
+                    value={formData1.publisher}
+                    onChange={handleInputChange1}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Type</FormLabel>
+                  <Select
+                    name='type'
+                    value={formData1.type}
+                    onChange={handleInputChange1}
+                  >
+                    <option value='Web app'>Web app</option>
+                    <option value='Desktop app'>Desktop app</option>
+                  </Select>
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>OS</FormLabel>
+                  <Select
+                    name='os'
+                    value={formData1.os}
+                    onChange={handleInputChange1}
+                  >
+                    <option value='Window'>Window</option>
+                    <option value='macOS'>macOS</option>
+                    <option value='Linux'>Linux</option>
+                    <option value='Android'>Android</option>
+                    <option value='iOS'>iOS</option>
+                  </Select>
+                </FormControl>
+                {/* Add more fields for the second column */}
+              </GridItem>
+            </Grid>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={handleEditSoftware}>
+              Save
+            </Button>
+            <Button onClick={() => setIsOpenEdit(false)}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

@@ -17,6 +17,8 @@ import {
   useDisclosure,
   Icon,
   useToast,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -176,37 +178,15 @@ function FeedbackPage() {
     const query = searchQuery.toLowerCase();
     const filteredData = reportData.filter((item) => {
       const name = item.name.toLowerCase();
-      const type = item.type.toLowerCase();
-      return name.includes(query) || type.includes(query);
+      const title = item.title.toLowerCase();
+      return name.includes(query) || title.includes(query);
     });
     setFilteredReportData(filteredData);
     setDynamicFilteredReportData(
       filteredData.filter((item) => item.type === 'Feedback'),
     );
   };
-  const handleStatusChange = async (item, e) => {
-    try {
-      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.put(
-        `${BACK_END_PORT}/api/Report/UpdateReport/` + item.reportId,
-        {
-          // appId: item.appId,
-          description: item.description,
-          type: item.type,
-          // startDate: item.startDate,
-          endDate: item.endDate,
-          status: e.target.value,
-        },
-      );
-      console.log('Data saved:', response.data);
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/Report/GetReportsForSoftware/` + software.appId,
-      );
-      setData(newDataResponse.data);
-    } catch (error) {
-      console.error('Error saving data:', error);
-    }
-  };
+
   // Update filtered data whenever the search query changes
   useEffect(() => {
     filterAssets();
@@ -239,14 +219,19 @@ function FeedbackPage() {
           <Flex>
             <Text fontSize='2xl'>List Feedback</Text>
             <Spacer />
-            <Input
-              type='text'
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              placeholder='Search'
-              w={300}
-              mr={1}
-            />
+            <Box>
+              <InputGroup>
+                <InputLeftAddon children='Search' />
+                <Input
+                  type='text'
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  placeholder='title'
+                  w={300}
+                  mr={1}
+                />
+              </InputGroup>
+            </Box>
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
@@ -273,7 +258,7 @@ function FeedbackPage() {
               <Thead>
                 <Tr>
                   <Th className={styles.cTh}>No</Th>
-                  <Th className={styles.cTh}>Software</Th>
+                  <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Title</Th>
                   <Th className={styles.cTh}>Start Date</Th>
                   <Th className={styles.cTh}>End Date</Th>
@@ -297,16 +282,15 @@ function FeedbackPage() {
                     <Td>{item.start_Date}</Td>
                     <Td>{item.end_Date}</Td>
                     <Td>
-                      <Select
-                        name='status'
-                        value={item?.status}
-                        onChange={(e) => handleStatusChange(item, e)} // Add onChange handler
-                        border='none'
-                      >
-                        <option value='1'>Unsolved</option>
-                        <option value='2'>Solved</option>
-                        <option value='3'>Deleted</option>
-                      </Select>
+                      {item?.status == 1
+                        ? 'Unsolved'
+                        : item?.status == 2
+                        ? 'Solved'
+                        : item?.status == 3
+                        ? 'Deleted'
+                        : item?.status == 4
+                        ? 'Canceled'
+                        : 'Unknown'}
                     </Td>
                   </Tr>
                 ))}

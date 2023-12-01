@@ -14,9 +14,10 @@ import {
   Flex,
   Spacer,
   IconButton,
-  useDisclosure,
   Icon,
   useToast,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -51,7 +52,7 @@ const defaultData = {
   version: '',
   release: '',
   publisher: '',
-  type: '',
+  type: 'Web App',
   os: 'Window',
   osversion: '',
   description: '',
@@ -182,6 +183,7 @@ function SoftwarePage() {
       );
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
+      setButtonDisabled(true);
       setFormData2(defaultData);
       setSelectedRow(new Set());
       // Reload new data for the table
@@ -287,6 +289,7 @@ function SoftwarePage() {
           formData2.appId,
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
+      setButtonDisabled(true);
       setSelectedRow(new Set());
 
       // Reload the data for the table after deletion
@@ -321,14 +324,19 @@ function SoftwarePage() {
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
-            <Input
-              type='text'
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              placeholder='Search'
-              w={300}
-              mr={1}
-            />
+            <Box>
+              <InputGroup>
+                <InputLeftAddon children='Search' />
+                <Input
+                  type='text'
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  placeholder='name - publisher'
+                  w={300}
+                  mr={1}
+                />
+              </InputGroup>
+            </Box>
             <Spacer />
             <Box>
               <IconButton
@@ -366,19 +374,20 @@ function SoftwarePage() {
               <TableCaption>
                 Total{' '}
                 {
-                  filteredSoftwareData.filter(
-                    (item) => item.status === 1 || item.status === 2,
-                  ).length
+                  filteredSoftwareData.filter((item) => item.status !== 3)
+                    .length
                 }{' '}
                 softwares
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th className={styles.cTh}>No</Th>
+                  <Th className={styles.cTh} w='20px'>
+                    No
+                  </Th>
                   <Th className={styles.cTh}>Name</Th>
                   <Th className={styles.cTh}>Assets</Th>
                   <Th className={styles.cTh}>Publisher</Th>
-                  <Th className={styles.cTh}>Versions</Th>
+                  <Th className={styles.cTh}>Version</Th>
                   <Th className={styles.cTh}>Release</Th>
                   <Th className={styles.cTh}>Type</Th>
                   <Th className={styles.cTh}>Status</Th>
@@ -386,7 +395,7 @@ function SoftwarePage() {
               </Thead>
               <Tbody>
                 {filteredSoftwareData
-                  // .filter((item) => item.status === 1 || item.status === 2)
+                  .filter((item) => item.status !== 3)
                   .map((item, index) => (
                     <Tr
                       _hover={{
@@ -417,7 +426,7 @@ function SoftwarePage() {
                           ? 'Inactive'
                           : item.status === 3
                           ? 'Deleted'
-                          : 'Active'}
+                          : 'Unknown'}
                       </Td>
                     </Tr>
                   ))}
@@ -526,6 +535,7 @@ function SoftwarePage() {
                   >
                     <option value='Web App'>Web App</option>
                     <option value='Desktop App'>Desktop App</option>
+                    <option value='Mobile App'>Mobile App</option>
                   </Select>
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -543,6 +553,18 @@ function SoftwarePage() {
                     value={formData2.db}
                     onChange={handleInputChange2}
                   />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    name='status'
+                    value={formData2.status}
+                    onChange={handleInputChange2}
+                  >
+                    <option value='1'>Active</option>
+                    <option value='2'>Inactive</option>
+                    <option value='3'>Deleted</option>
+                  </Select>
                 </FormControl>
               </GridItem>
             </Grid>
@@ -565,7 +587,7 @@ function SoftwarePage() {
         </ModalContent>
       </Modal>
 
-      <Modal // Modal add new software
+      <Modal // Modal add new application
         isOpen={isOpenAdd}
         onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
         closeOnOverlayClick={false}
@@ -664,6 +686,7 @@ function SoftwarePage() {
                   >
                     <option value='Web App'>Web App</option>
                     <option value='Desktop App'>Desktop App</option>
+                    <option value='Mobile App'>Mobile App</option>
                   </Select>
                 </FormControl>
                 <FormControl className={styles.formInput}>

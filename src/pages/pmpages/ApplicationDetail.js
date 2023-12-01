@@ -18,6 +18,8 @@ import {
   Icon,
   useToast,
   Center,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -89,17 +91,6 @@ function SoftwarePage() {
   //
   const [software, setSoftware] = useState();
 
-  useEffect(() => {
-    const data = localStorage.getItem('software');
-    if (data) {
-      const softwareDataDecode = JSON.parse(data);
-      if (!softwareDataDecode) {
-        // router.push('/pmpages/assetlist');
-      } else {
-        setSoftware(softwareDataDecode);
-      }
-    }
-  }, []);
   //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -107,7 +98,7 @@ function SoftwarePage() {
   const [isOpenEditLi, setIsOpenEditLi] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenDeleteLi, setIsOpenDeleteLi] = useState(false);
-  const [formData, setFormData] = useState(defaultData);
+  const [formData, setFormData] = useState([]);
   const [formData1, setFormData1] = useState(defaultData2);
   const [formData2, setFormData2] = useState(defaultData);
   const [formData3, setFormData3] = useState(defaultData2);
@@ -115,6 +106,7 @@ function SoftwarePage() {
   const [feedbackData, setFeedbackData] = useState([]);
   const [deviceData, setDeviceData] = useState([]);
   const [softwareData, setSoftwareData] = useState([]);
+  const [appData, setAppData] = useState({});
   const [reportData, setReportData] = useState([]);
   const [libraryData, setLibraryData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -126,12 +118,13 @@ function SoftwarePage() {
   const [selectedRow1, setSelectedRow1] = useState(new Set());
   const [isButtonDisabled, setButtonDisabled] = useState(true);
   const [isButtonDisabled1, setButtonDisabled1] = useState(true);
+  const [showEditApp, setShowEditApp] = useState(true);
   const toast = useToast();
   //
   //
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setAppData({ ...appData, [name]: value });
     // console.log(formData);
   };
   const handleInputChange2 = (e) => {
@@ -155,6 +148,40 @@ function SoftwarePage() {
     if (selectedFile) {
       console.log('Selected File:', selectedFile);
       // You can perform actions with the selected file here
+    }
+  };
+  //
+  const handleEditApp = async () => {
+    try {
+      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const response = await axios.put(
+        `${BACK_END_PORT}/api/v1/App/UpdateApplication/` + software.appId,
+        {
+          // accId: account.accId,
+          name: appData.name,
+          publisher: appData.publisher,
+          version: appData.version,
+          release: appData.release,
+          type: appData.type,
+          os: appData.os,
+          osversion: appData.osversion,
+          description: appData.description,
+          download: appData.download,
+          docs: appData.docs,
+          language: appData.language,
+          db: appData.db,
+          status: appData.status,
+        },
+      );
+      console.log('Data saved:', response.data);
+      setShowEditApp(true); // Close the modal after successful save
+      // Reload new data for the table
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/App/get_App_by_Id/` + software.appId,
+      );
+      setAppData(newDataResponse.data);
+    } catch (error) {
+      console.error('Error saving data:', error);
     }
   };
   //
@@ -187,7 +214,7 @@ function SoftwarePage() {
       );
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
-      setFormData(defaultData);
+      // setFormData(defaultData);
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
@@ -264,6 +291,7 @@ function SoftwarePage() {
       setLoading(false);
     }
   };
+
   const handleSaveAddLi = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
@@ -368,11 +396,21 @@ function SoftwarePage() {
     } else {
       setSelectedRow1(item.libraryId);
       setFormData1(item);
-      // const formatDate = convertDateFormat(formData1.start_Date);
-      // setFormData1({ ...formData1, 'start_Date': formatDate });
       setButtonDisabled1(false);
     }
   };
+  //
+  useEffect(() => {
+    const data = localStorage.getItem('software');
+    if (data) {
+      const softwareDataDecode = JSON.parse(data);
+      if (!softwareDataDecode) {
+        // router.push('/pmpages/assetlist');
+      } else {
+        setSoftware(softwareDataDecode);
+      }
+    }
+  }, []);
   //
   useEffect(() => {
     const fetchData = async () => {
@@ -402,6 +440,11 @@ function SoftwarePage() {
             software?.appId,
         );
         setLibraryData(response5.data);
+        const response6 = await axios.get(
+          `${BACK_END_PORT}/api/v1/App/get_App_by_Id/` + software?.appId,
+        );
+        console.log('API Response:', response6.data);
+        setAppData(response6.data[0]);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -410,7 +453,7 @@ function SoftwarePage() {
     };
 
     fetchData();
-  }, [software, account]);
+  }, [software, account, showEditApp]);
   //
   // useEffect(() => {
   //   if (data.length > 0 && softwareData.length > 0) {
@@ -564,78 +607,228 @@ function SoftwarePage() {
           </TabList>
           <TabPanels>
             <TabPanel>
-              <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
-                <TableContainer>
-                  <Table>
-                    <Tbody>
-                      <Tr className={styles.borderTop}>
-                        <Td className={styles.text2}>Name</Td>
-                        <Td className={styles.borderRight}>{software?.name}</Td>
-                        <Td className={styles.text2}>Version</Td>
-                        <Td className={styles.borderRight}>
-                          {software?.version}
-                        </Td>
-                        <Td className={styles.text2}>OS</Td>
-                        <Td>{software?.os}</Td>
-                      </Tr>
-                      <Tr>
-                        <Td className={styles.text2}>Publisher</Td>
-                        <Td className={styles.borderRight}>
-                          {software?.publisher}
-                        </Td>
-                        <Td className={styles.text2}>Release</Td>
-                        <Td className={styles.borderRight}>
-                          {software?.release}
-                        </Td>
-                        <Td className={styles.text2}>OS Version</Td>
-                        <Td>{software?.osversion}</Td>
-                      </Tr>
-                      <Tr>
-                        <Td className={styles.text2}>Programming</Td>
-                        <Td className={styles.borderRight}>
-                          {software?.language}
-                        </Td>
-                        <Td className={styles.text2}>Database</Td>
-                        <Td className={styles.borderRight}>{software?.db}</Td>
-                        <Td className={styles.text2}>Status</Td>
-                        <Td>
-                          {software?.status === 1
-                            ? 'No issue'
-                            : software?.status === 2
-                            ? 'Have issue'
-                            : software?.status === 3
-                            ? 'Deleted'
-                            : 'Active'}
-                        </Td>
-                      </Tr>
-                      <Tr className={styles.borderTop}>
-                        <Td className={styles.text2}>Download Link</Td>
-                        <Td className={styles.borderRight} colSpan='2'>
-                          {software?.download}
-                        </Td>
-                        <Td className={styles.text2}>Document Link</Td>
-                        <Td colSpan='2'>{software?.docs}</Td>
-                      </Tr>
-                      <Tr className={styles.borderTop}>
-                        <Td className={styles.text2}>Note</Td>
-                        <Td colSpan='5'>{software?.description}</Td>
-                      </Tr>
-                    </Tbody>
-                  </Table>
-                </TableContainer>
-              </Box>
+              {showEditApp ? (
+                <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
+                  <TableContainer>
+                    <Table>
+                      <Tbody>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>Name</Td>
+                          <Td className={styles.borderRight}>
+                            {appData?.name || 'loading'}
+                          </Td>
+                          <Td className={styles.text2}>Version</Td>
+                          <Td className={styles.borderRight}>
+                            {appData?.version}
+                          </Td>
+                          <Td className={styles.text2}>OS</Td>
+                          <Td>{appData?.os}</Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Publisher</Td>
+                          <Td className={styles.borderRight}>
+                            {appData?.publisher}
+                          </Td>
+                          <Td className={styles.text2}>Release</Td>
+                          <Td className={styles.borderRight}>
+                            {appData?.release}
+                          </Td>
+                          <Td className={styles.text2}>OS Version</Td>
+                          <Td>{appData?.osversion}</Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Programming</Td>
+                          <Td className={styles.borderRight}>
+                            {appData?.language}
+                          </Td>
+                          <Td className={styles.text2}>Database</Td>
+                          <Td className={styles.borderRight}>{appData?.db}</Td>
+                          <Td className={styles.text2}>Status</Td>
+                          <Td>
+                            {appData?.status === 1
+                              ? 'Active'
+                              : appData?.status === 2
+                              ? 'Inactive'
+                              : appData?.status === 3
+                              ? 'Deleted'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>Download Link</Td>
+                          <Td className={styles.borderRight} colSpan='2'>
+                            {appData?.download}
+                          </Td>
+                          <Td className={styles.text2}>Document Link</Td>
+                          <Td colSpan='2'>{appData?.docs}</Td>
+                        </Tr>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>Note</Td>
+                          <Td colSpan='5'>{appData?.description}</Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </TableContainer>
+                  <Button
+                    colorScheme='gray'
+                    mt={3}
+                    onClick={() => setShowEditApp(false)}
+                  >
+                    Edit
+                  </Button>
+                </Box>
+              ) : (
+                <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
+                  <TableContainer>
+                    <Table>
+                      <Tbody>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>Name</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              name='name'
+                              value={appData?.name}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Version</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              name='version'
+                              value={appData?.version}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>OS</Td>
+                          <Td>
+                            <Input
+                              name='os'
+                              value={appData?.os}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Publisher</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              name='publisher'
+                              value={appData?.publisher}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Release</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              name='release'
+                              value={appData?.release}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>OS Version</Td>
+                          <Td>
+                            <Input
+                              name='osversion'
+                              value={appData?.osversion}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>Programming</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              name='language'
+                              value={appData?.language}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Database</Td>
+                          <Td className={styles.borderRight}>
+                            <Input
+                              name='db'
+                              value={appData?.db}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Status</Td>
+                          <Td>
+                            <Select
+                              name='status'
+                              value={appData?.status}
+                              onChange={handleInputChange}
+                            >
+                              <option value='1'>Active</option>
+                              <option value='2'>Inactive</option>
+                              <option value='3'>Deleted</option>
+                            </Select>
+                          </Td>
+                        </Tr>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>Download Link</Td>
+                          <Td className={styles.borderRight} colSpan='2'>
+                            <Input
+                              name='download'
+                              value={appData?.download}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                          <Td className={styles.text2}>Document Link</Td>
+                          <Td colSpan='2'>
+                            <Input
+                              name='docs'
+                              value={appData?.docs}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                        </Tr>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>Note</Td>
+                          <Td colSpan='5'>
+                            <Input
+                              name='description'
+                              value={appData?.description}
+                              onChange={handleInputChange}
+                            />
+                          </Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </TableContainer>
+                  <Button
+                    colorScheme='blue'
+                    mt={3}
+                    mr={2}
+                    onClick={handleEditApp}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    colorScheme='gray'
+                    mt={3}
+                    onClick={() => setShowEditApp(true)}
+                  >
+                    Back
+                  </Button>
+                </Box>
+              )}
             </TabPanel>
             <TabPanel>
               <ListItem className={styles.list} pt={0}>
                 <Flex>
-                  <Input
-                    type='text'
-                    value={searchQuery}
-                    onChange={handleSearchInputChange}
-                    placeholder='Search'
-                    w={300}
-                    mr={1}
-                  />
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Search' />
+                      <Input
+                        type='text'
+                        value={searchQuery}
+                        onChange={handleSearchInputChange}
+                        placeholder='name - manufacturer - model'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                  </Box>
                   <Spacer />
                   <Box>
                     <IconButton
@@ -733,14 +926,19 @@ function SoftwarePage() {
             <TabPanel>
               <ListItem className={styles.list} pt={0}>
                 <Flex>
-                  <Input
-                    type='text'
-                    value={searchQuery1}
-                    onChange={handleSearchInputChange1}
-                    placeholder='Search'
-                    w={300}
-                    mr={1}
-                  />
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Search' />
+                      <Input
+                        type='text'
+                        value={searchQuery1}
+                        onChange={handleSearchInputChange1}
+                        placeholder='name - publisher'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                  </Box>
                   <Spacer />
                   <Box>
                     <IconButton
@@ -855,6 +1053,8 @@ function SoftwarePage() {
                             ? 'Solved'
                             : item.status === 3
                             ? 'Deleted'
+                            : item.status === 4
+                            ? 'Canceled'
                             : 'Unknown'}
                         </Td>
                       </Tr>
@@ -897,6 +1097,8 @@ function SoftwarePage() {
                             ? 'Solved'
                             : item.status === 3
                             ? 'Deleted'
+                            : item.status === 4
+                            ? 'Canceled'
                             : 'Unknown'}
                         </Td>
                       </Tr>

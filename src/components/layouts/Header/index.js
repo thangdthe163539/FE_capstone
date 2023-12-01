@@ -59,7 +59,7 @@ function Header() {
               router.push('adminpages/adminhome');
             }
             else if (id == 2) {
-              router.push('/pmpages/pmhome');
+              router.push('/pmpages/PoHome');
             }
             else if (id == 3) {
               router.push('/userpages/userhome');

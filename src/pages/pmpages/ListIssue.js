@@ -17,6 +17,8 @@ import {
   useDisclosure,
   Icon,
   useToast,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -175,8 +177,8 @@ function SecurityPage() {
     const query = searchQuery.toLowerCase();
     const filteredData = reportData.filter((item) => {
       const name = item.name.toLowerCase();
-      const type = item.type.toLowerCase();
-      return name.includes(query) || type.includes(query);
+      const title = item.title.toLowerCase();
+      return name.includes(query) || title.includes(query);
     });
     setFilteredReportData(filteredData);
     setDynamicFilteredReportData(
@@ -184,92 +186,17 @@ function SecurityPage() {
     );
   };
   // Function to get the current date and set it for the endDate field
-  const getCurrentDateString = () => {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDate.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  
 
   // Update filtered data whenever the search query changes
   useEffect(() => {
     filterAssets();
   }, [searchQuery, reportData]);
   //
-  const [imagesState, setImages] = useState([]);
-
-  // console.log(imagesState);
-  function dataURLtoBlob(dataURL) {
-    const parts = dataURL.split(';base64,');
-    const contentType = parts[0].split(':')[1];
-    const raw = window.atob(parts[1]);
-    const rawLength = raw.length;
-    const uInt8Array = new Uint8Array(rawLength);
-
-    for (let i = 0; i < rawLength; ++i) {
-      uInt8Array[i] = raw.charCodeAt(i);
-    }
-
-    return new Blob([uInt8Array], { type: contentType });
-  }
-
-  const fileObjects = imagesState.map((image) => {
-    // Tạo một Blob từ dataURL
-    const blob = dataURLtoBlob(image.dataURL);
-    // Tạo một File từ Blob
-    return new File([blob], image.fileName, { type: blob.type });
-    [];
-  });
+ 
 
   //
-  const handleStatusChange = async (item, e) => {
-    setFormData(item);
-    console.log(formData);
-    // if (formData.status === 1) {
-    //   // If status is 1, set endDate to an empty string
-    //   setFormData({
-    //     ...formData,
-    //     endDate: null, // Empty string
-    //   });
-    // } else {
-    //   // If status is not 1, set endDate to the current date
-    //   const currentDate = getCurrentDateString();
-    //   setFormData({
-    //     ...formData,
-    //     endDate: currentDate, // Empty string
-    //   });
-    // }
-    const submitData = new FormData();
-    try {
-      fileObjects.forEach((file) => {
-        submitData.append(`Images`, file);
-      });
-      submitData.append('AppId', formData?.appId);
-      submitData.append('Title', formData?.title);
-      submitData.append('Description', formData?.description);
-      submitData.append('Type', formData?.type);
-      submitData.append('Start_Date', formData?.start_Date);
-      submitData.append('End_Date', formData?.end_Date);
-      submitData.append('Status', e.target.value);
-      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.put(
-        `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.appId,
-        submitData,
-      );
-      console.log('Data saved:', response.data);
-      toast({
-        title: 'Edit Report',
-        description: 'The report has been successfully edited.',
-        status: 'success',
-        duration: 3000, // Duration in milliseconds
-        isClosable: true,
-      });
-      router.push('/pmpages/ListIssue');
-    } catch (error) {
-      console.error('Error saving data:', error);
-    }
-  };
+  
   // Handle search input change
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value);
@@ -297,14 +224,19 @@ function SecurityPage() {
           <Flex>
             <Text fontSize='2xl'>Issue</Text>
             <Spacer />
-            <Input
-              type='text'
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              placeholder='Search'
-              w={300}
-              mr={1}
-            />
+            <Box>
+              <InputGroup>
+                <InputLeftAddon children='Search' />
+                <Input
+                  type='text'
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  placeholder='title'
+                  w={300}
+                  mr={1}
+                />
+              </InputGroup>
+            </Box>
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
@@ -355,16 +287,15 @@ function SecurityPage() {
                     <Td>{item.start_Date}</Td>
                     <Td>{item.end_Date}</Td>
                     <Td>
-                      <Select
-                        name='status'
-                        value={item?.status}
-                        onChange={(e) => handleStatusChange(item, e)} // Add onChange handler
-                        border='none'
-                      >
-                        <option value='1'>Unsolved</option>
-                        <option value='2'>Solved</option>
-                        <option value='3'>Deleted</option>
-                      </Select>
+                      {item?.status == 1
+                        ? 'Unsolved'
+                        : item?.status == 2
+                        ? 'Solved'
+                        : item?.status == 3
+                        ? 'Deleted'
+                        : item?.status == 4
+                        ? 'Canceled'
+                        : 'Unknown'}
                     </Td>
                   </Tr>
                 ))}

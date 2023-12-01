@@ -18,6 +18,8 @@ import {
   useToast,
   Center,
   Image,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -330,13 +332,17 @@ function ReportPage(title) {
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>Status:</Text>
               <Text className={styles.text1}>
-                {formData?.status === 1
-                  ? 'Unsolved'
-                  : formData?.status === 2
-                  ? 'Solved'
-                  : formData?.status === 3
-                  ? 'Deleted'
-                  : 'Unknown'}
+                <Select
+                  name='status'
+                  value={formData?.status}
+                  onChange={handleStatusChange} // Add onChange handler
+                  border='none'
+                >
+                  <option value='1'>Unsolved</option>
+                  <option value='2'>Solved</option>
+                  <option value='3'>Deleted</option>
+                  <option value='4'>Canceled</option>
+                </Select>
               </Text>
             </Flex>
           </Flex>

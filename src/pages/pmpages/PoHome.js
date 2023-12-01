@@ -26,6 +26,11 @@ function PmHome() {
             Feedback
           </Link>
         </ListItem>
+        <ListItem className={styles.list}>
+          <Link href='/pmpages/Report' className={styles.listitem}>
+            Report
+          </Link>
+        </ListItem>
       </List>
     </Box>
   );

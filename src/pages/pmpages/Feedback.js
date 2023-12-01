@@ -17,6 +17,8 @@ import {
   useDisclosure,
   Icon,
   useToast,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -199,13 +201,12 @@ function SoftwarePage() {
     const query = searchQuery.toLowerCase();
     const filteredData = softwareData.filter((item) => {
       const name = item.name.toLowerCase();
-      const publisher = item.publisher.toLowerCase();
-      return name.includes(query) || publisher.includes(query);
+      return name.includes(query);
     });
     setFilteredSoftwareData(filteredData);
-     setDynamicFilteredSoftwareData(
-       filteredData.filter((item) => item.status === 1 || item.status === 2),
-     );
+    setDynamicFilteredSoftwareData(
+      filteredData.filter((item) => item.status === 1 || item.status === 2),
+    );
   };
 
   // Update filtered data whenever the search query changes
@@ -236,16 +237,21 @@ function SoftwarePage() {
         </ListItem>
         <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Feedback Detail</Text>
+            <Text fontSize='2xl'>Feedback</Text>
             <Spacer />
-            <Input
-              type='text'
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              placeholder='Search'
-              w={300}
-              mr={1}
-            />
+            <Box>
+              <InputGroup>
+                <InputLeftAddon children='Search' />
+                <Input
+                  type='text'
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  placeholder='name'
+                  w={300}
+                  mr={1}
+                />
+              </InputGroup>
+            </Box>
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
@@ -281,31 +287,30 @@ function SoftwarePage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {dynamicList
-                  .map((item, index) => (
-                    <Tr
-                      _hover={{
-                        cursor: 'pointer',
-                      }}
-                      key={item.appId}
-                      color={selectedRow === item.appId ? 'red' : 'black'}
-                      onClick={() => handleRowClick(item)}
-                    >
-                      <Td>{index + 1}</Td>
-                      <Td className={styles.listitem}>
-                        <Link
-                          href={'/pmpages/ListFeedback'}
-                          onClick={() => handleDetail(item)}
-                        >
-                          {item.name}
-                        </Link>
-                      </Td>
-                      <Td>{item.version}</Td>
-                      <Td>{item.release}</Td>
-                      <Td>{item.done}</Td>
-                      <Td>{item.doing}</Td>
-                    </Tr>
-                  ))}
+                {dynamicList.map((item, index) => (
+                  <Tr
+                    _hover={{
+                      cursor: 'pointer',
+                    }}
+                    key={item.appId}
+                    color={selectedRow === item.appId ? 'red' : 'black'}
+                    onClick={() => handleRowClick(item)}
+                  >
+                    <Td>{index + 1}</Td>
+                    <Td className={styles.listitem}>
+                      <Link
+                        href={'/pmpages/ListFeedback'}
+                        onClick={() => handleDetail(item)}
+                      >
+                        {item.name}
+                      </Link>
+                    </Td>
+                    <Td>{item.version}</Td>
+                    <Td>{item.release}</Td>
+                    <Td>{item.done}</Td>
+                    <Td>{item.doing}</Td>
+                  </Tr>
+                ))}
               </Tbody>
             </Table>
           </TableContainer>
