@@ -173,10 +173,16 @@ function SoftwarePage() {
             );
             const reports = response2.data;
             const count1 = reports
-              .filter((report) => report.type === 'Feedback')
+              .filter(
+                (report) =>
+                  report.type === 'Feedback' || report.type === 'feedback',
+              )
               .filter((report) => report.status === 2).length;
             const count2 = reports
-              .filter((report) => report.type === 'Feedback')
+              .filter(
+                (report) =>
+                  report.type === 'Feedback' || report.type === 'feedback',
+              )
               .filter((report) => report.status === 1).length;
             return {
               ...software,

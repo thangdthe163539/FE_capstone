@@ -1,8 +1,22 @@
 .homeBody {
   margin-top: 0px;
   padding: 0 58px;
-  height: 100vh;
+  height: 80vh;
   /* background-color: #4d9ffe; */
+}
+
+.image1 {
+  width: 60%;
+}
+
+@media (max-height: 1300px) {
+  .homeBody {
+    height: 70vh;
+    /* background-color: #4d9ffe; */
+  }
+  .image1 {
+    width: 50%;
+  }
 }
 
 .loginForm {

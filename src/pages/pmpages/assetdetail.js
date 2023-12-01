@@ -85,6 +85,7 @@ function AssetDetailPage() {
   const [formData2, setFormData2] = useState(defaultData);
   const [formData3, setFormData3] = useState(defaultData);
   const [data, setData] = useState([]);
+  const [assetData, setAssetData] = useState([]);
   const [dataLicense, setDataLicense] = useState([]);
   const [listLicense, setListLicense] = useState([]);
   const [listAllSoftware, setListAllSoftware] = useState([]);
@@ -153,7 +154,7 @@ function AssetDetailPage() {
   };
   const handleInputChange4 = (e) => {
     const { name, value } = e.target;
-    setFormData3({ ...formData3, [name]: value });
+    setAssetData({ ...assetData, [name]: value });
     // console.log(formData);
   };
   const handleSearchAppInputChange = (e) => {
@@ -181,6 +182,12 @@ function AssetDetailPage() {
     } else {
       setSelectedRow2(item.licenseId);
       setFormData2(item);
+      setFormData2((prevFormData) => {
+        return {
+          ...prevFormData,
+          start_Date: convertToISODate(prevFormData.start_Date),
+        };
+      });
       setButtonDisabled2(false);
     }
   };
@@ -292,11 +299,46 @@ function AssetDetailPage() {
     }
   };
   //
+  const handleEditAsset = async () => {
+    try {
+      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const curDate = new Date();
+      const response = await axios.put(
+        `${BACK_END_PORT}/api/v1/Asset/UpdateAsset/` + assetData.assetId,
+        {
+          name: assetData.name,
+          cpu: assetData.cpu,
+          gpu: assetData.gpu,
+          ram: assetData.ram,
+          memory: assetData.memory,
+          os: assetData.os,
+          version: assetData.version,
+          ipAddress: assetData.ipAddress,
+          bandwidth: assetData.bandwidth,
+          manufacturer: assetData.manufacturer,
+          model: assetData.model,
+          serialNumber: assetData.serialNumber,
+          lastSuccesfullScan: curDate,
+          status: assetData.status,
+        },
+      );
+      console.log('Data saved:', response.data);
+      setShowEditAsset(true); // Close the modal after successful save
+      // Reload new data for the table
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/v1/Asset/GetAssetsById/` + device?.assetId,
+      );
+      setAssetData(newDataResponse.data);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
+  //
   const handleSaveEdit = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/License/UpdateLicense` + formData2.licenseId,
+        `${BACK_END_PORT}/api/v1/License/UpdateLicense/` + formData2.licenseId,
         {
           // assetId: device.assetId,
           // softwareId: formData.softwareId,
@@ -428,19 +470,32 @@ function AssetDetailPage() {
         } catch (error) {
           setDataLicense([]);
         }
-        const response3 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Software/ListSoftwares`,
-        );
-        setListAllSoftware(response3.data);
+        try {
+          const response3 = await axios.get(
+            `${BACK_END_PORT}/api/v1/Software/ListSoftwares`,
+          );
+          setListAllSoftware(response3.data);
+        } catch (error) {
+          setListAllSoftware([]);
+        }
+        try {
+          const response4 = await axios.get(
+            `${BACK_END_PORT}/api/v1/Asset/GetAssetsById/` + device.assetId,
+          );
+          setAssetData(response4.data[0]);
+        } catch (error) {
+          setAssetData([]);
+        }
+        setLoading(true);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
         setLoading(false);
       }
     };
     if (device?.assetId && account?.accId) {
       fetchData();
     }
-  }, [device, account]);
+  }, [device, account, showEditAsset]);
   //
   const softwareIdsInAsset = data?.map((software) => software?.softwareId);
   //
@@ -597,50 +652,56 @@ function AssetDetailPage() {
                       <Tbody>
                         <Tr className={styles.borderTop}>
                           <Td className={styles.text2}>Name</Td>
-                          <Td className={styles.borderRight}>{device?.name}</Td>
+                          <Td className={styles.borderRight}>
+                            {assetData?.name}
+                          </Td>
                           <Td className={styles.text2}>CPU</Td>
-                          <Td className={styles.borderRight}>{device?.cpu}</Td>
+                          <Td className={styles.borderRight}>
+                            {assetData?.cpu}
+                          </Td>
                           <Td className={styles.text2}>Operation System</Td>
-                          <Td>{device?.os}</Td>
+                          <Td>{assetData?.os}</Td>
                         </Tr>
                         <Tr>
                           <Td className={styles.text2}>Manufacturer</Td>
                           <Td className={styles.borderRight}>
-                            {device?.manufacturer}
+                            {assetData?.manufacturer}
                           </Td>
                           <Td className={styles.text2}>GPU</Td>
-                          <Td className={styles.borderRight}>{device?.gpu}</Td>
+                          <Td className={styles.borderRight}>
+                            {assetData?.gpu}
+                          </Td>
                           <Td className={styles.text2}>Version</Td>
-                          <Td>{device?.version}</Td>
+                          <Td>{assetData?.version}</Td>
                         </Tr>
                         <Tr>
                           <Td className={styles.text2}>Model</Td>
                           <Td className={styles.borderRight}>
-                            {device?.model}
+                            {assetData?.model}
                           </Td>
                           <Td className={styles.text2}>RAM</Td>
                           <Td className={styles.borderRight}>
-                            {device?.ram} GB
+                            {assetData?.ram} GB
                           </Td>
                           <Td className={styles.text2}>Last Updated</Td>
-                          <Td>{device?.lastSuccesfullScan}</Td>
+                          <Td>{assetData?.lastSuccesfullScan}</Td>
                         </Tr>
                         <Tr>
                           <Td className={styles.text2}>Serial Number</Td>
                           <Td className={styles.borderRight}>
-                            {device?.serialNumber}
+                            {assetData?.serialNumber}
                           </Td>
                           <Td className={styles.text2}>Memory</Td>
                           <Td className={styles.borderRight}>
-                            {device?.memory} GB
+                            {assetData?.memory} GB
                           </Td>
                           <Td className={styles.text2}>Status</Td>
                           <Td>
-                            {device?.status === 1
+                            {assetData?.status === 1
                               ? 'Active'
-                              : device?.status === 2
+                              : assetData?.status === 2
                               ? 'Inactive'
-                              : device?.status === 3
+                              : assetData?.status === 3
                               ? 'Deleted'
                               : 'Unknown'}
                           </Td>
@@ -665,7 +726,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>Name</Td>
                           <Td className={styles.borderRight}>
                             <Input
-                              value={device?.name}
+                              value={assetData?.name}
                               name='name'
                               onChange={handleInputChange4}
                             />
@@ -673,7 +734,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>CPU</Td>
                           <Td className={styles.borderRight}>
                             <Input
-                              value={device?.cpu}
+                              value={assetData?.cpu}
                               name='cpu'
                               onChange={handleInputChange4}
                             />
@@ -681,7 +742,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>Operation System</Td>
                           <Td>
                             <Input
-                              value={device?.os}
+                              value={assetData?.os}
                               name='os'
                               onChange={handleInputChange4}
                             />
@@ -691,7 +752,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>Manufacturer</Td>
                           <Td className={styles.borderRight}>
                             <Input
-                              value={device?.manufacturer}
+                              value={assetData?.manufacturer}
                               name='manufacturer'
                               onChange={handleInputChange4}
                             />
@@ -699,7 +760,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>GPU</Td>
                           <Td className={styles.borderRight}>
                             <Input
-                              value={device?.gpu}
+                              value={assetData?.gpu}
                               name='gpu'
                               onChange={handleInputChange4}
                             />
@@ -707,7 +768,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>Version</Td>
                           <Td>
                             <Input
-                              value={device?.version}
+                              value={assetData?.version}
                               name='version'
                               onChange={handleInputChange4}
                             />
@@ -717,7 +778,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>Model</Td>
                           <Td className={styles.borderRight}>
                             <Input
-                              value={device?.model}
+                              value={assetData?.model}
                               name='model'
                               onChange={handleInputChange4}
                             />
@@ -725,7 +786,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>RAM</Td>
                           <Td className={styles.borderRight}>
                             <Input
-                              value={device?.ram}
+                              value={assetData?.ram}
                               name='ram'
                               onChange={handleInputChange4}
                             />
@@ -733,9 +794,10 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>Last Updated</Td>
                           <Td>
                             <Input
-                              value={device?.lastSuccesfullScan}
+                              value={assetData?.lastSuccesfullScan}
                               name='lastSuccesfullScan'
                               onChange={handleInputChange4}
+                              disabled
                             />
                           </Td>
                         </Tr>
@@ -743,7 +805,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>Serial Number</Td>
                           <Td className={styles.borderRight}>
                             <Input
-                              value={device?.serialNumber}
+                              value={assetData?.serialNumber}
                               name='serialNumber'
                               onChange={handleInputChange4}
                             />
@@ -751,7 +813,7 @@ function AssetDetailPage() {
                           <Td className={styles.text2}>Memory</Td>
                           <Td className={styles.borderRight}>
                             <Input
-                              value={device?.memory}
+                              value={assetData?.memory}
                               name='memory'
                               onChange={handleInputChange4}
                             />
@@ -760,7 +822,7 @@ function AssetDetailPage() {
                           <Td>
                             <Select
                               name='status'
-                              value={device?.status}
+                              value={assetData?.status}
                               onChange={handleInputChange4}
                             >
                               <option value='1'>Active</option>
@@ -775,7 +837,7 @@ function AssetDetailPage() {
                     colorScheme='blue'
                     mt={3}
                     mr={2}
-                    // onClick={handleEditApp}
+                    onClick={handleEditAsset}
                   >
                     Save
                   </Button>
@@ -1053,7 +1115,7 @@ function AssetDetailPage() {
                   <FormLabel>Start Date</FormLabel>
                   <Input
                     name='startDate'
-                    value={convertToISODate(formData2.start_Date)}
+                    value={formData2.start_Date}
                     onChange={handleInputChange2}
                     type='date'
                     required
@@ -1154,6 +1216,7 @@ function AssetDetailPage() {
                       >
                         <option value='Web app'>Web app</option>
                         <option value='Desktop app'>Desktop app</option>
+                        <option value='Antivirus'>Antivirus</option>
                       </Select>
                     </FormControl>
                     <FormControl className={styles.formInput}>
@@ -1211,11 +1274,12 @@ function AssetDetailPage() {
                   <Table variant='simple'>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh}>#</Th>
+                        <Th className={styles.cTh}>Add</Th>
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Publisher</Th>
                         <Th className={styles.cTh}>Versions</Th>
                         <Th className={styles.cTh}>Release</Th>
+                        {/* <Th className={styles.cTh}>OS</Th> */}
                         <Th className={styles.cTh}>Type</Th>
                       </Tr>
                     </Thead>
@@ -1225,22 +1289,32 @@ function AssetDetailPage() {
                           (item) =>
                             !softwareIdsInAsset.includes(item.softwareId),
                         )
-                        .filter((item) => item.status != 3)
+                        .filter(
+                          (item) =>
+                            item.status !== 3 &&
+                            item.os &&
+                            device.os &&
+                            device.os
+                              .toLowerCase()
+                              .includes(item.os.toLowerCase()),
+                        )
                         .map((item) => (
                           <Tr key={item.softwareId}>
                             <Td>
-                              <Button
+                              <IconButton
+                                aria-label='Add'
+                                icon={<FaPlus />}
+                                colorScheme='gray' // Choose an appropriate color
                                 onClick={() => (
                                   setShowModalTable(false), setFormData1(item)
                                 )}
-                              >
-                                Add
-                              </Button>
+                              />
                             </Td>
                             <Td>{item.name}</Td>
                             <Td>{item.publisher}</Td>
                             <Td>{item.version}</Td>
                             <Td>{item.release}</Td>
+                            {/* <Td>{item.os}</Td> */}
                             <Td>{item.type}</Td>
                           </Tr>
                         ))}
@@ -1391,9 +1465,11 @@ function AssetDetailPage() {
                     name='type'
                     value={formData1.type}
                     onChange={handleInputChange1}
+                    disabled
                   >
                     <option value='Web app'>Web app</option>
                     <option value='Desktop app'>Desktop app</option>
+                    <option value='Antivirus'>Antivirus</option>
                   </Select>
                 </FormControl>
                 <FormControl className={styles.formInput}>

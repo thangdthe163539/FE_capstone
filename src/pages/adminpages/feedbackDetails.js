@@ -120,13 +120,12 @@ function FeedBackDetailManagePage() {
       // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
       setImage((prevImages) => [
         ...(Array.isArray(prevImages) ? prevImages : []).filter(
-          (img) => img && img.dataURL
+          (img) => img && img.dataURL,
         ),
         ...newImages.filter(Boolean),
       ]);
     }
   };
-
 
   const handleImageClick = (index) => {
     setZoomedIndex(index);
@@ -310,7 +309,7 @@ function FeedBackDetailManagePage() {
         ? detail.description.trim()
         : description.trim(),
     );
-    formData.append('Type', 'feedback');
+    formData.append('Type', 'Feedback');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
     formData.append(
@@ -336,8 +335,8 @@ function FeedBackDetailManagePage() {
       fileObjects.forEach((file, index) => {
         formData.append(`Images`, file);
       });
-    }else{
-      formData.append(`Images`," ");
+    } else {
+      formData.append(`Images`, ' ');
     }
     try {
       const response = await axios.put(url, formData, {
@@ -353,7 +352,6 @@ function FeedBackDetailManagePage() {
       console.error('Lỗi:', error);
     }
   };
-
 
   useEffect(() => {
     if (detail?.reportId) {
@@ -404,7 +402,7 @@ function FeedBackDetailManagePage() {
   // }, [appId]);
 
   const fetchDataAndUpdateState = () => {
-    const url = `http://localhost:5001/api/Report/GetReportsForAppAndType/${appId}/feedback`;
+    const url = `http://localhost:5001/api/Report/GetReportsForAppAndType/${appId}/Feedback`;
     if (appId) {
       fetch(url, {
         method: 'GET',
@@ -446,10 +444,7 @@ function FeedBackDetailManagePage() {
               Home
             </Link>
             <ArrowForwardIcon margin={1}></ArrowForwardIcon>
-            <Link
-              href='/adminpages/feedbackhome'
-              className={styles.listitem}
-            >
+            <Link href='/adminpages/feedbackhome' className={styles.listitem}>
               Feedback management
             </Link>
             <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback detail
@@ -507,7 +502,7 @@ function FeedBackDetailManagePage() {
                         No
                       </Th>
                       <Th
-                        style={{ width: '5%', textAlign: 'center' }}
+                        style={{ width: '15%', textAlign: 'center' }}
                         className={styles.cTh}
                       >
                         Title
@@ -570,12 +565,12 @@ function FeedBackDetailManagePage() {
                           {item.status === 1
                             ? 'Unsolved '
                             : item.status === 2
-                              ? 'Solved '
-                              : item.status === 3
-                                ? 'Deleted '
-                                : item.status === 4
-                                  ? 'Cancel '
-                                  : 'Unknown Status'}
+                            ? 'Solved '
+                            : item.status === 3
+                            ? 'Deleted '
+                            : item.status === 4
+                            ? 'Cancel '
+                            : 'Unknown Status'}
                         </Td>
                       </Tr>
                     ))}
@@ -623,12 +618,12 @@ function FeedBackDetailManagePage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                            ? 'Solved'
-                            : status === 3
-                              ? 'Deleted'
-                              : status === 4
-                                ? 'Cancel'
-                                : 'Unknow'}
+                          ? 'Solved'
+                          : status === 3
+                          ? 'Deleted'
+                          : status === 4
+                          ? 'Cancel'
+                          : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}
@@ -724,7 +719,9 @@ function FeedBackDetailManagePage() {
                               right='5px'
                               fontSize='15px'
                               variant='ghost'
-                              onClick={(event) => handleDeleteClick(index, event)}
+                              onClick={(event) =>
+                                handleDeleteClick(index, event)
+                              }
                               _hover={{ color: 'black ' }}
                             />
                             <Text
@@ -765,7 +762,8 @@ function FeedBackDetailManagePage() {
                         </Modal>
                       </div>
                     )}
-                  </Box>)}
+                  </Box>
+                )}
                 {error && <Text color='red'>{error}</Text>}
               </GridItem>
             </Grid>

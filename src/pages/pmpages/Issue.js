@@ -175,12 +175,12 @@ function SoftwarePage() {
             const reports = response2.data;
             const count1 = reports
               .filter(
-                (report) => report.type === 'Issue' || report.type === 'Risk',
+                (report) => report.type === 'Issue' || report.type === 'issue',
               )
               .filter((report) => report.status === 2).length;
             const count2 = reports
               .filter(
-                (report) => report.type === 'Issue' || report.type === 'Risk',
+                (report) => report.type === 'Issue' || report.type === 'issue',
               )
               .filter((report) => report.status === 1).length;
             return {

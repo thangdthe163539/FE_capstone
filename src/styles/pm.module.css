@@ -13,6 +13,10 @@
   border-bottom: 1px solid #c4c4c4;
 }
 
+.list table {
+  font-size: 16px;
+}
+
 .listitem {
   color: #4d9ffe;
   text-decoration: none;
@@ -73,7 +77,7 @@
 .formInput {
   margin-top: 10px;
 }
-.alert{
+.alert {
   width: 320px;
   position: fixed;
   top: 10%;
@@ -81,18 +85,18 @@
 }
 
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.5); /* Mờ độ 50% */
-    z-index: 999; /* Đảm bảo nó ở trên cùng */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5); /* Mờ độ 50% */
+  z-index: 999; /* Đảm bảo nó ở trên cùng */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Styles for zoomed image */
 .zoomed-image-container {
-    position: relative;
-    overflow: hidden;
+  position: relative;
+  overflow: hidden;
 }

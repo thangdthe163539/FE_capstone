@@ -415,39 +415,63 @@ function SoftwarePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${BACK_END_PORT}/api/Report/GetReportsForAppAndType/` +
-            software?.appId +
-            `/Issue`,
-        );
-        setReportData(response.data); // Assuming the API returns an array of objects
-        const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + software?.appId,
-        );
-        setDeviceData(response2.data); // Assuming the API returns an array of objects
-        const response3 = await axios.get(
-          `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
-        );
-        setSoftwareData(response3.data);
-        const response4 = await axios.get(
-          `${BACK_END_PORT}/api/Report/GetReportsForAppAndType/` +
-            software?.appId +
-            `/Feedback`,
-        );
-        setFeedbackData(response4.data); // Assuming the API returns an array of objects
-        const response5 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Library/ListLibrariesByApp/` +
-            software?.appId,
-        );
-        setLibraryData(response5.data);
-        const response6 = await axios.get(
-          `${BACK_END_PORT}/api/v1/App/get_App_by_Id/` + software?.appId,
-        );
-        console.log('API Response:', response6.data);
-        setAppData(response6.data[0]);
+        try {
+          const response = await axios.get(
+            `${BACK_END_PORT}/api/Report/GetReportsForAppAndType/` +
+              software?.appId +
+              `/Issue`,
+          );
+          setReportData(response.data); // Assuming the API returns an array of objects
+        } catch (error) {
+          setReportData([]);
+        }
+        try {
+          const response2 = await axios.get(
+            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` +
+              software?.appId,
+          );
+          setDeviceData(response2.data); // Assuming the API returns an array of objects
+        } catch (error) {
+          setDeviceData([]);
+        }
+        try {
+          const response3 = await axios.get(
+            `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
+          );
+          setSoftwareData(response3.data);
+        } catch (error) {
+          setSoftwareData([]);
+        }
+        try {
+          const response4 = await axios.get(
+            `${BACK_END_PORT}/api/Report/GetReportsForAppAndType/` +
+              software?.appId +
+              `/Feedback`,
+          );
+          setFeedbackData(response4.data); // Assuming the API returns an array of objects
+        } catch (error) {
+          setFeedbackData([]);
+        }
+        try {
+          const response5 = await axios.get(
+            `${BACK_END_PORT}/api/v1/Library/ListLibrariesByApp/` +
+              software?.appId,
+          );
+          setLibraryData(response5.data);
+        } catch (error) {
+          setLibraryData([]);
+        }
+        try {
+          const response6 = await axios.get(
+            `${BACK_END_PORT}/api/v1/App/get_App_by_Id/` + software?.appId,
+          );
+          setAppData(response6.data[0]);
+        } catch (error) {
+          setAppData([]);
+        }
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        //console.error('Error fetching data:', error);
         setLoading(false);
       }
     };

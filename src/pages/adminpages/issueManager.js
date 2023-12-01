@@ -14,7 +14,10 @@ import {
   Flex,
   Spacer,
   IconButton,
-  Textarea, InputGroup, InputLeftAddon, Center
+  Textarea,
+  InputGroup,
+  InputLeftAddon,
+  Center,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -79,7 +82,9 @@ function IssuePage() {
   const allowedExtensions = ['jpg', 'png'];
   const [mode, setMode] = useState('Application');
   const toggleMode = () => {
-    setMode((prevMode) => (prevMode === 'Application' ? 'Software' : 'Application'));
+    setMode((prevMode) =>
+      prevMode === 'Application' ? 'Software' : 'Application',
+    );
   };
 
   const filteAppSof = () => {
@@ -126,8 +131,9 @@ function IssuePage() {
     }
     setDynamicList(newList);
   };
-  const totalPages = dynamicFilteredAppData ? dynamicFilteredAppData?.length : 0;
-
+  const totalPages = dynamicFilteredAppData
+    ? dynamicFilteredAppData?.length
+    : 0;
 
   //image
   const handleFileChange = (e) => {
@@ -238,7 +244,7 @@ function IssuePage() {
 
   const countIssue = (appId) => {
     const occurrences = Issues.filter((item) => item.appId === appId);
-    console.log(occurrences.length + "---issue by appId = " + appId);
+    console.log(occurrences.length + '---issue by appId = ' + appId);
     return occurrences.length;
   };
 
@@ -247,9 +253,7 @@ function IssuePage() {
     const query = searchQueryTb.toLowerCase();
     const filteredData = Apps.filter((item) => {
       const name = item.name.toLowerCase();
-      return (
-        name.includes(query)
-      );
+      return name.includes(query);
     });
     setfilteredAppData(filteredData);
     setDynamicFilteredAppData(
@@ -370,7 +374,7 @@ function IssuePage() {
     formData.append('AppId', Id);
     formData.append('Title', title);
     formData.append('Description', desc);
-    formData.append('Type', 'issue');
+    formData.append('Type', 'Issue');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
     formData.append('Status', 2);
@@ -461,11 +465,9 @@ function IssuePage() {
             </Text>
             <Spacer />
             <InputGroup style={{ paddingTop: '', width: '35%' }}>
-              <InputLeftAddon
-                pointerEvents="none"
-                children='Application'
-              />
-              <Input style={{ width: '100%' }}
+              <InputLeftAddon pointerEvents='none' children='Application' />
+              <Input
+                style={{ width: '100%' }}
                 type='text'
                 value={searchQueryTb}
                 onChange={handleSearchTbInputChange}
@@ -487,7 +489,11 @@ function IssuePage() {
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
-            <Center><Text fontSize={30} mb={2}>List all issue</Text></Center>
+            <Center>
+              <Text fontSize={30} mb={2}>
+                List all issue
+              </Text>
+            </Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -567,10 +573,13 @@ function IssuePage() {
                   display='none'
                 />
                 <Flex alignItems='center'>
-                  <FormLabel style={{ marginRight: '1rem' }}>
-                    {mode}
-                  </FormLabel>
-                  <RepeatIcon onClick={toggleMode} style={{ marginRight: '1rem' }} boxSize={4} color="blue.500"></RepeatIcon>
+                  <FormLabel style={{ marginRight: '1rem' }}>{mode}</FormLabel>
+                  <RepeatIcon
+                    onClick={toggleMode}
+                    style={{ marginRight: '1rem' }}
+                    boxSize={4}
+                    color='blue.500'
+                  ></RepeatIcon>
                   <div
                     style={{
                       position: 'relative',
@@ -612,12 +621,13 @@ function IssuePage() {
                                 style={{ padding: '8px', cursor: 'pointer' }}
                                 onClick={() => {
                                   setSearchQuery(
-                                    `${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`
+                                    `${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`,
                                   );
                                   setAppId(app.appId);
                                 }}
                               >
-                                {app.name.trim()} - {app.os.trim()} - {app.osversion.trim()}
+                                {app.name.trim()} - {app.os.trim()} -{' '}
+                                {app.osversion.trim()}
                               </div>
                             ))}
                           </div>
@@ -656,7 +666,7 @@ function IssuePage() {
                                 style={{ padding: '8px', cursor: 'pointer' }}
                                 onClick={() => {
                                   setSearchQuerySof(
-                                    `${app.os.trim()} - ${app.osversion.trim()}`
+                                    `${app.os.trim()} - ${app.osversion.trim()}`,
                                   );
                                   setOs(app.os.trim());
                                   setOsversion(app.osversion.trim());
@@ -804,7 +814,13 @@ function IssuePage() {
             </Grid>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={mode === 'Application' ? handleSaveAdd : handleSaveAddMul}>
+            <Button
+              colorScheme='blue'
+              mr={3}
+              onClick={
+                mode === 'Application' ? handleSaveAdd : handleSaveAddMul
+              }
+            >
               Save
             </Button>
             <Button

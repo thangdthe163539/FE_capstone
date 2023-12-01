@@ -113,7 +113,7 @@ function IssueDetailManagePage() {
       // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
       setImage((prevImages) => [
         ...(Array.isArray(prevImages) ? prevImages : []).filter(
-          (img) => img && img.dataURL
+          (img) => img && img.dataURL,
         ),
         ...newImages.filter(Boolean),
       ]);
@@ -323,7 +323,7 @@ function IssueDetailManagePage() {
         ? detail.description.trim()
         : description.trim(),
     );
-    formData.append('Type', 'issue');
+    formData.append('Type', 'Issue');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
     formData.append(
@@ -350,8 +350,8 @@ function IssueDetailManagePage() {
       fileObjects.forEach((file, index) => {
         formData.append(`Images`, file);
       });
-    }else{
-      formData.append(`Images`, " ");
+    } else {
+      formData.append(`Images`, ' ');
     }
 
     try {
@@ -543,12 +543,12 @@ function IssueDetailManagePage() {
                           {item.status === 1
                             ? 'Unsolve'
                             : item.status === 2
-                              ? 'Solved '
-                              : item.status === 3
-                                ? 'Deleted '
-                                : item.status === 4
-                                  ? 'Cancel '
-                                  : ''}
+                            ? 'Solved '
+                            : item.status === 3
+                            ? 'Deleted '
+                            : item.status === 4
+                            ? 'Cancel '
+                            : ''}
                         </Td>
                       </Tr>
                     ))}
@@ -597,12 +597,12 @@ function IssueDetailManagePage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                            ? 'Solved'
-                            : status === 3
-                              ? 'Deleted'
-                              : status === 4
-                                ? 'Cancel'
-                                : 'Unknow'}
+                          ? 'Solved'
+                          : status === 3
+                          ? 'Deleted'
+                          : status === 4
+                          ? 'Cancel'
+                          : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}
@@ -698,7 +698,9 @@ function IssueDetailManagePage() {
                               right='5px'
                               fontSize='15px'
                               variant='ghost'
-                              onClick={(event) => handleDeleteClick(index, event)}
+                              onClick={(event) =>
+                                handleDeleteClick(index, event)
+                              }
                               _hover={{ color: 'black ' }}
                             />
                             <Text
@@ -739,7 +741,8 @@ function IssueDetailManagePage() {
                         </Modal>
                       </div>
                     )}
-                  </Box>)}
+                  </Box>
+                )}
                 {error && <Text color='red'>{error}</Text>}
               </GridItem>
             </Grid>

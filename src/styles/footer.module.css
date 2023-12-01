@@ -1,13 +1,11 @@
 .footer {
-  height: 300px;
   background-color: white;
   color: #344e74;
+  padding: 50px;
 }
 
 .logo {
   background: white;
-  margin-left: 10%;
-  margin-top: 8.5%;
   height: 20px;
 }
 
@@ -28,32 +26,23 @@
   color: #344e74;
   font-family: Sanchez;
   font-size: 30px;
-  margin-left: 13%;
-  margin-top: 3%;
 }
 .buttonContact {
-  margin-top: 8%;
-  margin-left: -10.6%;
+  /* margin-top: 8%;
+  margin-left: -10.6%; */
 }
 .about {
   color: #344e74;
   font-family: Sanchez;
   font-size: 30px;
-  margin-left: 13%;
-  margin-top: 3%;
-}
-.textAbout {
-  margin-left: 59%;
-  margin-top: -14%;
 }
 .lastline {
   background-color: whitesmoke;
   height: 40px;
   font-family: Sanchez;
-  font-size: 15px;
+  font-size: 16px;
   text-align: center;
-  margin-top: 4.5%;
-  padding-top: 0.5%;
+  padding-top: 10px;
 }
 .lastline1 {
   background-color: whitesmoke;

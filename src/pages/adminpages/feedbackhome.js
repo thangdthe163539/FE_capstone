@@ -189,7 +189,7 @@ function FeedbackPage() {
   };
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/Report/ReportsByType/feedback';
+    const url = 'http://localhost:5001/api/Report/ReportsByType/Feedback';
     fetch(url, {
       method: 'GET',
     })

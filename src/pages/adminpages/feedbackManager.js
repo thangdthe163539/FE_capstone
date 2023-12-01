@@ -453,7 +453,7 @@ function FeedBackPage() {
         ? detail.description.trim()
         : description.trim(),
     );
-    formData.append('Type', 'feedback');
+    formData.append('Type', 'Feedback');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
     formData.append(
