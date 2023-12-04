@@ -260,45 +260,47 @@ function FeedBackDetailManagePage() {
     setDetail(item);
   };
 
-  const handleSendMail = () => {
-    const url = `http://localhost:5001/api/Report/SendReportByEmail/${detail.reportId}`;
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        accept: '*/*',
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          setIsOpenDetail(false);
-          setIsSuccess('true');
-        } else {
-          setIsOpenDetail(false);
-          setIsSuccess('false');
-        }
-      })
-      .catch((error) => {
-        setIsOpenDetail(false);
-        setIsSuccess('false');
-        console.error('Lỗi:', error);
-      });
-  };
+  // const handleSendMail = () => {
+  //   const url = `http://localhost:5001/api/Report/SendReportByEmail/${detail.reportId}`;
+  //   fetch(url, {
+  //     method: 'POST',
+  //     headers: {
+  //       accept: '*/*',
+  //       'Content-Type': 'application/json',
+  //     },
+  //   })
+  //     .then((response) => {
+  //       if (response.ok) {
+  //         setIsOpenDetail(false);
+  //         setIsSuccess('true');
+  //       } else {
+  //         setIsOpenDetail(false);
+  //         setIsSuccess('false');
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       setIsOpenDetail(false);
+  //       setIsSuccess('false');
+  //       console.error('Lỗi:', error);
+  //     });
+  // };
 
   const handleUpdate = async () => {
     const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
 
+    const accId = 5;
     const endDate = document.getElementsByName('endDate')[0].value;
     const dateParts = endDate.split('-');
     let formattedDate = '';
     if (dateParts.length === 3) {
-      formattedDate = `${dateParts[1]}/${dateParts[2]}/${dateParts[0]}`;
+      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
     } else {
       console.error('Ngày không hợp lệ.');
     }
 
     const formData = new FormData();
     formData.append('AppId', detail.appId);
+    formData.append('AccId', accId);
     formData.append(
       'Title',
       title.trim() === '' ? detail.title.trim() : title.trim(),
@@ -384,22 +386,6 @@ function FeedBackDetailManagePage() {
       });
   }, []);
 
-  // useEffect(() => {
-  //   const url = `http://localhost:5001/api/Report/GetReportsForAppAndType/${appId}/feedback`;
-  //   if (appId) {
-  //     fetch(url, {
-  //       method: 'GET',
-  //     })
-  //       .then((response) => response.json())
-  //       .then((data) => {
-  //         console.log(data.status);
-  //         setIssue(data);
-  //       })
-  //       .catch((error) => {
-  //         console.error('Lỗi:', error);
-  //       });
-  //   }
-  // }, [appId]);
 
   const fetchDataAndUpdateState = () => {
     const url = `http://localhost:5001/api/Report/GetReportsForAppAndType/${appId}/Feedback`;
@@ -409,8 +395,19 @@ function FeedBackDetailManagePage() {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data.status);
-          setIssue(data);
+          const sortedData = data.sort((a, b) => {
+            if (a.status === 1 && b.status !== 1) {
+              return -1;
+            } else if (a.status !== 1 && b.status === 1) {
+              return 1;
+            } else if (a.status === 1 && b.status === 1) {
+              const dateA = new Date(a.start_Date.split('/').reverse().join('-'));
+              const dateB = new Date(b.start_Date.split('/').reverse().join('-'));
+
+              return dateA.getTime() - dateB.getTime();
+            }
+          });
+          setIssue(sortedData);
         })
         .catch((error) => {
           console.error('Lỗi:', error);
@@ -517,6 +514,12 @@ function FeedBackDetailManagePage() {
                         style={{ width: '5%', textAlign: 'center' }}
                         className={styles.cTh}
                       >
+                        CreateBy
+                      </Th>
+                      <Th
+                        style={{ width: '5%', textAlign: 'center' }}
+                        className={styles.cTh}
+                      >
                         StartDate
                       </Th>
                       <Th
@@ -538,7 +541,7 @@ function FeedBackDetailManagePage() {
                       <Tr key={index}>
                         <Td style={{ width: '5%' }}>{index + 1}</Td>
                         <Td
-                          style={{ width: '5%', color: 'blue' }}
+                          style={{ color: 'blue', textAlign: 'center' }}
                           onClick={() => {
                             handleAdd();
                             setDetails(item);
@@ -556,6 +559,9 @@ function FeedBackDetailManagePage() {
                           {trimTextToMaxWidth(item.description, 350)}
                         </Td>
                         <Td style={{ width: '15%', textAlign: 'center' }}>
+                          {item.emailSend}
+                        </Td>
+                        <Td style={{ width: '15%', textAlign: 'center' }}>
                           {item.start_Date}
                         </Td>
                         <Td style={{ width: '15%', textAlign: 'center' }}>
@@ -565,12 +571,12 @@ function FeedBackDetailManagePage() {
                           {item.status === 1
                             ? 'Unsolved '
                             : item.status === 2
-                            ? 'Solved '
-                            : item.status === 3
-                            ? 'Deleted '
-                            : item.status === 4
-                            ? 'Cancel '
-                            : 'Unknown Status'}
+                              ? 'Solved '
+                              : item.status === 3
+                                ? 'Deleted '
+                                : item.status === 4
+                                  ? 'Cancel '
+                                  : 'Unknown Status'}
                         </Td>
                       </Tr>
                     ))}
@@ -618,12 +624,12 @@ function FeedBackDetailManagePage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                          ? 'Solved'
-                          : status === 3
-                          ? 'Deleted'
-                          : status === 4
-                          ? 'Cancel'
-                          : 'Unknow'}
+                            ? 'Solved'
+                            : status === 3
+                              ? 'Deleted'
+                              : status === 4
+                                ? 'Cancel'
+                                : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}
@@ -771,9 +777,6 @@ function FeedBackDetailManagePage() {
           <ModalFooter>
             <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
               Save
-            </Button>
-            <Button colorScheme='whatsapp' mr={3} onClick={handleSendMail}>
-              Send Mail
             </Button>
             <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
           </ModalFooter>

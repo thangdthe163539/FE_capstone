@@ -7,13 +7,13 @@ function ADHomePage() {
   return (
     <Box className={styles.bodybox}>
       <List>
-        <ListItem className={styles.list}>
+        {/* <ListItem className={styles.list}>
           <Flex style={{ fontSize: '18px' }}>
             <Link className={styles.listitem} href='/adminpages/dashboard'>
               Dashboard
             </Link>
           </Flex>
-        </ListItem>
+        </ListItem> */}
         <ListItem className={styles.list}>
           <Flex style={{ fontSize: '18px' }}>
             <Link className={styles.listitem} href='/adminpages/userManager'>

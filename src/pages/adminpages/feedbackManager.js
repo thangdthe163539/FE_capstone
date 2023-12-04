@@ -13,7 +13,6 @@ import {
   TableContainer,
   Flex,
   Spacer,
-  IconButton,
   Textarea,
   Image, Center
 } from '@chakra-ui/react';
@@ -38,9 +37,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
-import { FaPlus } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import Pagination from '@/components/pagination';
 
 const defaultData = {
@@ -54,24 +51,18 @@ const defaultData = {
 };
 
 function FeedBackPage() {
-  const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenDetail, setIsOpenDetail] = useState(false);
   const [formData, setFormData] = useState(defaultData);
-  const [searchQuery, setSearchQuery] = useState('');
   const [searchQueryTb, setSearchQueryTb] = useState('');
-  const [filteredAppData, setfilteredAppData] = useState([]);
   const [filteredIssueData, setFilteredIssueData] = useState([]);
   const [Issues, setIssues] = useState([]);
   const [Apps, setApps] = useState([]);
   const [isSuccess, setIsSuccess] = useState('');
   const notificationTimeout = 2000;
-  // const [showOptions, setShowOptions] = useState(false);
-  // const [appId, setAppId] = useState('');
   const [detail, setDetail] = useState(null);
   const [selectedOptionActive, setSelectedOptionActive] = useState('');
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
-  // const [imagesState, setImages] = useState([]);
   const [error, setError] = useState('');
   const [image, setImage] = useState([]);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -99,6 +90,8 @@ function FeedBackPage() {
   useEffect(() => {
     if (filteredIssueData.length) {
       handleChangePage(1);
+    }else {
+      setDynamicList([])
     }
   }, [filteredIssueData]);
   //Image
@@ -154,33 +147,6 @@ function FeedBackPage() {
     }
   };
 
-  // const handleFileChange = (e) => {
-  //   const files = e.target.files;
-
-  //   if (files) {
-  //     const newImages = Array.from(files).map((file) => {
-  //       const extension = file.name.split('.').pop().toLowerCase();
-
-  //       if (allowedExtensions.includes(extension)) {
-  //         const reader = new FileReader();
-
-  //         reader.onload = () => {
-  //           setImages((prevImages) => [
-  //             ...prevImages,
-  //             { fileName: file.name, dataURL: reader.result },
-  //           ]);
-  //           setError('');
-  //         };
-
-  //         reader.readAsDataURL(file);
-  //       } else {
-  //         setError('Invalid file type. Please select a JPG or PNG file.');
-  //         return null;
-  //       }
-  //     });
-  //   }
-  // };
-
   const handleImageClick = (index) => {
     setZoomedIndex(index);
     setIsZoomed(true);
@@ -200,15 +166,6 @@ function FeedBackPage() {
     setIsHovered(index);
   };
 
-  // const handleRemoveImage = (index) => {
-  //   setImages((prevImages) => {
-  //     const newImages = [...prevImages];
-  //     newImages.splice(index, 1);
-  //     return newImages;
-  //   });
-  //   setError('');
-  // };
-
   const handleRemoveImageU = (index) => {
     setImage((prevImages) => {
       const newImages = [...prevImages];
@@ -217,11 +174,6 @@ function FeedBackPage() {
     });
     setError('');
   };
-
-  // const handleDeleteClick_Add = (index, event) => {
-  //   event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
-  //   handleRemoveImage(index);
-  // };
 
   const handleDeleteClick = (index, event) => {
     event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
@@ -241,12 +193,6 @@ function FeedBackPage() {
 
     return new Blob([uInt8Array], { type: contentType });
   }
-
-  //End
-
-  // const handleSearchInputChange = (e) => {
-  //   setSearchQuery(e.target.value);
-  // };
 
   const handleSearchTbInputChange = (e) => {
     setSearchQueryTb(e.target.value);
@@ -281,27 +227,6 @@ function FeedBackPage() {
       </span>
     );
   };
-
-  // useEffect(() => {
-  //   const url = 'http://localhost:5001/api/Report/ReportsByType/Feedback';
-  //   fetch(url, {
-  //     method: 'GET',
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       const filteredData = data.filter(
-  //         (item) =>
-  //           item.status !== -1 &&
-  //           item.status !== 3 &&
-  //           item.status !== 4 &&
-  //           item.status !== 2,
-  //       );
-  //       setIssues(filteredData);
-  //     })
-  //     .catch((error) => {
-  //       console.error('Lỗi:', error);
-  //     });
-  // }, []);
 
   useEffect(() => {
     const url = 'http://localhost:5001/api/v1/App/ListApps';
@@ -338,24 +263,6 @@ function FeedBackPage() {
   useEffect(() => {
     filteIssue();
   }, [searchQueryTb, Issues]);
-
-  // const filteApp = () => {
-  //   const query = searchQuery.toLowerCase();
-  //   const filteredData = Apps.filter((item) => {
-  //     const name = item.name.toLowerCase();
-  //     const os = item.os.toLowerCase();
-  //     const version = item.osversion.toLowerCase();
-  //     return (
-  //       name.includes(query) || os.includes(query) || version.includes(query)
-  //     );
-  //   });
-  //   setfilteredAppData(filteredData);
-  // };
-
-  // useEffect(() => {
-  //   filteApp();
-  // }, [searchQuery, Issues]);
-  //end
 
   //detail
   const setDetails = (item) => {
@@ -500,55 +407,6 @@ function FeedBackPage() {
     }
   };
 
-  // const handleSaveAdd = async () => {
-  //   const url = 'http://localhost:5001/api/Report/CreateReport';
-
-  //   const Id = parseInt(appId);
-  //   const desc = document.getElementById('description').value;
-  //   const title = document.getElementById('title').value;
-  //   const endDate = document.getElementsByName('endDate')[0].value;
-  //   const dateParts = endDate.split('-');
-  //   let formattedDate = '';
-  //   if (dateParts.length === 3) {
-  //     formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-  //   } else {
-  //     console.error('Ngày không hợp lệ.');
-  //   }
-  //   // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
-  //   const fileObjects = imagesState.map((image) => {
-  //     // Tạo một Blob từ dataURL
-  //     const blob = dataURLtoBlob(image.dataURL);
-  //     // Tạo một File từ Blob
-  //     return new File([blob], image.fileName, { type: blob.type });
-  //     [];
-  //   });
-  //   const formData = new FormData();
-  //   formData.append('AppId', Id);
-  //   formData.append('Title', title);
-  //   formData.append('Description', desc);
-  //   formData.append('Type', 'Feedback');
-  //   formData.append('Start_Date', formattedDate);
-  //   formData.append('End_Date', formattedDate);
-  //   formData.append('Status', 1);
-
-  //   // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
-  //   fileObjects.forEach((file, index) => {
-  //     formData.append(`Images`, file);
-  //   });
-  //   try {
-  //     const response = await axios.post(url, formData, {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data',
-  //       },
-  //     });
-  //     setIsSuccess('true');
-  //     setIsOpenAdd(false);
-  //   } catch (error) {
-  //     setIsSuccess('false');
-  //     setIsOpenAdd(false);
-  //     console.error('Lỗi:', error);
-  //   }
-  // };
   const fetchDataAndUpdateState = () => {
     const url = 'http://localhost:5001/api/Report/ReportsByType/Feedback';
     fetch(url, {
@@ -625,7 +483,7 @@ function FeedBackPage() {
             <InputGroup style={{ paddingTop: '', width: '35%' }}>
               <InputLeftAddon
                 pointerEvents="none"
-                children='Title - Application'
+                children='Title / Application'
               />
               <Input style={{ width: '100%' }}
                 type='text'
@@ -636,20 +494,11 @@ function FeedBackPage() {
                 mr={1}
               />
             </InputGroup>
-            {/* <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray'
-                marginRight={1}
-                onClick={() => setIsOpenAdd(true)}
-              />
-            </Box> */}
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
-            <Center><Text fontSize={30} mb={2}>List open feedback</Text></Center>
+            <Center><Text fontSize={30} mb={2}>Open feedback</Text></Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -678,7 +527,6 @@ function FeedBackPage() {
                   <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Start Date</Th>
                   <Th className={styles.cTh}>Deadline</Th>
-                  {/* <Th className={styles.cTh}>Status</Th> */}
 
                 </Tr>
               </Thead>
@@ -715,12 +563,6 @@ function FeedBackPage() {
                     </Td>
                     <Td style={{ width: '10%' }}>{issue.start_Date}</Td>
                     <Td style={{ width: '7%' }}>{issue.end_Date}</Td>
-                    {/* <Td>{issue.status === 1 ? 'Unsolved ' :
-                      issue.status === 2 ? 'Solved ' :
-                        issue.status === 3 ? 'Deleted ' :
-                          issue.status === 4 ? 'Cancel ' :
-                            'Unknown Status'}</Td> */}
-
                   </Tr>
                 ))}
               </Tbody>
@@ -918,226 +760,6 @@ function FeedBackPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      {/* <Modal
-        isOpen={isOpenAdd}
-        onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
-        closeOnOverlayClick={false}
-        size='lg'
-      >
-        <ModalOverlay />
-        <ModalContent maxW='1100px'>
-          <ModalHeader>Create New Feedback</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid templateColumns='repeat(3, 1fr)' gap={8}>
-              <GridItem colSpan={1}>
-                <Input
-                  name='softwareID'
-                  value={formData.softwareId}
-                  onChange={handleInputChange}
-                  display='none'
-                />
-                <Flex alignItems='center'>
-                  <FormLabel style={{ marginRight: '1rem' }}>
-                    Application
-                  </FormLabel>
-                  <div
-                    style={{
-                      position: 'relative',
-                      display: 'inline-block',
-                      backgroundColor: 'whitesmoke',
-                      width: '300px',
-                    }}
-                  >
-                    <Input
-                      type='text'
-                      style={{ backgroundColor: 'whitesmoke, width: 270px' }}
-                      value={searchQuery}
-                      onChange={(e) => {
-                        handleSearchInputChange(e);
-                        setShowOptions(e.target.value !== '');
-                      }}
-                      placeholder='Name - Os - Version'
-                      w={300}
-                      mr={1}
-                    />
-                    {showOptions && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: 0,
-                          width: '300px',
-                          border: '2px solid whitesmoke',
-                          background: '#fff',
-                          zIndex: 1,
-                          borderRadius: '5px',
-                        }}
-                      >
-                        {filteredAppData.map((app) => (
-                          <div
-                            key={app.appId}
-                            style={{ padding: '8px', cursor: 'pointer' }}
-                            onClick={() => {
-                              setSearchQuery(
-                                `${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`,
-                              );
-                              setAppId(app.appId);
-                            }}
-                          >
-                            {app.name.trim()} - {app.os.trim()} -{' '}
-                            {app.osversion.trim()}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Title</FormLabel>
-                  <Input
-                    id='title'
-                    placeholder='Title'
-                    style={{ backgroundColor: 'whitesmoke' }}
-                  />
-                </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>EndDate</FormLabel>
-                  <Input
-                    style={{
-                      marginLeft: '-7px',
-                      backgroundColor: 'whitesmoke',
-                    }}
-                    type='date'
-                    name='endDate'
-                    onChange={handleInputChange}
-                  />
-                </Flex>
-              </GridItem>
-            </Grid>
-            <FormControl mt={4}>
-              <FormLabel>Description</FormLabel>
-              <Textarea
-                id='description'
-                placeholder='Description...'
-                width='100%'
-                minH={40}
-              />
-            </FormControl>
-            <br />
-            <Grid templateColumns='repeat(1, 1fr)' gap={8}>
-              <GridItem>
-                <Flex>
-                  <FormLabel style={{ width: '50px' }}>Image</FormLabel>
-                  <Input
-                    style={{
-                      width: '300px',
-                      border: 'none',
-                      textAlign: 'center',
-                      height: '40px',
-                    }}
-                    id='file'
-                    type='file'
-                    onChange={handleFileChange}
-                    multiple
-                  />
-                </Flex>
-                <Box display='flex' flexWrap='wrap' gap={4}>
-                  {imagesState.map((image, index) => (
-                    <Box
-                      key={index}
-                      position='relative'
-                      maxW='100px'
-                      maxH='200px'
-                      overflow='hidden'
-                      onClick={() => handleImageClick(index)}
-                      onMouseEnter={(event) =>
-                        handleImageMouseEnter(index, event)
-                      }
-                      onMouseLeave={handleImageMouseLeave}
-                    >
-                      <Image
-                        src={image.dataURL}
-                        alt={`Selected Image ${index}`}
-                        w='100%'
-                        h='100%'
-                        objectFit='cover'
-                        _hover={{ cursor: 'pointer' }}
-                      />
-                      {isHovered === index && (
-                        <>
-                          <DeleteIcon
-                            position='absolute'
-                            top='5px'
-                            color='black'
-                            right='5px'
-                            fontSize='15px'
-                            variant='ghost'
-                            onClick={(event) =>
-                              handleDeleteClick_Add(index, event)
-                            }
-                            _hover={{ color: 'black' }}
-                          />
-                          <Text
-                            position='absolute'
-                            bottom='5px'
-                            left='5px'
-                            fontSize='10px'
-                            color='white'
-                          >
-                            {image.fileName}
-                          </Text>
-                        </>
-                      )}
-                    </Box>
-                  ))}
-                  {isZoomed && (
-                    <div className='modal-overlay' onClick={handleZoomClose}>
-                      <Modal
-                        isOpen={isZoomed}
-                        onClose={handleZoomClose}
-                        size='xl'
-                        isCentered
-                      >
-                        <ModalOverlay />
-                        <ModalContent>
-                          <ModalBody>
-                            <Box className='zoomed-image-container'>
-                              <Image
-                                src={imagesState[zoomedIndex]?.dataURL}
-                                alt={`${zoomedIndex}`}
-                                w='100%' // Thiết lập kích thước modal sao cho đủ lớn
-                                h='100%'
-                                objectFit='contain'
-                              />
-                            </Box>
-                          </ModalBody>
-                        </ModalContent>
-                      </Modal>
-                    </div>
-                  )}
-                </Box>
-                {error && <Text color='red'>{error}</Text>}
-              </GridItem>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
-              Save
-            </Button>
-            <Button
-              onClick={() => (setIsOpenAdd(false), setFormData(defaultData))}
-            >
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal> */}
     </Box>
   );
 }
