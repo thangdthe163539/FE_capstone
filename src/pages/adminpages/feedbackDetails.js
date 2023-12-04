@@ -284,11 +284,25 @@ function FeedBackDetailManagePage() {
   //       console.error('Lỗi:', error);
   //     });
   // };
+  const [account, setAccount] = useState();
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
 
   const handleUpdate = async () => {
     const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
 
-    const accId = 5;
+    const accId = account?.accId;
     const endDate = document.getElementsByName('endDate')[0].value;
     const dateParts = endDate.split('-');
     let formattedDate = '';

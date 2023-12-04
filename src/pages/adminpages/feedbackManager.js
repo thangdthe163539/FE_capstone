@@ -90,7 +90,7 @@ function FeedBackPage() {
   useEffect(() => {
     if (filteredIssueData.length) {
       handleChangePage(1);
-    }else {
+    } else {
       setDynamicList([])
     }
   }, [filteredIssueData]);
@@ -337,19 +337,35 @@ function FeedBackPage() {
       });
   };
 
+  const [account, setAccount] = useState();
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
+
   const handleUpdate = async () => {
     const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
-
+    const accId = account?.accId;
     const endDate = document.getElementsByName('endDate')[0].value;
     const dateParts = endDate.split('-');
     let formattedDate = '';
     if (dateParts.length === 3) {
-      formattedDate = `${dateParts[1]}/${dateParts[2]}/${dateParts[0]}`;
+      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
     } else {
       console.error('Ngày không hợp lệ.');
     }
     const formData = new FormData();
     formData.append('AppId', detail.appId);
+    formData.append('AccId', accId);
     formData.append(
       'Title',
       title.trim() === '' ? detail.title.trim() : title.trim(),
@@ -389,8 +405,8 @@ function FeedBackPage() {
       fileObjects.forEach((file, index) => {
         formData.append(`Images`, file);
       });
-    }else{
-      formData.append(`Images`," ");
+    } else {
+      formData.append(`Images`, " ");
     }
     try {
       const response = await axios.put(url, formData, {
@@ -752,9 +768,6 @@ function FeedBackPage() {
           <ModalFooter>
             <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
               Save
-            </Button>
-            <Button colorScheme='whatsapp' mr={3} onClick={handleSendMail}>
-              Send Mail
             </Button>
             <Button onClick={() => setIsOpenDetail(false)}>Cancel</Button>
           </ModalFooter>

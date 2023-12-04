@@ -370,7 +370,7 @@ function IssuePage() {
   const totalPages = filteredIssueData ? filteredIssueData?.length : 0;
 
   //lọc
-  const filteIssue = () => {
+  const filteIssue = () => {handleSearchInputChangeHw
     const query = searchQueryTb.toLowerCase();
     const filteredData = Issues.filter((item) => {
       const title = item.title.toLowerCase();
@@ -389,6 +389,8 @@ function IssuePage() {
   useEffect(() => {
     if (filteredIssueData.length) {
       handleChangePage(1);
+    }else{
+      setDynamicList([])
     }
   }, [filteredIssueData]);
 
@@ -1029,7 +1031,7 @@ function IssuePage() {
             <InputGroup style={{ paddingTop: '', width: '35%' }}>
               <InputLeftAddon
                 pointerEvents='none'
-                children='Title - Application'
+                children='Title / Application'
               />
               <Input
                 style={{ width: '100%' }}
@@ -1056,7 +1058,7 @@ function IssuePage() {
           <TableContainer>
             <Center>
               <Text fontSize={30} mb={2}>
-                List open issue
+                Open issue
               </Text>
             </Center>
             <Table
@@ -1314,9 +1316,6 @@ function IssuePage() {
           <ModalFooter>
             <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
               Save
-            </Button>
-            <Button colorScheme='whatsapp' mr={3} onClick={handleSendMail}>
-              Send Mail
             </Button>
             <Button
               onClick={() => (setIsOpenDetail(false), setFormData(defaultData))}

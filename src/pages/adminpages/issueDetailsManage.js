@@ -392,6 +392,18 @@ function IssueDetailManagePage() {
         .then((response) => response.json())
         .then((data) => {
           if (data.status !== 400) {
+            const sortedData = data.sort((a, b) => {
+              if (a.status === 1 && b.status !== 1) {
+                return -1;
+              } else if (a.status !== 1 && b.status === 1) {
+                return 1;
+              } else if (a.status === 1 && b.status === 1) {
+                const dateA = new Date(a.start_Date.split('/').reverse().join('-'));
+                const dateB = new Date(b.start_Date.split('/').reverse().join('-'));
+  
+                return dateA.getTime() - dateB.getTime();
+              }
+            });
             setIssue(data);
           }
         })
@@ -494,6 +506,12 @@ function IssueDetailManagePage() {
                         style={{ width: '5%', textAlign: 'center' }}
                         className={styles.cTh}
                       >
+                        CreateBy
+                      </Th>
+                      <Th
+                        style={{ width: '5%', textAlign: 'center' }}
+                        className={styles.cTh}
+                      >
                         StartDate
                       </Th>
                       <Th
@@ -515,7 +533,7 @@ function IssueDetailManagePage() {
                       <Tr key={index}>
                         <Td style={{ width: '5%' }}>{index + 1}</Td>
                         <Td
-                          style={{ width: '5%', color: 'blue' }}
+                          style={{ width: '5%', color: 'blue', textAlign: 'center' }}
                           cursor={'pointer'}
                           onClick={() => {
                             handleAdd();
@@ -532,6 +550,9 @@ function IssueDetailManagePage() {
                           }}
                         >
                           {trimTextToMaxWidth(item.description, 300)}
+                        </Td>
+                        <Td style={{ width: '15%', textAlign: 'center' }}>
+                          {item.emailSend}
                         </Td>
                         <Td style={{ width: '15%', textAlign: 'center' }}>
                           {item.start_Date}
@@ -750,9 +771,6 @@ function IssueDetailManagePage() {
           <ModalFooter>
             <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
               Save
-            </Button>
-            <Button colorScheme='whatsapp' mr={3} onClick={handleSendMail}>
-              Send Mail
             </Button>
             <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
           </ModalFooter>
