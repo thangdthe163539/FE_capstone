@@ -146,7 +146,7 @@ function FeedbackPage() {
         );
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
+          `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
         );
         setSoftwareData(response2.data); // Assuming the API returns an array of objects
 

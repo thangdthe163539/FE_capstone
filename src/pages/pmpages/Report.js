@@ -71,11 +71,11 @@ function ReportPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
+          `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
         );
         setAppData(response.data); // Assuming the API returns an array of objects
         // const response2 = await axios.get(
-        //   `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
+        //   `${BACK_END_PORT}/api/Device/list_device_with_user` +
         //     account.accId,
         // );
         // setDeviceData(response2.data); // Assuming the API returns an array of objects
@@ -101,7 +101,7 @@ function ReportPage() {
             .map(async (software) => {
               try {
                 const response2 = await axios.get(
-                  `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` +
+                  `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` +
                     software?.appId,
                 );
 
@@ -155,7 +155,7 @@ function ReportPage() {
             try {
               try {
                 const response2 = await axios.get(
-                  `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+                  `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
                     asset?.assetId,
                 );
                 // Filter out duplicate software based on assetID
@@ -171,11 +171,11 @@ function ReportPage() {
 
               try {
                 const response3 = await axios.get(
-                  `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
+                  `${BACK_END_PORT}/api/License/list_Licenses_by_Asset/` +
                     asset?.assetId,
                 );
                 const response4 = await axios.get(
-                  `${BACK_END_PORT}/api/v1/Software/ListSoftwares`,
+                  `${BACK_END_PORT}/api/Software/ListSoftwares`,
                 );
                 // Add assetId to each license item
                 const licenseDataWithAssetId = response3.data.map(

@@ -126,33 +126,30 @@ function SoftwarePage() {
   const handleSaveAdd = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.post(
-        `${BACK_END_PORT}/api/v1/App/CreateApp`,
-        {
-          accId: account.accId,
-          name: formData.name,
-          publisher: formData.publisher,
-          version: formData.version,
-          release: formData.release,
-          type: formData.type,
-          os: formData.os,
-          osversion: formData.osversion,
-          description: formData.description,
-          download: formData.download,
-          docs: formData.docs,
-          language: formData.language,
-          db: formData.db,
-          status: 1,
-          // deviceId: formData.deviceId,
-        },
-      );
+      const response = await axios.post(`${BACK_END_PORT}/api/App/CreateApp`, {
+        accId: account.accId,
+        name: formData.name,
+        publisher: formData.publisher,
+        version: formData.version,
+        release: formData.release,
+        type: formData.type,
+        os: formData.os,
+        osversion: formData.osversion,
+        description: formData.description,
+        download: formData.download,
+        docs: formData.docs,
+        language: formData.language,
+        db: formData.db,
+        status: 1,
+        // deviceId: formData.deviceId,
+      });
       console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
       setFormData(defaultData);
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
+        `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -164,7 +161,7 @@ function SoftwarePage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/App/UpdateApplication/` + formData2.appId,
+        `${BACK_END_PORT}/api/App/UpdateApplication/` + formData2.appId,
         {
           // accId: account.accId,
           name: formData2.name,
@@ -189,7 +186,7 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
+        `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -202,14 +199,14 @@ function SoftwarePage() {
       try {
         try {
           const response = await axios.get(
-            `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
+            `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
           );
           setData(response.data); // Assuming the API returns an array of objects
         } catch (error) {
           setData([]);
         }
         // const response2 = await axios.get(
-        //   `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
+        //   `${BACK_END_PORT}/api/Device/list_device_with_user` +
         //     account.accId,
         // );
         // setDeviceData(response2.data); // Assuming the API returns an array of objects
@@ -230,7 +227,7 @@ function SoftwarePage() {
           data.map(async (software) => {
             try {
               const response2 = await axios.get(
-                `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` +
+                `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` +
                   software?.appId,
               );
               const count = response2.data.length;
@@ -290,8 +287,7 @@ function SoftwarePage() {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `${BACK_END_PORT}/api/v1/App/DeleteAppWith_key?Appid=` +
-          formData2.appId,
+        `${BACK_END_PORT}/api/App/DeleteAppWith_key?Appid=` + formData2.appId,
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
       setButtonDisabled(true);
@@ -299,7 +295,7 @@ function SoftwarePage() {
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
+        `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
       );
       setData(newDataResponse.data);
       toast({
@@ -331,12 +327,12 @@ function SoftwarePage() {
           <Flex>
             <Box>
               <InputGroup>
-                <InputLeftAddon children='Search' />
+                <InputLeftAddon children='Name / publisher' />
                 <Input
                   type='text'
                   value={searchQuery}
                   onChange={handleSearchInputChange}
-                  placeholder='name - publisher'
+                  placeholder='search...'
                   w={300}
                   mr={1}
                 />

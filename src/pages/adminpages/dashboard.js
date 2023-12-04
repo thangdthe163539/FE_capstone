@@ -74,10 +74,10 @@ function Dashboard() {
       issueResponse,
       feedbackResponse,
     ] = await Promise.all([
-      axios.get('/api/v1/Account/ListAccount'),
-      axios.get('api/v1/App/ListApps'),
-      axios.get('api/v1/Asset/ListAssets'),
-      axios.get('api/v1/Software/ListSoftwares'),
+      axios.get('/api/Account/ListAccount'),
+      axios.get('api/App/ListApps'),
+      axios.get('api/Asset/ListAssets'),
+      axios.get('api/Software/ListSoftwares'),
       axios.get('api/Report/ReportsByType/Issue'),
       axios.get('api/Report/ReportsByType/Feedback'),
     ]);

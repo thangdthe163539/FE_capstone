@@ -145,7 +145,7 @@ function IssueDetailManagePage() {
 
   useEffect(() => {
     if (detail?.reportId) {
-      const url = `http://localhost:5001/api/v1/Image/list_Images_by_Report/${detail.reportId}`;
+      const url = `http://localhost:5001/api/Image/list_Images_by_Report/${detail.reportId}`;
 
       fetch(url, {
         method: 'GET',
@@ -370,7 +370,7 @@ function IssueDetailManagePage() {
   };
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/v1/App/ListApps';
+    const url = 'http://localhost:5001/api/App/ListApps';
     fetch(url, {
       method: 'GET',
     })
@@ -398,9 +398,13 @@ function IssueDetailManagePage() {
               } else if (a.status !== 1 && b.status === 1) {
                 return 1;
               } else if (a.status === 1 && b.status === 1) {
-                const dateA = new Date(a.start_Date.split('/').reverse().join('-'));
-                const dateB = new Date(b.start_Date.split('/').reverse().join('-'));
-  
+                const dateA = new Date(
+                  a.start_Date.split('/').reverse().join('-'),
+                );
+                const dateB = new Date(
+                  b.start_Date.split('/').reverse().join('-'),
+                );
+
                 return dateA.getTime() - dateB.getTime();
               }
             });
@@ -533,7 +537,11 @@ function IssueDetailManagePage() {
                       <Tr key={index}>
                         <Td style={{ width: '5%' }}>{index + 1}</Td>
                         <Td
-                          style={{ width: '5%', color: 'blue', textAlign: 'center' }}
+                          style={{
+                            width: '5%',
+                            color: 'blue',
+                            textAlign: 'center',
+                          }}
                           cursor={'pointer'}
                           onClick={() => {
                             handleAdd();

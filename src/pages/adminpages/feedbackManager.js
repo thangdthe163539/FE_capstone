@@ -1,6 +1,8 @@
 import {
-  Box, InputGroup,
-  ListItem, InputLeftAddon,
+  Box,
+  InputGroup,
+  ListItem,
+  InputLeftAddon,
   List,
   Text,
   Table,
@@ -14,7 +16,8 @@ import {
   Flex,
   Spacer,
   Textarea,
-  Image, Center
+  Image,
+  Center,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -91,13 +94,13 @@ function FeedBackPage() {
     if (filteredIssueData.length) {
       handleChangePage(1);
     } else {
-      setDynamicList([])
+      setDynamicList([]);
     }
   }, [filteredIssueData]);
   //Image
   useEffect(() => {
     if (detail?.reportId) {
-      const url = `http://localhost:5001/api/v1/Image/list_Images_by_Report/${detail.reportId}`;
+      const url = `http://localhost:5001/api/Image/list_Images_by_Report/${detail.reportId}`;
 
       fetch(url, {
         method: 'GET',
@@ -140,7 +143,7 @@ function FeedBackPage() {
       // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
       setImage((prevImages) => [
         ...(Array.isArray(prevImages) ? prevImages : []).filter(
-          (img) => img && img.dataURL
+          (img) => img && img.dataURL,
         ),
         ...newImages.filter(Boolean),
       ]);
@@ -229,7 +232,7 @@ function FeedBackPage() {
   };
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/v1/App/ListApps';
+    const url = 'http://localhost:5001/api/App/ListApps';
     fetch(url, {
       method: 'GET',
     })
@@ -384,7 +387,6 @@ function FeedBackPage() {
       selectedOptionActive === '' ? detail.status : selectedOptionActive,
     );
 
-
     if (Array.isArray(image) && image.length !== 0) {
       const fileObjects = await Promise.all(
         image.map(async (image) => {
@@ -406,7 +408,7 @@ function FeedBackPage() {
         formData.append(`Images`, file);
       });
     } else {
-      formData.append(`Images`, " ");
+      formData.append(`Images`, ' ');
     }
     try {
       const response = await axios.put(url, formData, {
@@ -498,10 +500,11 @@ function FeedBackPage() {
             <Spacer />
             <InputGroup style={{ paddingTop: '', width: '35%' }}>
               <InputLeftAddon
-                pointerEvents="none"
+                pointerEvents='none'
                 children='Title / Application'
               />
-              <Input style={{ width: '100%' }}
+              <Input
+                style={{ width: '100%' }}
                 type='text'
                 value={searchQueryTb}
                 onChange={handleSearchTbInputChange}
@@ -514,7 +517,11 @@ function FeedBackPage() {
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
-            <Center><Text fontSize={30} mb={2}>Open feedback</Text></Center>
+            <Center>
+              <Text fontSize={30} mb={2}>
+                Open feedback
+              </Text>
+            </Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -523,7 +530,8 @@ function FeedBackPage() {
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
-                    Show {dynamicList.length}/{filteredIssueData.length} result(s)
+                    Show {dynamicList.length}/{filteredIssueData.length}{' '}
+                    result(s)
                   </Text>{' '}
                   <Pagination
                     current={currentPage}
@@ -543,7 +551,6 @@ function FeedBackPage() {
                   <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Start Date</Th>
                   <Th className={styles.cTh}>Deadline</Th>
-
                 </Tr>
               </Thead>
               <Tbody>
@@ -618,12 +625,12 @@ function FeedBackPage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                            ? 'Solved'
-                            : status === 3
-                              ? 'Deleted'
-                              : status === 4
-                                ? 'Cancel'
-                                : 'Unknow'}
+                          ? 'Solved'
+                          : status === 3
+                          ? 'Deleted'
+                          : status === 4
+                          ? 'Cancel'
+                          : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}
@@ -719,7 +726,9 @@ function FeedBackPage() {
                               right='5px'
                               fontSize='15px'
                               variant='ghost'
-                              onClick={(event) => handleDeleteClick(index, event)}
+                              onClick={(event) =>
+                                handleDeleteClick(index, event)
+                              }
                               _hover={{ color: 'black ' }}
                             />
                             <Text
@@ -760,7 +769,8 @@ function FeedBackPage() {
                         </Modal>
                       </div>
                     )}
-                  </Box>)}
+                  </Box>
+                )}
                 {error && <Text color='red'>{error}</Text>}
               </GridItem>
             </Grid>
