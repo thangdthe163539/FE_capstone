@@ -90,6 +90,8 @@ function FeedBackPage() {
   useEffect(() => {
     if (filteredIssueData.length) {
       handleChangePage(1);
+    }else {
+      setDynamicList([])
     }
   }, [filteredIssueData]);
   //Image
@@ -481,7 +483,7 @@ function FeedBackPage() {
             <InputGroup style={{ paddingTop: '', width: '35%' }}>
               <InputLeftAddon
                 pointerEvents="none"
-                children='Title - Application'
+                children='Title / Application'
               />
               <Input style={{ width: '100%' }}
                 type='text'

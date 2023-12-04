@@ -71,6 +71,8 @@ function UserManager() {
   useEffect(() => {
     if (filteredAccData.length) {
       handleChangePage(1);
+    }else{
+      setDynamicList([])
     }
   }, [filteredAccData]);
 

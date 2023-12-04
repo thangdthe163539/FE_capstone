@@ -102,7 +102,6 @@ function FeedbackPage() {
 
   const countIssue = (appId) => {
     const occurrences = Issues.filter((item) => item.appId === appId);
-    console.log(occurrences.length + "---issue by appId = " + appId);
     return occurrences.length;
   };
 
@@ -115,7 +114,7 @@ function FeedbackPage() {
         name.includes(query) 
       );
     });
-    setfilteredAppData(filteredData);
+    setfilteredAppData(filteredData.filter((item) => countIssue(item.appId) !== 0));
     setDynamicFilteredAppData(
       filteredData.filter((item) => countIssue(item.appId) !== 0),
     );
