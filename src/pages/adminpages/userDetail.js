@@ -1,11 +1,11 @@
 import {
-    Text, ModalBody,
-    Modal, Grid, Select,
-    ModalOverlay, ModalFooter,
+    Text, ModalBody,TableContainer ,Center ,
+    Modal, Grid, Select,Table ,
+    ModalOverlay, ModalFooter,Thead,
     ModalContent, FormLabel, Input,
-    ModalHeader, GridItem,
-    ModalCloseButton,
-    Box, Button, Flex
+    ModalHeader, GridItem,Tr ,
+    ModalCloseButton,Td ,
+    Box, Button, Flex,Tbody 
 } from '@chakra-ui/react'
 import {
     Alert,
@@ -129,7 +129,7 @@ function UserDetail() {
     return <Box style={{ backgroundColor: 'white', width: 'auto', height: '100%', padding: '10px 20px' }}>
         <Flex>
             <Text fontSize='30px' color='black' style={{ marginLeft: '5%', marginTop: '2%' }}>
-                User detail 
+                User detail
             </Text>
             <Text className={styles.alert}>
                 {isSuccess === 'true' && (
@@ -140,7 +140,7 @@ function UserDetail() {
                 )}
                 {isSuccess === 'false' && (
                     <Alert status='error'>
-                        <AlertIcon style={{width:'350px'}} />
+                        <AlertIcon style={{ width: '350px' }} />
                         Error processing your request.
                     </Alert>
                 )}
@@ -148,27 +148,32 @@ function UserDetail() {
         </Flex>
 
         <hr style={{ borderTop: '1px solid #c4c4c4', width: '100%', marginTop: '0.5%' }} />
-        <div style={{marginLeft:'8%', marginTop:'6%'}}>
-            <Flex mb={10}>
-                <Text style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '5%' }}>Name:</Text>
-                <Text>{name}</Text>
-            </Flex>
-
-            <Flex mb={10}>
-                <Text style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '5%' }}>Email:</Text>
-                <Text>{email}</Text>
-            </Flex>
-
-            <Flex mb={10}>
-                <Text style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '5%' }}>Active:</Text>
-                <Text>{status == 1 ? 'Active' : status == 2 ? 'InActive' : 'Locked'}</Text>
-            </Flex>
-
-            <Flex mb={10}>
-                <Text style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '8%' }}>Role name:</Text>
-                <Text>{role}</Text>
-            </Flex>
-        </div>
+        <TableContainer>
+            <Center>
+                <Table variant='simple' style={{ marginTop: '5%', backgroundColor: 'white', width: '90%' }}>
+                    <Thead>
+                        <Tr>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '50px', textAlign: "right" }}>Name</Td>
+                            <Td style={{ textAlign: 'left' }}>{name}</Td>
+                        </Tr>
+                        <Tr>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', textAlign: "right" }}>Email</Td>
+                            <Td style={{ textAlign: 'left' }}>{email}</Td>
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        <Tr>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', textAlign: "right" }}>Active</Td>
+                            <Td style={{ textAlign: 'left' }}>{status == 1 ? 'Active' : status == 2 ? 'InActive' : 'Locked'}</Td>
+                        </Tr>
+                        <Tr>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', textAlign: "right" }}>Role Name</Td>
+                            <Td style={{ textAlign: 'left' }}>{role}</Td>
+                        </Tr>
+                    </Tbody>
+                </Table>
+            </Center>
+        </TableContainer>
 
         <Button style={{ marginLeft: '7%', marginTop: '5%' }} onClick={() => setIsOpenUD(true)}>Edit</Button>
         <Button style={{ marginLeft: '0.5%', marginTop: '5%' }} onClick={handleDelete}>Delete</Button>
@@ -213,7 +218,7 @@ function UserDetail() {
                         <GridItem colSpan={1}>
                             <Flex alignItems="center">
                                 <FormLabel style={{ width: '50px' }}>Name</FormLabel>
-                                <Input id='name'  autoComplete="off" value={name1} placeholder='' onChange={handleNameChange} />
+                                <Input id='name' autoComplete="off" value={name1} placeholder='' onChange={handleNameChange} />
                             </Flex>
                         </GridItem>
                         <GridItem colSpan={1}>
