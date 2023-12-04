@@ -161,7 +161,7 @@ function Dashboard() {
   }, []);
   return (
     <Stack p={5}>
-      <Flex fontSize={'24px'} alignItems={'center'}>
+      <Flex fontSize={'18px'} alignItems={'center'}>
         <Link
           href='/adminpages/adminhome'
           _hover={{ textDecor: 'underline' }}
@@ -176,7 +176,7 @@ function Dashboard() {
         <Text>Dashboard</Text>
       </Flex>
       <hr />
-      <Text fontSize={'28px'}>Dashboard</Text>
+      <Text fontSize='24px'>Dashboard</Text>
       <hr />
       <Flex justifyContent={'space-evenly'} m={'2% 0'}>
         <Stack>

@@ -133,6 +133,7 @@ function ReportPage() {
 
         setAssetData(allAssets);
       } catch (error) {
+        setAssetData([]);
         console.error('Error fetching data:', error);
       }
     };
@@ -147,41 +148,47 @@ function ReportPage() {
       try {
         const uniqueSoftwareIds = new Set();
         const allSoftware = [];
-        const uniqueLicenseIds = new Set();
         const allLicense = [];
 
         await Promise.all(
           assetData.map(async (asset) => {
             try {
-              const response2 = await axios.get(
-                `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
-                  asset?.assetId,
-              );
-              const response3 = await axios.get(
-                `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
-                  asset?.assetId,
-              );
+              try {
+                const response2 = await axios.get(
+                  `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+                    asset?.assetId,
+                );
+                // Filter out duplicate software based on assetID
+                const uniqueSoftware = response2.data.filter((sw) => {
+                  if (!uniqueSoftwareIds.has(sw.softwareId)) {
+                    uniqueSoftwareIds.add(sw.softwareId);
+                    return true;
+                  }
+                  return false;
+                });
+                allSoftware.push(...uniqueSoftware);
+              } catch (error) {}
 
-              // Filter out duplicate assets based on device ID
-              const uniqueSoftware = response2.data.filter((sw) => {
-                if (!uniqueSoftwareIds.has(sw.softwareId)) {
-                  uniqueSoftwareIds.add(sw.softwareId);
-                  return true;
-                }
-                return false;
-              });
-              const uniqueLicense = response3.data.filter((sw) => {
-                if (!uniqueLicenseIds.has(sw.softwareId)) {
-                  uniqueLicenseIds.add(sw.softwareId);
-                  return true;
-                }
-                return false;
-              });
-
-              // Accumulate unique assets for each app
-              allSoftware.push(...uniqueSoftware);
-              allLicense.push(...uniqueLicense);
-
+              try {
+                const response3 = await axios.get(
+                  `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
+                    asset?.assetId,
+                );
+                const response4 = await axios.get(
+                  `${BACK_END_PORT}/api/v1/Software/ListSoftwares`,
+                );
+                // Add assetId to each license item
+                const licenseDataWithAssetId = response3.data.map(
+                  (license) => ({
+                    ...license,
+                    asset: asset?.name,
+                    name: response4.data.find(
+                      (software) => software.softwareId === license.softwareId,
+                    )?.name,
+                  }),
+                );
+                allLicense.push(...licenseDataWithAssetId);
+              } catch (error) {}
               return {
                 ...asset,
                 // No need to set assets here
@@ -195,7 +202,11 @@ function ReportPage() {
             }
           }),
         );
-
+        // Filter out null values (failed assets) before setting the state
+        const filteredAssets = assetData.filter(
+          (_, index) =>
+            allSoftware[index] !== null && allLicense[index] !== null,
+        );
         setSoftwareData(allSoftware);
         setLicenseData(allLicense);
       } catch (error) {
@@ -209,23 +220,31 @@ function ReportPage() {
   }, [assetData]);
 
   function calculateEndDate(startDate, months) {
-    // Split the start date into day, month, and year
-    const [day, month, year] = startDate.split('/').map(Number);
+    if (months !== 0) {
+      if (startDate) {
+        // Split the start date into day, month, and year
+        const [day, month, year] = startDate?.split('/').map(Number);
 
-    // Create a Date object with the parsed values
-    const startDateObj = new Date(year, month - 1, day);
+        // Create a Date object with the parsed values
+        const startDateObj = new Date(year, month - 1, day);
 
-    // Calculate the end date by adding the specified number of months
-    startDateObj.setMonth(startDateObj.getMonth() + months);
+        // Calculate the end date by adding the specified number of months
+        startDateObj.setMonth(startDateObj.getMonth() + months);
 
-    // Format the end date as "dd/mm/yyyy"
-    const endYear = startDateObj.getFullYear();
-    const endMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
-    const endDay = String(startDateObj.getDate()).padStart(2, '0');
+        // Format the end date as "dd/mm/yyyy"
+        const endYear = startDateObj.getFullYear();
+        const endMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
+        const endDay = String(startDateObj.getDate()).padStart(2, '0');
 
-    const endDate = `${endDay}/${endMonth}/${endYear}`;
+        const endDate = `${endDay}/${endMonth}/${endYear}`;
 
-    return endDate;
+        return endDate;
+      } else {
+        return months;
+      }
+    } else {
+      return 'No limited time';
+    }
   }
 
   return (
@@ -272,7 +291,7 @@ function ReportPage() {
           </TabList>
           <TabPanels>
             <TabPanel>
-              <ListItem className={styles.list} pt={0}>
+              {/* <ListItem className={styles.list} pt={0}>
                 <Flex>
                   <Box>
                     <InputGroup>
@@ -286,7 +305,7 @@ function ReportPage() {
                     </InputGroup>
                   </Box>
                 </Flex>
-              </ListItem>
+              </ListItem> */}
               <ListItem className={styles.list}>
                 <TableContainer>
                   <Table
@@ -304,7 +323,9 @@ function ReportPage() {
                     </TableCaption>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh}>No</Th>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Manufacturer</Th>
                         <Th className={styles.cTh}>Model</Th>
@@ -341,7 +362,7 @@ function ReportPage() {
               </ListItem>
             </TabPanel>
             <TabPanel>
-              <ListItem className={styles.list} pt={0}>
+              {/* <ListItem className={styles.list} pt={0}>
                 <Flex>
                   <Box>
                     <InputGroup>
@@ -355,7 +376,7 @@ function ReportPage() {
                     </InputGroup>
                   </Box>
                 </Flex>
-              </ListItem>
+              </ListItem> */}
               <ListItem className={styles.list}>
                 <TableContainer>
                   <Table variant='striped' colorScheme='gray'>
@@ -364,7 +385,9 @@ function ReportPage() {
                     </TableCaption>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh}>No</Th>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Publisher</Th>
                         <Th className={styles.cTh}>Versions</Th>
@@ -393,7 +416,7 @@ function ReportPage() {
               </ListItem>
             </TabPanel>
             <TabPanel>
-              <ListItem className={styles.list} pt={0}>
+              {/* <ListItem className={styles.list} pt={0}>
                 <Flex>
                   <Box>
                     <InputGroup>
@@ -407,7 +430,7 @@ function ReportPage() {
                     </InputGroup>
                   </Box>
                 </Flex>
-              </ListItem>
+              </ListItem> */}
               <ListItem className={styles.list}>
                 <TableContainer>
                   <Table
@@ -420,8 +443,11 @@ function ReportPage() {
                     </TableCaption>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh}>No</Th>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
                         <Th className={styles.cTh}>Software</Th>
+                        <Th className={styles.cTh}>Asset</Th>
                         <Th className={styles.cTh}>License Key</Th>
                         <Th className={styles.cTh}>Start Date</Th>
                         <Th className={styles.cTh}>End Date</Th>
@@ -432,10 +458,12 @@ function ReportPage() {
                         <Tr cursor={'pointer'} key={item.licenseId}>
                           <Td>{index + 1}</Td>
                           <Td>{item.name}</Td>
+                          <Td>{item.asset}</Td>
                           <Td>{item.licenseKey}</Td>
                           <Td>{item.start_Date}</Td>
                           <Td>
                             {calculateEndDate(item.start_Date, item.time)}
+                            {/* {item.time} */}
                           </Td>
                         </Tr>
                       ))}

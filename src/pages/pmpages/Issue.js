@@ -282,7 +282,9 @@ function SoftwarePage() {
               <Thead>
                 <Tr>
                   <Th display='none'>Software ID</Th>
-                  <Th className={styles.cTh}>No</Th>
+                  <Th className={styles.cTh} width='10px'>
+                    No
+                  </Th>
                   <Th className={styles.cTh}>Name</Th>
                   <Th className={styles.cTh}>Versions</Th>
                   <Th className={styles.cTh}>Release</Th>

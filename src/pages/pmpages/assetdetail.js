@@ -19,6 +19,7 @@ import {
   Center,
   InputGroup,
   InputLeftAddon,
+  Tooltip,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -37,8 +38,16 @@ import {
   GridItem,
   Checkbox,
   ScrollView,
+  Switch,
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import {
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from '@chakra-ui/react';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import {
@@ -61,7 +70,7 @@ function AssetDetailPage() {
     assetId: '',
     licenseKey: '',
     startDate: '',
-    time: '',
+    time: '0',
     status_License: '',
     name: '',
     version: '',
@@ -95,6 +104,7 @@ function AssetDetailPage() {
   const [showModalTable, setShowModalTable] = useState(true);
   const [showModalAdd, setShowModalAdd] = useState(false);
   const [showEditAsset, setShowEditAsset] = useState(true);
+  const [haveLicense, setHaveLicense] = useState(true);
   const toast = useToast();
   const [selectedRow1, setSelectedRow1] = useState(new Set());
   const [selectedRow2, setSelectedRow2] = useState(new Set());
@@ -140,8 +150,9 @@ function AssetDetailPage() {
   const handleInputChange1 = (e) => {
     const { name, value } = e.target;
     setFormData1({ ...formData1, [name]: value });
-    // console.log(formData);
+    // console.log(formData1);
   };
+
   const handleInputChange2 = (e) => {
     const { name, value } = e.target;
     setFormData2({ ...formData2, [name]: value });
@@ -202,6 +213,9 @@ function AssetDetailPage() {
       setButtonDisabled3(false);
     }
   };
+  const handleSwitchChange = () => {
+    setHaveLicense((prevHaveLicense) => !prevHaveLicense);
+  };
 
   //all button handle
   const handleSaveCreate = async () => {
@@ -228,7 +242,7 @@ function AssetDetailPage() {
           licenseKey: formData.licenseKey,
           start_Date: formattedStartDate,
           time: formData.time,
-          status_License: 1,
+          status_License: formData.time !== 0 ? 1 : 2,
           status_Software: 1,
           status_AssetSoftware: 1,
         },
@@ -238,7 +252,7 @@ function AssetDetailPage() {
       setShowModalAdd(false);
       setShowModalTable(true);
       setFormData(defaultData);
-      setSelectedRow1(new Set());
+      // setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
@@ -271,18 +285,28 @@ function AssetDetailPage() {
           softwareId: formData1.softwareId,
           installDate: currentDateOnly,
           status_AssetSoftware: 1,
-          licenseKey: formData1.licenseKey,
-          start_Date: formatDate(formData1.start_Date),
-          time: formData1.time,
-          status_License: 1,
+          ...(haveLicense
+            ? {
+                licenseKey: formData1.licenseKey,
+                start_Date: formatDate(formData1.start_Date),
+                time: formData1.time,
+                status_License: formData1.time !== 0 ? 1 : 2,
+              }
+            : {
+                licenseKey: 'string',
+                start_Date: 'string',
+                time: -1,
+                status_License: 0,
+              }),
         },
       );
       console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
+      setHaveLicense(true);
       setShowModalAdd(false);
       setShowModalTable(true);
       setFormData(defaultData);
-      setSelectedRow1(new Set());
+      // setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
@@ -346,13 +370,14 @@ function AssetDetailPage() {
           licenseKey: formData2.licenseKey,
           startDate: formData2.startDate,
           time: formData2.time,
-          status: formData2.status,
+          status: formData2.time !== 0 ? 1 : 2,
         },
       );
       console.log('Data saved:', response.data);
       setIsOpenEditLi(false); // Close the modal after successful save
       setFormData2(defaultData);
-      setSelectedRow2(new Set());
+      setSelectedRow2(null);
+      setButtonDisabled2(true);
       // Reload new data for the table
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
@@ -378,8 +403,8 @@ function AssetDetailPage() {
           formData1.softwareId,
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
-      setSelectedRow1(new Set());
-
+      setSelectedRow1(null);
+      setButtonDisabled1(true);
       // Reload the data for the table after deletion
       const response = await axios.get(
         `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
@@ -423,7 +448,8 @@ function AssetDetailPage() {
       console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
       setFormData1(defaultData);
-      setSelectedRow1(new Set());
+      setButtonDisabled1(true);
+      setSelectedRow1(null);
       // Reload new data for the table
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
@@ -549,23 +575,31 @@ function AssetDetailPage() {
   }, [isOpenAdd, searchAddQuery, data]);
   //
   function calculateEndDate(startDate, months) {
-    // Split the start date into day, month, and year
-    const [day, month, year] = startDate.split('/').map(Number);
+    if (months !== 0) {
+      if (startDate) {
+        // Split the start date into day, month, and year
+        const [day, month, year] = startDate.split('/').map(Number);
 
-    // Create a Date object with the parsed values
-    const startDateObj = new Date(year, month - 1, day);
+        // Create a Date object with the parsed values
+        const startDateObj = new Date(year, month - 1, day);
 
-    // Calculate the end date by adding the specified number of months
-    startDateObj.setMonth(startDateObj.getMonth() + months);
+        // Calculate the end date by adding the specified number of months
+        startDateObj.setMonth(startDateObj.getMonth() + months);
 
-    // Format the end date as "dd/mm/yyyy"
-    const endYear = startDateObj.getFullYear();
-    const endMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
-    const endDay = String(startDateObj.getDate()).padStart(2, '0');
+        // Format the end date as "dd/mm/yyyy"
+        const endYear = startDateObj.getFullYear();
+        const endMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
+        const endDay = String(startDateObj.getDate()).padStart(2, '0');
 
-    const endDate = `${endDay}/${endMonth}/${endYear}`;
+        const endDate = `${endDay}/${endMonth}/${endYear}`;
 
-    return endDate;
+        return endDate;
+      } else {
+        return months;
+      }
+    } else {
+      return 'No limited time';
+    }
   }
   const convertToISODate = (dateString) => {
     if (dateString) {
@@ -646,209 +680,225 @@ function AssetDetailPage() {
           <TabPanels>
             <TabPanel>
               {showEditAsset ? (
-                <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
-                  <TableContainer>
-                    <Table>
-                      <Tbody>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>Name</Td>
-                          <Td className={styles.borderRight}>
-                            {assetData?.name}
-                          </Td>
-                          <Td className={styles.text2}>CPU</Td>
-                          <Td className={styles.borderRight}>
-                            {assetData?.cpu}
-                          </Td>
-                          <Td className={styles.text2}>Operation System</Td>
-                          <Td>{assetData?.os}</Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Manufacturer</Td>
-                          <Td className={styles.borderRight}>
-                            {assetData?.manufacturer}
-                          </Td>
-                          <Td className={styles.text2}>GPU</Td>
-                          <Td className={styles.borderRight}>
-                            {assetData?.gpu}
-                          </Td>
-                          <Td className={styles.text2}>Version</Td>
-                          <Td>{assetData?.version}</Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Model</Td>
-                          <Td className={styles.borderRight}>
-                            {assetData?.model}
-                          </Td>
-                          <Td className={styles.text2}>RAM</Td>
-                          <Td className={styles.borderRight}>
-                            {assetData?.ram} GB
-                          </Td>
-                          <Td className={styles.text2}>Last Updated</Td>
-                          <Td>{assetData?.lastSuccesfullScan}</Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Serial Number</Td>
-                          <Td className={styles.borderRight}>
-                            {assetData?.serialNumber}
-                          </Td>
-                          <Td className={styles.text2}>Memory</Td>
-                          <Td className={styles.borderRight}>
-                            {assetData?.memory} GB
-                          </Td>
-                          <Td className={styles.text2}>Status</Td>
-                          <Td>
-                            {assetData?.status === 1
-                              ? 'Active'
-                              : assetData?.status === 2
-                              ? 'Inactive'
-                              : assetData?.status === 3
-                              ? 'Deleted'
-                              : 'Unknown'}
-                          </Td>
-                        </Tr>
-                      </Tbody>
-                    </Table>
-                  </TableContainer>
-                  <Button
-                    colorScheme='gray'
-                    mt={3}
-                    onClick={() => setShowEditAsset(false)}
+                <Center>
+                  <Box
+                    borderWidth='1px'
+                    borderRadius='lg'
+                    p={4}
+                    boxShadow='md'
+                    width='fit-content'
                   >
-                    Edit
-                  </Button>
-                </Box>
+                    <TableContainer>
+                      <Table>
+                        <Tbody>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Name</Td>
+                            <Td className={styles.borderRight}>
+                              {assetData?.name}
+                            </Td>
+                            <Td className={styles.text2}>CPU</Td>
+                            <Td className={styles.borderRight}>
+                              {assetData?.cpu}
+                            </Td>
+                            <Td className={styles.text2}>Operation System</Td>
+                            <Td>{assetData?.os}</Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Manufacturer</Td>
+                            <Td className={styles.borderRight}>
+                              {assetData?.manufacturer}
+                            </Td>
+                            <Td className={styles.text2}>GPU</Td>
+                            <Td className={styles.borderRight}>
+                              {assetData?.gpu}
+                            </Td>
+                            <Td className={styles.text2}>Version</Td>
+                            <Td>{assetData?.version}</Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Model</Td>
+                            <Td className={styles.borderRight}>
+                              {assetData?.model}
+                            </Td>
+                            <Td className={styles.text2}>RAM</Td>
+                            <Td className={styles.borderRight}>
+                              {assetData?.ram}GB
+                            </Td>
+                            <Td className={styles.text2}>Last Updated</Td>
+                            <Td>{assetData?.lastSuccesfullScan}</Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Serial Number</Td>
+                            <Td className={styles.borderRight}>
+                              {assetData?.serialNumber}
+                            </Td>
+                            <Td className={styles.text2}>Memory</Td>
+                            <Td className={styles.borderRight}>
+                              {assetData?.memory}GB
+                            </Td>
+                            <Td className={styles.text2}>Status</Td>
+                            <Td>
+                              {assetData?.status === 1
+                                ? 'Active'
+                                : assetData?.status === 2
+                                ? 'Inactive'
+                                : assetData?.status === 3
+                                ? 'Deleted'
+                                : 'Unknown'}
+                            </Td>
+                          </Tr>
+                        </Tbody>
+                      </Table>
+                    </TableContainer>
+                    <Button
+                      colorScheme='gray'
+                      mt={3}
+                      onClick={() => setShowEditAsset(false)}
+                    >
+                      Edit
+                    </Button>
+                  </Box>
+                </Center>
               ) : (
-                <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
-                  <TableContainer>
-                    <Table>
-                      <Tbody>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>Name</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              value={assetData?.name}
-                              name='name'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>CPU</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              value={assetData?.cpu}
-                              name='cpu'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Operation System</Td>
-                          <Td>
-                            <Input
-                              value={assetData?.os}
-                              name='os'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Manufacturer</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              value={assetData?.manufacturer}
-                              name='manufacturer'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>GPU</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              value={assetData?.gpu}
-                              name='gpu'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Version</Td>
-                          <Td>
-                            <Input
-                              value={assetData?.version}
-                              name='version'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Model</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              value={assetData?.model}
-                              name='model'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>RAM</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              value={assetData?.ram}
-                              name='ram'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Last Updated</Td>
-                          <Td>
-                            <Input
-                              value={assetData?.lastSuccesfullScan}
-                              name='lastSuccesfullScan'
-                              onChange={handleInputChange4}
-                              disabled
-                            />
-                          </Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Serial Number</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              value={assetData?.serialNumber}
-                              name='serialNumber'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Memory</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              value={assetData?.memory}
-                              name='memory'
-                              onChange={handleInputChange4}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Status</Td>
-                          <Td>
-                            <Select
-                              name='status'
-                              value={assetData?.status}
-                              onChange={handleInputChange4}
-                            >
-                              <option value='1'>Active</option>
-                              <option value='2'>Inactive</option>
-                            </Select>
-                          </Td>
-                        </Tr>
-                      </Tbody>
-                    </Table>
-                  </TableContainer>
-                  <Button
-                    colorScheme='blue'
-                    mt={3}
-                    mr={2}
-                    onClick={handleEditAsset}
+                <Center>
+                  <Box
+                    borderWidth='1px'
+                    borderRadius='lg'
+                    p={4}
+                    boxShadow='md'
+                    width='fit-content'
                   >
-                    Save
-                  </Button>
-                  <Button
-                    colorScheme='gray'
-                    mt={3}
-                    onClick={() => setShowEditAsset(true)}
-                  >
-                    Back
-                  </Button>
-                </Box>
+                    <TableContainer>
+                      <Table>
+                        <Tbody>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Name</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.name}
+                                name='name'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>CPU</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.cpu}
+                                name='cpu'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>Operation System</Td>
+                            <Td>
+                              <Input
+                                value={assetData?.os}
+                                name='os'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Manufacturer</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.manufacturer}
+                                name='manufacturer'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>GPU</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.gpu}
+                                name='gpu'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>Version</Td>
+                            <Td>
+                              <Input
+                                value={assetData?.version}
+                                name='version'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Model</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.model}
+                                name='model'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>RAM</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.ram}
+                                name='ram'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>Last Updated</Td>
+                            <Td>
+                              <Input
+                                value={assetData?.lastSuccesfullScan}
+                                name='lastSuccesfullScan'
+                                onChange={handleInputChange4}
+                                disabled
+                              />
+                            </Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Serial Number</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.serialNumber}
+                                name='serialNumber'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>Memory</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.memory}
+                                name='memory'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>Status</Td>
+                            <Td>
+                              <Select
+                                name='status'
+                                value={assetData?.status}
+                                onChange={handleInputChange4}
+                              >
+                                <option value='1'>Active</option>
+                                <option value='2'>Inactive</option>
+                              </Select>
+                            </Td>
+                          </Tr>
+                        </Tbody>
+                      </Table>
+                    </TableContainer>
+                    <Button
+                      colorScheme='blue'
+                      mt={3}
+                      mr={2}
+                      onClick={handleEditAsset}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      colorScheme='gray'
+                      mt={3}
+                      onClick={() => setShowEditAsset(true)}
+                    >
+                      Back
+                    </Button>
+                  </Box>
+                </Center>
               )}
             </TabPanel>
             <TabPanel>
@@ -869,28 +919,34 @@ function AssetDetailPage() {
                   </Box>
                   <Spacer />
                   <Box>
-                    <IconButton
-                      aria-label='Add'
-                      icon={<FaPlus />}
-                      colorScheme='gray' // Choose an appropriate color
-                      marginRight={1}
-                      onClick={() => setIsOpenAdd(true)}
-                    />
-                    <IconButton
-                      aria-label='Edit'
-                      icon={<FaEdit />}
-                      colorScheme='gray' // Choose an appropriate color
-                      marginRight={1}
-                      onClick={() => setIsOpenEdit(true)}
-                      isDisabled={isButtonDisabled1}
-                    />
-                    <IconButton
-                      aria-label='Delete'
-                      icon={<FaTrash />}
-                      colorScheme='gray' // Choose an appropriate color
-                      onClick={() => setIsOpenDelete(true)}
-                      isDisabled={isButtonDisabled1}
-                    />
+                    <Tooltip label='Create'>
+                      <IconButton
+                        aria-label='Add'
+                        icon={<FaPlus />}
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setIsOpenAdd(true)}
+                      />
+                    </Tooltip>
+                    <Tooltip label='Edit'>
+                      <IconButton
+                        aria-label='Edit'
+                        icon={<FaEdit />}
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setIsOpenEdit(true)}
+                        isDisabled={isButtonDisabled1}
+                      />
+                    </Tooltip>
+                    <Tooltip label='Delete'>
+                      <IconButton
+                        aria-label='Delete'
+                        icon={<FaTrash />}
+                        colorScheme='gray' // Choose an appropriate color
+                        onClick={() => setIsOpenDelete(true)}
+                        isDisabled={isButtonDisabled1}
+                      />
+                    </Tooltip>
                   </Box>
                 </Flex>
               </ListItem>
@@ -909,7 +965,9 @@ function AssetDetailPage() {
                     </TableCaption>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh}>No</Th>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Publisher</Th>
                         <Th className={styles.cTh}>Versions</Th>
@@ -967,14 +1025,16 @@ function AssetDetailPage() {
                   </Box>
                   <Spacer />
                   <Box>
-                    <IconButton
-                      aria-label='Edit'
-                      icon={<FaEdit />}
-                      colorScheme='gray' // Choose an appropriate color
-                      marginRight={1}
-                      onClick={() => setIsOpenEditLi(true)}
-                      isDisabled={isButtonDisabled2}
-                    />
+                    <Tooltip label='Edit'>
+                      <IconButton
+                        aria-label='Edit'
+                        icon={<FaEdit />}
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setIsOpenEditLi(true)}
+                        isDisabled={isButtonDisabled2}
+                      />
+                    </Tooltip>
                   </Box>
                 </Flex>
               </ListItem>
@@ -990,7 +1050,9 @@ function AssetDetailPage() {
                     </TableCaption>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh}>No</Th>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
                         <Th className={styles.cTh}>Software</Th>
                         <Th className={styles.cTh}>License Key</Th>
                         <Th className={styles.cTh}>Start Date</Th>
@@ -1022,54 +1084,60 @@ function AssetDetailPage() {
               </ListItem>
             </TabPanel>
             <TabPanel>
-              <TableContainer>
-                <Table variant='striped' colorScheme='gray'>
-                  <TableCaption>
-                    Total{' '}
-                    {
-                      data.filter(
-                        (item) => item.type == 'Antivirus' && item.status != 3,
-                      ).length
-                    }{' '}
-                    antivirus
-                  </TableCaption>
-                  <Thead>
-                    <Tr>
-                      <Th className={styles.cTh}>No</Th>
-                      <Th className={styles.cTh}>Name</Th>
-                      <Th className={styles.cTh}>Publisher</Th>
-                      <Th className={styles.cTh}>Versions</Th>
-                      <Th className={styles.cTh}>Release</Th>
-                      <Th className={styles.cTh}>Install Date</Th>
-                      {/* <Th className={styles.cTh}>Status</Th> */}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {data
-                      .filter(
-                        (item) => item.type == 'Antivirus' && item.status != 3,
-                      )
-                      .map((item, index) => (
-                        <Tr
-                          cursor={'pointer'}
-                          key={item.softwareId}
-                          color={
-                            selectedRow1 === item.softwareId ? 'red' : 'black'
-                          } // Change background color for selected rows
-                          onClick={() => handleRowClick1(item)}
-                        >
-                          <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.publisher}</Td>
-                          <Td>{item.version}</Td>
-                          <Td>{item.release}</Td>
-                          <Td>{item.installDate}</Td>
-                          {/* <Td>{item.status ? 'No Issues' : 'Have Issues'}</Td> */}
-                        </Tr>
-                      ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+              <ListItem className={styles.list} pt={0}>
+                <TableContainer>
+                  <Table variant='striped' colorScheme='gray'>
+                    <TableCaption>
+                      Total{' '}
+                      {
+                        data.filter(
+                          (item) =>
+                            item.type == 'Antivirus' && item.status != 3,
+                        ).length
+                      }{' '}
+                      antivirus
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
+                        <Th className={styles.cTh}>Name</Th>
+                        <Th className={styles.cTh}>Publisher</Th>
+                        <Th className={styles.cTh}>Versions</Th>
+                        <Th className={styles.cTh}>Release</Th>
+                        <Th className={styles.cTh}>Install Date</Th>
+                        {/* <Th className={styles.cTh}>Status</Th> */}
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {data
+                        .filter(
+                          (item) =>
+                            item.type == 'Antivirus' && item.status != 3,
+                        )
+                        .map((item, index) => (
+                          <Tr
+                            cursor={'pointer'}
+                            key={item.softwareId}
+                            color={
+                              selectedRow1 === item.softwareId ? 'red' : 'black'
+                            } // Change background color for selected rows
+                            onClick={() => handleRowClick1(item)}
+                          >
+                            <Td>{index + 1}</Td>
+                            <Td>{item.name}</Td>
+                            <Td>{item.publisher}</Td>
+                            <Td>{item.version}</Td>
+                            <Td>{item.release}</Td>
+                            <Td>{item.installDate}</Td>
+                            {/* <Td>{item.status ? 'No Issues' : 'Have Issues'}</Td> */}
+                          </Tr>
+                        ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </ListItem>
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -1125,8 +1193,10 @@ function AssetDetailPage() {
                   <FormLabel>Time</FormLabel>
                   <Input
                     name='time'
+                    min={0}
                     value={formData2.time}
                     onChange={handleInputChange2}
+                    type='number'
                   />
                 </FormControl>
               </GridItem>
@@ -1152,7 +1222,7 @@ function AssetDetailPage() {
       >
         <ModalOverlay />
         <ModalContent
-          w={showModalAdd ? '40vw' : showModalTable ? '100vw' : '40vw'}
+          w={showModalAdd ? '40vw' : showModalTable ? '100vw' : '45vw'}
         >
           <ModalHeader>
             {showModalAdd ? 'Create New Software' : 'Add Software'}
@@ -1216,6 +1286,7 @@ function AssetDetailPage() {
                       >
                         <option value='Web app'>Web app</option>
                         <option value='Desktop app'>Desktop app</option>
+                        <option value='Service'>Service</option>
                         <option value='Antivirus'>Antivirus</option>
                       </Select>
                     </FormControl>
@@ -1247,8 +1318,10 @@ function AssetDetailPage() {
                       <FormLabel>Time</FormLabel>
                       <Input
                         name='time'
+                        min={0}
                         value={formData.time}
                         onChange={handleInputChange}
+                        type='number'
                       />
                     </FormControl>
                     {/* Add more fields for the second column */}
@@ -1337,47 +1410,70 @@ function AssetDetailPage() {
                 </TableContainer>
               </Box>
             ) : (
-              <Grid templateColumns='repeat(2, 1fr)' gap={4}>
-                <GridItem>
-                  <FormControl>
-                    <FormLabel>Software</FormLabel>
-                    <Input
-                      name='softwareId'
-                      value={formData1.name}
-                      onChange={handleInputChange1}
-                      disabled
-                    ></Input>
-                  </FormControl>
-                  <FormControl className={styles.formInput}>
-                    <FormLabel>License Key</FormLabel>
-                    <Input
-                      name='licenseKey'
-                      value={formData1.licenseKey}
-                      onChange={handleInputChange1}
-                    />
-                  </FormControl>
-                </GridItem>
-                <GridItem>
-                  <FormControl>
-                    <FormLabel>Start Date</FormLabel>
-                    <Input
-                      name='start_Date'
-                      value={formData1.start_Date}
-                      onChange={handleInputChange1}
-                      type='date'
-                      required
-                    />
-                  </FormControl>
-                  <FormControl className={styles.formInput}>
-                    <FormLabel>Time</FormLabel>
-                    <Input
-                      name='time'
-                      value={formData1.time}
-                      onChange={handleInputChange1}
-                    />
-                  </FormControl>
-                </GridItem>
-              </Grid>
+              <>
+                <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Software</FormLabel>
+                      <Input
+                        name='softwareId'
+                        value={formData1.name}
+                        onChange={handleInputChange1}
+                        disabled
+                      ></Input>
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    <FormControl display='flex' alignItems='center'>
+                      <FormLabel>Add software with license</FormLabel>
+                      <Switch
+                        defaultChecked={haveLicense}
+                        size='md'
+                        onChange={handleSwitchChange}
+                        mt='-2px'
+                      />
+                    </FormControl>
+                  </GridItem>
+                </Grid>
+                {haveLicense ? (
+                  <Grid templateColumns='repeat(2, 1fr)' gap={4}>
+                    <GridItem>
+                      <FormControl className={styles.formInput}>
+                        <FormLabel>License Key</FormLabel>
+                        <Input
+                          name='licenseKey'
+                          value={formData1.licenseKey}
+                          onChange={handleInputChange1}
+                        />
+                      </FormControl>
+                    </GridItem>
+                    <GridItem>
+                      <FormControl className={styles.formInput}>
+                        <FormLabel>Start Date</FormLabel>
+                        <Input
+                          name='start_Date'
+                          value={formData1.start_Date}
+                          onChange={handleInputChange1}
+                          type='date'
+                          required
+                        />
+                      </FormControl>
+                      <FormControl className={styles.formInput}>
+                        <FormLabel>Time</FormLabel>
+                        <Input
+                          min={0}
+                          name='time'
+                          value={formData1.time}
+                          onChange={handleInputChange1}
+                          type='number'
+                        />
+                      </FormControl>
+                    </GridItem>
+                  </Grid>
+                ) : (
+                  ''
+                )}
+              </>
             )}
           </ModalBody>
           <ModalFooter>
@@ -1410,7 +1506,7 @@ function AssetDetailPage() {
         </ModalContent>
       </Modal>
 
-      <Modal // Modal edit library
+      <Modal // Modal edit software
         isOpen={isOpenEdit}
         onClose={() => setIsOpenEdit(false)}
         closeOnOverlayClick={false}
@@ -1428,7 +1524,7 @@ function AssetDetailPage() {
                   <Input
                     name='name'
                     value={formData1.name}
-                    onChange={handleInputChange1}
+                    onChange={(e) => handleInputChange1(e)}
                     required
                   />
                 </FormControl>
@@ -1437,7 +1533,7 @@ function AssetDetailPage() {
                   <Input
                     name='version'
                     value={formData1.version}
-                    onChange={handleInputChange1}
+                    onChange={(e) => handleInputChange1(e)}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1445,7 +1541,7 @@ function AssetDetailPage() {
                   <Input
                     name='release'
                     value={formData1.release}
-                    onChange={handleInputChange1}
+                    onChange={(e) => handleInputChange1(e)}
                   />
                 </FormControl>
                 {/* Add more fields for the first column */}
@@ -1456,7 +1552,7 @@ function AssetDetailPage() {
                   <Input
                     name='publisher'
                     value={formData1.publisher}
-                    onChange={handleInputChange1}
+                    onChange={(e) => handleInputChange1(e)}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1464,11 +1560,11 @@ function AssetDetailPage() {
                   <Select
                     name='type'
                     value={formData1.type}
-                    onChange={handleInputChange1}
-                    disabled
+                    onChange={(e) => handleInputChange1(e)}
                   >
                     <option value='Web app'>Web app</option>
                     <option value='Desktop app'>Desktop app</option>
+                    <option value='Service'>Service</option>
                     <option value='Antivirus'>Antivirus</option>
                   </Select>
                 </FormControl>
@@ -1477,7 +1573,7 @@ function AssetDetailPage() {
                   <Select
                     name='os'
                     value={formData1.os}
-                    onChange={handleInputChange1}
+                    onChange={(e) => handleInputChange1(e)}
                   >
                     <option value='Window'>Window</option>
                     <option value='macOS'>macOS</option>

@@ -20,6 +20,7 @@ import {
   Center,
   InputGroup,
   InputLeftAddon,
+  Tooltip,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -38,6 +39,13 @@ import {
   GridItem,
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import {
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from '@chakra-ui/react';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import { ArrowForwardIcon, ViewIcon } from '@chakra-ui/icons';
@@ -304,7 +312,7 @@ function SoftwarePage() {
           libraryKey: formData3.libraryKey,
           start_Date: formData3.start_Date,
           time: formData3.time,
-          status: 1,
+          status: formData3.time !== 0 ? 1 : 2,
         },
       );
       console.log('Data saved:', response.data);
@@ -333,7 +341,7 @@ function SoftwarePage() {
           libraryKey: formData1.libraryKey,
           start_Date: formData1.start_Date,
           time: formData1.time,
-          status: formData1.status,
+          status: formData1.time !== 0 ? 1 : 2,
         },
       );
       console.log('Data saved:', response.data);
@@ -396,6 +404,12 @@ function SoftwarePage() {
     } else {
       setSelectedRow1(item.libraryId);
       setFormData1(item);
+      setFormData1((prevFormData) => {
+        return {
+          ...prevFormData,
+          start_Date: convertToISODate(prevFormData.start_Date),
+        };
+      });
       setButtonDisabled1(false);
     }
   };
@@ -537,23 +551,31 @@ function SoftwarePage() {
     // console.log(localStorage.getItem('assetId'));
   };
   function calculateEndDate(startDate, months) {
-    // Split the start date into day, month, and year
-    const [day, month, year] = startDate.split('/').map(Number);
+    if (months !== 0) {
+      if (startDate) {
+        // Split the start date into day, month, and year
+        const [day, month, year] = startDate.split('/').map(Number);
 
-    // Create a Date object with the parsed values
-    const startDateObj = new Date(year, month - 1, day);
+        // Create a Date object with the parsed values
+        const startDateObj = new Date(year, month - 1, day);
 
-    // Calculate the end date by adding the specified number of months
-    startDateObj.setMonth(startDateObj.getMonth() + months);
+        // Calculate the end date by adding the specified number of months
+        startDateObj.setMonth(startDateObj.getMonth() + months);
 
-    // Format the end date as "dd/mm/yyyy"
-    const endYear = startDateObj.getFullYear();
-    const endMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
-    const endDay = String(startDateObj.getDate()).padStart(2, '0');
+        // Format the end date as "dd/mm/yyyy"
+        const endYear = startDateObj.getFullYear();
+        const endMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
+        const endDay = String(startDateObj.getDate()).padStart(2, '0');
 
-    const endDate = `${endDay}/${endMonth}/${endYear}`;
+        const endDate = `${endDay}/${endMonth}/${endYear}`;
 
-    return endDate;
+        return endDate;
+      } else {
+        return months;
+      }
+    } else {
+      return 'No limited time';
+    }
   }
   const convertToISODate = (dateString) => {
     if (dateString) {
@@ -562,6 +584,47 @@ function SoftwarePage() {
     }
     return null; // or handle the case where dateString is undefined
   };
+  const formatDate = (dateString) => {
+    if (dateString) {
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    }
+    return null; // or handle the case where dateString is undefined
+  };
+  //cut text descriptions
+  const trimTextToMaxWidth = (text, maxWidth) => {
+    if (!text) {
+      return null; // or return an appropriate fallback value
+    }
+
+    const words = text.split(' ');
+
+    let currentWidth = 0;
+    let trimmedWords = [];
+
+    for (let i = 0; i < words.length; i++) {
+      const wordWidth = words[i].length * 7;
+
+      if (currentWidth + wordWidth <= maxWidth) {
+        trimmedWords.push(words[i]);
+        currentWidth += wordWidth;
+      } else {
+        break;
+      }
+    }
+
+    const trimmedText = trimmedWords.join(' ');
+
+    return (
+      <span>
+        {trimmedText}
+        <span style={{ color: 'blue', fontSize: '15px' }}>
+          {words.length > trimmedWords.length ? ' ...' : ''}
+        </span>
+      </span>
+    );
+  };
+
   //
   return (
     <Box className={styles.bodybox}>
@@ -632,209 +695,231 @@ function SoftwarePage() {
           <TabPanels>
             <TabPanel>
               {showEditApp ? (
-                <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
-                  <TableContainer>
-                    <Table>
-                      <Tbody>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>Name</Td>
-                          <Td className={styles.borderRight}>
-                            {appData?.name || 'loading'}
-                          </Td>
-                          <Td className={styles.text2}>Version</Td>
-                          <Td className={styles.borderRight}>
-                            {appData?.version}
-                          </Td>
-                          <Td className={styles.text2}>OS</Td>
-                          <Td>{appData?.os}</Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Publisher</Td>
-                          <Td className={styles.borderRight}>
-                            {appData?.publisher}
-                          </Td>
-                          <Td className={styles.text2}>Release</Td>
-                          <Td className={styles.borderRight}>
-                            {appData?.release}
-                          </Td>
-                          <Td className={styles.text2}>OS Version</Td>
-                          <Td>{appData?.osversion}</Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Programming</Td>
-                          <Td className={styles.borderRight}>
-                            {appData?.language}
-                          </Td>
-                          <Td className={styles.text2}>Database</Td>
-                          <Td className={styles.borderRight}>{appData?.db}</Td>
-                          <Td className={styles.text2}>Status</Td>
-                          <Td>
-                            {appData?.status === 1
-                              ? 'Active'
-                              : appData?.status === 2
-                              ? 'Inactive'
-                              : appData?.status === 3
-                              ? 'Deleted'
-                              : 'Unknown'}
-                          </Td>
-                        </Tr>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>Download Link</Td>
-                          <Td className={styles.borderRight} colSpan='2'>
-                            {appData?.download}
-                          </Td>
-                          <Td className={styles.text2}>Document Link</Td>
-                          <Td colSpan='2'>{appData?.docs}</Td>
-                        </Tr>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>Note</Td>
-                          <Td colSpan='5'>{appData?.description}</Td>
-                        </Tr>
-                      </Tbody>
-                    </Table>
-                  </TableContainer>
-                  <Button
-                    colorScheme='gray'
-                    mt={3}
-                    onClick={() => setShowEditApp(false)}
+                <Center>
+                  <Box
+                    borderWidth='1px'
+                    borderRadius='lg'
+                    p={4}
+                    boxShadow='md'
+                    width='fit-content'
                   >
-                    Edit
-                  </Button>
-                </Box>
+                    <TableContainer>
+                      <Table>
+                        <Tbody>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Name</Td>
+                            <Td className={styles.borderRight}>
+                              {appData?.name || 'loading'}
+                            </Td>
+                            <Td className={styles.text2}>Version</Td>
+                            <Td className={styles.borderRight}>
+                              {appData?.version}
+                            </Td>
+                            <Td className={styles.text2}>OS</Td>
+                            <Td>{appData?.os}</Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Publisher</Td>
+                            <Td className={styles.borderRight}>
+                              {appData?.publisher}
+                            </Td>
+                            <Td className={styles.text2}>Release</Td>
+                            <Td className={styles.borderRight}>
+                              {appData?.release}
+                            </Td>
+                            <Td className={styles.text2}>OS Version</Td>
+                            <Td>{appData?.osversion}</Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Programming</Td>
+                            <Td className={styles.borderRight}>
+                              {appData?.language}
+                            </Td>
+                            <Td className={styles.text2}>Database</Td>
+                            <Td className={styles.borderRight}>
+                              {appData?.db}
+                            </Td>
+                            <Td className={styles.text2}>Status</Td>
+                            <Td>
+                              {appData?.status === 1
+                                ? 'Active'
+                                : appData?.status === 2
+                                ? 'Inactive'
+                                : appData?.status === 3
+                                ? 'Deleted'
+                                : 'Unknown'}
+                            </Td>
+                          </Tr>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Download Link</Td>
+                            <Td colSpan='5'>{appData?.download}</Td>
+                          </Tr>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Document Link</Td>
+                            <Td colSpan='5'>{appData?.docs}</Td>
+                          </Tr>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Description</Td>
+                            <Td colSpan='5' className={styles.truncate}>
+                              {trimTextToMaxWidth(appData?.description, 800)}
+                            </Td>
+                          </Tr>
+                        </Tbody>
+                      </Table>
+                    </TableContainer>
+                    <Button
+                      colorScheme='gray'
+                      mt={3}
+                      onClick={() => setShowEditApp(false)}
+                    >
+                      Edit
+                    </Button>
+                  </Box>
+                </Center>
               ) : (
-                <Box borderWidth='1px' borderRadius='lg' p={4} boxShadow='md'>
-                  <TableContainer>
-                    <Table>
-                      <Tbody>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>Name</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              name='name'
-                              value={appData?.name}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Version</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              name='version'
-                              value={appData?.version}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>OS</Td>
-                          <Td>
-                            <Input
-                              name='os'
-                              value={appData?.os}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Publisher</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              name='publisher'
-                              value={appData?.publisher}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Release</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              name='release'
-                              value={appData?.release}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>OS Version</Td>
-                          <Td>
-                            <Input
-                              name='osversion'
-                              value={appData?.osversion}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>Programming</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              name='language'
-                              value={appData?.language}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Database</Td>
-                          <Td className={styles.borderRight}>
-                            <Input
-                              name='db'
-                              value={appData?.db}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Status</Td>
-                          <Td>
-                            <Select
-                              name='status'
-                              value={appData?.status}
-                              onChange={handleInputChange}
-                            >
-                              <option value='1'>Active</option>
-                              <option value='2'>Inactive</option>
-                              <option value='3'>Deleted</option>
-                            </Select>
-                          </Td>
-                        </Tr>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>Download Link</Td>
-                          <Td className={styles.borderRight} colSpan='2'>
-                            <Input
-                              name='download'
-                              value={appData?.download}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                          <Td className={styles.text2}>Document Link</Td>
-                          <Td colSpan='2'>
-                            <Input
-                              name='docs'
-                              value={appData?.docs}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                        </Tr>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>Note</Td>
-                          <Td colSpan='5'>
-                            <Input
-                              name='description'
-                              value={appData?.description}
-                              onChange={handleInputChange}
-                            />
-                          </Td>
-                        </Tr>
-                      </Tbody>
-                    </Table>
-                  </TableContainer>
-                  <Button
-                    colorScheme='blue'
-                    mt={3}
-                    mr={2}
-                    onClick={handleEditApp}
+                <Center>
+                  <Box
+                    borderWidth='1px'
+                    borderRadius='lg'
+                    p={4}
+                    boxShadow='md'
+                    width='fit-content'
                   >
-                    Save
-                  </Button>
-                  <Button
-                    colorScheme='gray'
-                    mt={3}
-                    onClick={() => setShowEditApp(true)}
-                  >
-                    Back
-                  </Button>
-                </Box>
+                    <TableContainer>
+                      <Table>
+                        <Tbody>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Name</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                name='name'
+                                value={appData?.name}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>Version</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                name='version'
+                                value={appData?.version}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>OS</Td>
+                            <Td>
+                              <Input
+                                name='os'
+                                value={appData?.os}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Publisher</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                name='publisher'
+                                value={appData?.publisher}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>Release</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                name='release'
+                                value={appData?.release}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>OS Version</Td>
+                            <Td>
+                              <Input
+                                name='osversion'
+                                value={appData?.osversion}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>Programming</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                name='language'
+                                value={appData?.language}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>Database</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                name='db'
+                                value={appData?.db}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>Status</Td>
+                            <Td>
+                              <Select
+                                name='status'
+                                value={appData?.status}
+                                onChange={handleInputChange}
+                              >
+                                <option value='1'>Active</option>
+                                <option value='2'>Inactive</option>
+                                <option value='3'>Deleted</option>
+                              </Select>
+                            </Td>
+                          </Tr>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Download Link</Td>
+                            <Td colSpan='5'>
+                              <Input
+                                name='download'
+                                value={appData?.download}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                          </Tr>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Document Link</Td>
+                            <Td colSpan='5'>
+                              <Input
+                                name='docs'
+                                value={appData?.docs}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                          </Tr>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Note</Td>
+                            <Td colSpan='5'>
+                              <Input
+                                name='description'
+                                value={appData?.description}
+                                onChange={handleInputChange}
+                              />
+                            </Td>
+                          </Tr>
+                        </Tbody>
+                      </Table>
+                    </TableContainer>
+                    <Button
+                      colorScheme='blue'
+                      mt={3}
+                      mr={2}
+                      onClick={handleEditApp}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      colorScheme='gray'
+                      mt={3}
+                      onClick={() => setShowEditApp(true)}
+                    >
+                      Back
+                    </Button>
+                  </Box>
+                </Center>
               )}
             </TabPanel>
             <TabPanel>
@@ -855,28 +940,34 @@ function SoftwarePage() {
                   </Box>
                   <Spacer />
                   <Box>
-                    <IconButton
-                      aria-label='Add'
-                      icon={<FaPlus />}
-                      colorScheme='gray' // Choose an appropriate color
-                      marginRight={1}
-                      onClick={() => setIsOpenAdd(true)}
-                    />
-                    <IconButton
-                      aria-label='Edit'
-                      icon={<FaEdit />}
-                      colorScheme='gray' // Choose an appropriate color
-                      marginRight={1}
-                      onClick={() => setIsOpenEdit(true)}
-                      isDisabled={isButtonDisabled}
-                    />
-                    <IconButton
-                      aria-label='Delete'
-                      icon={<FaTrash />}
-                      colorScheme='gray' // Choose an appropriate color
-                      onClick={() => setIsOpenDelete(true)}
-                      isDisabled={isButtonDisabled}
-                    />
+                    <Tooltip label='Create'>
+                      <IconButton
+                        aria-label='Add'
+                        icon={<FaPlus />}
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setIsOpenAdd(true)}
+                      />
+                    </Tooltip>
+                    <Tooltip label='Edit'>
+                      <IconButton
+                        aria-label='Edit'
+                        icon={<FaEdit />}
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setIsOpenEdit(true)}
+                        isDisabled={isButtonDisabled}
+                      />
+                    </Tooltip>
+                    <Tooltip label='Delete'>
+                      <IconButton
+                        aria-label='Delete'
+                        icon={<FaTrash />}
+                        colorScheme='gray' // Choose an appropriate color
+                        onClick={() => setIsOpenDelete(true)}
+                        isDisabled={isButtonDisabled}
+                      />
+                    </Tooltip>
                   </Box>
                 </Flex>
               </ListItem>
@@ -898,7 +989,9 @@ function SoftwarePage() {
                     </TableCaption>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh}>No</Th>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Manufacturer</Th>
                         <Th className={styles.cTh}>Model</Th>
@@ -965,28 +1058,34 @@ function SoftwarePage() {
                   </Box>
                   <Spacer />
                   <Box>
-                    <IconButton
-                      aria-label='Add'
-                      icon={<FaPlus />}
-                      colorScheme='gray' // Choose an appropriate color
-                      marginRight={1}
-                      onClick={() => setIsOpenAddLi(true)}
-                    />
-                    <IconButton
-                      aria-label='Edit'
-                      icon={<FaEdit />}
-                      colorScheme='gray' // Choose an appropriate color
-                      marginRight={1}
-                      onClick={() => setIsOpenEditLi(true)}
-                      isDisabled={isButtonDisabled1}
-                    />
-                    <IconButton
-                      aria-label='Delete'
-                      icon={<FaTrash />}
-                      colorScheme='gray' // Choose an appropriate color
-                      onClick={() => setIsOpenDeleteLi(true)}
-                      isDisabled={isButtonDisabled1}
-                    />
+                    <Tooltip label='Create'>
+                      <IconButton
+                        aria-label='Add'
+                        icon={<FaPlus />}
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setIsOpenAddLi(true)}
+                      />
+                    </Tooltip>
+                    <Tooltip label='Edit'>
+                      <IconButton
+                        aria-label='Edit'
+                        icon={<FaEdit />}
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setIsOpenEditLi(true)}
+                        isDisabled={isButtonDisabled1}
+                      />
+                    </Tooltip>
+                    <Tooltip label='Delete'>
+                      <IconButton
+                        aria-label='Delete'
+                        icon={<FaTrash />}
+                        colorScheme='gray' // Choose an appropriate color
+                        onClick={() => setIsOpenDeleteLi(true)}
+                        isDisabled={isButtonDisabled1}
+                      />
+                    </Tooltip>
                   </Box>
                 </Flex>
               </ListItem>
@@ -1008,7 +1107,9 @@ function SoftwarePage() {
                     </TableCaption>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh}>No</Th>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Publisher</Th>
                         <Th className={styles.cTh}>License Key</Th>
@@ -1044,92 +1145,104 @@ function SoftwarePage() {
               </ListItem>
             </TabPanel>
             <TabPanel>
-              <TableContainer>
-                <Table
-                  variant='striped'
-                  colorScheme='gray'
-                  className={styles.cTable}
-                >
-                  <TableCaption>
-                    Total{' '}
-                    {reportData.length < 2
-                      ? reportData.length + ' issue'
-                      : reportData.length + ' issues'}
-                  </TableCaption>
-                  <Thead>
-                    <Tr>
-                      <Th className={styles.cTh}>Title</Th>
-                      <Th className={styles.cTh}>Start Date</Th>
-                      <Th className={styles.cTh}>End Date</Th>
-                      <Th className={styles.cTh}>Status</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {reportData.map((item) => (
-                      <Tr key={item.reportId}>
-                        <Td>{item.title}</Td>
-                        <Td>{item.start_Date}</Td>
-                        <Td>{item.end_Date}</Td>
-                        <Td>
-                          {item.status === 1
-                            ? 'Unsolved'
-                            : item.status === 2
-                            ? 'Solved'
-                            : item.status === 3
-                            ? 'Deleted'
-                            : item.status === 4
-                            ? 'Canceled'
-                            : 'Unknown'}
-                        </Td>
+              <ListItem className={styles.list} pt={0}>
+                <TableContainer>
+                  <Table
+                    variant='striped'
+                    colorScheme='gray'
+                    className={styles.cTable}
+                  >
+                    <TableCaption>
+                      Total{' '}
+                      {reportData.length < 2
+                        ? reportData.length + ' issue'
+                        : reportData.length + ' issues'}
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
+                        <Th className={styles.cTh}>Title</Th>
+                        <Th className={styles.cTh}>Start Date</Th>
+                        <Th className={styles.cTh}>End Date</Th>
+                        <Th className={styles.cTh}>Status</Th>
                       </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+                    </Thead>
+                    <Tbody>
+                      {reportData.map((item, index) => (
+                        <Tr key={item.reportId}>
+                          <Td>{index + 1}</Td>
+                          <Td>{item.title}</Td>
+                          <Td>{item.start_Date}</Td>
+                          <Td>{item.end_Date}</Td>
+                          <Td>
+                            {item.status === 1
+                              ? 'Unsolved'
+                              : item.status === 2
+                              ? 'Solved'
+                              : item.status === 3
+                              ? 'Deleted'
+                              : item.status === 4
+                              ? 'Canceled'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </ListItem>
             </TabPanel>
             <TabPanel>
-              <TableContainer>
-                <Table
-                  variant='striped'
-                  colorScheme='gray'
-                  className={styles.cTable}
-                >
-                  <TableCaption>
-                    Total{' '}
-                    {feedbackData.length < 2
-                      ? feedbackData.length + ' feedback'
-                      : feedbackData.length + ' feedbacks'}
-                  </TableCaption>
-                  <Thead>
-                    <Tr>
-                      <Th className={styles.cTh}>Title</Th>
-                      <Th className={styles.cTh}>Start Date</Th>
-                      <Th className={styles.cTh}>End Date</Th>
-                      <Th className={styles.cTh}>Status</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {feedbackData.map((item) => (
-                      <Tr key={item.reportId}>
-                        <Td>{item.title}</Td>
-                        <Td>{item.start_Date}</Td>
-                        <Td>{item.end_Date}</Td>
-                        <Td>
-                          {item.status === 1
-                            ? 'Unsolved'
-                            : item.status === 2
-                            ? 'Solved'
-                            : item.status === 3
-                            ? 'Deleted'
-                            : item.status === 4
-                            ? 'Canceled'
-                            : 'Unknown'}
-                        </Td>
+              <ListItem className={styles.list} pt={0}>
+                <TableContainer>
+                  <Table
+                    variant='striped'
+                    colorScheme='gray'
+                    className={styles.cTable}
+                  >
+                    <TableCaption>
+                      Total{' '}
+                      {feedbackData.length < 2
+                        ? feedbackData.length + ' feedback'
+                        : feedbackData.length + ' feedbacks'}
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
+                        <Th className={styles.cTh}>Title</Th>
+                        <Th className={styles.cTh}>Start Date</Th>
+                        <Th className={styles.cTh}>End Date</Th>
+                        <Th className={styles.cTh}>Status</Th>
                       </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+                    </Thead>
+                    <Tbody>
+                      {feedbackData.map((item, index) => (
+                        <Tr key={item.reportId}>
+                          <Td>{index + 1}</Td>
+                          <Td>{item.title}</Td>
+                          <Td>{item.start_Date}</Td>
+                          <Td>{item.end_Date}</Td>
+                          <Td>
+                            {item.status === 1
+                              ? 'Unsolved'
+                              : item.status === 2
+                              ? 'Solved'
+                              : item.status === 3
+                              ? 'Deleted'
+                              : item.status === 4
+                              ? 'Canceled'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </ListItem>
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -1285,7 +1398,7 @@ function SoftwarePage() {
                   <FormLabel>Start Date</FormLabel>
                   <Input
                     name='start_Date'
-                    value={convertToISODate(formData1.start_Date)}
+                    value={formData1.start_Date}
                     onChange={handleInputChange4}
                     type='date'
                     required

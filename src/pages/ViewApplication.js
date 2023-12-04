@@ -274,31 +274,22 @@ function ApplicationPage() {
                   width='300px'
                   boxShadow='md'
                 >
-                  <Flex>
-                    <Image
-                      src='https://theproductmanager.b-cdn.net/wp-content/uploads/sites/4/2022/05/PRD-Keyword-software-development-life-cycle_Featured-Image-1280x720.png'
-                      alt=''
-                      boxSize='100px'
-                      objectFit='cover'
-                      mb={2}
-                    />
-                    <Spacer />
-                    <Box>
-                      <Text fontSize='lg' fontWeight='bold' mb={2}>
-                        {item.name}
+                  <Box>
+                    <Text fontSize='lg' fontWeight='bold' mb={2}>
+                      {item.name}
+                    </Text>
+                    <Text>{item.description}</Text>
+                    <HStack justify='space-between' mt={8}>
+                      <Text
+                        className={styles.listitem}
+                        onClick={() => (
+                          setIsShowFeedback(true), setSelectedApp(item)
+                        )}
+                      >
+                        Send Feedback
                       </Text>
-                      <HStack justify='space-between' mt={8}>
-                        <Text
-                          className={styles.listitem}
-                          onClick={() => (
-                            setIsShowFeedback(true), setSelectedApp(item)
-                          )}
-                        >
-                          Send Feedback
-                        </Text>
-                      </HStack>
-                    </Box>
-                  </Flex>
+                    </HStack>
+                  </Box>
                 </Box>
               ))}
             </Grid>

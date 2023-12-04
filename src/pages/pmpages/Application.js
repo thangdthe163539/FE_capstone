@@ -18,6 +18,7 @@ import {
   useToast,
   InputGroup,
   InputLeftAddon,
+  Tooltip,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -199,10 +200,14 @@ function SoftwarePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
-        );
-        setData(response.data); // Assuming the API returns an array of objects
+        try {
+          const response = await axios.get(
+            `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
+          );
+          setData(response.data); // Assuming the API returns an array of objects
+        } catch (error) {
+          setData([]);
+        }
         // const response2 = await axios.get(
         //   `${BACK_END_PORT}/api/v1/Device/list_device_with_user` +
         //     account.accId,
@@ -339,28 +344,34 @@ function SoftwarePage() {
             </Box>
             <Spacer />
             <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                onClick={() => setIsOpenAdd(true)}
-              />
-              <IconButton
-                aria-label='Edit'
-                icon={<FaEdit />}
-                colorScheme='gray' // Choose an appropriate color
-                marginRight={1}
-                onClick={() => setIsOpenEdit(true)}
-                isDisabled={isButtonDisabled}
-              />
-              <IconButton
-                aria-label='Delete'
-                icon={<FaTrash />}
-                colorScheme='gray' // Choose an appropriate color
-                onClick={() => setIsOpenDelete(true)}
-                isDisabled={isButtonDisabled}
-              />
+              <Tooltip label='Create'>
+                <IconButton
+                  aria-label='Add'
+                  icon={<FaPlus />}
+                  colorScheme='gray' // Choose an appropriate color
+                  marginRight={1}
+                  onClick={() => setIsOpenAdd(true)}
+                />
+              </Tooltip>
+              <Tooltip label='Edit'>
+                <IconButton
+                  aria-label='Edit'
+                  icon={<FaEdit />}
+                  colorScheme='gray' // Choose an appropriate color
+                  marginRight={1}
+                  onClick={() => setIsOpenEdit(true)}
+                  isDisabled={isButtonDisabled}
+                />
+              </Tooltip>
+              <Tooltip label='Delete'>
+                <IconButton
+                  aria-label='Delete'
+                  icon={<FaTrash />}
+                  colorScheme='gray' // Choose an appropriate color
+                  onClick={() => setIsOpenDelete(true)}
+                  isDisabled={isButtonDisabled}
+                />
+              </Tooltip>
             </Box>
           </Flex>
         </ListItem>
@@ -381,7 +392,7 @@ function SoftwarePage() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th className={styles.cTh} w='20px'>
+                  <Th className={styles.cTh} width='10px'>
                     No
                   </Th>
                   <Th className={styles.cTh}>Name</Th>
@@ -563,13 +574,12 @@ function SoftwarePage() {
                   >
                     <option value='1'>Active</option>
                     <option value='2'>Inactive</option>
-                    <option value='3'>Deleted</option>
                   </Select>
                 </FormControl>
               </GridItem>
             </Grid>
             <FormControl className={styles.formInput}>
-              <FormLabel>Note</FormLabel>
+              <FormLabel>Description</FormLabel>
               <Input
                 name='description'
                 value={formData2.description}
@@ -708,7 +718,7 @@ function SoftwarePage() {
               </GridItem>
             </Grid>
             <FormControl className={styles.formInput}>
-              <FormLabel>Note</FormLabel>
+              <FormLabel>Description</FormLabel>
               <Input
                 name='description'
                 value={formData.description}

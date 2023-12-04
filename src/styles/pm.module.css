@@ -100,3 +100,10 @@
   position: relative;
   overflow: hidden;
 }
+
+/* styles.css or styles.module.css */
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -257,7 +257,9 @@ function FeedbackPage() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th className={styles.cTh}>No</Th>
+                  <Th className={styles.cTh} width='10px'>
+                    No
+                  </Th>
                   <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Title</Th>
                   <Th className={styles.cTh}>Start Date</Th>

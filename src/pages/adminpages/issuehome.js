@@ -13,8 +13,11 @@ import {
   TableContainer,
   Flex,
   Spacer,
-  IconButton, Center, InputLeftAddon,
-  Textarea, InputGroup,
+  IconButton,
+  Center,
+  InputLeftAddon,
+  Textarea,
+  InputGroup,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -39,16 +42,20 @@ import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import { ArrowForwardIcon, DeleteIcon, RepeatIcon } from '@chakra-ui/icons';
 import { FaPlus } from 'react-icons/fa';
+import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import React from 'react';
+import { BACK_END_PORT } from '../../../env';
 import Pagination from '@/components/pagination';
 const defaultData = {
   reportId: '',
   softwareId: '',
+  accId: '',
+  title: '',
   type: '',
   description: '',
-  startDate: '',
-  endDate: '',
+  start_Date: '',
+  end_Date: '',
   status: '',
 };
 
@@ -57,18 +64,26 @@ function IssuePage() {
   const [isOpenDetail, setIsOpenDetail] = useState(false);
   const [formData, setFormData] = useState(defaultData);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchQuerySof, setSearchQuerySof] = useState('');
+  const [searchQuerySw, setSearchQuerySw] = useState('');
+  const [searchQueryAnti, setSearchQueryAnti] = useState('');
+  const [searchQueryHw, setSearchQueryHw] = useState('');
   const [searchQueryTb, setSearchQueryTb] = useState('');
-  const [filteredAppData, setfilteredAppData] = useState([]);
-  const [filteredAppDataSof, setfilteredAppDataSof] = useState([]);
+  const [filteredAppData, setFilteredAppData] = useState([]);
+  const [filteredHwData, setFilteredHwData] = useState([]);
+  const [filteredSwData, setFilteredSwData] = useState([]);
+  const [filteredAntiData, setFilteredAntiData] = useState([]);
   const [filteredIssueData, setFilteredIssueData] = useState([]);
   const [Issues, setIssues] = useState([]);
   const [Apps, setApps] = useState([]);
+  const [Hardware, setHardware] = useState([]);
+  const [Software, setSoftware] = useState([]);
   const [isSuccess, setIsSuccess] = useState('');
   const notificationTimeout = 2000;
   const [showOptions, setShowOptions] = useState(false);
-  const [showOptionsSof, setShowOptionsSof] = useState(false);
-  const [appId, setAppId] = useState('');
+  const [showOptionsSw, setShowOptionsSw] = useState(false);
+  const [showOptionsHw, setShowOptionsHw] = useState(false);
+  const [showOptionsAnti, setShowOptionsAnti] = useState(false);
+  const [appId, setAppId] = useState([]);
   const [detail, setDetail] = useState(null);
   const [selectedOptionActive, setSelectedOptionActive] = useState('');
   const [description, setDescription] = useState('');
@@ -83,6 +98,24 @@ function IssuePage() {
   const [isHovered, setIsHovered] = useState(null);
   const [mode, setMode] = useState('Application');
   const allowedExtensions = ['jpg', 'png'];
+
+  const router = useRouter();
+  const [account, setAccount] = useState();
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
+
   const handleFileChange = (e) => {
     const files = e.target.files;
 
@@ -138,7 +171,7 @@ function IssuePage() {
       // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
       setImage((prevImages) => [
         ...(Array.isArray(prevImages) ? prevImages : []).filter(
-          (img) => img && img.dataURL
+          (img) => img && img.dataURL,
         ),
         ...newImages.filter(Boolean),
       ]);
@@ -166,9 +199,14 @@ function IssuePage() {
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value);
   };
-
-  const handleSearchInputChangeSof = (e) => {
-    setSearchQuerySof(e.target.value);
+  const handleSearchInputChangeHw = (e) => {
+    setSearchQueryHw(e.target.value);
+  };
+  const handleSearchInputChangeSw = (e) => {
+    setSearchQuerySw(e.target.value);
+  };
+  const handleSearchInputChangeAnti = (e) => {
+    setSearchQueryAnti(e.target.value);
   };
 
   const handleSearchTbInputChange = (e) => {
@@ -218,6 +256,95 @@ function IssuePage() {
         console.error('Lỗi:', error);
       });
   }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const uniqueAssetIds = new Set();
+        const allAssets = [];
+
+        await Promise.all(
+          Apps.filter((app) => app.status !== 3).map(async (app) => {
+            try {
+              const response2 = await axios.get(
+                `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app?.appId,
+              );
+
+              // Filter out duplicate assets based on device ID
+
+              const uniqueAssets = response2.data.filter((asset) => {
+                if (!uniqueAssetIds.has(asset.assetId)) {
+                  uniqueAssetIds.add(asset.assetId);
+                  return true;
+                }
+                return false;
+              });
+              // Accumulate unique assets for each app
+              allAssets.push(...uniqueAssets);
+
+              return {
+                // No need to set assets here
+              };
+            } catch (error) {
+              console.log(error);
+              return {
+                // Handle error if needed
+              };
+            }
+          }),
+        );
+
+        setHardware(allAssets);
+      } catch (error) {
+        setHardware([]);
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    if (Apps.length > 0) {
+      fetchData();
+    }
+  }, [Apps]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const uniqueSoftwareIds = new Set();
+        const allSoftware = [];
+
+        await Promise.all(
+          Hardware.map(async (asset) => {
+            try {
+              const response2 = await axios.get(
+                `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+                  asset?.assetId,
+              );
+              // Filter out duplicate software based on assetID
+              const uniqueSoftware = response2.data.filter((sw) => {
+                if (!uniqueSoftwareIds.has(sw.softwareId)) {
+                  uniqueSoftwareIds.add(sw.softwareId);
+                  return true;
+                }
+                return false;
+              });
+              allSoftware.push(...uniqueSoftware);
+            } catch (error) {
+              console.log(error);
+              return {
+                // Handle error if needed
+              };
+            }
+          }),
+        );
+        setSoftware(allSoftware);
+      } catch (error) {
+        setSoftware([]);
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    if (Hardware.length > 0) {
+      fetchData();
+    }
+  }, [Hardware]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -265,53 +392,303 @@ function IssuePage() {
     }
   }, [filteredIssueData]);
 
-  const filteApp = () => {
+  const filterApps = () => {
     const query = searchQuery.toLowerCase();
+
     const filteredData = Apps.filter((item) => {
       const name = item.name.toLowerCase();
       const os = item.os.toLowerCase();
       const version = item.osversion.toLowerCase();
+
+      // Check if the query matches either name or OS
       return (
         name.includes(query) || os.includes(query) || version.includes(query)
       );
     });
-    setfilteredAppData(filteredData);
+
+    setFilteredAppData(filteredData);
   };
+  useEffect(() => {
+    filterApps();
+  }, [searchQuery]);
+  const filterHardware = () => {
+    const query = searchQueryHw.toLowerCase();
 
-  const filteAppSof = () => {
-    const query = searchQuerySof.toLowerCase();
-
-    // Sử dụng Set để theo dõi các giá trị đã xuất hiện
-    const uniqueValues = new Set();
-
-    const filteredData = Apps.filter((item) => {
+    const filteredData = Hardware.filter((item) => {
+      const name = item.name.toLowerCase();
       const os = item.os.toLowerCase();
-      const version = item.osversion.toLowerCase();
+      const version = item.version.toLowerCase();
 
-      // Tạo một khóa duy nhất từ os và version
-      const key = `${os}-${version}`;
-
-      // Nếu giá trị đã tồn tại, bỏ qua
-      if (uniqueValues.has(key)) {
-        return false;
-      }
-
-      // Nếu không, thêm vào Set và giữ lại
-      uniqueValues.add(key);
-      return os.includes(query) || version.includes(query);
+      // Check if the query matches either name or OS
+      return (
+        name.includes(query) || os.includes(query) || version.includes(query)
+      );
     });
 
-    setfilteredAppDataSof(filteredData);
+    setFilteredHwData(filteredData);
+  };
+  useEffect(() => {
+    filterHardware();
+  }, [searchQueryHw]);
+  const filterSoftware = () => {
+    const query = searchQuerySw.toLowerCase();
+
+    const filteredData = Software.filter(
+      (item) => item.type !== 'Antivirus',
+    ).filter((item) => {
+      const name = item.name.toLowerCase();
+      const os = item.os.toLowerCase();
+      const version = item.version.toLowerCase();
+
+      // Check if the query matches either name or OS
+      return (
+        name.includes(query) || os.includes(query) || version.includes(query)
+      );
+    });
+
+    setFilteredSwData(filteredData);
+  };
+  useEffect(() => {
+    filterSoftware();
+  }, [searchQuerySw]);
+  const filterAntivirus = () => {
+    const query = searchQueryAnti.toLowerCase();
+
+    const filteredData = Software.filter(
+      (item) => item.type === 'Antivirus',
+    ).filter((item) => {
+      const name = item.name.toLowerCase();
+      const os = item.os.toLowerCase();
+      const version = item.version.toLowerCase();
+
+      // Check if the query matches either name or OS
+      return (
+        name.includes(query) || os.includes(query) || version.includes(query)
+      );
+    });
+
+    setFilteredAntiData(filteredData);
+  };
+  useEffect(() => {
+    filterAntivirus();
+  }, [searchQueryAnti]);
+
+  const handleSelectAppName = (app) => {
+    setSearchQuery(`${app.name}-${app.os}-${app.osversion}`);
+    setAppId([app.appId]);
+    setShowOptions(false);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      title: 'Application-' + app.name,
+    }));
   };
 
+  const handleSelectAppOs = (item) => {
+    setSearchQuery(`${item.os}-${item.osversion}`);
+    const key = `${item.os.trim().toLowerCase()}-${item.osversion
+      .trim()
+      .toLowerCase()}`;
+    const matchingAppIds = Apps.filter(
+      (app) =>
+        `${app.os.trim().toLowerCase()}-${app.osversion
+          .trim()
+          .toLowerCase()}` === key,
+    ).map((app) => app.appId);
+    setAppId(matchingAppIds);
+    setShowOptions(false);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      title: 'Application-' + item.os + '-' + item.osversion,
+    }));
+  };
+  const handleSelectHwName = async (item) => {
+    setSearchQueryHw(`${item.name}-${item.os}-${item.version}`);
 
-  useEffect(() => {
-    filteApp();
-  }, [searchQuery]);
+    try {
+      // Array to store appIds
+      let appIds = [];
 
-  useEffect(() => {
-    filteAppSof();
-  }, [searchQuerySof]);
+      // Use for...of loop to iterate over each app
+      for (const app of Apps) {
+        try {
+          const response = await axios.get(
+            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app.appId,
+          );
+
+          // Extract appIds from the response data
+          const matchingAppIds = response.data
+            .filter((asset) => asset.assetId === item.assetId)
+            .map((matchingAsset) => app.appId);
+
+          // Add matchingAppIds to appIds
+          appIds = appIds.concat(matchingAppIds);
+        } catch (error) {
+          console.log(`Error for appId ${app.appId}:`, error);
+          // Handle error for the specific app if needed
+        }
+      }
+
+      // Remove duplicate appIds (if any)
+      const uniqueAppIds = [...new Set(appIds)];
+
+      // Set the state with the unique appIds
+      setAppId(uniqueAppIds);
+      setShowOptionsHw(false);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        title: 'Hardware-' + item.name,
+      }));
+    } catch (error) {
+      console.log('Error in handleSelectHwName:', error);
+      // Handle error if needed
+    }
+  };
+
+  const handleSelectHwOs = async (item) => {
+    setSearchQueryHw(`${item.os}-${item.version}`);
+
+    try {
+      // Array to store appIds
+      let appIds = [];
+
+      // Use for...of loop to iterate over each app
+      for (const app of Apps) {
+        try {
+          const response = await axios.get(
+            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app.appId,
+          );
+
+          // Extract appIds from the response data
+          const matchingAppIds = response.data
+            .filter(
+              (asset) => asset.os === item.os && asset.version === item.version,
+            )
+            .map((matchingAsset) => app.appId);
+
+          // Add matchingAppIds to appIds
+          appIds = appIds.concat(matchingAppIds);
+        } catch (error) {
+          console.log(`Error for appId ${app.appId}:`, error);
+          // Handle error for the specific app if needed
+        }
+      }
+
+      // Remove duplicate appIds (if any)
+      const uniqueAppIds = [...new Set(appIds)];
+
+      // Set the state with the unique appIds
+      setAppId(uniqueAppIds);
+      setShowOptionsHw(false);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        title: 'Hardware-' + item.os + '-' + item.version,
+      }));
+    } catch (error) {
+      console.log('Error in handleSelectHwName:', error);
+      // Handle error if needed
+    }
+  };
+
+  const handleSelectSwName = async (item) => {
+    setSearchQuerySw(`${item.name}-${item.version}-${item.os}`);
+    try {
+      // Array to store appIds
+      let appIds = [];
+
+      // Use for...of loop to iterate over each app
+      for (const app of Apps) {
+        try {
+          const response = await axios.get(
+            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app.appId,
+          );
+
+          for (const asset of response.data) {
+            // Extract appIds from the response data
+            const response2 = await axios.get(
+              `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+                asset.assetId,
+            );
+
+            // Check if the list of software includes the target softwareId
+            if (
+              response2.data.some((sw) => sw.softwareId === item.softwareId)
+            ) {
+              // If there is a match, add the appId to appIds
+              appIds.push(app.appId);
+            }
+          }
+        } catch (error) {
+          console.log(`Error for appId ${app.appId}:`, error);
+          // Handle error for the specific app if needed
+        }
+      }
+
+      // Remove duplicate appIds (if any)
+      const uniqueAppIds = [...new Set(appIds)];
+
+      // Set the state with the unique appIds
+      setAppId(uniqueAppIds);
+      setShowOptionsSw(false);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        title: 'Software-' + item.name + '-' + item.version,
+      }));
+    } catch (error) {
+      console.log('Error in handleSelectSwName:', error);
+      // Handle error if needed
+    }
+  };
+
+  const handleSelectAntiName = async (item) => {
+    setSearchQueryAnti(`${item.name}-${item.version}-${item.os}`);
+    try {
+      // Array to store appIds
+      let appIds = [];
+
+      // Use for...of loop to iterate over each app
+      for (const app of Apps) {
+        try {
+          const response = await axios.get(
+            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app.appId,
+          );
+
+          for (const asset of response.data) {
+            // Extract appIds from the response data
+            const response2 = await axios.get(
+              `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+                asset.assetId,
+            );
+
+            // Check if the list of software includes the target softwareId
+            if (
+              response2.data.some((sw) => sw.softwareId === item.softwareId)
+            ) {
+              // If there is a match, add the appId to appIds
+              appIds.push(app.appId);
+            }
+          }
+        } catch (error) {
+          console.log(`Error for appId ${app.appId}:`, error);
+          // Handle error for the specific app if needed
+        }
+      }
+
+      // Remove duplicate appIds (if any)
+      const uniqueAppIds = [...new Set(appIds)];
+
+      // Set the state with the unique appIds
+      setAppId(uniqueAppIds);
+      setShowOptionsAnti(false);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        title: 'Antivirus-' + item.name + '-' + item.version,
+      }));
+    } catch (error) {
+      console.log('Error in handleSelectAntiName:', error);
+      // Handle error if needed
+    }
+  };
+  console.log('4:' + appId);
 
   //end
 
@@ -419,7 +796,6 @@ function IssuePage() {
       selectedOptionActive === '' ? detail.status : selectedOptionActive,
     );
 
-
     if (Array.isArray(image) && image.length !== 0) {
       const fileObjects = await Promise.all(
         image.map(async (image) => {
@@ -428,7 +804,6 @@ function IssuePage() {
             const blob = dataURLtoBlob(image.dataURL);
             return new File([blob], image.fileName, { type: blob.type });
           } else {
-
             // Giữ nguyên ảnh khi dataURL không xác định
             const fullImagePath = `/images/${image.image1}`;
             const blob = await fetch(fullImagePath).then((res) => res.blob());
@@ -440,7 +815,7 @@ function IssuePage() {
         formData.append(`Images`, file);
       });
     } else {
-      formData.append(`Images`, " ");
+      formData.append(`Images`, ' ');
     }
 
     try {
@@ -473,11 +848,12 @@ function IssuePage() {
   }
 
   const handleSaveAdd = async () => {
-    const url = 'http://localhost:5001/api/Report/CreateReport';
+    const url = 'http://localhost:5001/api/Report/CreateReport_appids';
 
-    const Id = parseInt(appId);
+    // const appIds = appId.join(',');
+    const accId = account?.accId;
     const desc = document.getElementById('description').value;
-    const title = document.getElementById('title').value;
+    const title = formData.title;
     const endDate = document.getElementsByName('endDate')[0].value;
     const dateParts = endDate.split('-');
     let formattedDate = '';
@@ -497,80 +873,32 @@ function IssuePage() {
       [];
     });
     // Sử dụng FormData để chứa dữ liệu và file
-    const formData = new FormData();
-    formData.append('AppId', Id);
-    formData.append('Title', title);
-    formData.append('Description', desc);
-    formData.append('Type', 'Issue');
-    formData.append('Start_Date', formattedDate);
-    formData.append('End_Date', formattedDate);
-    formData.append('Status', 1);
+    const apiData = new FormData();
+    appId.forEach((id) => {
+      apiData.append('AppIds', id);
+    });
+    apiData.append('AccId', accId);
+    apiData.append('Title', title);
+    apiData.append('Description', desc);
+    apiData.append('Type', 'Issue');
+    apiData.append('Start_Date', formattedDate);
+    apiData.append('End_Date', formattedDate);
+    apiData.append('Status', 1);
 
     // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
     fileObjects.forEach((file, index) => {
-      formData.append(`Images`, file);
+      apiData.append(`Images`, file);
     });
     try {
-      const response = await axios.post(url, formData, {
+      const response = await axios.post(url, apiData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       setIsSuccess('true');
       setIsOpenAdd(false);
-    } catch (error) {
-      setIsSuccess('false');
-      setIsOpenAdd(false);
-      console.error('Lỗi:', error);
-    }
-  };
-
-  const handleSaveAddMul = async () => {
-    const url = 'http://localhost:5001/api/Report/CreateReport_os';
-
-    const desc = document.getElementById('description').value;
-    const title = document.getElementById('title').value;
-    const endDate = document.getElementsByName('endDate')[0].value;
-    const dateParts = endDate.split('-');
-    let formattedDate = '';
-    if (dateParts.length === 3) {
-      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-    } else {
-      console.error('Ngày không hợp lệ.');
-      return; // Nếu ngày không hợp lệ, thoát khỏi hàm
-    }
-
-    // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
-    const fileObjects = imagesState.map((image) => {
-      // Tạo một Blob từ dataURL
-      const blob = dataURLtoBlob(image.dataURL);
-      // Tạo một File từ Blob
-      return new File([blob], image.fileName, { type: blob.type });
-      [];
-    });
-    // Sử dụng FormData để chứa dữ liệu và file
-    const formData = new FormData();
-    formData.append('Os', os);
-    formData.append('OsVersion', osversion);
-    formData.append('Title', title);
-    formData.append('Description', desc);
-    formData.append('Type', 'Issue');
-    formData.append('Start_Date', formattedDate);
-    formData.append('End_Date', formattedDate);
-    formData.append('Status', 1);
-
-    // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
-    fileObjects.forEach((file, index) => {
-      formData.append(`Images`, file);
-    });
-    try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setIsSuccess('true');
-      setIsOpenAdd(false);
+      setSearchQuery('');
+      setFormData(defaultData);
     } catch (error) {
       setIsSuccess('false');
       setIsOpenAdd(false);
@@ -658,8 +986,9 @@ function IssuePage() {
     handleRemoveImage(index);
   };
 
-  const toggleMode = () => {
-    setMode((prevMode) => (prevMode === 'Application' ? 'Software' : 'Application'));
+  const toggleMode = (e) => {
+    setMode(e.target.value);
+    console.log(mode);
   };
 
   return (
@@ -699,10 +1028,11 @@ function IssuePage() {
             <Spacer />
             <InputGroup style={{ paddingTop: '', width: '35%' }}>
               <InputLeftAddon
-                pointerEvents="none"
+                pointerEvents='none'
                 children='Title - Application'
               />
-              <Input style={{ width: '100%' }}
+              <Input
+                style={{ width: '100%' }}
                 type='text'
                 value={searchQueryTb}
                 onChange={handleSearchTbInputChange}
@@ -724,7 +1054,11 @@ function IssuePage() {
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
-            <Center><Text fontSize={30} mb={2}>List open issue</Text></Center>
+            <Center>
+              <Text fontSize={30} mb={2}>
+                List open issue
+              </Text>
+            </Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -732,7 +1066,10 @@ function IssuePage() {
             >
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
-                  <Text>Show {dynamicList.length}/{filteredIssueData.length} result(s)</Text>{' '}
+                  <Text>
+                    Show {dynamicList.length}/{filteredIssueData.length}{' '}
+                    result(s)
+                  </Text>{' '}
                   <Pagination
                     current={currentPage}
                     onChange={handleChangePage}
@@ -769,7 +1106,8 @@ function IssuePage() {
                         {issue.title}
                       </Button>
                     </Td>
-                    <Td style={{ width: '45%' }}
+                    <Td
+                      style={{ width: '45%' }}
                       onClick={() => {
                         handleDetail();
                         setDetails(issue);
@@ -777,7 +1115,7 @@ function IssuePage() {
                     >
                       {trimTextToMaxWidth(issue.description.trim(), 400)}
                     </Td>
-                    <Td >
+                    <Td>
                       {
                         Apps.find((appItem) => appItem.appId === issue.appId)
                           ?.name
@@ -820,7 +1158,15 @@ function IssuePage() {
                   >
                     {sortedIssue.map((status) => (
                       <option key={status} value={status}>
-                        {status === 1 ? 'Unsolve' : status === 2 ? 'Solved' : status === 3 ? 'Deleted' : status === 4 ? 'Cancel' : 'Unknow'}
+                        {status === 1
+                          ? 'Unsolve'
+                          : status === 2
+                          ? 'Solved'
+                          : status === 3
+                          ? 'Deleted'
+                          : status === 4
+                          ? 'Cancel'
+                          : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}
@@ -916,7 +1262,9 @@ function IssuePage() {
                               right='5px'
                               fontSize='15px'
                               variant='ghost'
-                              onClick={(event) => handleDeleteClick(index, event)}
+                              onClick={(event) =>
+                                handleDeleteClick(index, event)
+                              }
                               _hover={{ color: 'black ' }}
                             />
                             <Text
@@ -957,7 +1305,8 @@ function IssuePage() {
                         </Modal>
                       </div>
                     )}
-                  </Box>)}
+                  </Box>
+                )}
                 {error && <Text color='red'>{error}</Text>}
               </GridItem>
             </Grid>
@@ -992,10 +1341,12 @@ function IssuePage() {
             <Grid templateColumns='repeat(3, 1fr)' gap={8}>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
-                  <FormLabel>
-                    {mode}
-                  </FormLabel>
-                  <RepeatIcon onClick={toggleMode} style={{ marginRight: '1rem' }} boxSize={4} color="blue.500"></RepeatIcon>
+                  <Select value={mode} onChange={toggleMode} width='140px'>
+                    <option value='Application'>Application</option>
+                    <option value='Hardware'>Hardware</option>
+                    <option value='Software'>Software</option>
+                    <option value='Antivirus'>Antivirus</option>
+                  </Select>
                   <div
                     style={{
                       position: 'relative',
@@ -1024,7 +1375,7 @@ function IssuePage() {
                               position: 'absolute',
                               top: '100%',
                               left: 0,
-                              width: '300px',
+                              width: '270px',
                               border: '2px solid whitesmoke',
                               background: '#fff',
                               zIndex: 1,
@@ -1032,37 +1383,97 @@ function IssuePage() {
                             }}
                           >
                             {filteredAppData.map((app) => (
-                              <div
+                              <Box
                                 key={app.appId}
                                 style={{ padding: '8px', cursor: 'pointer' }}
-                                onClick={() => {
-                                  setSearchQuery(
-                                    `${app.name.trim()} - ${app.os.trim()} - ${app.osversion.trim()}`
-                                  );
-                                  setAppId(app.appId);
-                                }}
                               >
-                                {app.name.trim()} - {app.os.trim()} - {app.osversion.trim()}
-                              </div>
+                                <Flex>
+                                  <Text
+                                    className={styles.listitem}
+                                    onClick={() => handleSelectAppName(app)}
+                                  >
+                                    {app.name.trim()}
+                                  </Text>
+                                  <Spacer />
+                                  <Text
+                                    className={styles.listitem}
+                                    onClick={() => handleSelectAppOs(app)}
+                                  >
+                                    {app.os.trim()} - {app.osversion.trim()}
+                                  </Text>
+                                </Flex>
+                              </Box>
                             ))}
                           </div>
                         )}
                       </React.Fragment>
-                    ) : (
+                    ) : mode === 'Hardware' ? (
                       <React.Fragment>
                         <Input
                           type='text'
                           style={{ backgroundColor: 'white', width: '270px' }}
-                          value={searchQuerySof}
+                          value={searchQueryHw}
                           onChange={(e) => {
-                            handleSearchInputChangeSof(e);
-                            setShowOptionsSof(e.target.value !== '');
+                            handleSearchInputChangeHw(e);
+                            setShowOptionsHw(e.target.value !== '');
                           }}
-                          placeholder={'Os - Version'}
+                          placeholder={'Name - Os - Version'}
                           w={300}
                           mr={1}
                         />
-                        {showOptionsSof && (
+                        {showOptionsHw && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              width: '270px',
+                              border: '2px solid whitesmoke',
+                              background: '#fff',
+                              zIndex: 1,
+                              borderRadius: '5px',
+                            }}
+                          >
+                            {filteredHwData.map((item) => (
+                              <Box
+                                key={item.assetId}
+                                style={{ padding: '8px', cursor: 'pointer' }}
+                              >
+                                <Flex>
+                                  <Text
+                                    className={styles.listitem}
+                                    onClick={() => handleSelectHwName(item)}
+                                  >
+                                    {item.name.trim()}
+                                  </Text>
+                                  <Spacer />
+                                  <Text
+                                    className={styles.listitem}
+                                    onClick={() => handleSelectHwOs(item)}
+                                  >
+                                    {item.os.trim()} - {item.version.trim()}
+                                  </Text>
+                                </Flex>
+                              </Box>
+                            ))}
+                          </div>
+                        )}
+                      </React.Fragment>
+                    ) : mode === 'Software' ? (
+                      <React.Fragment>
+                        <Input
+                          type='text'
+                          style={{ backgroundColor: 'white', width: '270px' }}
+                          value={searchQuerySw}
+                          onChange={(e) => {
+                            handleSearchInputChangeSw(e);
+                            setShowOptionsSw(e.target.value !== '');
+                          }}
+                          placeholder={'Name - Version - Os'}
+                          w={300}
+                          mr={1}
+                        />
+                        {showOptionsSw && (
                           <div
                             style={{
                               position: 'absolute',
@@ -1075,20 +1486,63 @@ function IssuePage() {
                               borderRadius: '5px',
                             }}
                           >
-                            {filteredAppDataSof.map((app) => (
-                              <div
-                                key={app.appId}
+                            {filteredSwData.map((item) => (
+                              <Box
+                                key={item.softwareId}
                                 style={{ padding: '8px', cursor: 'pointer' }}
-                                onClick={() => {
-                                  setSearchQuerySof(
-                                    `${app.os.trim()} - ${app.osversion.trim()}`
-                                  );
-                                  setOs(app.os.trim());
-                                  setOsversion(app.osversion.trim());
-                                }}
                               >
-                                {app.os.trim()} - {app.osversion.trim()}
-                              </div>
+                                <Text
+                                  className={styles.listitem}
+                                  onClick={() => handleSelectSwName(item)}
+                                >
+                                  {item.name.trim()} - {item.version.trim()} -{' '}
+                                  {item.os.trim()}
+                                </Text>
+                              </Box>
+                            ))}
+                          </div>
+                        )}
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <Input
+                          type='text'
+                          style={{ backgroundColor: 'white', width: '270px' }}
+                          value={searchQueryAnti}
+                          onChange={(e) => {
+                            handleSearchInputChangeAnti(e);
+                            setShowOptionsAnti(e.target.value !== '');
+                          }}
+                          placeholder={'Name - Version - Os'}
+                          w={300}
+                          mr={1}
+                        />
+                        {showOptionsAnti && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '100%',
+                              left: 0,
+                              width: '300px',
+                              border: '2px solid whitesmoke',
+                              background: '#fff',
+                              zIndex: 1,
+                              borderRadius: '5px',
+                            }}
+                          >
+                            {filteredAntiData.map((item) => (
+                              <Box
+                                key={item.softwareId}
+                                style={{ padding: '8px', cursor: 'pointer' }}
+                              >
+                                <Text
+                                  className={styles.listitem}
+                                  onClick={() => handleSelectAntiName(item)}
+                                >
+                                  {item.name.trim()} - {item.version.trim()} -{' '}
+                                  {item.os.trim()}
+                                </Text>
+                              </Box>
                             ))}
                           </div>
                         )}
@@ -1101,8 +1555,10 @@ function IssuePage() {
                 <Flex alignItems='center'>
                   <FormLabel>Title</FormLabel>
                   <Input
-                    id='title'
                     placeholder='Title'
+                    name='title'
+                    value={formData.title}
+                    onChange={handleInputChange}
                     style={{ backgroundColor: 'white' }}
                   />
                 </Flex>
@@ -1229,7 +1685,7 @@ function IssuePage() {
             </Grid>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={mode === 'Application' ? handleSaveAdd : handleSaveAddMul}>
+            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
               Save
             </Button>
             <Button

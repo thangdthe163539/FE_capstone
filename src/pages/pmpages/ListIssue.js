@@ -186,17 +186,15 @@ function SecurityPage() {
     );
   };
   // Function to get the current date and set it for the endDate field
-  
 
   // Update filtered data whenever the search query changes
   useEffect(() => {
     filterAssets();
   }, [searchQuery, reportData]);
   //
- 
 
   //
-  
+
   // Handle search input change
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value);
@@ -262,7 +260,9 @@ function SecurityPage() {
               </TableCaption>
               <Thead>
                 <Tr>
-                  <Th className={styles.cTh}>No</Th>
+                  <Th className={styles.cTh} width='10px'>
+                    No
+                  </Th>
                   <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Title</Th>
                   <Th className={styles.cTh}>Start Date</Th>
