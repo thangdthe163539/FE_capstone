@@ -408,7 +408,7 @@ function IssueDetailManagePage() {
                 return dateA.getTime() - dateB.getTime();
               }
             });
-            setIssue(data);
+            setIssue(sortedData);
           }
         })
         .catch((error) => {
