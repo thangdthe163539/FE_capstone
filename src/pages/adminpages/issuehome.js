@@ -370,7 +370,8 @@ function IssuePage() {
   const totalPages = filteredIssueData ? filteredIssueData?.length : 0;
 
   //lọc
-  const filteIssue = () => {handleSearchInputChangeHw
+  const filteIssue = () => {
+    handleSearchInputChangeHw;
     const query = searchQueryTb.toLowerCase();
     const filteredData = Issues.filter((item) => {
       const title = item.title.toLowerCase();
@@ -389,8 +390,8 @@ function IssuePage() {
   useEffect(() => {
     if (filteredIssueData.length) {
       handleChangePage(1);
-    }else{
-      setDynamicList([])
+    } else {
+      setDynamicList([]);
     }
   }, [filteredIssueData]);
 
@@ -1328,7 +1329,15 @@ function IssuePage() {
 
       <Modal
         isOpen={isOpenAdd}
-        onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
+        onClose={() => (
+          setIsOpenAdd(false),
+          setFormData(defaultData),
+          setSearchQuery(''),
+          setSearchQueryAnti(''),
+          setSearchQueryHw(''),
+          setSearchQuerySw(''),
+          setMode('Application')
+        )}
         closeOnOverlayClick={false}
         size='lg'
       >
@@ -1688,7 +1697,15 @@ function IssuePage() {
               Save
             </Button>
             <Button
-              onClick={() => (setIsOpenAdd(false), setFormData(defaultData))}
+              onClick={() => (
+                setIsOpenAdd(false),
+                setFormData(defaultData),
+                setSearchQuery(''),
+                setSearchQueryAnti(''),
+                setSearchQueryHw(''),
+                setSearchQuerySw(''),
+                setMode('Application')
+              )}
             >
               Cancel
             </Button>

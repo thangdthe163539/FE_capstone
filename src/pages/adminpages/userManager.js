@@ -31,7 +31,8 @@ import {
   Stack,
   InputGroup,
   Button,
-  Center, InputLeftElement,
+  Center,
+  InputLeftElement,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import Pagination from '@/components/pagination';
@@ -71,8 +72,8 @@ function UserManager() {
   useEffect(() => {
     if (filteredAccData.length) {
       handleChangePage(1);
-    }else{
-      setDynamicList([])
+    } else {
+      setDynamicList([]);
     }
   }, [filteredAccData]);
 
@@ -245,8 +246,8 @@ function UserManager() {
             </Text>
             <InputGroup style={{ paddingTop: '0.6%', width: '25%' }}>
               <InputLeftElement
-                pointerEvents="none"
-                children={<EmailIcon color="gray.300" boxSize={5} />}
+                pointerEvents='none'
+                children={<EmailIcon color='gray.300' boxSize={5} />}
                 style={{
                   position: 'absolute',
                   top: '60%',
@@ -347,10 +348,10 @@ function UserManager() {
                     {user.status === 1
                       ? 'Active'
                       : user.status === 2
-                        ? 'Inactive'
-                        : user.status === 3
-                          ? 'Locked'
-                          : 'Deleted'}
+                      ? 'Inactive'
+                      : user.status === 3
+                      ? 'Locked'
+                      : 'Deleted'}
                   </Td>
                 </Tr>
               ))}
@@ -374,13 +375,13 @@ function UserManager() {
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
                   <FormLabel style={{ width: '15%' }}>Email</FormLabel>
-                  <Input id='email1'  autoComplete="off"/>
+                  <Input id='email1' autoComplete='off' />
                 </Flex>
               </GridItem>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
                   <FormLabel style={{ width: '15%' }}>Role</FormLabel>
-                  <Select 
+                  <Select
                     value={selectedOptionRole}
                     onChange={(e) => setSelectedOptionRole(e.target.value)}
                   >
@@ -401,7 +402,7 @@ function UserManager() {
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
                   <FormLabel style={{ width: '15%' }}>Name</FormLabel>
-                  <Input id='name'  autoComplete="off"/>
+                  <Input id='name' autoComplete='off' />
                 </Flex>
               </GridItem>
               <GridItem colSpan={1}>

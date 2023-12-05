@@ -255,13 +255,12 @@ function AssetDetailPage() {
       // setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+        `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
           device.assetId,
       );
       setData(newDataResponse.data);
       const response2 = await axios.get(
-        `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
-          device.assetId,
+        `${BACK_END_PORT}/api/License/list_Licenses_by_Asset/` + device.assetId,
       );
       setDataLicense(response2.data);
     } catch (error) {
@@ -309,13 +308,12 @@ function AssetDetailPage() {
       // setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+        `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
           device.assetId,
       );
       setData(newDataResponse.data);
       const response2 = await axios.get(
-        `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
-          device.assetId,
+        `${BACK_END_PORT}/api/License/list_Licenses_by_Asset/` + device.assetId,
       );
       setDataLicense(response2.data);
     } catch (error) {
@@ -328,7 +326,7 @@ function AssetDetailPage() {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const curDate = new Date();
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Asset/UpdateAsset/` + assetData.assetId,
+        `${BACK_END_PORT}/api/Asset/UpdateAsset/` + assetData.assetId,
         {
           name: assetData.name,
           cpu: assetData.cpu,
@@ -350,7 +348,7 @@ function AssetDetailPage() {
       setShowEditAsset(true); // Close the modal after successful save
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Asset/GetAssetsById/` + device?.assetId,
+        `${BACK_END_PORT}/api/Asset/GetAssetsById/` + device?.assetId,
       );
       setAssetData(newDataResponse.data);
     } catch (error) {
@@ -362,7 +360,7 @@ function AssetDetailPage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/License/UpdateLicense/` + formData2.licenseId,
+        `${BACK_END_PORT}/api/License/UpdateLicense/` + formData2.licenseId,
         {
           // assetId: device.assetId,
           // softwareId: formData.softwareId,
@@ -380,13 +378,12 @@ function AssetDetailPage() {
       setButtonDisabled2(true);
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+        `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
           device.assetId,
       );
       setData(newDataResponse.data);
       const response2 = await axios.get(
-        `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
-          device.assetId,
+        `${BACK_END_PORT}/api/License/list_Licenses_by_Asset/` + device.assetId,
       );
       setDataLicense(response2.data);
     } catch (error) {
@@ -407,13 +404,12 @@ function AssetDetailPage() {
       setButtonDisabled1(true);
       // Reload the data for the table after deletion
       const response = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+        `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
           device.assetId,
       );
       setData(response.data); // Assuming the API returns an array of objects
       const response2 = await axios.get(
-        `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
-          device.assetId,
+        `${BACK_END_PORT}/api/License/list_Licenses_by_Asset/` + device.assetId,
       );
       setDataLicense(response2.data);
       toast({
@@ -433,8 +429,7 @@ function AssetDetailPage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Software/UpdateSoftware/` +
-          formData1.softwareId,
+        `${BACK_END_PORT}/api/Software/UpdateSoftware/` + formData1.softwareId,
         {
           name: formData1.name,
           publisher: formData1.publisher,
@@ -452,7 +447,7 @@ function AssetDetailPage() {
       setSelectedRow1(null);
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+        `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
           device.assetId,
       );
       setData(newDataResponse.data);
@@ -480,7 +475,7 @@ function AssetDetailPage() {
       try {
         try {
           const response = await axios.get(
-            `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+            `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
               device.assetId,
           );
           setData(response.data); // Assuming the API returns an array of objects
@@ -489,7 +484,7 @@ function AssetDetailPage() {
         }
         try {
           const response2 = await axios.get(
-            `${BACK_END_PORT}/api/v1/License/list_Licenses_by_Asset/` +
+            `${BACK_END_PORT}/api/License/list_Licenses_by_Asset/` +
               device.assetId,
           );
           setDataLicense(response2.data);
@@ -498,7 +493,7 @@ function AssetDetailPage() {
         }
         try {
           const response3 = await axios.get(
-            `${BACK_END_PORT}/api/v1/Software/ListSoftwares`,
+            `${BACK_END_PORT}/api/Software/ListSoftwares`,
           );
           setListAllSoftware(response3.data);
         } catch (error) {
@@ -506,7 +501,7 @@ function AssetDetailPage() {
         }
         try {
           const response4 = await axios.get(
-            `${BACK_END_PORT}/api/v1/Asset/GetAssetsById/` + device.assetId,
+            `${BACK_END_PORT}/api/Asset/GetAssetsById/` + device.assetId,
           );
           setAssetData(response4.data[0]);
         } catch (error) {
