@@ -94,7 +94,7 @@ function UserManager() {
   }, [searchQueryTb, userData]);
 
   const handleAddUser = () => {
-    const url = 'http://localhost:5001/api/v1/Account/Register';
+    const url = 'http://localhost:5001/api/Account/Register';
 
     const email = document.getElementById('email1').value;
     const name = document.getElementById('name').value;
@@ -149,7 +149,7 @@ function UserManager() {
     var email = document.getElementById('email').value;
 
     if (email == '') {
-      const url = 'http://localhost:5001/api/v1/Account/ListAccount';
+      const url = 'http://localhost:5001/api/Account/ListAccount';
       fetch(url, {
         method: 'GET',
       })
@@ -162,7 +162,7 @@ function UserManager() {
         });
     }
     if (email != '') {
-      const url = `http://localhost:5001/api/v1/Account/SearchByEmail?email=${email}`;
+      const url = `http://localhost:5001/api/Account/SearchByEmail?email=${email}`;
       fetch(url, {
         method: 'GET',
         headers: {

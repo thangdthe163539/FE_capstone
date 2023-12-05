@@ -87,7 +87,7 @@ function FeedbackPage() {
   }, []);
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/v1/App/ListApps';
+    const url = 'http://localhost:5001/api/App/ListApps';
     fetch(url, {
       method: 'GET',
     })

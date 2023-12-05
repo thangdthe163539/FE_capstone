@@ -371,7 +371,7 @@ function FeedBackDetailManagePage() {
 
   useEffect(() => {
     if (detail?.reportId) {
-      const url = `http://localhost:5001/api/v1/Image/list_Images_by_Report/${detail.reportId}`;
+      const url = `http://localhost:5001/api/Image/list_Images_by_Report/${detail.reportId}`;
 
       fetch(url, {
         method: 'GET',
@@ -387,7 +387,7 @@ function FeedBackDetailManagePage() {
   }, [detail?.reportId]);
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/v1/App/ListApps';
+    const url = 'http://localhost:5001/api/App/ListApps';
     fetch(url, {
       method: 'GET',
     })
