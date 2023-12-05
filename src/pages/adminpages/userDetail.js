@@ -53,7 +53,7 @@ function UserDetail() {
     };
 
     const handleDelete = () => {
-        const url = `http://localhost:5001/api/v1/Account/DeleteAccountWith_key?accountId=${accid}`;
+        const url = `http://localhost:5001/api/Account/DeleteAccountWith_key?accountId=${accid}`;
         fetch(url, {
             method: 'DELETE',
         })
@@ -72,7 +72,7 @@ function UserDetail() {
 
     const handleUpdateUser = () => {
         if (accid) {
-            const url = `http://localhost:5001/api/v1/Account/Update_Accpunt${accid}`;
+            const url = `http://localhost:5001/api/Account/Update_Accpunt${accid}`;
 
             const email = document.getElementById('email1').value;
             const isActive = selectedOptionActive ? selectedOptionActive : status;

@@ -37,7 +37,7 @@ function Header() {
     signInWithPopup(auth, provider)
       .then((result) => {
         const mail = result.user.email;
-        const url = 'http://localhost:5001/api/v1/Account/login';
+        const url = 'http://localhost:5001/api/Account/login';
 
         const requestData = mail;
 

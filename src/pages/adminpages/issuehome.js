@@ -244,7 +244,7 @@ function IssuePage() {
   };
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/v1/App/ListApps';
+    const url = 'http://localhost:5001/api/App/ListApps';
     fetch(url, {
       method: 'GET',
     })
@@ -266,7 +266,7 @@ function IssuePage() {
           Apps.filter((app) => app.status !== 3).map(async (app) => {
             try {
               const response2 = await axios.get(
-                `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app?.appId,
+                `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + app?.appId,
               );
 
               // Filter out duplicate assets based on device ID
@@ -314,7 +314,7 @@ function IssuePage() {
           Hardware.map(async (asset) => {
             try {
               const response2 = await axios.get(
-                `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+                `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
                   asset?.assetId,
               );
               // Filter out duplicate software based on assetID
@@ -514,7 +514,7 @@ function IssuePage() {
       for (const app of Apps) {
         try {
           const response = await axios.get(
-            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app.appId,
+            `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + app.appId,
           );
 
           // Extract appIds from the response data
@@ -557,7 +557,7 @@ function IssuePage() {
       for (const app of Apps) {
         try {
           const response = await axios.get(
-            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app.appId,
+            `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + app.appId,
           );
 
           // Extract appIds from the response data
@@ -601,13 +601,13 @@ function IssuePage() {
       for (const app of Apps) {
         try {
           const response = await axios.get(
-            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app.appId,
+            `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + app.appId,
           );
 
           for (const asset of response.data) {
             // Extract appIds from the response data
             const response2 = await axios.get(
-              `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+              `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
                 asset.assetId,
             );
 
@@ -651,13 +651,13 @@ function IssuePage() {
       for (const app of Apps) {
         try {
           const response = await axios.get(
-            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + app.appId,
+            `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + app.appId,
           );
 
           for (const asset of response.data) {
             // Extract appIds from the response data
             const response2 = await axios.get(
-              `${BACK_END_PORT}/api/v1/Software/list_Softwares_by_Asset/` +
+              `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
                 asset.assetId,
             );
 
@@ -910,7 +910,7 @@ function IssuePage() {
 
   useEffect(() => {
     if (detail?.reportId) {
-      const url = `http://localhost:5001/api/v1/Image/list_Images_by_Report/${detail.reportId}`;
+      const url = `http://localhost:5001/api/Image/list_Images_by_Report/${detail.reportId}`;
 
       fetch(url, {
         method: 'GET',
