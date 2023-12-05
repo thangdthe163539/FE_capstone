@@ -901,12 +901,12 @@ function AssetDetailPage() {
                 <Flex>
                   <Box>
                     <InputGroup>
-                      <InputLeftAddon children='Search' />
+                      <InputLeftAddon children='Name / publisher' />
                       <Input
                         type='text'
                         value={searchAppQuery}
                         onChange={handleSearchAppInputChange}
-                        placeholder='name - publisher'
+                        placeholder='search...'
                         w={300}
                         mr={1}
                       />
@@ -1007,12 +1007,12 @@ function AssetDetailPage() {
                 <Flex>
                   <Box>
                     <InputGroup>
-                      <InputLeftAddon children='Search' />
+                      <InputLeftAddon children='Software' />
                       <Input
                         type='text'
                         value={searchAppQuery}
                         onChange={handleSearchAppInputChange}
-                        placeholder='software'
+                        placeholder='search...'
                         w={300}
                         mr={1}
                       />
@@ -1327,12 +1327,12 @@ function AssetDetailPage() {
               <Box>
                 <Box ml={6} mb={4}>
                   <InputGroup>
-                    <InputLeftAddon children='Search' />
+                    <InputLeftAddon children='Name / publisher' />
                     <Input
                       type='text'
                       value={searchAddQuery}
                       onChange={handleSearchAddInputChange}
-                      placeholder='name - publisher'
+                      placeholder='search software'
                       w={300}
                       mr={1}
                     />

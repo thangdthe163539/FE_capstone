@@ -268,6 +268,15 @@ function ReportPage() {
                 borderBottom: '1px solid #4d9ffe',
               }}
             >
+              Application
+            </Tab>
+            <Tab
+              className={styles.tab}
+              _selected={{
+                color: '#4d9ffe',
+                borderBottom: '1px solid #4d9ffe',
+              }}
+            >
               Asset
             </Tab>
             <Tab
@@ -290,6 +299,55 @@ function ReportPage() {
             </Tab>
           </TabList>
           <TabPanels>
+            <TabPanel>
+              <ListItem className={styles.list}>
+                <TableContainer>
+                  <Table
+                    variant='striped'
+                    colorScheme='gray'
+                    className={styles.cTable}
+                  >
+                    <TableCaption>
+                      Total {appData.length} softwares
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
+                        <Th className={styles.cTh}>Name</Th>
+                        <Th className={styles.cTh}>Publisher</Th>
+                        <Th className={styles.cTh}>Version</Th>
+                        <Th className={styles.cTh}>Release</Th>
+                        <Th className={styles.cTh}>Type</Th>
+                        <Th className={styles.cTh}>Status</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {appData.map((item, index) => (
+                        <Tr key={item.appId}>
+                          <Td>{index + 1}</Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.publisher}</Td>
+                          <Td>{item.version}</Td>
+                          <Td>{item.release}</Td>
+                          <Td>{item.type}</Td>
+                          <Td>
+                            {item.status === 1
+                              ? 'Active'
+                              : item.status === 2
+                              ? 'Inactive'
+                              : item.status === 3
+                              ? 'Deleted'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </ListItem>
+            </TabPanel>
             <TabPanel>
               {/* <ListItem className={styles.list} pt={0}>
                 <Flex>
@@ -340,7 +398,7 @@ function ReportPage() {
                         .map((item, index) => (
                           <Tr key={item.assetId}>
                             <Td>{index + 1}</Td>
-                            <Td className={styles.listitem}>{item.name}</Td>
+                            <Td>{item.name}</Td>
                             <Td>{item.manufacturer}</Td>
                             <Td>{item.model}</Td>
                             <Td>{item.serialNumber}</Td>
