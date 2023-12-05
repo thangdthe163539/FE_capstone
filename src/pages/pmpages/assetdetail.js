@@ -78,7 +78,7 @@ function AssetDetailPage() {
     installDate: '',
     publisher: '',
     type: 'Desktop App',
-    os: 'Window',
+    os: 'Windows',
     status_AssetSoftware: '',
   };
 
@@ -1292,7 +1292,7 @@ function AssetDetailPage() {
                         value={formData.os}
                         onChange={handleInputChange}
                       >
-                        <option value='Window'>Window</option>
+                        <option value='Windows'>Windows</option>
                         <option value='macOS'>macOS</option>
                         <option value='Linux'>Linux</option>
                         <option value='Android'>Android</option>
@@ -1570,7 +1570,7 @@ function AssetDetailPage() {
                     value={formData1.os}
                     onChange={(e) => handleInputChange1(e)}
                   >
-                    <option value='Window'>Window</option>
+                    <option value='Windows'>Windows</option>
                     <option value='macOS'>macOS</option>
                     <option value='Linux'>Linux</option>
                     <option value='Android'>Android</option>

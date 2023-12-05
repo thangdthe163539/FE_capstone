@@ -245,12 +245,12 @@ function SoftwarePage() {
             <Spacer />
             <Box>
               <InputGroup>
-                <InputLeftAddon children='Search' />
+                <InputLeftAddon children='Name' />
                 <Input
                   type='text'
                   value={searchQuery}
                   onChange={handleSearchInputChange}
-                  placeholder='name'
+                  placeholder='search...'
                   w={300}
                   mr={1}
                 />
@@ -286,10 +286,10 @@ function SoftwarePage() {
                     No
                   </Th>
                   <Th className={styles.cTh}>Name</Th>
-                  <Th className={styles.cTh}>Versions</Th>
+                  <Th className={styles.cTh}>Version</Th>
                   <Th className={styles.cTh}>Release</Th>
-                  <Th className={styles.cTh}>Solved Issue</Th>
-                  <Th className={styles.cTh}>Unsolved Issue</Th>
+                  <Th className={styles.cTh}>Solved</Th>
+                  <Th className={styles.cTh}>Unsolved</Th>
                 </Tr>
               </Thead>
               <Tbody>

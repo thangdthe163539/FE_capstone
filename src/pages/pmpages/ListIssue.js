@@ -224,12 +224,12 @@ function SecurityPage() {
             <Spacer />
             <Box>
               <InputGroup>
-                <InputLeftAddon children='Search' />
+                <InputLeftAddon children='Title' />
                 <Input
                   type='text'
                   value={searchQuery}
                   onChange={handleSearchInputChange}
-                  placeholder='title'
+                  placeholder='search...'
                   w={300}
                   mr={1}
                 />
@@ -266,7 +266,7 @@ function SecurityPage() {
                   <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Title</Th>
                   <Th className={styles.cTh}>Start Date</Th>
-                  <Th className={styles.cTh}>End Date</Th>
+                  <Th className={styles.cTh}>Deadline</Th>
                   <Th className={styles.cTh}>Status</Th>
                 </Tr>
               </Thead>

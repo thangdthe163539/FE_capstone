@@ -54,7 +54,7 @@ const defaultData = {
   release: '',
   publisher: '',
   type: 'Web App',
-  os: 'Window',
+  os: 'Windows',
   osversion: '',
   description: '',
   download: '',
@@ -499,7 +499,7 @@ function SoftwarePage() {
                     value={formData2.os}
                     onChange={handleInputChange2}
                   >
-                    <option value='Window'>Window</option>
+                    <option value='Windows'>Windows</option>
                     <option value='macOS'>macOS</option>
                     <option value='Linux'>Linux</option>
                     <option value='Android'>Android</option>
@@ -649,7 +649,7 @@ function SoftwarePage() {
                     value={formData.os}
                     onChange={handleInputChange}
                   >
-                    <option value='Window'>Window</option>
+                    <option value='Windows'>Windows</option>
                     <option value='macOS'>macOS</option>
                     <option value='Linux'>Linux</option>
                     <option value='Android'>Android</option>

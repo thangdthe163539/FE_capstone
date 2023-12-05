@@ -261,7 +261,7 @@ function ApplicationPage() {
         </ListItem>
         <ListItem>
           <Center>
-            <Grid templateColumns='repeat(2, 1fr)' gap={4} mt={5}>
+            <Grid templateColumns='repeat(3, 1fr)' gap={4} mt={5}>
               {data.map((item) => (
                 <Box
                   key={item.id}

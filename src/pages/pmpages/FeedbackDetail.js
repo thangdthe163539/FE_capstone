@@ -72,6 +72,21 @@ function ReportPage(title) {
     }
   }, []);
   //
+  const [account, setAccount] = useState();
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
   //
   const handleDescriptionChange = (e) => {
     setFormData({
@@ -118,15 +133,16 @@ function ReportPage(title) {
         submitData.append(`Images`, file);
       });
       submitData.append('AppId', formData?.appId);
+      submitData.append('AccId', account?.accId);
       submitData.append('Title', formData?.title);
       submitData.append('Description', formData?.description);
       submitData.append('Type', formData?.type);
-      submitData.append('Start_Date', formData?.start_date);
-      submitData.append('End_Date', formData?.end_date);
+      submitData.append('Start_Date', formData?.start_Date);
+      submitData.append('End_Date', formData?.end_Date);
       submitData.append('Status', formData?.status);
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.appId,
+        `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.reportId,
         submitData,
       );
       console.log('Data saved:', response.data);
@@ -319,16 +335,24 @@ function ReportPage(title) {
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>
-                Start Date:
+                Created by:{' '}
+              </Text>
+              <Text className={styles.text1}>{formData?.emailSend}</Text>
+            </Flex>
+            <Flex direction='row' align='center'>
+              <Text className={`${styles.text1} ${styles.text2}`}>
+                Start date:
               </Text>
               <Text className={styles.text1}>{formData?.start_Date}</Text>
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>
-                End Date:
+                Deadline:
               </Text>
               <Text className={styles.text1}>{formData?.end_Date}</Text>
             </Flex>
+          </Flex>
+          <Box>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>Status:</Text>
               <Text className={styles.text1}>
@@ -336,18 +360,13 @@ function ReportPage(title) {
                   name='status'
                   value={formData?.status}
                   onChange={handleStatusChange} // Add onChange handler
-                  border='none'
                 >
                   <option value='1'>Unsolved</option>
                   <option value='2'>Solved</option>
-                  <option value='3'>Deleted</option>
                   <option value='4'>Canceled</option>
                 </Select>
               </Text>
             </Flex>
-          </Flex>
-
-          <Box>
             <Flex>
               <Text className={`${styles.text1} ${styles.text2}`}>Title: </Text>
               <Text className={styles.text1}>{formData?.title}</Text>

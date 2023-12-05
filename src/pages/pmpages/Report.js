@@ -509,6 +509,7 @@ function ReportPage() {
                         <Th className={styles.cTh}>License Key</Th>
                         <Th className={styles.cTh}>Start Date</Th>
                         <Th className={styles.cTh}>End Date</Th>
+                        <Th className={styles.cTh}>Type</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -522,6 +523,13 @@ function ReportPage() {
                           <Td>
                             {calculateEndDate(item.start_Date, item.time)}
                             {/* {item.time} */}
+                          </Td>
+                          <Td>
+                            {item.status == 1
+                              ? 'Closed source'
+                              : item.status == 2
+                              ? 'Open source'
+                              : 'Unknown'}
                           </Td>
                         </Tr>
                       ))}

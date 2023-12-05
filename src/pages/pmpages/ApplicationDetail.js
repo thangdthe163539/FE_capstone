@@ -806,11 +806,17 @@ function SoftwarePage() {
                             </Td>
                             <Td className={styles.text2}>OS</Td>
                             <Td>
-                              <Input
+                              <Select
                                 name='os'
                                 value={appData?.os}
                                 onChange={handleInputChange}
-                              />
+                              >
+                                <option value='Windows'>Windows</option>
+                                <option value='macOS'>macOS</option>
+                                <option value='Linux'>Linux</option>
+                                <option value='Android'>Android</option>
+                                <option value='iOS'>iOS</option>
+                              </Select>
                             </Td>
                           </Tr>
                           <Tr>
