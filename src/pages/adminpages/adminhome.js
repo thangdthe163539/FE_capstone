@@ -10,7 +10,7 @@ function ADHomePage() {
         <ListItem className={styles.list}>
           <Flex style={{ fontSize: '18px' }}>
             <Link className={styles.listitem} href='/adminpages/report'>
-              Dashboard
+              Report
             </Link>
           </Flex>
         </ListItem>
