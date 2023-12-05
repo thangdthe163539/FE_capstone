@@ -140,7 +140,7 @@ function UserDetail() {
                 )}
                 {isSuccess === 'false' && (
                     <Alert status='error'>
-                        <AlertIcon style={{ width: '350px' }} />
+                        <AlertIcon style={{ width: '360px' }} />
                         Error processing your request.
                     </Alert>
                 )}

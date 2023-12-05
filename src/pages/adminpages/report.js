@@ -365,6 +365,34 @@ function ReportPage() {
       });
   }, []);
 
+  function calculateEndDate(startDate, months) {
+    if (months !== 0) {
+      if (startDate) {
+        // Split the start date into day, month, and year
+        const [day, month, year] = startDate?.split('/').map(Number);
+
+        // Create a Date object with the parsed values
+        const startDateObj = new Date(year, month - 1, day);
+
+        // Calculate the end date by adding the specified number of months
+        startDateObj.setMonth(startDateObj.getMonth() + months);
+
+        // Format the end date as "dd/mm/yyyy"
+        const endYear = startDateObj.getFullYear();
+        const endMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
+        const endDay = String(startDateObj.getDate()).padStart(2, '0');
+
+        const endDate = `${endDay}/${endMonth}/${endYear}`;
+
+        return endDate;
+      } else {
+        return months;
+      }
+    } else {
+      return 'No limited time';
+    }
+  }
+
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -422,7 +450,7 @@ function ReportPage() {
                 borderBottom: '1px solid #4d9ffe',
               }}
             >
-              Library
+              App License
             </Tab>
             <Tab
               className={styles.tab}
@@ -494,7 +522,7 @@ function ReportPage() {
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Release</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Type</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Os</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>OsVersion</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Os Version</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Language</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Database</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
@@ -565,7 +593,7 @@ function ReportPage() {
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Cpu</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Ram</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Memory</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>IpAddress</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Ip Address</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Bandwidth</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Model</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
@@ -635,8 +663,8 @@ function ReportPage() {
                         </Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Title</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Application</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>CreateBy</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>StartDate</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Create By</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Start Date</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Deadline</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
                       </Tr>
@@ -707,8 +735,8 @@ function ReportPage() {
                         </Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Title</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Application</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>CreateBy</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>StartDate</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Create By</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Start Date</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Deadline</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
                       </Tr>
@@ -776,9 +804,9 @@ function ReportPage() {
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Name</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Application</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Publisher</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>LibraryKey</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>StartDate</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Time</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Library Key</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Start Date</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>End Date</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Type</Th>
                       </Tr>
                     </Thead>
@@ -794,7 +822,7 @@ function ReportPage() {
                           <Td style={{ textAlign: 'center' }}>{item.publisher}</Td>
                           <Td style={{ textAlign: 'center' }}>{item.libraryKey}</Td>
                           <Td style={{ textAlign: 'center' }}>{item.start_Date}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.time} months</Td>
+                          <Td style={{ textAlign: 'center' }}>{calculateEndDate(item.start_Date, item.time)}</Td>
                           <Td style={{ width: '10%', textAlign: 'center' }}>
                             {item.status === 1
                               ? 'Closed source license '
@@ -810,7 +838,6 @@ function ReportPage() {
               </ListItem>
             </TabPanel>
 
-            {/* license */}
             <TabPanel>
               <ListItem className={styles.list}>
               <Flex marginBottom={5}>
@@ -843,9 +870,9 @@ function ReportPage() {
                         <Th className={styles.cTh} width='5px'>
                           No
                         </Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>LibraryKey</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>StartDate</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Time</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Library Key</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Start Date</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>End Date</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Type</Th>
                       </Tr>
                     </Thead>
@@ -855,7 +882,7 @@ function ReportPage() {
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
                           <Td style={{ textAlign: 'center' }}>{item.licenseKey}</Td>
                           <Td style={{ textAlign: 'center' }}>{item.start_Date}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.time} months</Td>
+                          <Td style={{ textAlign: 'center' }}>{calculateEndDate(item.start_Date, item.time)}</Td>
                           <Td style={{ width: '10%', textAlign: 'center' }}>
                             {item.status === 1
                               ? 'Closed source license '
@@ -975,7 +1002,7 @@ function ReportPage() {
                         </Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Name</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Email</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>RoleName</Th>
+                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Role Name</Th>
                         <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
