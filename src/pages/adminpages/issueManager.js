@@ -17,7 +17,8 @@ import {
   Textarea,
   InputGroup,
   InputLeftAddon,
-  Center,Select
+  Center,
+  Select,
 } from '@chakra-ui/react';
 import {
   Modal,
@@ -668,7 +669,9 @@ function IssuePage() {
       const name = item.name.toLowerCase();
       return name.includes(query);
     });
-    setfilteredAppData(filteredData.filter((item) => countIssue(item.appId) !== 0));
+    setfilteredAppData(
+      filteredData.filter((item) => countIssue(item.appId) !== 0),
+    );
     setDynamicFilteredAppData(
       filteredData.filter((item) => countIssue(item.appId) !== 0),
     );
@@ -677,8 +680,8 @@ function IssuePage() {
   useEffect(() => {
     if (dynamicFilteredAppData.length) {
       handleChangePage(1);
-    }else{
-      setDynamicList([])
+    } else {
+      setDynamicList([]);
     }
   }, [dynamicFilteredAppData]);
 
@@ -707,61 +710,6 @@ function IssuePage() {
   const [os, setOs] = useState('');
   const [osversion, setOsversion] = useState('');
 
-  const handleSaveAddMul = async () => {
-    const url = 'http://localhost:5001/api/Report/CreateReport_os';
-
-    const desc = document.getElementById('description').value;
-    const title = document.getElementById('title').value;
-    const endDate = document.getElementsByName('endDate')[0].value;
-    const dateParts = endDate.split('-');
-    let formattedDate = '';
-    if (dateParts.length === 3) {
-      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-    } else {
-      console.error('Ngày không hợp lệ.');
-      return; // Nếu ngày không hợp lệ, thoát khỏi hàm
-    }
-
-    // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
-    const fileObjects = imagesState.map((image) => {
-      // Tạo một Blob từ dataURL
-      const blob = dataURLtoBlob(image.dataURL);
-      // Tạo một File từ Blob
-      return new File([blob], image.fileName, { type: blob.type });
-      [];
-    });
-    // Sử dụng FormData để chứa dữ liệu và file
-    const formData = new FormData();
-    formData.append('Os', os);
-    formData.append('OsVersion', osversion);
-    formData.append('Title', title);
-    formData.append('Description', desc);
-    formData.append('Type', 'Issue');
-    formData.append('Start_Date', formattedDate);
-    formData.append('End_Date', formattedDate);
-    formData.append('Status', 1);
-
-    // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
-    fileObjects.forEach((file, index) => {
-      formData.append(`Images`, file);
-    });
-    try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setIsSuccess('true');
-      setIsOpenAdd(false);
-    } catch (error) {
-      setIsSuccess('false');
-      setIsOpenAdd(false);
-      console.error('Lỗi:', error);
-    }
-  };
-  const handleSearchInputChangeSof = (e) => {
-    setSearchQuerySof(e.target.value);
-  };
   const handleSaveAdd = async () => {
     const url = 'http://localhost:5001/api/Report/CreateReport_appids';
 
@@ -983,7 +931,15 @@ function IssuePage() {
       </List>
       <Modal
         isOpen={isOpenAdd}
-        onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
+        onClose={() => (
+          setIsOpenAdd(false),
+          setFormData(defaultData),
+          setSearchQuery(''),
+          setSearchQueryAnti(''),
+          setSearchQueryHw(''),
+          setSearchQuerySw(''),
+          setMode('Application')
+        )}
         closeOnOverlayClick={false}
         size='lg'
       >
@@ -992,7 +948,7 @@ function IssuePage() {
           <ModalHeader>Create new issue</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
-          <Grid templateColumns='repeat(3, 1fr)' gap={8}>
+            <Grid templateColumns='repeat(3, 1fr)' gap={8}>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
                   <Select value={mode} onChange={toggleMode} width='140px'>
@@ -1343,7 +1299,15 @@ function IssuePage() {
               Save
             </Button>
             <Button
-              onClick={() => (setIsOpenAdd(false), setFormData(defaultData))}
+              onClick={() => (
+                setIsOpenAdd(false),
+                setFormData(defaultData),
+                setSearchQuery(''),
+                setSearchQueryAnti(''),
+                setSearchQueryHw(''),
+                setSearchQuerySw(''),
+                setMode('Application')
+              )}
             >
               Cancel
             </Button>

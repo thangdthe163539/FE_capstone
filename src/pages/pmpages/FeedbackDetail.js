@@ -270,7 +270,7 @@ function ReportPage(title) {
   };
   useEffect(() => {
     if (formData?.reportId) {
-      const url = `http://localhost:5001/api/v1/Image/list_Images_by_Report/${formData?.reportId}`;
+      const url = `http://localhost:5001/api/Image/list_Images_by_Report/${formData?.reportId}`;
 
       fetch(url, {
         method: 'GET',

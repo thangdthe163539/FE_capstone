@@ -400,7 +400,6 @@ function FeedBackDetailManagePage() {
       });
   }, []);
 
-
   const fetchDataAndUpdateState = () => {
     const url = `http://localhost:5001/api/Report/GetReportsForAppAndType/${appId}/Feedback`;
     if (appId) {
@@ -415,8 +414,12 @@ function FeedBackDetailManagePage() {
             } else if (a.status !== 1 && b.status === 1) {
               return 1;
             } else if (a.status === 1 && b.status === 1) {
-              const dateA = new Date(a.start_Date.split('/').reverse().join('-'));
-              const dateB = new Date(b.start_Date.split('/').reverse().join('-'));
+              const dateA = new Date(
+                a.start_Date.split('/').reverse().join('-'),
+              );
+              const dateB = new Date(
+                b.start_Date.split('/').reverse().join('-'),
+              );
 
               return dateA.getTime() - dateB.getTime();
             }
@@ -585,12 +588,12 @@ function FeedBackDetailManagePage() {
                           {item.status === 1
                             ? 'Unsolved '
                             : item.status === 2
-                              ? 'Solved '
-                              : item.status === 3
-                                ? 'Deleted '
-                                : item.status === 4
-                                  ? 'Cancel '
-                                  : 'Unknown Status'}
+                            ? 'Solved '
+                            : item.status === 3
+                            ? 'Deleted '
+                            : item.status === 4
+                            ? 'Cancel '
+                            : 'Unknown Status'}
                         </Td>
                       </Tr>
                     ))}
@@ -638,12 +641,12 @@ function FeedBackDetailManagePage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                            ? 'Solved'
-                            : status === 3
-                              ? 'Deleted'
-                              : status === 4
-                                ? 'Cancel'
-                                : 'Unknow'}
+                          ? 'Solved'
+                          : status === 3
+                          ? 'Deleted'
+                          : status === 4
+                          ? 'Cancel'
+                          : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}

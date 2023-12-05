@@ -398,9 +398,13 @@ function IssueDetailManagePage() {
               } else if (a.status !== 1 && b.status === 1) {
                 return 1;
               } else if (a.status === 1 && b.status === 1) {
-                const dateA = new Date(a.start_Date.split('/').reverse().join('-'));
-                const dateB = new Date(b.start_Date.split('/').reverse().join('-'));
-  
+                const dateA = new Date(
+                  a.start_Date.split('/').reverse().join('-'),
+                );
+                const dateB = new Date(
+                  b.start_Date.split('/').reverse().join('-'),
+                );
+
                 return dateA.getTime() - dateB.getTime();
               }
             });
@@ -533,7 +537,11 @@ function IssueDetailManagePage() {
                       <Tr key={index}>
                         <Td style={{ width: '5%' }}>{index + 1}</Td>
                         <Td
-                          style={{ width: '5%', color: 'blue', textAlign: 'center' }}
+                          style={{
+                            width: '5%',
+                            color: 'blue',
+                            textAlign: 'center',
+                          }}
                           cursor={'pointer'}
                           onClick={() => {
                             handleAdd();

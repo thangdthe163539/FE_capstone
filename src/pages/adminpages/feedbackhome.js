@@ -11,13 +11,13 @@ import {
   Td,
   TableCaption,
   TableContainer,
-  Flex,Center,InputLeftAddon,
-  Spacer,InputGroup 
+  Flex,
+  Center,
+  InputLeftAddon,
+  Spacer,
+  InputGroup,
 } from '@chakra-ui/react';
-import {
-  Input,
-  Button
-} from '@chakra-ui/react';
+import { Input, Button } from '@chakra-ui/react';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
@@ -27,14 +27,13 @@ import Pagination from '@/components/pagination';
 
 function FeedbackPage() {
   const router = useRouter();
-    const [searchQueryTb, setSearchQueryTb] = useState('');
+  const [searchQueryTb, setSearchQueryTb] = useState('');
   const [filteredAppData, setfilteredAppData] = useState([]);
   const [dynamicFilteredAppData, setDynamicFilteredAppData] = useState([]);
   const [Apps, setApps] = useState([]);
   const [Issues, setIssues] = useState([]);
 
   const notificationTimeout = 2000;
-
 
   //pagination
   const itemPerPage = 5;
@@ -58,15 +57,14 @@ function FeedbackPage() {
   useEffect(() => {
     if (dynamicFilteredAppData.length) {
       handleChangePage(1);
-    }else {
-      setDynamicList([])
+    } else {
+      setDynamicList([]);
     }
   }, [dynamicFilteredAppData]);
 
   const handleIssuerDetails = (appId) => {
     router.push(`feedbackDetails?appId=${appId}`);
   };
-
 
   const handleSearchTbInputChange = (e) => {
     setSearchQueryTb(e.target.value);
@@ -82,6 +80,7 @@ function FeedbackPage() {
         setIssues(data);
       })
       .catch((error) => {
+        setIssues([]);
         console.error('Lỗi:', error);
       });
   }, []);
@@ -101,8 +100,12 @@ function FeedbackPage() {
   }, []);
 
   const countIssue = (appId) => {
-    const occurrences = Issues.filter((item) => item.appId === appId);
-    return occurrences.length;
+    if (Issues.length > 0) {
+      const occurrences = Issues.filter((item) => item.appId === appId);
+      return occurrences.length;
+    } else {
+      return 0;
+    }
   };
 
   //lọc
@@ -110,11 +113,11 @@ function FeedbackPage() {
     const query = searchQueryTb.toLowerCase();
     const filteredData = Apps.filter((item) => {
       const name = item.name.toLowerCase();
-      return (
-        name.includes(query) 
-      );
+      return name.includes(query);
     });
-    setfilteredAppData(filteredData.filter((item) => countIssue(item.appId) !== 0));
+    setfilteredAppData(
+      filteredData.filter((item) => countIssue(item.appId) !== 0),
+    );
     setDynamicFilteredAppData(
       filteredData.filter((item) => countIssue(item.appId) !== 0),
     );
@@ -146,25 +149,26 @@ function FeedbackPage() {
             </Text>
             <Spacer />
             <InputGroup style={{ paddingTop: '', width: '35%' }}>
-              <InputLeftAddon
-                pointerEvents="none"
-                children='Application'
-              />
+              <InputLeftAddon pointerEvents='none' children='Application' />
               <Input
-              style={{width:'100%'}}
-              type='text'
-              value={searchQueryTb}
-              onChange={handleSearchTbInputChange}
-              placeholder='Search'
-              w={300}
-              mr={1}
-            />
+                style={{ width: '100%' }}
+                type='text'
+                value={searchQueryTb}
+                onChange={handleSearchTbInputChange}
+                placeholder='Search'
+                w={300}
+                mr={1}
+              />
             </InputGroup>
           </Flex>
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
-          <Center><Text fontSize={30} mb={2}>All feedback</Text></Center>
+            <Center>
+              <Text fontSize={30} mb={2}>
+                All feedback
+              </Text>
+            </Center>
             <Table
               variant='striped'
               colorScheme='gray'
@@ -173,7 +177,7 @@ function FeedbackPage() {
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
-                  Show {dynamicList.length}/{filteredAppData.length} result(s)
+                    Show {dynamicList.length}/{filteredAppData.length} result(s)
                   </Text>{' '}
                   <Pagination
                     current={currentPage}
@@ -200,10 +204,9 @@ function FeedbackPage() {
               <Tbody>
                 {dynamicList.map(
                   (app, index) =>
-                    countIssue(app.appId) !== 0 && 
-                    (
+                    countIssue(app.appId) !== 0 && (
                       <Tr key={app.appId}>
-                        <Td style={{width:'5%'}}>{index + 1}</Td>
+                        <Td style={{ width: '5%' }}>{index + 1}</Td>
                         <Td>
                           <Button
                             color={'blue'}

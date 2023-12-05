@@ -75,12 +75,10 @@ function ApplicationPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/App/ListApps`,
-        );
+        const response = await axios.get(`${BACK_END_PORT}/api/App/ListApps`);
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Account/ListAccount`,
+          `${BACK_END_PORT}/api/Account/ListAccount`,
         );
         setDataAcc(response2.data); // Assuming the API returns an array of objects
         setLoading(false);

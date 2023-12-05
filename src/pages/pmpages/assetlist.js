@@ -107,7 +107,7 @@ function AssetsPage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Device/UpdateDeviceWith` + formData.deviceId,
+        `${BACK_END_PORT}/api/Device/UpdateDeviceWith` + formData.deviceId,
         {
           name: formData.name,
           cpu: formData.cpu,
@@ -130,8 +130,7 @@ function AssetsPage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
-          account.accId,
+        `${BACK_END_PORT}/api/Device/list_device_with_Account` + account.accId,
       );
       setData(newDataResponse.data);
     } catch (error) {
@@ -180,7 +179,7 @@ function AssetsPage() {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `${BACK_END_PORT}/api/v1/Device/DeleteDeviceWith_key?DeviceId` +
+        `${BACK_END_PORT}/api/Device/DeleteDeviceWith_key?DeviceId` +
           formData.deviceId,
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
@@ -188,8 +187,7 @@ function AssetsPage() {
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
-          account.accId,
+        `${BACK_END_PORT}/api/Device/list_device_with_Account` + account.accId,
       );
       setData(newDataResponse.data);
       toast({
@@ -223,12 +221,12 @@ function AssetsPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${BACK_END_PORT}/api/v1/Device/list_device_with_Account` +
+          `${BACK_END_PORT}/api/Device/list_device_with_Account` +
             account.accId,
         );
         setData(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
-          `${BACK_END_PORT}/api/v1/Account/ListAccount`,
+          `${BACK_END_PORT}/api/Account/ListAccount`,
         );
         setAccData(response2.data); // Assuming the API returns an array of objects
         setLoading(false);
@@ -540,7 +538,9 @@ function AssetsPage() {
       </Modal>
 
       <Modal //modal delete
-       isOpen={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
+        isOpen={isOpenDelete}
+        onClose={() => setIsOpenDelete(false)}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Confirm Delete</ModalHeader>

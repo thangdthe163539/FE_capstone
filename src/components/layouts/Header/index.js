@@ -4,16 +4,9 @@ import Link from 'next/link';
 import { initializeApp } from 'firebase/app';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
-import {
-  Alert,
-  AlertIcon,
-} from '@chakra-ui/react'
+import { Alert, AlertIcon } from '@chakra-ui/react';
 
 function Header() {
   const [isSuccess, setIsSuccess] = useState('');
@@ -52,23 +45,21 @@ function Header() {
           .then((data) => {
             console.log(data);
             const id = data.roleId;
-            console.log("khang");
+            console.log('khang');
             console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {
               router.push('adminpages/adminhome');
-            }
-            else if (id == 2) {
+            } else if (id == 2) {
               router.push('/pmpages/PoHome');
-            }
-            else if (id == 3) {
+            } else if (id == 3) {
               router.push('/userpages/userhome');
             } else {
               router.push('http://localhost:3000/');
             }
           })
           .catch((error) => {
-            setIsSuccess("false");
+            setIsSuccess('false');
             console.error('Lỗi:', error);
           });
       })
@@ -81,19 +72,40 @@ function Header() {
   return (
     <Box>
       <Flex className={`${styles.navbar}`}>
-        <Link className={`${styles.logo}`} href={'/'}><Image src="/lo-go.png" alt="SoftTrack Logo" boxSize="40px" /></Link>
+        <Link className={`${styles.logo}`} href={'/'}>
+          <Image src='/lo-go.png' alt='SoftTrack Logo' boxSize='40px' />
+        </Link>
         <Text className={`${styles.navbarLogo}`}>
           <Link href={'/'}>SoftTrack</Link>
         </Text>
-        <Text className={`${styles.navbarText}`}>
-          You are not logged in.
+        <Text className={`${styles.navbarText}`}>You are not logged in.</Text>
+        <Text
+          style={{
+            fontSize: '20px',
+            textAlign: 'center',
+            marginTop: '-0.5%',
+            marginLeft: '0.5%',
+            color: '#344e74',
+          }}
+        >
+          (
         </Text>
-        <Text style={{ fontSize: '20px', textAlign: 'center', marginTop: '-0.5%', marginLeft: '0.5%', color: '#344e74' }}>(</Text>
-        <Text onClick={handleGoogleLogin} className={`${styles.loggin}`}>Login</Text>
-        <Text style={{ fontSize: '20px', textAlign: 'center', marginTop: '-0.5%', color: '#344e74' }}>)</Text>
+        <Text onClick={handleGoogleLogin} className={`${styles.loggin}`}>
+          Login
+        </Text>
+        <Text
+          style={{
+            fontSize: '20px',
+            textAlign: 'center',
+            marginTop: '-0.5%',
+            color: '#344e74',
+          }}
+        >
+          )
+        </Text>
         <Text style={{ paddingTop: '5px', position: 'fixed', right: '45%' }}>
           {isSuccess === 'false' && (
-            <Text style={{color: 'black'}}>
+            <Text style={{ color: 'black' }}>
               Login failed. Please try again!
             </Text>
           )}

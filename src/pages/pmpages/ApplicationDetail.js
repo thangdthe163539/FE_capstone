@@ -163,7 +163,7 @@ function SoftwarePage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/App/UpdateApplication/` + software.appId,
+        `${BACK_END_PORT}/api/App/UpdateApplication/` + software.appId,
         {
           // accId: account.accId,
           name: appData.name,
@@ -185,7 +185,7 @@ function SoftwarePage() {
       setShowEditApp(true); // Close the modal after successful save
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/App/get_App_by_Id/` + software.appId,
+        `${BACK_END_PORT}/api/App/get_App_by_Id/` + software.appId,
       );
       setAppData(newDataResponse.data);
     } catch (error) {
@@ -203,7 +203,7 @@ function SoftwarePage() {
         curDate.getDate(),
       );
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Asset/CreateAsset`,
+        `${BACK_END_PORT}/api/Asset/CreateAsset`,
         {
           name: formData.name,
           cpu: formData.cpu,
@@ -226,7 +226,7 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + software?.appId,
+        `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
       );
       setDeviceData(newDataResponse.data);
     } catch (error) {
@@ -238,7 +238,7 @@ function SoftwarePage() {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const curDate = new Date();
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Asset/UpdateAsset/` + formData2.assetId,
+        `${BACK_END_PORT}/api/Asset/UpdateAsset/` + formData2.assetId,
         {
           name: formData2.name,
           cpu: formData2.cpu,
@@ -263,7 +263,7 @@ function SoftwarePage() {
       setSelectedRow(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + software?.appId,
+        `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
       );
       setDeviceData(newDataResponse.data);
     } catch (error) {
@@ -284,7 +284,7 @@ function SoftwarePage() {
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` + software?.appId,
+        `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
       );
       setDeviceData(newDataResponse.data);
       toast({
@@ -304,7 +304,7 @@ function SoftwarePage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.post(
-        `${BACK_END_PORT}/api/v1/Library/CreateLibrary`,
+        `${BACK_END_PORT}/api/Library/CreateLibrary`,
         {
           appId: software.appId,
           name: formData3.name,
@@ -322,7 +322,7 @@ function SoftwarePage() {
       setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Library/ListLibrariesByApp/` + software?.appId,
+        `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
       );
       setLibraryData(newDataResponse.data);
     } catch (error) {
@@ -333,7 +333,7 @@ function SoftwarePage() {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
-        `${BACK_END_PORT}/api/v1/Library/UpdateLibrary/` + formData1.libraryId,
+        `${BACK_END_PORT}/api/Library/UpdateLibrary/` + formData1.libraryId,
         {
           appId: software.appId,
           name: formData1.name,
@@ -351,7 +351,7 @@ function SoftwarePage() {
       setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Library/ListLibrariesByApp/` + software?.appId,
+        `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
       );
       setLibraryData(newDataResponse.data);
     } catch (error) {
@@ -361,7 +361,7 @@ function SoftwarePage() {
   const handleDeleteLi = async () => {
     try {
       await axios.delete(
-        `${BACK_END_PORT}/api/v1/Library/DeleteLibraryWith_key?libraryId=` +
+        `${BACK_END_PORT}/api/Library/DeleteLibraryWith_key?libraryId=` +
           formData1?.libraryId,
       );
       setIsOpenDeleteLi(false); // Close the "Confirm Delete" modal
@@ -369,7 +369,7 @@ function SoftwarePage() {
 
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/v1/Library/ListLibrariesByApp/` + software?.appId,
+        `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
       );
       setLibraryData(newDataResponse.data);
       toast({
@@ -441,8 +441,7 @@ function SoftwarePage() {
         }
         try {
           const response2 = await axios.get(
-            `${BACK_END_PORT}/api/v1/Asset/list_Asset_by_App/` +
-              software?.appId,
+            `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
           );
           setDeviceData(response2.data); // Assuming the API returns an array of objects
         } catch (error) {
@@ -450,7 +449,7 @@ function SoftwarePage() {
         }
         try {
           const response3 = await axios.get(
-            `${BACK_END_PORT}/api/v1/App/list_App_by_user/` + account?.accId,
+            `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
           );
           setSoftwareData(response3.data);
         } catch (error) {
@@ -468,7 +467,7 @@ function SoftwarePage() {
         }
         try {
           const response5 = await axios.get(
-            `${BACK_END_PORT}/api/v1/Library/ListLibrariesByApp/` +
+            `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` +
               software?.appId,
           );
           setLibraryData(response5.data);
@@ -477,7 +476,7 @@ function SoftwarePage() {
         }
         try {
           const response6 = await axios.get(
-            `${BACK_END_PORT}/api/v1/App/get_App_by_Id/` + software?.appId,
+            `${BACK_END_PORT}/api/App/get_App_by_Id/` + software?.appId,
           );
           setAppData(response6.data[0]);
         } catch (error) {
@@ -927,12 +926,12 @@ function SoftwarePage() {
                 <Flex>
                   <Box>
                     <InputGroup>
-                      <InputLeftAddon children='Search' />
+                      <InputLeftAddon children='Name / manufacturer / model' />
                       <Input
                         type='text'
                         value={searchQuery}
                         onChange={handleSearchInputChange}
-                        placeholder='name - manufacturer - model'
+                        placeholder='search...'
                         w={300}
                         mr={1}
                       />
@@ -1045,12 +1044,12 @@ function SoftwarePage() {
                 <Flex>
                   <Box>
                     <InputGroup>
-                      <InputLeftAddon children='Search' />
+                      <InputLeftAddon children='Name / publisher' />
                       <Input
                         type='text'
                         value={searchQuery1}
                         onChange={handleSearchInputChange1}
-                        placeholder='name - publisher'
+                        placeholder='search...'
                         w={300}
                         mr={1}
                       />
