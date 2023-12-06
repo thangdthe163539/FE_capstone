@@ -16,17 +16,17 @@ function Feature() {
             <Text className={`${styles.title}`}>SoftTrack features</Text>
             <Flex className={`${styles.formSof}`} color='white'>
                 <Box>
-                    <Text className={`${styles.software}`}>Software</Text>
+                    <Text className={`${styles.software}`}>Application</Text>
                     <Text className={`${styles.textSof}`}>
-                        Optimize the management of your software assets.<br />
-                        With SoftTrack, you have the ability to effectively track <br />
-                        and monitor software licenses, ensure regulatory compliance,<br />
-                        and optimize costs across your organization.
+                        An application is a software or computer program developed to perform<br />
+                        a specific set of functions or tasks. It can be used  solve a specific problem <br />
+                        or provide the best user experience. Our application management program  <br />
+                        is built to meet the specific needs of users:
                     </Text>
                     <Flex>
                         <UnorderedList className={`${styles.textList}`}>
                             <ListItem>Tracking</ListItem>
-                            <ListItem>Monitoring</ListItem>
+                            <ListItem>Feedback / Issue</ListItem>
                         </UnorderedList>
                         <UnorderedList style={{ marginLeft: '40%' }} className={`${styles.textList}`}>
                             <ListItem>Security</ListItem>
@@ -44,42 +44,40 @@ function Feature() {
                     <Image boxSize='350px' objectFit='cover' style={{ width: '550px', height: '300px' }} className={`${styles.image}`} src="/image.png" />
                 </Box>
                 <Box style={{ marginLeft: "13%" }}>
-                    <Text className={`${styles.software}`}>Device</Text>
+                    <Text className={`${styles.software}`}>Asset</Text>
                     <Text className={`${styles.textSof}`}>
-                        Device Management is an important part of organizing and navigating<br />
-                        multiple devices within an organization or network. This is especially <br />
-                        important in corporate environments, where security, operational<br />
-                        efficiency, and IT infrastructure management need to be ensured.
+                        Optimize the management of your software assets. With SoftTrack,<br />
+                        you have the ability to effectively track and monitor software licenses,<br />
+                        ensure regulatory compliance, and optimize costs across your organization.<br />
                     </Text>
-                    <Flex className={`${styles.textList}`}>
-                        <UnorderedList>
-                            <ListItem>Performance</ListItem>
-                            <ListItem>Update software</ListItem>
+                    <Flex>
+                        <UnorderedList className={`${styles.textList}`}>
+                            <ListItem>Feedback / Issue</ListItem>
+                            <ListItem>Asset management</ListItem>
                         </UnorderedList>
-                        <UnorderedList style={{ marginLeft: '40%' }}>
-                            <ListItem>Device registration</ListItem>
-                            <ListItem>Troubleshooting</ListItem>
+                        <UnorderedList style={{ marginLeft: '40%' }} className={`${styles.textList}`}>
+                            <ListItem>Security</ListItem>
+                            <ListItem>Resources and tools</ListItem>
                         </UnorderedList>
                     </Flex>
                 </Box>
             </Flex>
             <Flex className={`${styles.formSof}`} color='white'>
                 <Box>
-                    <Text className={`${styles.software}`}>Report/Issue-feedback</Text>
+                    <Text className={`${styles.software}`}>Software</Text>
                     <Text className={`${styles.textSof}`}>
-                        An important aspect in building and maintaining a system or product<br />
-                        that is stable and continuously improving. This entails the process of<br />
-                        organizing, tracking and resolving reports of incidents or feedback<br />
-                        from you.
+                        Software is an important part of the system, containing computer<br />
+                        programs, source code, and related documents to perform specific<br />
+                        functions. Our software is developed to meet technical, safety and <br />
+                        high performance requirements.
                     </Text>
                     <Flex>
                         <UnorderedList className={`${styles.textList}`}>
-                            <ListItem>Collect and record</ListItem>
                             <ListItem>Categorize and prioritize</ListItem>
                             <ListItem style={{ width: '250px' }}>Processing and resolution</ListItem>
                         </UnorderedList>
                         <UnorderedList style={{ marginLeft: '15%' }} className={`${styles.textList}`}>
-                            <ListItem>Feedback</ListItem>
+                            <ListItem>Feedback / Issue</ListItem>
                             <ListItem style={{ width: '250px' }}>Continuous optimization</ListItem>
                         </UnorderedList>
                     </Flex>

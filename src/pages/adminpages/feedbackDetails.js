@@ -1,7 +1,7 @@
 import {
-  Box,
+  Box, InputGroup,
   Thead,
-  Textarea,
+  Textarea, InputLeftAddon,
   ListItem,
   Tr,
   FormControl,
@@ -31,6 +31,7 @@ import {
   TableCaption,
 } from '@chakra-ui/react';
 import Link from 'next/link';
+import { parse, isAfter } from 'date-fns';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
@@ -66,8 +67,15 @@ function FeedBackDetailManagePage() {
   const [zoomedIndex, setZoomedIndex] = useState(null);
   const [isHovered, setIsHovered] = useState(null);
 
+  const [searchQueryTb, setSearchQueryTb] = useState('');
+  const [dynamicfilteredFb, setDynamicfilteredFb] = useState([]);
+  const [filteredFb, setfilteredFb] = useState([]);
+
+  const handleSearchTbInputChange = (e) => {
+    setSearchQueryTb(e.target.value);
+  };
   //pagination
-  const itemPerPage = 8;
+  const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -75,20 +83,38 @@ function FeedBackDetailManagePage() {
     setCurrentPage(page);
     let newList = [];
     for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
-      if (issue[i]) {
-        newList.push(issue[i]);
+      if (dynamicfilteredFb[i]) {
+        newList.push(dynamicfilteredFb[i]);
       }
     }
     setDynamicList(newList);
   };
 
-  const totalPages = issue ? issue?.length : 0;
+  const totalPages = dynamicfilteredFb
+    ? dynamicfilteredFb?.length
+    : 0;
 
   useEffect(() => {
-    if (issue.length) {
+    if (dynamicfilteredFb.length) {
       handleChangePage(1);
+    } else {
+      setDynamicList([]);
     }
-  }, [issue]);
+  }, [dynamicfilteredFb]);
+
+  const filterStatus = () => {
+    const query = searchQueryTb.toLowerCase();
+    const filteredData = issue.filter((item) => {
+      const status = getStatusLabel(item.status).toLowerCase(); // Chuyển đổi số trạng thái thành nhãn tương ứng
+      return status.includes(query);
+    });
+    setfilteredFb(filteredData);
+    setDynamicfilteredFb(filteredData);
+  };
+
+  useEffect(() => {
+    filterStatus();
+  }, [searchQueryTb, Apps, issue]);
 
   const allowedExtensions = ['jpg', 'png'];
   //Image
@@ -213,36 +239,6 @@ function FeedBackDetailManagePage() {
     return `${year}-${month}-${day}`;
   };
 
-  //cut text descriptions
-  const trimTextToMaxWidth = (text, maxWidth) => {
-    const words = text.split(' ');
-
-    let currentWidth = 0;
-    let trimmedWords = [];
-
-    for (let i = 0; i < words.length; i++) {
-      const wordWidth = words[i].length * 7;
-
-      if (currentWidth + wordWidth <= maxWidth) {
-        trimmedWords.push(words[i]);
-        currentWidth += wordWidth;
-      } else {
-        break;
-      }
-    }
-
-    const trimmedText = trimmedWords.join(' ');
-
-    return (
-      <span>
-        {trimmedText}
-        <span style={{ color: 'blue', fontSize: '15px' }}>
-          {words.length > trimmedWords.length ? ' ...' : ''}
-        </span>
-      </span>
-    );
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -339,7 +335,6 @@ function FeedBackDetailManagePage() {
             const blob = dataURLtoBlob(image.dataURL);
             return new File([blob], image.fileName, { type: blob.type });
           } else {
-            console.log(image.image1 + '----111');
 
             const fullImagePath = `/images/${image.image1}`;
             const blob = await fetch(fullImagePath).then((res) => res.blob());
@@ -449,6 +444,7 @@ function FeedBackDetailManagePage() {
     }
   }, [isSuccess]);
 
+
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -487,13 +483,26 @@ function FeedBackDetailManagePage() {
               {Apps.find((appItem) => appItem.appId == appId)?.version}
             </strong>
           </Text>
+          <InputGroup style={{ paddingTop: '5px', width: '20%', marginLeft: '800px' }}>
+            <InputLeftAddon
+              pointerEvents='none'
+              children='Status'
+            />
+            <Select value={searchQueryTb} onChange={handleSearchTbInputChange} style={{ width: '100%' }}>
+              <option value="">All Feedback</option>
+              <option value="Unsolve">Unsolve</option>
+              <option value="Solved">Solved</option>
+              <option value="Deleted">Deleted</option>
+              <option value="Cancel">Cancel</option>
+            </Select>
+          </InputGroup>
         </Flex>
         <Flex>
           <Text fontSize='20px'>Total {issue.length} feedback(s) found:</Text>
         </Flex>
         <ListItem className={styles.list}>
           <Center>
-            <Box width='80%'>
+            <Box width='90%'>
               <TableContainer>
                 <Table
                   variant='striped'
@@ -501,14 +510,17 @@ function FeedBackDetailManagePage() {
                   className={styles.cTable}
                 >
                   <TableCaption>
-                    <Pagination
-                      display='flex'
-                      justifyContent={'center'}
-                      current={currentPage}
-                      onChange={handleChangePage}
-                      total={totalPages}
-                      pageSize={itemPerPage}
-                    />
+                    <Flex alignItems={'center'} justifyContent={'space-between'}>
+                      <Text>
+                        Show {dynamicList.length}/{filteredFb.length} result(s)
+                      </Text>{' '}
+                      <Pagination
+                        current={currentPage}
+                        onChange={handleChangePage}
+                        total={totalPages}
+                        pageSize={itemPerPage}
+                      />
+                    </Flex>
                   </TableCaption>
                   <Thead>
                     <Tr>
@@ -516,37 +528,37 @@ function FeedBackDetailManagePage() {
                         No
                       </Th>
                       <Th
-                        style={{ width: '15%', textAlign: 'center' }}
+                        style={{ width: '15%', textAlign: 'left' }}
                         className={styles.cTh}
                       >
                         Title
                       </Th>
                       <Th
-                        style={{ textAlign: 'center' }}
+                        style={{ width: '5%', textAlign: 'left' }}
                         className={styles.cTh}
                       >
-                        Description
+                        Create By
                       </Th>
                       <Th
-                        style={{ width: '5%', textAlign: 'center' }}
+                        style={{ width: '5%', textAlign: 'left' }}
                         className={styles.cTh}
                       >
-                        CreateBy
+                        Start Date
                       </Th>
                       <Th
-                        style={{ width: '5%', textAlign: 'center' }}
-                        className={styles.cTh}
-                      >
-                        StartDate
-                      </Th>
-                      <Th
-                        style={{ width: '5%', textAlign: 'center' }}
+                        style={{ width: '5%', textAlign: 'left' }}
                         className={styles.cTh}
                       >
                         Deadline
                       </Th>
                       <Th
-                        style={{ width: '5%', textAlign: 'center' }}
+                        style={{ width: '5%', textAlign: 'left' }}
+                        className={styles.cTh}
+                      >
+                        Closed Date
+                      </Th>
+                      <Th
+                        style={{ width: '5%', textAlign: 'left' }}
                         className={styles.cTh}
                       >
                         Status
@@ -554,50 +566,50 @@ function FeedBackDetailManagePage() {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {dynamicList.map((item, index) => (
-                      <Tr key={index}>
-                        <Td style={{ width: '5%' }}>{index + 1}</Td>
-                        <Td
-                          style={{ color: 'blue', textAlign: 'center' }}
-                          onClick={() => {
-                            handleAdd();
-                            setDetails(item);
-                          }}
-                        >
-                          {item.title}
-                        </Td>
-                        <Td
-                          style={{ width: '50px', textAlign: 'left' }}
-                          onClick={() => {
-                            handleAdd();
-                            setDetails(item);
-                          }}
-                        >
-                          {trimTextToMaxWidth(item.description, 350)}
-                        </Td>
-                        <Td style={{ width: '15%', textAlign: 'center' }}>
-                          {item.emailSend}
-                        </Td>
-                        <Td style={{ width: '15%', textAlign: 'center' }}>
-                          {item.start_Date}
-                        </Td>
-                        <Td style={{ width: '15%', textAlign: 'center' }}>
-                          {item.end_Date}
-                        </Td>
-                        <Td style={{ width: '15%', textAlign: 'center' }}>
-                          {item.status === 1
-                            ? 'Unsolved '
-                            : item.status === 2
-                            ? 'Solved '
-                            : item.status === 3
-                            ? 'Deleted '
-                            : item.status === 4
-                            ? 'Cancel '
-                            : 'Unknown Status'}
-                        </Td>
-                      </Tr>
-                    ))}
+                    {dynamicList.map((item, index) => {
+                      const currentDate = new Date();
+                      const endDate = parse(item.end_Date, 'dd/MM/yyyy', new Date());
+                      const isOverdue = item.status === 1 && isAfter(currentDate, endDate);
+                      return (
+                        <Tr key={index}>
+                          <Td style={{ width: '5%', color: isOverdue ? 'red' : 'black'  }}>{index + 1}</Td>
+                          <Td
+                            style={{ color: 'blue', textAlign: 'left' }}
+                            onClick={() => {
+                              handleAdd();
+                              setDetails(item);
+                            }}
+                          >
+                            {item.title}
+                          </Td>
+                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
+                            {item.emailSend}
+                          </Td>
+                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black'  }}>
+                            {item.start_Date}
+                          </Td>
+                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
+                            {item.end_Date}
+                          </Td>
+                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
+                            {item.end_Date}
+                          </Td>
+                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black'  }}>
+                            {item.status === 1
+                              ? 'Unsolve '
+                              : item.status === 2
+                                ? 'Solved '
+                                : item.status === 3
+                                  ? 'Deleted '
+                                  : item.status === 4
+                                    ? 'Cancel '
+                                    : 'Unknown Status'}
+                          </Td>
+                        </Tr>
+                      );
+                    })}
                   </Tbody>
+
                 </Table>
               </TableContainer>
             </Box>
@@ -641,12 +653,12 @@ function FeedBackDetailManagePage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                          ? 'Solved'
-                          : status === 3
-                          ? 'Deleted'
-                          : status === 4
-                          ? 'Cancel'
-                          : 'Unknow'}
+                            ? 'Solved'
+                            : status === 3
+                              ? 'Deleted'
+                              : status === 4
+                                ? 'Cancel'
+                                : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}

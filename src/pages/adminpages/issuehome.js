@@ -1085,7 +1085,7 @@ function IssuePage() {
                 <Tr>
                   <Th className={styles.cTh}>No</Th>
                   <Th className={styles.cTh}>Title</Th>
-                  <Th style={{ textAlign: 'center' }} className={styles.cTh}>
+                  <Th style={{ textAlign: 'left' }} className={styles.cTh}>
                     Description
                   </Th>
                   <Th className={styles.cTh}>Application</Th>
