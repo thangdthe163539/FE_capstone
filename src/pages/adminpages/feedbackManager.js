@@ -368,7 +368,7 @@ function FeedBackPage() {
     }
     const formData = new FormData();
     formData.append('AppId', detail.appId);
-    formData.append('AccId', accId);
+    formData.append('UpdaterID', accId);
     formData.append(
       'Title',
       title.trim() === '' ? detail.title.trim() : title.trim(),

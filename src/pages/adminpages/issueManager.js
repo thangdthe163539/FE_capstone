@@ -740,7 +740,7 @@ function IssuePage() {
     appId.forEach((id) => {
       apiData.append('AppIds', id);
     });
-    apiData.append('AccId', accId);
+    apiData.append('CreatorID', accId);
     apiData.append('Title', title);
     apiData.append('Description', desc);
     apiData.append('Type', 'Issue');

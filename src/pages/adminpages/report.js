@@ -485,13 +485,13 @@ function ReportPage() {
 
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Active:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Apps.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Inactive:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Apps.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Locked:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Apps.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Apps.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Inactive:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Apps.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Locked:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Apps.filter(feedback => feedback.status === 3).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -557,13 +557,13 @@ function ReportPage() {
 
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Active:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Asset.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Inactive:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Asset.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Locked:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Asset.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Asset.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Inactive:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Asset.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Locked:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Asset.filter(feedback => feedback.status === 3).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -629,13 +629,13 @@ function ReportPage() {
               <ListItem className={styles.list}>
                 <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Unsolve:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Feedback.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Solved:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Feedback.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Deleted:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Feedback.filter(feedback => feedback.status === 3).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Cancel:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Feedback.filter(feedback => feedback.status === 4).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Feedback.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Solved:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Feedback.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Deleted:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Feedback.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Cancel:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Feedback.filter(feedback => feedback.status === 4).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -699,15 +699,15 @@ function ReportPage() {
 
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Unsolve:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Issue.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Solved:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Issue.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Deleted:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Issue.filter(feedback => feedback.status === 3).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Cancel:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Issue.filter(feedback => feedback.status === 4).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Issue.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Solved:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Issue.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Deleted:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Issue.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Cancel:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Issue.filter(feedback => feedback.status === 4).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -771,11 +771,11 @@ function ReportPage() {
 
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Closed source license:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Library.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Open source license:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Library.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Library.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Open source license:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Library.filter(feedback => feedback.status === 2).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -837,14 +837,14 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
-
+            {/* License */}
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Closed source license:</Text>
-                  <Text style={{marginLeft: '5px'}}>{License.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Open source license:</Text>
-                  <Text style={{marginLeft: '5px'}}>{License.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{License.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Open source license:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{License.filter(feedback => feedback.status === 2).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -871,6 +871,8 @@ function ReportPage() {
                           No
                         </Th>
                         <Th style={{ textAlign: 'left' }} className={styles.cTh}>Library Key</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Software</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Asset</Th>
                         <Th style={{ textAlign: 'left' }} className={styles.cTh}>Start Date</Th>
                         <Th style={{ textAlign: 'left' }} className={styles.cTh}>End Date</Th>
                         <Th style={{ textAlign: 'left' }} className={styles.cTh}>Type</Th>
@@ -881,6 +883,14 @@ function ReportPage() {
                         <Tr key={item.licenseId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
                           <Td style={{ textAlign: 'left' }}>{item.licenseKey}</Td>
+                          <Td style={{ textAlign: 'left' }}>{
+                            Software.find((sof) => sof.softwareId === item.softwareId)
+                              ?.name
+                          }</Td>
+                          <Td style={{ textAlign: 'left' }}>{
+                            Asset.find((asset) => asset.assetId === item.assetId)
+                              ?.name
+                          }</Td>
                           <Td style={{ textAlign: 'left' }}>{item.start_Date}</Td>
                           <Td style={{ textAlign: 'left' }}>{calculateEndDate(item.start_Date, item.time)}</Td>
                           <Td style={{ width: '10%', textAlign: 'left' }}>
@@ -897,16 +907,16 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
-
+            {/* Software */}
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Active:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Software.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Inactive:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Software.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Locked:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Software.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Software.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Inactive:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Software.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Locked:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Software.filter(feedback => feedback.status === 3).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -966,15 +976,16 @@ function ReportPage() {
               </ListItem>
             </TabPanel>
 
+            {/* User */}
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Active:</Text>
-                  <Text style={{marginLeft: '5px'}}>{User.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Inactive:</Text>
-                  <Text style={{marginLeft: '5px'}}>{User.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Locked:</Text>
-                  <Text style={{marginLeft: '5px'}}>{User.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{User.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Inactive:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{User.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Locked:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{User.filter(feedback => feedback.status === 3).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table

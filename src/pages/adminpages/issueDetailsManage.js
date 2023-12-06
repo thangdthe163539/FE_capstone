@@ -68,6 +68,22 @@ function IssueDetailManagePage() {
   const [isHovered, setIsHovered] = useState(null);
   const allowedExtensions = ['jpg', 'png'];
 
+  const [account, setAccount] = useState();
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
+
   const [searchQueryTb, setSearchQueryTb] = useState('');
   const [dynamicfilteredFb, setDynamicfilteredFb] = useState([]);
   const [filteredFb, setfilteredFb] = useState([]);
@@ -276,6 +292,7 @@ function IssueDetailManagePage() {
     const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
     const endDate = document.getElementsByName('endDate')[0].value;
     const dateParts = endDate.split('-');
+    const accId = account?.accId;
     let formattedDate = '';
     if (dateParts.length === 3) {
       formattedDate = `${dateParts[1]}/${dateParts[2]}/${dateParts[0]}`;
@@ -285,6 +302,7 @@ function IssueDetailManagePage() {
 
     const formData = new FormData();
     formData.append('AppId', detail.appId);
+    formData.append('UpdaterID', accId);
     formData.append(
       'Title',
       title.trim() === '' ? detail.title.trim() : title.trim(),
@@ -523,13 +541,13 @@ function IssueDetailManagePage() {
                     </Tr>
                   </Thead>
                   <Tbody>
-                  {dynamicList.map((item, index) => {
+                    {dynamicList.map((item, index) => {
                       const currentDate = new Date();
                       const endDate = parse(item.end_Date, 'dd/MM/yyyy', new Date());
                       const isOverdue = item.status === 1 && isAfter(currentDate, endDate);
                       return (
                         <Tr key={index}>
-                          <Td style={{ width: '5%', color: isOverdue ? 'red' : 'black'  }}>{index + 1}</Td>
+                          <Td style={{ width: '5%', color: isOverdue ? 'red' : 'black' }}>{index + 1}</Td>
                           <Td
                             style={{ color: 'blue', textAlign: 'left' }}
                             onClick={() => {
@@ -542,16 +560,16 @@ function IssueDetailManagePage() {
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.emailSend}
                           </Td>
-                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black'  }}>
+                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.start_Date}
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.end_Date}
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
-                            {item.end_Date}
+                            {item.closedDate !== null ? item.closedDate : 'Null'}
                           </Td>
-                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black'  }}>
+                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.status === 1
                               ? 'Unsolve '
                               : item.status === 2

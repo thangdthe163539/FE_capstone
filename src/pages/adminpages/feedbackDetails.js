@@ -310,7 +310,7 @@ function FeedBackDetailManagePage() {
 
     const formData = new FormData();
     formData.append('AppId', detail.appId);
-    formData.append('AccId', accId);
+    formData.append('UpdaterID', accId);
     formData.append(
       'Title',
       title.trim() === '' ? detail.title.trim() : title.trim(),
@@ -324,6 +324,7 @@ function FeedBackDetailManagePage() {
     formData.append('Type', 'Feedback');
     formData.append('Start_Date', formattedDate);
     formData.append('End_Date', formattedDate);
+    formData.append('ClosedDate', formattedDate);
     formData.append(
       'Status',
       selectedOptionActive === '' ? detail.status : selectedOptionActive,
@@ -572,7 +573,7 @@ function FeedBackDetailManagePage() {
                       const isOverdue = item.status === 1 && isAfter(currentDate, endDate);
                       return (
                         <Tr key={index}>
-                          <Td style={{ width: '5%', color: isOverdue ? 'red' : 'black'  }}>{index + 1}</Td>
+                          <Td style={{ width: '5%', color: isOverdue ? 'red' : 'black' }}>{index + 1}</Td>
                           <Td
                             style={{ color: 'blue', textAlign: 'left' }}
                             onClick={() => {
@@ -585,16 +586,16 @@ function FeedBackDetailManagePage() {
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.emailSend}
                           </Td>
-                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black'  }}>
+                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.start_Date}
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.end_Date}
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
-                            {item.end_Date}
+                            {item.closedDate !== null ? item.closedDate : 'Null'}
                           </Td>
-                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black'  }}>
+                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.status === 1
                               ? 'Unsolve '
                               : item.status === 2
