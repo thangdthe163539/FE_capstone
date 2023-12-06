@@ -20,6 +20,7 @@ import {
   Center,
   InputGroup,
   InputLeftAddon,
+  textDecoration,
 } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 
@@ -135,12 +136,16 @@ function ReportPage(title) {
         submitData.append(`Images`, file);
       });
       submitData.append('AppId', formData?.appId);
-      submitData.append('AccId', account?.accId);
+      submitData.append('UpdaterID', account?.accId);
       submitData.append('Title', formData?.title);
       submitData.append('Description', formData?.description);
       submitData.append('Type', formData?.type);
       submitData.append('Start_Date', formData?.start_Date);
       submitData.append('End_Date', formData?.end_Date);
+      submitData.append(
+        'ClosedDate',
+        formData?.status == 2 ? currentDate : formData?.closedDate,
+      );
       submitData.append('Status', formData?.status);
       console.log(submitData);
       const response = await axios.put(
@@ -335,12 +340,7 @@ function ReportPage(title) {
               <Text className={`${styles.text1} ${styles.text2}`}>Type:</Text>
               <Text className={styles.text1}>{formData?.type}</Text>
             </Flex>
-            <Flex direction='row' align='center'>
-              <Text className={`${styles.text1} ${styles.text2}`}>
-                Created by:{' '}
-              </Text>
-              <Text className={styles.text1}>{formData?.emailSend}</Text>
-            </Flex>
+
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>
                 Start date:
@@ -353,30 +353,44 @@ function ReportPage(title) {
               </Text>
               <Text className={styles.text1}>{formData?.end_Date}</Text>
             </Flex>
-          </Flex>
-          <Box>
             <Flex direction='row' align='center'>
-              <Text className={`${styles.text1} ${styles.text2}`}>Status:</Text>
+              <Text className={`${styles.text1} ${styles.text2}`}>
+                Closed date:
+              </Text>
               <Text className={styles.text1}>
-                <Select
-                  name='status'
-                  value={formData?.status}
-                  onChange={handleStatusChange} // Add onChange handler
-                  border='none'
-                >
-                  <option value='1'>Unsolved</option>
-                  <option value='2'>Solved</option>
-                  {/* <option value='3'>Deleted</option> */}
-                  <option value='4'>Canceled</option>
-                </Select>
+                {formData?.closedDate !== null
+                  ? formData?.closedDate
+                  : 'In processing'}
               </Text>
             </Flex>
+          </Flex>
+          <Flex direction='row' width='100%' justify='space-between'>
+            <Flex direction='row' align='center'>
+              <Text className={`${styles.text1} ${styles.text2}`}>
+                Created by:{' '}
+              </Text>
+              <Text className={styles.text1}>{formData?.emailSend}</Text>
+            </Flex>
+            <Flex direction='row' align='center'>
+              <Text className={`${styles.text1} ${styles.text2}`}>Status:</Text>
+              <Select
+                name='status'
+                value={formData?.status}
+                onChange={handleStatusChange} // Add onChange handler
+              >
+                <option value='1'>Unsolved</option>
+                <option value='2'>Solved</option>
+                <option value='4'>Canceled</option>
+              </Select>
+            </Flex>
+          </Flex>
+          <Box>
             <Flex>
               <Text className={`${styles.text1} ${styles.text2}`}>Title: </Text>
               <Text className={styles.text1}>{formData?.title}</Text>
             </Flex>
             <FormControl>
-              <Text className={`${styles.text1} ${styles.text2}`}>
+              <Text className={`${styles.text1}`} fontWeight='bold'>
                 Description
               </Text>
               <Textarea

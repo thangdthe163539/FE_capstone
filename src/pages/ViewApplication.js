@@ -72,6 +72,22 @@ function ApplicationPage() {
   const [image, setImage] = useState([]);
   const [isHovered, setIsHovered] = useState(null);
 
+  const [account, setAccount] = useState();
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -97,7 +113,6 @@ function ApplicationPage() {
     const Id = parseInt(selectedApp.appId);
     const desc = document.getElementById('description').value;
     const title = document.getElementById('title').value;
-    const endDate = document.getElementsByName('endDate')[0].value;
     const dateParts = endDate.split('-');
     let formattedDate = '';
     if (dateParts.length === 3) {
@@ -114,12 +129,14 @@ function ApplicationPage() {
       [];
     });
     const formData = new FormData();
-    formData.append('AppId', Id);
+    formData.append('AppIds', Id);
+    formData.append('CreatorID', account?.accId);
     formData.append('Title', title);
     formData.append('Description', desc);
     formData.append('Type', 'Feedback');
     formData.append('Start_Date', formattedDate);
-    formData.append('End_Date', formattedDate);
+    formData.append('End_Date', null);
+    formData.append('ClosedDate', null);
     formData.append('Status', 1);
 
     // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
@@ -305,7 +322,7 @@ function ApplicationPage() {
           <ModalHeader>Send New Feedback</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
-            <Grid templateColumns='repeat(3, 1fr)' gap={8}>
+            <Grid templateColumns='repeat(2, 1fr)' gap={8}>
               <GridItem colSpan={1}>
                 <Flex alignItems='center'>
                   <FormLabel style={{ marginRight: '1rem' }}>
@@ -315,13 +332,11 @@ function ApplicationPage() {
                     style={{
                       position: 'relative',
                       display: 'inline-block',
-                      backgroundColor: 'whitesmoke',
                       width: '300px',
                     }}
                   >
                     <Input
                       type='text'
-                      style={{ backgroundColor: 'whitesmoke, width: 270px' }}
                       value={selectedApp.name}
                       w={300}
                       mr={1}
@@ -330,28 +345,10 @@ function ApplicationPage() {
                   </div>
                 </Flex>
               </GridItem>
-              <GridItem colSpan={1}>
+              <GridItem colSpan={1} width='600px'>
                 <Flex alignItems='center'>
                   <FormLabel>Title</FormLabel>
-                  <Input
-                    id='title'
-                    placeholder='Title'
-                    style={{ backgroundColor: 'whitesmoke' }}
-                  />
-                </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>EndDate</FormLabel>
-                  <Input
-                    style={{
-                      marginLeft: '-7px',
-                      backgroundColor: 'whitesmoke',
-                    }}
-                    type='date'
-                    name='endDate'
-                    onChange={handleInputChange}
-                  />
+                  <Input id='title' placeholder='Title' />
                 </Flex>
               </GridItem>
             </Grid>

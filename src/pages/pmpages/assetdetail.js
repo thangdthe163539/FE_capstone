@@ -685,54 +685,68 @@ function AssetDetailPage() {
                   >
                     <TableContainer>
                       <Table>
+                        <Thead>
+                          <Tr>
+                            <Th
+                              className={`${styles.cTh} ${styles.borderRight}`}
+                              colSpan={4}
+                              textAlign='center'
+                            >
+                              Asset detail
+                            </Th>
+                            <Th
+                              className={styles.cTh}
+                              colSpan={2}
+                              textAlign='center'
+                            >
+                              Hardware
+                            </Th>
+                          </Tr>
+                        </Thead>
                         <Tbody>
                           <Tr className={styles.borderTop}>
                             <Td className={styles.text2}>Name</Td>
                             <Td className={styles.borderRight}>
                               {assetData?.name}
                             </Td>
-                            <Td className={styles.text2}>CPU</Td>
+                            <Td className={styles.text2}>OS</Td>
                             <Td className={styles.borderRight}>
-                              {assetData?.cpu}
+                              {assetData?.os}
                             </Td>
-                            <Td className={styles.text2}>Operation System</Td>
-                            <Td>{assetData?.os}</Td>
+                            <Td className={styles.text2}>CPU</Td>
+                            <Td>{assetData?.cpu}</Td>
                           </Tr>
                           <Tr>
                             <Td className={styles.text2}>Manufacturer</Td>
                             <Td className={styles.borderRight}>
                               {assetData?.manufacturer}
                             </Td>
-                            <Td className={styles.text2}>GPU</Td>
-                            <Td className={styles.borderRight}>
-                              {assetData?.gpu}
-                            </Td>
                             <Td className={styles.text2}>Version</Td>
-                            <Td>{assetData?.version}</Td>
+                            <Td className={styles.borderRight}>
+                              {assetData?.version}
+                            </Td>
+                            <Td className={styles.text2}>GPU</Td>
+                            <Td>{assetData?.gpu}</Td>
                           </Tr>
                           <Tr>
                             <Td className={styles.text2}>Model</Td>
                             <Td className={styles.borderRight}>
                               {assetData?.model}
                             </Td>
-                            <Td className={styles.text2}>RAM</Td>
+                            <Td className={styles.text2}>Last updated</Td>
                             <Td className={styles.borderRight}>
-                              {assetData?.ram}GB
+                              {assetData?.lastSuccesfullScan}
                             </Td>
-                            <Td className={styles.text2}>Last Updated</Td>
-                            <Td>{assetData?.lastSuccesfullScan}</Td>
+                            <Td className={styles.text2}>RAM</Td>
+                            <Td>{assetData?.ram}GB</Td>
                           </Tr>
                           <Tr>
                             <Td className={styles.text2}>Serial Number</Td>
                             <Td className={styles.borderRight}>
                               {assetData?.serialNumber}
                             </Td>
-                            <Td className={styles.text2}>Memory</Td>
-                            <Td className={styles.borderRight}>
-                              {assetData?.memory}GB
-                            </Td>
                             <Td className={styles.text2}>Status</Td>
-                            <Td>
+                            <Td className={styles.borderRight}>
                               {assetData?.status === 1
                                 ? 'Active'
                                 : assetData?.status === 2
@@ -741,6 +755,8 @@ function AssetDetailPage() {
                                 ? 'Deleted'
                                 : 'Unknown'}
                             </Td>
+                            <Td className={styles.text2}>Storage</Td>
+                            <Td>{assetData?.memory}GB</Td>
                           </Tr>
                         </Tbody>
                       </Table>
@@ -765,6 +781,24 @@ function AssetDetailPage() {
                   >
                     <TableContainer>
                       <Table>
+                        <Thead>
+                          <Tr>
+                            <Th
+                              className={`${styles.cTh} ${styles.borderRight}`}
+                              colSpan={4}
+                              textAlign='center'
+                            >
+                              Asset detail
+                            </Th>
+                            <Th
+                              className={styles.cTh}
+                              colSpan={2}
+                              textAlign='center'
+                            >
+                              Hardware
+                            </Th>
+                          </Tr>
+                        </Thead>
                         <Tbody>
                           <Tr className={styles.borderTop}>
                             <Td className={styles.text2}>Name</Td>
@@ -775,19 +809,19 @@ function AssetDetailPage() {
                                 onChange={handleInputChange4}
                               />
                             </Td>
+                            <Td className={styles.text2}>OS</Td>
+                            <Td>
+                              <Input
+                                value={assetData?.os}
+                                name='os'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
                             <Td className={styles.text2}>CPU</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.cpu}
                                 name='cpu'
-                                onChange={handleInputChange4}
-                              />
-                            </Td>
-                            <Td className={styles.text2}>Operation System</Td>
-                            <Td>
-                              <Input
-                                value={assetData?.os}
-                                name='os'
                                 onChange={handleInputChange4}
                               />
                             </Td>
@@ -801,19 +835,19 @@ function AssetDetailPage() {
                                 onChange={handleInputChange4}
                               />
                             </Td>
-                            <Td className={styles.text2}>GPU</Td>
-                            <Td className={styles.borderRight}>
-                              <Input
-                                value={assetData?.gpu}
-                                name='gpu'
-                                onChange={handleInputChange4}
-                              />
-                            </Td>
                             <Td className={styles.text2}>Version</Td>
                             <Td>
                               <Input
                                 value={assetData?.version}
                                 name='version'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>GPU</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.gpu}
+                                name='gpu'
                                 onChange={handleInputChange4}
                               />
                             </Td>
@@ -827,14 +861,6 @@ function AssetDetailPage() {
                                 onChange={handleInputChange4}
                               />
                             </Td>
-                            <Td className={styles.text2}>RAM</Td>
-                            <Td className={styles.borderRight}>
-                              <Input
-                                value={assetData?.ram}
-                                name='ram'
-                                onChange={handleInputChange4}
-                              />
-                            </Td>
                             <Td className={styles.text2}>Last Updated</Td>
                             <Td>
                               <Input
@@ -844,6 +870,14 @@ function AssetDetailPage() {
                                 disabled
                               />
                             </Td>
+                            <Td className={styles.text2}>RAM</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.ram}
+                                name='ram'
+                                onChange={handleInputChange4}
+                              />
+                            </Td>
                           </Tr>
                           <Tr>
                             <Td className={styles.text2}>Serial Number</Td>
@@ -851,14 +885,6 @@ function AssetDetailPage() {
                               <Input
                                 value={assetData?.serialNumber}
                                 name='serialNumber'
-                                onChange={handleInputChange4}
-                              />
-                            </Td>
-                            <Td className={styles.text2}>Memory</Td>
-                            <Td className={styles.borderRight}>
-                              <Input
-                                value={assetData?.memory}
-                                name='memory'
                                 onChange={handleInputChange4}
                               />
                             </Td>
@@ -872,6 +898,14 @@ function AssetDetailPage() {
                                 <option value='1'>Active</option>
                                 <option value='2'>Inactive</option>
                               </Select>
+                            </Td>
+                            <Td className={styles.text2}>Memory</Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.memory}
+                                name='memory'
+                                onChange={handleInputChange4}
+                              />
                             </Td>
                           </Tr>
                         </Tbody>

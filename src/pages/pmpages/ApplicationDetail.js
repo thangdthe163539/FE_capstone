@@ -117,11 +117,15 @@ function SoftwarePage() {
   const [appData, setAppData] = useState({});
   const [reportData, setReportData] = useState([]);
   const [libraryData, setLibraryData] = useState([]);
+  const [listAllAsset, setListAllAsset] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showModalAdd, setShowModalAdd] = useState(true);
+  const [searchAddQuery, setSearchAddQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchQuery1, setSearchQuery1] = useState('');
   const [filteredDeviceData, setFilteredDeviceData] = useState([]);
   const [filteredLibraryData, setFilteredLibraryData] = useState([]);
+  const [filteredAllAssetData, setFilteredAllAssetData] = useState([]);
   const [selectedRow, setSelectedRow] = useState(new Set());
   const [selectedRow1, setSelectedRow1] = useState(new Set());
   const [isButtonDisabled, setButtonDisabled] = useState(true);
@@ -145,10 +149,15 @@ function SoftwarePage() {
     setFormData3({ ...formData3, [name]: value });
     // console.log(formData2);
   };
-  const handleInputChange4 = (e) => {
+  const handleInputChange1 = (e) => {
     const { name, value } = e.target;
     setFormData1({ ...formData1, [name]: value });
-    console.log(formData1);
+    // console.log(formData1);
+  };
+  const handleInputChange4 = (e) => {
+    const { name, value } = e.target;
+    setFormData4({ ...formData4, [name]: value });
+    console.log(formData4);
   };
   //
   const handleFileChange = (e) => {
@@ -158,6 +167,10 @@ function SoftwarePage() {
       // You can perform actions with the selected file here
     }
   };
+  const handleSearchAddInputChange = (e) => {
+    setSearchAddQuery(e.target.value);
+  };
+  const assetIdsInAsset = deviceData?.map((device) => device?.assetId);
   //
   const handleEditApp = async () => {
     try {
@@ -193,7 +206,7 @@ function SoftwarePage() {
     }
   };
   //
-  const handleSaveAdd = async () => {
+  const handleSaveAdd = async (item) => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const curDate = new Date();
@@ -202,28 +215,62 @@ function SoftwarePage() {
         curDate.getMonth(),
         curDate.getDate(),
       );
-      const response = await axios.put(
-        `${BACK_END_PORT}/api/Asset/CreateAsset`,
+      const response = await axios.post(
+        `${BACK_END_PORT}/api/Asset_App/CreateAssetApplication`,
         {
-          name: formData.name,
-          cpu: formData.cpu,
-          gpu: formData.gpu,
-          ram: formData.ram,
-          memory: formData.memory,
-          os: formData.os,
-          version: formData.version,
-          ipAddress: formData.ipAddress,
-          manufacturer: formData.manufacturer,
-          model: formData.model,
-          serialNumber: formData.serialNumber,
-          lastSuccesfullScan: currentDateOnly,
+          assetId: item.assetId,
+          appId: software.appId,
+          installDate: formatDate(currentDateOnly),
           status: 1,
         },
       );
       console.log('Data saved:', response.data);
-      setIsOpenEdit(false); // Close the modal after successful save
-      // setFormData(defaultData);
-      setSelectedRow(new Set());
+      setIsOpenAdd(false); // Close the modal after successful save
+      setShowModalAdd(true);
+      setFormData4(defaultData);
+      // setSelectedRow1(new Set());
+      // Reload new data for the table
+
+      setData(newDataResponse.data);
+      const newDataResponse = await axios.get(
+        `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
+      );
+      setDeviceData(newDataResponse.data);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
+  const handleSaveCreate = async () => {
+    try {
+      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      const curDate = new Date();
+      const currentDateOnly = new Date(
+        curDate.getFullYear(),
+        curDate.getMonth(),
+        curDate.getDate(),
+      );
+      const response = await axios.post(
+        `${BACK_END_PORT}/api/Asset/CreateAsset`,
+        {
+          name: formData4.name,
+          cpu: formData4.cpu,
+          gpu: formData4.gpu !== null ? formData4.gpu : 'null',
+          ram: formData4.ram,
+          memory: formData4.memory,
+          os: formData4.os,
+          version: formData4.version,
+          ipAddress: formData4.ipAddress,
+          bandwidth: formData4.bandwidth,
+          manufacturer: formData4.manufacturer,
+          model: formData4.model !== null ? formData4.model : 'null',
+          serialNumber: formData4.serialNumber,
+          lastSuccesfullScan: formatDate(currentDateOnly),
+          status: 1,
+        },
+      );
+      console.log('Data saved:', response.data);
+      setShowModalAdd(false);
+      setFormData4(defaultData);
       // Reload new data for the table
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
@@ -482,6 +529,14 @@ function SoftwarePage() {
         } catch (error) {
           setAppData([]);
         }
+        try {
+          const response7 = await axios.get(
+            `${BACK_END_PORT}/api/Asset/ListAssets`,
+          );
+          setListAllAsset(response7.data);
+        } catch (error) {
+          setAppData([]);
+        }
         setLoading(false);
       } catch (error) {
         //console.error('Error fetching data:', error);
@@ -491,21 +546,7 @@ function SoftwarePage() {
 
     fetchData();
   }, [software, account, showEditApp]);
-  //
-  // useEffect(() => {
-  //   if (data.length > 0 && softwareData.length > 0) {
-  //     const mergedData = data.map((report) => {
-  //       const software = softwareData.find((sw) => sw.appId === report.appId);
-  //       return {
-  //         ...report,
-  //         name: software?.name ? software?.name : report.appId,
-  //       };
-  //     });
-  //     setReportData(mergedData);
-  //     // console.log(reportData);
-  //   }
-  // }, [data, softwareData]);
-  // Handle search input change
+
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -536,6 +577,21 @@ function SoftwarePage() {
     });
     setFilteredLibraryData(filteredData);
   };
+  const filterAssets1 = () => {
+    const query = searchAddQuery.toLowerCase();
+    const filteredData = listAllAsset
+      .filter((item) => item.status != 3)
+      .filter((item) => {
+        const name = item?.name.toLowerCase();
+        const manufacturer = item?.manufacturer.toLowerCase();
+        return name.includes(query) || manufacturer.includes(query);
+      });
+    setFilteredAllAssetData(filteredData);
+  };
+  // Update filtered data whenever the search query changes
+  useEffect(() => {
+    filterAssets1();
+  }, [isOpenAdd, searchAddQuery, listAllAsset]);
   // Update filtered data whenever the search query changes
   useEffect(() => {
     filterAssets();
@@ -583,12 +639,12 @@ function SoftwarePage() {
     }
     return null; // or handle the case where dateString is undefined
   };
-  const formatDate = (dateString) => {
-    if (dateString) {
-      const [year, month, day] = dateString.split('-');
-      return `${day}/${month}/${year}`;
-    }
-    return null; // or handle the case where dateString is undefined
+  const formatDate = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
   };
   //cut text descriptions
   const trimTextToMaxWidth = (text, maxWidth) => {
@@ -661,7 +717,7 @@ function SoftwarePage() {
                 borderBottom: '1px solid #4d9ffe',
               }}
             >
-              Asset
+              Asset (physical/virtual machine)
             </Tab>
             <Tab
               className={styles.tab}
@@ -726,7 +782,7 @@ function SoftwarePage() {
                             <Td className={styles.borderRight}>
                               {appData?.release}
                             </Td>
-                            <Td className={styles.text2}>OS Version</Td>
+                            <Td className={styles.text2}>OS version</Td>
                             <Td>{appData?.osversion}</Td>
                           </Tr>
                           <Tr>
@@ -750,11 +806,11 @@ function SoftwarePage() {
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Download Link</Td>
+                            <Td className={styles.text2}>Download link</Td>
                             <Td colSpan='5'>{appData?.download}</Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Document Link</Td>
+                            <Td className={styles.text2}>Document link</Td>
                             <Td colSpan='5'>{appData?.docs}</Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
@@ -836,7 +892,7 @@ function SoftwarePage() {
                                 onChange={handleInputChange}
                               />
                             </Td>
-                            <Td className={styles.text2}>OS Version</Td>
+                            <Td className={styles.text2}>OS version</Td>
                             <Td>
                               <Input
                                 name='osversion'
@@ -876,7 +932,7 @@ function SoftwarePage() {
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Download Link</Td>
+                            <Td className={styles.text2}>Download link</Td>
                             <Td colSpan='5'>
                               <Input
                                 name='download'
@@ -886,7 +942,7 @@ function SoftwarePage() {
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Document Link</Td>
+                            <Td className={styles.text2}>Document link</Td>
                             <Td colSpan='5'>
                               <Input
                                 name='docs'
@@ -1000,8 +1056,8 @@ function SoftwarePage() {
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Manufacturer</Th>
                         <Th className={styles.cTh}>Model</Th>
-                        <Th className={styles.cTh}>Serial Number</Th>
-                        <Th className={styles.cTh}>Last Updated</Th>
+                        <Th className={styles.cTh}>Serial number</Th>
+                        <Th className={styles.cTh}>Last updated</Th>
                         <Th className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
@@ -1117,9 +1173,9 @@ function SoftwarePage() {
                         </Th>
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Publisher</Th>
-                        <Th className={styles.cTh}>License Key</Th>
-                        <Th className={styles.cTh}>Start Date</Th>
-                        <Th className={styles.cTh}>End Date</Th>
+                        <Th className={styles.cTh}>License key</Th>
+                        <Th className={styles.cTh}>Start date</Th>
+                        <Th className={styles.cTh}>End date</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -1169,8 +1225,8 @@ function SoftwarePage() {
                           No
                         </Th>
                         <Th className={styles.cTh}>Title</Th>
-                        <Th className={styles.cTh}>Start Date</Th>
-                        <Th className={styles.cTh}>End Date</Th>
+                        <Th className={styles.cTh}>Start date</Th>
+                        <Th className={styles.cTh}>End date</Th>
                         <Th className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
@@ -1219,8 +1275,8 @@ function SoftwarePage() {
                           No
                         </Th>
                         <Th className={styles.cTh}>Title</Th>
-                        <Th className={styles.cTh}>Start Date</Th>
-                        <Th className={styles.cTh}>End Date</Th>
+                        <Th className={styles.cTh}>Start date</Th>
+                        <Th className={styles.cTh}>End date</Th>
                         <Th className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
@@ -1255,31 +1311,221 @@ function SoftwarePage() {
 
       <Modal // Modal add new asset
         isOpen={isOpenAdd}
-        onClose={() => setIsOpenAdd(false)}
+        onClose={() => (
+          setIsOpenAdd(false), setShowModalAdd(true), setFormData4(defaultData)
+        )}
         closeOnOverlayClick={false}
-        size='lg'
+        size='6x1'
       >
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add New Asset</ModalHeader>
+        <ModalContent w={showModalAdd ? 'fit-content' : '50vw'} maxW='100vw'>
+          <ModalHeader>
+            {showModalAdd ? 'Add Asset' : 'Create New Asset'}
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
-            <FormControl>
-              <Input
-                type='file'
-                // display='none' // Hide the default input styling
-                onChange={handleFileChange}
-              ></Input>
-              <label>
-                <Button as='span'>Choose File</Button>
-              </label>
-            </FormControl>
+            {showModalAdd ? (
+              <Box>
+                <Box ml={6} mb={4}>
+                  <InputGroup>
+                    <InputLeftAddon children='Name / manufacturer' />
+                    <Input
+                      type='text'
+                      value={searchAddQuery}
+                      onChange={handleSearchAddInputChange}
+                      placeholder='search asset'
+                      w={300}
+                      mr={1}
+                    />
+                  </InputGroup>
+                </Box>
+                <TableContainer>
+                  <Table simple>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh}>Add</Th>
+                        <Th className={styles.cTh}>Name</Th>
+                        <Th className={styles.cTh}>Manufacturer</Th>
+                        <Th className={styles.cTh}>Model</Th>
+                        <Th className={styles.cTh}>CPU</Th>
+                        <Th className={styles.cTh}>GPU</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {filteredAllAssetData
+                        .filter(
+                          (item) => !assetIdsInAsset.includes(item.assetId),
+                        )
+                        .filter((item) => item.status !== 3)
+                        .map((item) => (
+                          <Tr key={item.assetId}>
+                            <Td>
+                              <IconButton
+                                aria-label='Add'
+                                icon={<FaPlus />}
+                                colorScheme='gray' // Choose an appropriate color
+                                onClick={() => handleSaveAdd(item)}
+                              />
+                            </Td>
+                            <Td>{item.name}</Td>
+                            <Td>{item.manufacturer}</Td>
+                            <Td>{item.model}</Td>
+                            <Td>{item.cpu}</Td>
+                            <Td>{item.gpu}</Td>
+                          </Tr>
+                        ))}
+                      <Tr>
+                        <Td colSpan='6'>
+                          <Center>
+                            <Button
+                              w='100%'
+                              bgColor='white'
+                              border='1px solid gray'
+                              onClick={() => setShowModalAdd(false)}
+                            >
+                              Create new asset
+                            </Button>
+                          </Center>
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            ) : (
+              <>
+                <Grid templateColumns='repeat(3, 1fr)' gap={4}>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Name</FormLabel>
+                      <Input
+                        name='name'
+                        value={formData4.name}
+                        onChange={handleInputChange4}
+                        required
+                      />
+                    </FormControl>
+                    <FormControl className={styles.formInput}>
+                      <FormLabel>Manufacturer</FormLabel>
+                      <Input
+                        name='manufacturer'
+                        value={formData4.manufacturer}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    <FormControl className={styles.formInput}>
+                      <FormLabel>Model</FormLabel>
+                      <Input
+                        name='model'
+                        value={formData4.model}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    <FormControl className={styles.formInput}>
+                      <FormLabel>Serial Number</FormLabel>
+                      <Input
+                        name='serialNumber'
+                        value={formData4.serialNumber}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    {/* Add more fields for the first column */}
+                  </GridItem>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>CPU</FormLabel>
+                      <Input
+                        name='cpu'
+                        value={formData4.cpu}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    <FormControl className={styles.formInput}>
+                      <FormLabel>GPU</FormLabel>
+                      <Input
+                        name='gpu'
+                        value={formData4.gpu}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    <FormControl className={styles.formInput}>
+                      <FormLabel>RAM</FormLabel>
+                      <Input
+                        name='ram'
+                        value={formData4.ram}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    <FormControl className={styles.formInput}>
+                      <FormLabel>Storage</FormLabel>
+                      <Input
+                        name='memory'
+                        value={formData4.memory}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Operation System</FormLabel>
+                      <Input
+                        name='os'
+                        value={formData4.os}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    <FormControl className={styles.formInput}>
+                      <FormLabel>Version</FormLabel>
+                      <Input
+                        name='version'
+                        value={formData4.version}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    <FormControl className={styles.formInput}>
+                      <FormLabel>IP Address</FormLabel>
+                      <Input
+                        name='ipAddress'
+                        value={formData4.ipAddress}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    <FormControl className={styles.formInput}>
+                      <FormLabel>Bandwidth</FormLabel>
+                      <Input
+                        name='bandwidth'
+                        value={formData4.bandwidth}
+                        onChange={handleInputChange4}
+                      />
+                    </FormControl>
+                    {/* Add more fields for the second column */}
+                  </GridItem>
+                </Grid>
+                {/* Additional fields can be added to the respective columns */}
+              </>
+            )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
-              Save
-            </Button>
-            <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
+            {showModalAdd ? (
+              <>
+                <Button
+                  onClick={() => (
+                    setIsOpenAdd(false),
+                    setFormData4(defaultData),
+                    setShowModalAdd(true)
+                  )}
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button colorScheme='blue' mr={3} onClick={handleSaveCreate}>
+                  Save
+                </Button>
+                <Button onClick={() => setShowModalAdd(true)}>Back</Button>
+              </>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -1327,7 +1573,7 @@ function SoftwarePage() {
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
-                  <FormLabel>Start Date</FormLabel>
+                  <FormLabel>Start date</FormLabel>
                   <Input
                     name='start_Date'
                     value={formData3.start_Date}
@@ -1342,6 +1588,7 @@ function SoftwarePage() {
                     name='time'
                     value={formData3.time}
                     onChange={handleInputChange3}
+                    type='number'
                     required
                   />
                 </FormControl>
@@ -1375,7 +1622,7 @@ function SoftwarePage() {
                   <Input
                     name='name'
                     value={formData1.name}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange1}
                     required
                   />
                 </FormControl>
@@ -1384,7 +1631,7 @@ function SoftwarePage() {
                   <Input
                     name='publisher'
                     value={formData1.publisher}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange1}
                     required
                   />
                 </FormControl>
@@ -1395,16 +1642,16 @@ function SoftwarePage() {
                   <Input
                     name='libraryKey'
                     value={formData1.libraryKey}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange1}
                     required
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
-                  <FormLabel>Start Date</FormLabel>
+                  <FormLabel>Start date</FormLabel>
                   <Input
                     name='start_Date'
                     value={formData1.start_Date}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange1}
                     type='date'
                     required
                   />
@@ -1414,7 +1661,9 @@ function SoftwarePage() {
                   <Input
                     name='time'
                     value={formData1.time}
-                    onChange={handleInputChange4}
+                    min={0}
+                    onChange={handleInputChange1}
+                    type='number'
                     required
                   />
                 </FormControl>
@@ -1510,7 +1759,7 @@ function SoftwarePage() {
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
-                  <FormLabel>Memory</FormLabel>
+                  <FormLabel>Storage</FormLabel>
                   <Input
                     name='memory'
                     value={formData2.memory}

@@ -60,6 +60,7 @@
 }
 .text2 {
   font-weight: bold;
+  text-align: right !important;
 }
 
 .borderTop {
