@@ -485,13 +485,13 @@ function ReportPage() {
 
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Active:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Apps.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Inactive:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Apps.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Locked:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Apps.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Apps.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Inactive:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Apps.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Locked:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Apps.filter(feedback => feedback.status === 3).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -500,7 +500,7 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      <Flex alignItems={'center'} justifyContent={'space-between'}>
+                      <Flex alignItems={'left'} justifyContent={'space-between'}>
                         <Text>
                           Show {dynamicList.length}/{Apps.length} result(s)
                         </Text>{' '}
@@ -517,30 +517,30 @@ function ReportPage() {
                         <Th className={styles.cTh} width='5px'>
                           No
                         </Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Name</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Version</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Release</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Type</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Os</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Os Version</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Language</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Database</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Name</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Version</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Release</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Type</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Os</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Os Version</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Language</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Database</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {dynamicList.map((app, index) => (
                         <Tr key={app.appId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'center' }}>{app.name}</Td>
-                          <Td style={{ textAlign: 'center' }}>{app.version}</Td>
-                          <Td style={{ textAlign: 'center' }}>{app.release}</Td>
-                          <Td style={{ textAlign: 'center' }}>{app.type}</Td>
-                          <Td style={{ textAlign: 'center' }}>{app.os}</Td>
-                          <Td style={{ textAlign: 'center' }}>{app.osversion}</Td>
-                          <Td style={{ textAlign: 'center' }}>{app.language}</Td>
-                          <Td style={{ textAlign: 'center' }}>{app.db}</Td>
-                          <Td style={{ width: '10%', textAlign: 'center' }}>
+                          <Td style={{ textAlign: 'left' }}>{app.name}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.version}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.release}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.type}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.os}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.osversion}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.language}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.db}</Td>
+                          <Td style={{ width: '10%', textAlign: 'left' }}>
                             {app.status === 1
                               ? 'Active'
                               : app.status === 2
@@ -557,13 +557,13 @@ function ReportPage() {
 
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Active:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Asset.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Inactive:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Asset.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Locked:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Asset.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Asset.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Inactive:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Asset.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Locked:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Asset.filter(feedback => feedback.status === 3).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -572,7 +572,7 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      <Flex alignItems={'center'} justifyContent={'space-between'}>
+                      <Flex alignItems={'left'} justifyContent={'space-between'}>
                         <Text>
                           Show {dynamicListAs.length}/{Asset.length} result(s)
                         </Text>{' '}
@@ -589,28 +589,28 @@ function ReportPage() {
                         <Th className={styles.cTh} width='5px'>
                           No
                         </Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Name</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Cpu</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Ram</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Memory</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Ip Address</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Bandwidth</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Model</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Name</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Cpu</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Ram</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Memory</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Ip Address</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Bandwidth</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Model</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {dynamicListAs.map((item, index) => (
                         <Tr key={item.assetId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.name}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.cpu}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.ram}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.memory}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.ipAddress}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.bandwidth}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.model}</Td>
-                          <Td style={{ width: '10%', textAlign: 'center' }}>
+                          <Td style={{ textAlign: 'left' }}>{item.name}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.cpu}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.ram}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.memory}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.ipAddress}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.bandwidth}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.model}</Td>
+                          <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Active'
                               : item.status === 2
@@ -629,13 +629,13 @@ function ReportPage() {
               <ListItem className={styles.list}>
                 <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Unsolve:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Feedback.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Solved:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Feedback.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Deleted:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Feedback.filter(feedback => feedback.status === 3).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Cancel:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Feedback.filter(feedback => feedback.status === 4).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Feedback.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Solved:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Feedback.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Deleted:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Feedback.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Cancel:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Feedback.filter(feedback => feedback.status === 4).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -644,7 +644,7 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      <Flex alignItems={'center'} justifyContent={'space-between'}>
+                      <Flex alignItems={'left'} justifyContent={'space-between'}>
                         <Text>
                           Show {dynamicListFb.length}/{Feedback.length} result(s)
                         </Text>{' '}
@@ -661,27 +661,27 @@ function ReportPage() {
                         <Th className={styles.cTh} width='5px'>
                           No
                         </Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Title</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Application</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Create By</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Start Date</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Deadline</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Title</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Application</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Create By</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Start Date</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Deadline</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {dynamicListFb.map((item, index) => (
                         <Tr key={item.reportId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.title}</Td>
-                          <Td style={{ textAlign: 'center' }}>{
+                          <Td style={{ textAlign: 'left' }}>{item.title}</Td>
+                          <Td style={{ textAlign: 'left' }}>{
                             Apps.find((appItem) => appItem.appId === item.appId)
                               ?.name
                           }</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.emailSend}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.start_Date}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.end_Date}</Td>
-                          <Td style={{ width: '10%', textAlign: 'center' }}>
+                          <Td style={{ textAlign: 'left' }}>{item.emailSend}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.start_Date}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.end_Date}</Td>
+                          <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Unsolve'
                               : item.status === 2
@@ -699,15 +699,15 @@ function ReportPage() {
 
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Unsolve:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Issue.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Solved:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Issue.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Deleted:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Issue.filter(feedback => feedback.status === 3).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Cancel:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Issue.filter(feedback => feedback.status === 4).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Issue.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Solved:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Issue.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Deleted:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Issue.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Cancel:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Issue.filter(feedback => feedback.status === 4).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -716,7 +716,7 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      <Flex alignItems={'center'} justifyContent={'space-between'}>
+                      <Flex alignItems={'left'} justifyContent={'space-between'}>
                         <Text>
                           Show {dynamicListIs.length}/{Issue.length} result(s)
                         </Text>{' '}
@@ -733,27 +733,27 @@ function ReportPage() {
                         <Th className={styles.cTh} width='5px'>
                           No
                         </Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Title</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Application</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Create By</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Start Date</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Deadline</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Title</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Application</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Create By</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Start Date</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Deadline</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {dynamicListIs.map((item, index) => (
                         <Tr key={item.reportId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.title}</Td>
-                          <Td style={{ textAlign: 'center' }}>{
+                          <Td style={{ textAlign: 'left' }}>{item.title}</Td>
+                          <Td style={{ textAlign: 'left' }}>{
                             Apps.find((appItem) => appItem.appId === item.appId)
                               ?.name
                           }</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.emailSend}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.start_Date}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.end_Date}</Td>
-                          <Td style={{ width: '10%', textAlign: 'center' }}>
+                          <Td style={{ textAlign: 'left' }}>{item.emailSend}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.start_Date}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.end_Date}</Td>
+                          <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Unsolve'
                               : item.status === 2
@@ -771,11 +771,11 @@ function ReportPage() {
 
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Closed source license:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Library.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Open source license:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Library.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Library.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Open source license:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Library.filter(feedback => feedback.status === 2).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -784,7 +784,7 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      <Flex alignItems={'center'} justifyContent={'space-between'}>
+                      <Flex alignItems={'left'} justifyContent={'space-between'}>
                         <Text>
                           Show {dynamicListLib.length}/{Library.length} result(s)
                         </Text>{' '}
@@ -801,29 +801,29 @@ function ReportPage() {
                         <Th className={styles.cTh} width='5px'>
                           No
                         </Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Name</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Application</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Publisher</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Library Key</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Start Date</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>End Date</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Type</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Name</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Application</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Publisher</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Library Key</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Start Date</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>End Date</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Type</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {dynamicListLib.map((item, index) => (
                         <Tr key={item.libraryId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.name}</Td>
-                          <Td style={{ textAlign: 'center' }}>{
+                          <Td style={{ textAlign: 'left' }}>{item.name}</Td>
+                          <Td style={{ textAlign: 'left' }}>{
                             Apps.find((appItem) => appItem.appId === item.appId)
                               ?.name
                           }</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.publisher}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.libraryKey}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.start_Date}</Td>
-                          <Td style={{ textAlign: 'center' }}>{calculateEndDate(item.start_Date, item.time)}</Td>
-                          <Td style={{ width: '10%', textAlign: 'center' }}>
+                          <Td style={{ textAlign: 'left' }}>{item.publisher}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.libraryKey}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.start_Date}</Td>
+                          <Td style={{ textAlign: 'left' }}>{calculateEndDate(item.start_Date, item.time)}</Td>
+                          <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Closed source license '
                               : item.status === 2
@@ -837,14 +837,14 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
-
+            {/* License */}
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Closed source license:</Text>
-                  <Text style={{marginLeft: '5px'}}>{License.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Open source license:</Text>
-                  <Text style={{marginLeft: '5px'}}>{License.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{License.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Open source license:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{License.filter(feedback => feedback.status === 2).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -853,7 +853,7 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      <Flex alignItems={'center'} justifyContent={'space-between'}>
+                      <Flex alignItems={'left'} justifyContent={'space-between'}>
                         <Text>
                           Show {dynamicListLic.length}/{License.length} result(s)
                         </Text>{' '}
@@ -870,20 +870,30 @@ function ReportPage() {
                         <Th className={styles.cTh} width='5px'>
                           No
                         </Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Library Key</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Start Date</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>End Date</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Type</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Library Key</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Software</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Asset</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Start Date</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>End Date</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Type</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {dynamicListLic.map((item, index) => (
                         <Tr key={item.licenseId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.licenseKey}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.start_Date}</Td>
-                          <Td style={{ textAlign: 'center' }}>{calculateEndDate(item.start_Date, item.time)}</Td>
-                          <Td style={{ width: '10%', textAlign: 'center' }}>
+                          <Td style={{ textAlign: 'left' }}>{item.licenseKey}</Td>
+                          <Td style={{ textAlign: 'left' }}>{
+                            Software.find((sof) => sof.softwareId === item.softwareId)
+                              ?.name
+                          }</Td>
+                          <Td style={{ textAlign: 'left' }}>{
+                            Asset.find((asset) => asset.assetId === item.assetId)
+                              ?.name
+                          }</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.start_Date}</Td>
+                          <Td style={{ textAlign: 'left' }}>{calculateEndDate(item.start_Date, item.time)}</Td>
+                          <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Closed source license '
                               : item.status === 2
@@ -897,16 +907,16 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
-
+            {/* Software */}
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Active:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Software.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Inactive:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Software.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Locked:</Text>
-                  <Text style={{marginLeft: '5px'}}>{Software.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Software.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Inactive:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Software.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Locked:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{Software.filter(feedback => feedback.status === 3).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -915,7 +925,7 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      <Flex alignItems={'center'} justifyContent={'space-between'}>
+                      <Flex alignItems={'left'} justifyContent={'space-between'}>
                         <Text>
                           Show {dynamicListSw.length}/{Software.length} result(s)
                         </Text>{' '}
@@ -932,26 +942,26 @@ function ReportPage() {
                         <Th className={styles.cTh} width='5px'>
                           No
                         </Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Name</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Publisher</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Version</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Release</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Type</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Os</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Name</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Publisher</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Version</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Release</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Type</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Os</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {dynamicListSw.map((item, index) => (
                         <Tr key={item.appId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.name}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.publisher}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.version}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.release}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.type}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.os}</Td>
-                          <Td style={{ width: '10%', textAlign: 'center' }}>
+                          <Td style={{ textAlign: 'left' }}>{item.name}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.publisher}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.version}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.release}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.type}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.os}</Td>
+                          <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Active'
                               : item.status === 2
@@ -966,15 +976,16 @@ function ReportPage() {
               </ListItem>
             </TabPanel>
 
+            {/* User */}
             <TabPanel>
               <ListItem className={styles.list}>
-              <Flex marginBottom={5}>
+                <Flex marginBottom={5}>
                   <Text color={'blue.400'}>Active:</Text>
-                  <Text style={{marginLeft: '5px'}}>{User.filter(feedback => feedback.status === 1).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Inactive:</Text>
-                  <Text style={{marginLeft: '5px'}}>{User.filter(feedback => feedback.status === 2).length}</Text>
-                  <Text style={{marginLeft: '20px'}} color={'blue.400'}>Locked:</Text>
-                  <Text style={{marginLeft: '5px'}}>{User.filter(feedback => feedback.status === 3).length}</Text>
+                  <Text style={{ marginLeft: '5px' }}>{User.filter(feedback => feedback.status === 1).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Inactive:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{User.filter(feedback => feedback.status === 2).length}</Text>
+                  <Text style={{ marginLeft: '20px' }} color={'blue.400'}>Locked:</Text>
+                  <Text style={{ marginLeft: '5px' }}>{User.filter(feedback => feedback.status === 3).length}</Text>
                 </Flex>
                 <TableContainer>
                   <Table
@@ -983,7 +994,7 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      <Flex alignItems={'center'} justifyContent={'space-between'}>
+                      <Flex alignItems={'left'} justifyContent={'space-between'}>
                         <Text>
                           Show {dynamicListUs.length}/{User.length} result(s)
                         </Text>{' '}
@@ -1000,20 +1011,25 @@ function ReportPage() {
                         <Th className={styles.cTh} width='5px'>
                           No
                         </Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Name</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Email</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Role Name</Th>
-                        <Th style={{ textAlign: 'center' }} className={styles.cTh}>Status</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Name</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Email</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Role Name</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Application</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {dynamicListUs.map((item, index) => (
-                        <Tr key={item.appId}>
+                        <Tr key={item.AccID}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.name}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.email}</Td>
-                          <Td style={{ textAlign: 'center' }}>{item.roleName}</Td>
-                          <Td style={{ width: '10%', textAlign: 'center' }}>
+                          <Td style={{ textAlign: 'left' }}>{item.name}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.email}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.roleName}</Td>
+                          <Td style={{ textAlign: 'left' }}>{
+                            Apps.find((appItem) => appItem.AccID === item.AccID)
+                              ?.name
+                          }</Td>
+                          <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Active'
                               : item.status === 2

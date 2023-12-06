@@ -368,7 +368,7 @@ function FeedBackPage() {
     }
     const formData = new FormData();
     formData.append('AppId', detail.appId);
-    formData.append('AccId', accId);
+    formData.append('UpdaterID', accId);
     formData.append(
       'Title',
       title.trim() === '' ? detail.title.trim() : title.trim(),
@@ -545,7 +545,7 @@ function FeedBackPage() {
                 <Tr>
                   <Th className={styles.cTh}>No</Th>
                   <Th className={styles.cTh}>Title</Th>
-                  <Th style={{ textAlign: 'center' }} className={styles.cTh}>
+                  <Th style={{ textAlign: 'left' }} className={styles.cTh}>
                     Description
                   </Th>
                   <Th className={styles.cTh}>Application</Th>

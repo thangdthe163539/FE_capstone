@@ -153,22 +153,22 @@ function UserDetail() {
                 <Table variant='simple' style={{ marginTop: '5%', backgroundColor: 'white', width: '90%' }}>
                     <Thead>
                         <Tr>
-                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', width: '50px', textAlign: "right" }}>Name</Td>
-                            <Td style={{ textAlign: 'left' }}>{name}</Td>
+                            <Td style={{ width: '50px',textAlign: "right" }}>Name:</Td>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez',  textAlign: 'left' }}>{name}</Td>
                         </Tr>
                         <Tr>
-                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', textAlign: "right" }}>Email</Td>
-                            <Td style={{ textAlign: 'left' }}>{email}</Td>
+                            <Td style={{ width: '50px',textAlign: "right"  }}>Email:</Td>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez',  textAlign: 'left' }}>{email}</Td>
                         </Tr>
                     </Thead>
                     <Tbody>
                         <Tr>
-                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', textAlign: "right" }}>Active</Td>
-                            <Td style={{ textAlign: 'left' }}>{status == 1 ? 'Active' : status == 2 ? 'InActive' : 'Locked'}</Td>
+                            <Td style={{ width: '50px',textAlign: "right" }}>Active:</Td>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez',  textAlign: 'left' }}>{status == 1 ? 'Active' : status == 2 ? 'InActive' : 'Locked'}</Td>
                         </Tr>
                         <Tr>
-                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez', textAlign: "right" }}>Role Name</Td>
-                            <Td style={{ textAlign: 'left' }}>{role}</Td>
+                            <Td style={{ width: '50px',textAlign: "right"  }}>Role Name:</Td>
+                            <Td style={{ fontWeight: 'bold', color: '#344e74', fontFamilyfTo: 'Sanchez',  textAlign: 'left' }}>{role}</Td>
                         </Tr>
                     </Tbody>
                 </Table>

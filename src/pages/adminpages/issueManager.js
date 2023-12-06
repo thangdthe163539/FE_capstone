@@ -740,7 +740,7 @@ function IssuePage() {
     appId.forEach((id) => {
       apiData.append('AppIds', id);
     });
-    apiData.append('AccId', accId);
+    apiData.append('CreatorID', accId);
     apiData.append('Title', title);
     apiData.append('Description', desc);
     apiData.append('Type', 'Issue');
@@ -890,12 +890,12 @@ function IssuePage() {
                   <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Release</Th>
                   <Th className={styles.cTh}>OS</Th>
-                  <Th className={styles.cTh}>OsVersion</Th>
+                  <Th className={styles.cTh}>Os Version</Th>
                   <Th className={styles.cTh}>Language</Th>
                   <Th className={styles.cTh}>Database</Th>
                   <Th className={styles.cTh}>Publisher</Th>
                   <Th className={styles.cTh}>Status</Th>
-                  <Th className={styles.cTh}>Quantity</Th>
+                  <Th className={styles.cTh}>No.Issue</Th>
                 </Tr>
               </Thead>
               <Tbody>

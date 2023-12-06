@@ -771,6 +771,7 @@ function IssuePage() {
   const handleUpdate = async () => {
     const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
     const endDate = document.getElementsByName('endDate')[0].value;
+    const accId = account?.accId;
     const dateParts = endDate.split('-');
     let formattedDate = '';
     if (dateParts.length === 3) {
@@ -781,6 +782,7 @@ function IssuePage() {
 
     const formData = new FormData();
     formData.append('AppId', detail.appId);
+    formData.append('UpdaterID', accId);
     formData.append(
       'Title',
       title.trim() === '' ? detail.title.trim() : title.trim(),
@@ -880,7 +882,7 @@ function IssuePage() {
     appId.forEach((id) => {
       apiData.append('AppIds', id);
     });
-    apiData.append('AccId', accId);
+    apiData.append('CreatorID', accId);
     apiData.append('Title', title);
     apiData.append('Description', desc);
     apiData.append('Type', 'Issue');
@@ -1085,7 +1087,7 @@ function IssuePage() {
                 <Tr>
                   <Th className={styles.cTh}>No</Th>
                   <Th className={styles.cTh}>Title</Th>
-                  <Th style={{ textAlign: 'center' }} className={styles.cTh}>
+                  <Th style={{ textAlign: 'left' }} className={styles.cTh}>
                     Description
                   </Th>
                   <Th className={styles.cTh}>Application</Th>
