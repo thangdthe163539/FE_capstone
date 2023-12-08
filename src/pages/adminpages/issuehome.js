@@ -418,13 +418,13 @@ function IssuePage() {
     const query = searchQueryHw.toLowerCase();
 
     const filteredData = Hardware.filter((item) => {
-      const name = item.name.toLowerCase();
-      const os = item.os.toLowerCase();
-      const version = item.version.toLowerCase();
+      const model = item.model.toLowerCase();
+      const cpu = item.cpu.toLowerCase();
+      const gpu = item.gpu.toLowerCase();
 
       // Check if the query matches either name or OS
       return (
-        name.includes(query) || os.includes(query) || version.includes(query)
+        model.includes(query) || cpu.includes(query) || gpu.includes(query)
       );
     });
 
@@ -504,8 +504,8 @@ function IssuePage() {
       title: 'Application-' + item.os + '-' + item.osversion,
     }));
   };
-  const handleSelectHwName = async (item) => {
-    setSearchQueryHw(`${item.name}-${item.os}-${item.version}`);
+  const handleSelectHwModel = async (item) => {
+    setSearchQueryHw(`${item.model}`);
 
     try {
       // Array to store appIds
@@ -520,7 +520,7 @@ function IssuePage() {
 
           // Extract appIds from the response data
           const matchingAppIds = response.data
-            .filter((asset) => asset.assetId === item.assetId)
+            .filter((asset) => asset.model === item.model)
             .map((matchingAsset) => app.appId);
 
           // Add matchingAppIds to appIds
@@ -539,7 +539,7 @@ function IssuePage() {
       setShowOptionsHw(false);
       setFormData((prevFormData) => ({
         ...prevFormData,
-        title: 'Hardware-' + item.name,
+        title: 'Hardware-' + item.model,
       }));
     } catch (error) {
       console.log('Error in handleSelectHwName:', error);
@@ -547,8 +547,8 @@ function IssuePage() {
     }
   };
 
-  const handleSelectHwOs = async (item) => {
-    setSearchQueryHw(`${item.os}-${item.version}`);
+  const handleSelectHwCPU = async (item) => {
+    setSearchQueryHw(`${item.cpu}`);
 
     try {
       // Array to store appIds
@@ -563,9 +563,7 @@ function IssuePage() {
 
           // Extract appIds from the response data
           const matchingAppIds = response.data
-            .filter(
-              (asset) => asset.os === item.os && asset.version === item.version,
-            )
+            .filter((asset) => asset.cpu === item.cpu)
             .map((matchingAsset) => app.appId);
 
           // Add matchingAppIds to appIds
@@ -584,7 +582,50 @@ function IssuePage() {
       setShowOptionsHw(false);
       setFormData((prevFormData) => ({
         ...prevFormData,
-        title: 'Hardware-' + item.os + '-' + item.version,
+        title: 'Hardware-' + item.cpu,
+      }));
+    } catch (error) {
+      console.log('Error in handleSelectHwName:', error);
+      // Handle error if needed
+    }
+  };
+
+  const handleSelectHwGPU = async (item) => {
+    setSearchQueryHw(`${item.gpu}`);
+
+    try {
+      // Array to store appIds
+      let appIds = [];
+
+      // Use for...of loop to iterate over each app
+      for (const app of Apps) {
+        try {
+          const response = await axios.get(
+            `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + app.appId,
+          );
+
+          // Extract appIds from the response data
+          const matchingAppIds = response.data
+            .filter((asset) => asset.gpu === item.gpu)
+            .map((matchingAsset) => app.appId);
+
+          // Add matchingAppIds to appIds
+          appIds = appIds.concat(matchingAppIds);
+        } catch (error) {
+          console.log(`Error for appId ${app.appId}:`, error);
+          // Handle error for the specific app if needed
+        }
+      }
+
+      // Remove duplicate appIds (if any)
+      const uniqueAppIds = [...new Set(appIds)];
+
+      // Set the state with the unique appIds
+      setAppId(uniqueAppIds);
+      setShowOptionsHw(false);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        title: 'Hardware-' + item.gpu,
       }));
     } catch (error) {
       console.log('Error in handleSelectHwName:', error);
@@ -1427,7 +1468,7 @@ function IssuePage() {
                             handleSearchInputChangeHw(e);
                             setShowOptionsHw(e.target.value !== '');
                           }}
-                          placeholder={'Name - Os - Version'}
+                          placeholder={'Model - CPU - GPU'}
                           w={300}
                           mr={1}
                         />
@@ -1437,7 +1478,7 @@ function IssuePage() {
                               position: 'absolute',
                               top: '100%',
                               left: 0,
-                              width: '270px',
+                              width: '600px',
                               border: '2px solid whitesmoke',
                               background: '#fff',
                               zIndex: 1,
@@ -1452,16 +1493,23 @@ function IssuePage() {
                                 <Flex>
                                   <Text
                                     className={styles.listitem}
-                                    onClick={() => handleSelectHwName(item)}
+                                    onClick={() => handleSelectHwModel(item)}
                                   >
-                                    {item.name.trim()}
+                                    {item.model.trim()}
                                   </Text>
                                   <Spacer />
                                   <Text
                                     className={styles.listitem}
-                                    onClick={() => handleSelectHwOs(item)}
+                                    onClick={() => handleSelectHwCPU(item)}
                                   >
-                                    {item.os.trim()} - {item.version.trim()}
+                                    {item.cpu.trim()}
+                                  </Text>
+                                  <Spacer />
+                                  <Text
+                                    className={styles.listitem}
+                                    onClick={() => handleSelectHwGPU(item)}
+                                  >
+                                    {item.gpu.trim()}
                                   </Text>
                                 </Flex>
                               </Box>

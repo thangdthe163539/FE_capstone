@@ -115,7 +115,7 @@ function SoftwarePage() {
   };
 
   //pagination
-  const itemPerPage = 8;
+  const itemPerPage = 4;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -242,9 +242,10 @@ function SoftwarePage() {
           Feedback
         </ListItem>
         <ListItem className={styles.list}>
+          <Text fontSize='2xl'>Feedback</Text>
+        </ListItem>
+        <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Feedback</Text>
-            <Spacer />
             <Box>
               <InputGroup>
                 <InputLeftAddon children='Name' />
@@ -271,7 +272,7 @@ function SoftwarePage() {
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
                     Show {dynamicList.length}/
-                    {dynamicFilteredSoftwareData.length} feedbacks
+                    {dynamicFilteredSoftwareData.length} application(s)
                   </Text>{' '}
                   <PaginationCustom
                     current={currentPage}
@@ -287,9 +288,10 @@ function SoftwarePage() {
                   <Th className={styles.cTh} width='10px'>
                     No
                   </Th>
-                  <Th className={styles.cTh}>Name</Th>
+                  <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Version</Th>
-                  <Th className={styles.cTh}>Release</Th>
+                  <Th className={styles.cTh}>OS</Th>
+                  <Th className={styles.cTh}>OS Version</Th>
                   <Th className={styles.cTh}>Solved</Th>
                   <Th className={styles.cTh}>Unsolved</Th>
                 </Tr>
@@ -314,7 +316,8 @@ function SoftwarePage() {
                       </Link>
                     </Td>
                     <Td>{item.version}</Td>
-                    <Td>{item.release}</Td>
+                    <Td>{item.os}</Td>
+                    <Td>{item.osversion}</Td>
                     <Td>{item.done}</Td>
                     <Td>{item.doing}</Td>
                   </Tr>

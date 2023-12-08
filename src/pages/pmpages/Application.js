@@ -384,7 +384,7 @@ function SoftwarePage() {
                   filteredSoftwareData.filter((item) => item.status !== 3)
                     .length
                 }{' '}
-                softwares
+                application(s)
               </TableCaption>
               <Thead>
                 <Tr>

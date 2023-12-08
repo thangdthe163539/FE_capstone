@@ -107,19 +107,32 @@ function ApplicationPage() {
     fetchData();
   }, []);
 
+  function formatDate(date) {
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Months are zero-based
+    const year = date.getFullYear();
+
+    // Pad single-digit day and month with leading zeros
+    const formattedDay = day < 10 ? `0${day}` : day;
+    const formattedMonth = month < 10 ? `0${month}` : month;
+
+    return `${formattedDay}/${formattedMonth}/${year}`;
+  }
+
   const handleSaveAdd = async () => {
-    const url = 'http://localhost:5001/api/Report/CreateReport';
+    const url = 'http://localhost:5001/api/Report/CreateReport_appids';
 
     const Id = parseInt(selectedApp.appId);
     const desc = document.getElementById('description').value;
     const title = document.getElementById('title').value;
-    const dateParts = endDate.split('-');
-    let formattedDate = '';
-    if (dateParts.length === 3) {
-      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-    } else {
-      console.error('Ngày không hợp lệ.');
-    }
+
+    const curDate = new Date();
+    const currentDateOnly = new Date(
+      curDate.getFullYear(),
+      curDate.getMonth(),
+      curDate.getDate(),
+    );
+    const currentDateFormatted = formatDate(currentDateOnly);
     // Chuyển đổi imagesState thành một mảng các đối tượng giống với File
     const fileObjects = imagesState.map((image) => {
       // Tạo một Blob từ dataURL
@@ -134,9 +147,7 @@ function ApplicationPage() {
     formData.append('Title', title);
     formData.append('Description', desc);
     formData.append('Type', 'Feedback');
-    formData.append('Start_Date', formattedDate);
-    formData.append('End_Date', null);
-    formData.append('ClosedDate', null);
+    formData.append('Start_Date', currentDateFormatted);
     formData.append('Status', 1);
 
     // Duyệt qua tất cả các đối tượng file và thêm chúng vào formData
@@ -301,7 +312,7 @@ function ApplicationPage() {
                           setIsShowFeedback(true), setSelectedApp(item)
                         )}
                       >
-                        Send Feedback
+                        Send feedback
                       </Text>
                     </HStack>
                   </Box>
@@ -319,7 +330,7 @@ function ApplicationPage() {
       >
         <ModalOverlay />
         <ModalContent maxW='1100px'>
-          <ModalHeader>Send New Feedback</ModalHeader>
+          <ModalHeader>Send new feedback</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(2, 1fr)' gap={8}>

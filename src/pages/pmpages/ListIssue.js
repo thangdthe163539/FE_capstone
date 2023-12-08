@@ -102,14 +102,16 @@ function SecurityPage() {
   const [data, setData] = useState([]);
   const [softwareData, setSoftwareData] = useState([]);
   const [reportData, setReportData] = useState([]);
+  const [filterStatus, setFilterStatus] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredReportData, setFilteredReportData] = useState([]);
   const [dynamicFilteredReportData, setDynamicFilteredReportData] = useState(
     [],
   );
+  const toast = useToast();
   //pagination
-  const itemPerPage = 6;
+  const itemPerPage = 4;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -124,15 +126,16 @@ function SecurityPage() {
     setDynamicList(newList);
   };
   const totalPages = dynamicFilteredReportData
-    ? dynamicFilteredReportData?.length
+    ? dynamicFilteredReportData?.filter((item) =>
+        filterStatus !== -1 ? item.status === filterStatus : true,
+      ).length
     : 0;
 
   useEffect(() => {
-    if (dynamicFilteredReportData.length) {
+    if (dynamicFilteredReportData) {
       handleChangePage(1);
     }
-  }, [dynamicFilteredReportData]);
-  const toast = useToast();
+  }, [dynamicFilteredReportData, filterStatus]);
   //
   //
   useEffect(() => {
@@ -140,7 +143,7 @@ function SecurityPage() {
       try {
         const response = await axios.get(
           `${BACK_END_PORT}/api/Report/GetReportsForAppAndType/` +
-            software.appId +
+            software?.appId +
             `/Issue`,
         );
         setData(response.data); // Assuming the API returns an array of objects
@@ -173,7 +176,7 @@ function SecurityPage() {
     }
   }, [data, softwareData]);
   // Filter function to search for assets
-  const filterAssets = () => {
+  const filterIssue = () => {
     const query = searchQuery.toLowerCase();
     const filteredData = reportData.filter((item) => {
       const name = item.name.toLowerCase();
@@ -182,15 +185,19 @@ function SecurityPage() {
     });
     setFilteredReportData(filteredData);
     setDynamicFilteredReportData(
-      filteredData.filter((item) => item.type === 'Issue'),
+      filteredData
+        .filter((item) =>
+          filterStatus !== -1 ? item.status === filterStatus : true,
+        )
+        .filter((item) => item.type === 'Issue'),
     );
   };
   // Function to get the current date and set it for the endDate field
 
   // Update filtered data whenever the search query changes
   useEffect(() => {
-    filterAssets();
-  }, [searchQuery, reportData]);
+    filterIssue();
+  }, [searchQuery, reportData, filterStatus]);
   //
 
   //
@@ -219,9 +226,10 @@ function SecurityPage() {
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>List Issue
         </ListItem>
         <ListItem className={styles.list}>
+          <Text fontSize='2xl'>Issue</Text>
+        </ListItem>
+        <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>Issue</Text>
-            <Spacer />
             <Box>
               <InputGroup>
                 <InputLeftAddon children='Title' />
@@ -233,6 +241,22 @@ function SecurityPage() {
                   w={300}
                   mr={1}
                 />
+              </InputGroup>
+            </Box>
+            <Box>
+              <InputGroup>
+                <InputLeftAddon children='Status' />
+                <Select
+                  name='status'
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(Number(e.target.value))}
+                >
+                  <option value='-1'>All</option>
+                  <option value='1'>Unsolved</option>
+                  <option value='2'>Solved</option>
+                  <option value='3'>Deleted</option>
+                  <option value='4'>Canceled</option>
+                </Select>
               </InputGroup>
             </Box>
           </Flex>
@@ -247,8 +271,15 @@ function SecurityPage() {
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
-                    Show {dynamicList.length}/{dynamicFilteredReportData.length}{' '}
-                    reports
+                    Show {dynamicList.length}/
+                    {
+                      dynamicFilteredReportData.filter((item) =>
+                        filterStatus !== -1
+                          ? item.status === filterStatus
+                          : true,
+                      ).length
+                    }{' '}
+                    issue(s)
                   </Text>{' '}
                   <PaginationCustom
                     current={currentPage}
@@ -265,15 +296,15 @@ function SecurityPage() {
                   </Th>
                   <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Title</Th>
-                  <Th className={styles.cTh}>Start Date</Th>
+                  <Th className={styles.cTh}>Start date</Th>
                   <Th className={styles.cTh}>Deadline</Th>
+                  <Th className={styles.cTh}>Closed date</Th>
                   <Th className={styles.cTh}>Status</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {dynamicList.map((item, index) => (
                   <Tr key={item.reportId}>
-                    <Td display='none'>{item.reportId}</Td>
                     <Td>{index + 1}</Td>
                     <Td className={styles.listitem}>
                       <Link
@@ -286,6 +317,11 @@ function SecurityPage() {
                     <Td>{item.title}</Td>
                     <Td>{item.start_Date}</Td>
                     <Td>{item.end_Date}</Td>
+                    <Td>
+                      {item.closedDate !== null
+                        ? item.closedDate
+                        : 'In processing'}
+                    </Td>
                     <Td>
                       {item?.status == 1
                         ? 'Unsolved'
