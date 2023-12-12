@@ -233,12 +233,6 @@ function FeedBackDetailManagePage() {
       </option>
     ));
 
-  //convert to show update
-  const convertToISODate = (dateString) => {
-    const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`;
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -299,15 +293,6 @@ function FeedBackDetailManagePage() {
     const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
 
     const accId = account?.accId;
-    const endDate = document.getElementsByName('endDate')[0].value;
-    const dateParts = endDate.split('-');
-    let formattedDate = '';
-    if (dateParts.length === 3) {
-      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-    } else {
-      console.error('Ngày không hợp lệ.');
-    }
-
     const formData = new FormData();
     formData.append('AppId', detail.appId);
     formData.append('UpdaterID', accId);
@@ -322,9 +307,7 @@ function FeedBackDetailManagePage() {
         : description.trim(),
     );
     formData.append('Type', 'Feedback');
-    formData.append('Start_Date', formattedDate);
-    formData.append('End_Date', formattedDate);
-    formData.append('ClosedDate', formattedDate);
+    formData.append('Start_Date', '11/11/2023');
     formData.append(
       'Status',
       selectedOptionActive === '' ? detail.status : selectedOptionActive,
@@ -550,12 +533,6 @@ function FeedBackDetailManagePage() {
                         style={{ width: '5%', textAlign: 'left' }}
                         className={styles.cTh}
                       >
-                        Deadline
-                      </Th>
-                      <Th
-                        style={{ width: '5%', textAlign: 'left' }}
-                        className={styles.cTh}
-                      >
                         Closed Date
                       </Th>
                       <Th
@@ -588,9 +565,6 @@ function FeedBackDetailManagePage() {
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.start_Date}
-                          </Td>
-                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
-                            {item.end_Date}
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.closedDate !== null ? item.closedDate : 'Null'}
@@ -630,13 +604,13 @@ function FeedBackDetailManagePage() {
         size='lg'
       >
         <ModalOverlay />
-        <ModalContent maxW='1100px'>
+        <ModalContent maxW='1000px'>
           <ModalHeader>Update feedback</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid
               style={{ marginTop: '5px' }}
-              templateColumns='repeat(3, 1fr)'
+              templateColumns='repeat(2, 1fr)'
               gap={4}
             >
               <GridItem colSpan={1}>
@@ -677,23 +651,7 @@ function FeedBackDetailManagePage() {
                   />
                 </Flex>
               </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Deadline</FormLabel>
-                  <Input
-                    style={{
-                      marginLeft: '-7px',
-                      backgroundColor: 'white',
-                    }}
-                    type='date'
-                    name='endDate'
-                    defaultValue={
-                      detail ? convertToISODate(detail.end_Date) : ''
-                    }
-                    onChange={handleInputChange}
-                  />
-                </Flex>
-              </GridItem>
+             
             </Grid>
             <FormControl mt={4}>
               <FormLabel>Description</FormLabel>
