@@ -665,7 +665,7 @@ function ReportPage() {
                         <Th style={{ textAlign: 'left' }} className={styles.cTh}>Application</Th>
                         <Th style={{ textAlign: 'left' }} className={styles.cTh}>Create By</Th>
                         <Th style={{ textAlign: 'left' }} className={styles.cTh}>Start Date</Th>
-                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Deadline</Th>
+                        <Th style={{ textAlign: 'left' }} className={styles.cTh}>Closed Date</Th>
                         <Th style={{ textAlign: 'left' }} className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
@@ -680,7 +680,7 @@ function ReportPage() {
                           }</Td>
                           <Td style={{ textAlign: 'left' }}>{item.emailSend}</Td>
                           <Td style={{ textAlign: 'left' }}>{item.start_Date}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.end_Date}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.closedDate !== null ? item.closedDate : 'Null'}</Td>
                           <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Unsolve'

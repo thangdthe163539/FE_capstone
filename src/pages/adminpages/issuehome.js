@@ -742,32 +742,6 @@ function IssuePage() {
     return `${year}-${month}-${day}`;
   };
   //End
-
-  const handleSendMail = () => {
-    const url = `http://localhost:5001/api/Report/SendReportByEmail/${detail.reportId}`;
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        accept: '*/*',
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          setIsOpenDetail(false);
-          setIsSuccess('true');
-        } else {
-          setIsOpenDetail(false);
-          setIsSuccess('false');
-        }
-      })
-      .catch((error) => {
-        setIsOpenDetail(false);
-        setIsSuccess('false');
-        console.error('Lỗi:', error);
-      });
-  };
-
   const handleUpdate = async () => {
     const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
     const endDate = document.getElementsByName('endDate')[0].value;

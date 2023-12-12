@@ -309,10 +309,10 @@ function FeedBackPage() {
       </option>
     ));
 
-  const convertToISODate = (dateString) => {
-    const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`;
-  };
+  // const convertToISODate = (dateString) => {
+  //   const [day, month, year] = dateString.split('/');
+  //   return `${year}-${month}-${day}`;
+  // };
   //End
 
   const handleSendMail = () => {
@@ -358,14 +358,6 @@ function FeedBackPage() {
   const handleUpdate = async () => {
     const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
     const accId = account?.accId;
-    const endDate = document.getElementsByName('endDate')[0].value;
-    const dateParts = endDate.split('-');
-    let formattedDate = '';
-    if (dateParts.length === 3) {
-      formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-    } else {
-      console.error('Ngày không hợp lệ.');
-    }
     const formData = new FormData();
     formData.append('AppId', detail.appId);
     formData.append('UpdaterID', accId);
@@ -380,12 +372,11 @@ function FeedBackPage() {
         : description.trim(),
     );
     formData.append('Type', 'Feedback');
-    formData.append('Start_Date', formattedDate);
-    formData.append('End_Date', formattedDate);
+    formData.append('Start_Date', '11/11/2023');
     formData.append(
       'Status',
       selectedOptionActive === '' ? detail.status : selectedOptionActive,
-    );
+    )
 
     if (Array.isArray(image) && image.length !== 0) {
       const fileObjects = await Promise.all(
@@ -550,7 +541,6 @@ function FeedBackPage() {
                   </Th>
                   <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Start Date</Th>
-                  <Th className={styles.cTh}>Deadline</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -585,7 +575,6 @@ function FeedBackPage() {
                       }
                     </Td>
                     <Td style={{ width: '10%' }}>{issue.start_Date}</Td>
-                    <Td style={{ width: '7%' }}>{issue.end_Date}</Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -601,13 +590,13 @@ function FeedBackPage() {
         size='lg'
       >
         <ModalOverlay />
-        <ModalContent maxW='1100px'>
+        <ModalContent maxW='1000px'>
           <ModalHeader>Update feedback</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid
               style={{ marginTop: '5px' }}
-              templateColumns='repeat(3, 1fr)'
+              templateColumns='repeat(2, 1fr)'
               gap={4}
             >
               <GridItem colSpan={1}>
@@ -625,12 +614,12 @@ function FeedBackPage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                          ? 'Solved'
-                          : status === 3
-                          ? 'Deleted'
-                          : status === 4
-                          ? 'Cancel'
-                          : 'Unknow'}
+                            ? 'Solved'
+                            : status === 3
+                              ? 'Deleted'
+                              : status === 4
+                                ? 'Cancel'
+                                : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}
@@ -645,23 +634,6 @@ function FeedBackPage() {
                     style={{ backgroundColor: 'white' }}
                     defaultValue={detail?.title.trim()}
                     onChange={(e) => setTitle(e.target.value)}
-                  />
-                </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Deadline</FormLabel>
-                  <Input
-                    style={{
-                      marginLeft: '-7px',
-                      backgroundColor: 'white',
-                    }}
-                    type='date'
-                    name='endDate'
-                    defaultValue={
-                      detail ? convertToISODate(detail.end_Date) : ''
-                    }
-                    onChange={handleInputChange}
                   />
                 </Flex>
               </GridItem>
