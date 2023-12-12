@@ -78,6 +78,9 @@ function SoftwarePage() {
       if (!accountDataDecode) {
         // router.push('http://localhost:3000');
       } else {
+        if (accountDataDecode.roleId !== 2) {
+          router.push('/page405');
+        }
         setAccount(accountDataDecode);
       }
     }
@@ -115,7 +118,7 @@ function SoftwarePage() {
   };
 
   //pagination
-  const itemPerPage = 8;
+  const itemPerPage = 4;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -240,23 +243,22 @@ function SoftwarePage() {
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue
         </ListItem>
         <ListItem className={styles.list}>
-          <Flex>
-            <Text fontSize='2xl'>Issue</Text>
-            <Spacer />
-            <Box>
-              <InputGroup>
-                <InputLeftAddon children='Name' />
-                <Input
-                  type='text'
-                  value={searchQuery}
-                  onChange={handleSearchInputChange}
-                  placeholder='search...'
-                  w={300}
-                  mr={1}
-                />
-              </InputGroup>
-            </Box>
-          </Flex>
+          <Text fontSize='2xl'>Issue</Text>
+        </ListItem>
+        <ListItem className={styles.list}>
+          <Box>
+            <InputGroup>
+              <InputLeftAddon children='Name' />
+              <Input
+                type='text'
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                placeholder='search...'
+                w={300}
+                mr={1}
+              />
+            </InputGroup>
+          </Box>
         </ListItem>
         <ListItem className={styles.list}>
           <TableContainer>
@@ -269,7 +271,7 @@ function SoftwarePage() {
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
                     Show {dynamicList.length}/
-                    {dynamicFilteredSoftwareData.length} issues
+                    {dynamicFilteredSoftwareData.length} application(s)
                   </Text>{' '}
                   <PaginationCustom
                     current={currentPage}
@@ -285,9 +287,10 @@ function SoftwarePage() {
                   <Th className={styles.cTh} width='10px'>
                     No
                   </Th>
-                  <Th className={styles.cTh}>Name</Th>
+                  <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Version</Th>
-                  <Th className={styles.cTh}>Release</Th>
+                  <Th className={styles.cTh}>OS</Th>
+                  <Th className={styles.cTh}>OS Version</Th>
                   <Th className={styles.cTh}>Solved</Th>
                   <Th className={styles.cTh}>Unsolved</Th>
                 </Tr>
@@ -312,7 +315,8 @@ function SoftwarePage() {
                       </Link>
                     </Td>
                     <Td>{item.version}</Td>
-                    <Td>{item.release}</Td>
+                    <Td>{item.os}</Td>
+                    <Td>{item.osversion}</Td>
                     <Td>{item.done}</Td>
                     <Td>{item.doing}</Td>
                   </Tr>

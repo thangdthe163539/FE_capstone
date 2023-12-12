@@ -73,6 +73,9 @@ function FeedbackPage() {
       if (!accountDataDecode) {
         // router.push('http://localhost:3000');
       } else {
+        if (accountDataDecode.roleId !== 2) {
+          router.push('/page405');
+        }
         setAccount(accountDataDecode);
       }
     }
@@ -104,6 +107,7 @@ function FeedbackPage() {
   const [reportData, setReportData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState(-1);
   const [filteredReportData, setFilteredReportData] = useState([]);
   const [dynamicFilteredReportData, setDynamicFilteredReportData] = useState(
     [],
@@ -111,7 +115,7 @@ function FeedbackPage() {
   const toast = useToast();
 
   //pagination
-  const itemPerPage = 8;
+  const itemPerPage = 4;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -126,14 +130,16 @@ function FeedbackPage() {
     setDynamicList(newList);
   };
   const totalPages = dynamicFilteredReportData
-    ? dynamicFilteredReportData?.length
+    ? dynamicFilteredReportData?.filter((item) =>
+        filterStatus !== -1 ? item.status === filterStatus : true,
+      ).length
     : 0;
 
   useEffect(() => {
-    if (dynamicFilteredReportData.length) {
+    if (dynamicFilteredReportData) {
       handleChangePage(1);
     }
-  }, [dynamicFilteredReportData]);
+  }, [dynamicFilteredReportData, filterStatus]);
   //
   //
   useEffect(() => {
@@ -183,14 +189,18 @@ function FeedbackPage() {
     });
     setFilteredReportData(filteredData);
     setDynamicFilteredReportData(
-      filteredData.filter((item) => item.type === 'Feedback'),
+      filteredData
+        .filter((item) =>
+          filterStatus !== -1 ? item.status === filterStatus : true,
+        )
+        .filter((item) => item.type === 'Feedback'),
     );
   };
 
   // Update filtered data whenever the search query changes
   useEffect(() => {
     filterAssets();
-  }, [searchQuery, reportData]);
+  }, [searchQuery, reportData, filterStatus]);
 
   // Handle search input change
   const handleSearchInputChange = (e) => {
@@ -216,9 +226,10 @@ function FeedbackPage() {
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>List Feedback
         </ListItem>
         <ListItem className={styles.list}>
+          <Text fontSize='2xl'>Feedback</Text>
+        </ListItem>
+        <ListItem className={styles.list}>
           <Flex>
-            <Text fontSize='2xl'>List Feedback</Text>
-            <Spacer />
             <Box>
               <InputGroup>
                 <InputLeftAddon children='Title' />
@@ -230,6 +241,22 @@ function FeedbackPage() {
                   w={300}
                   mr={1}
                 />
+              </InputGroup>
+            </Box>
+            <Box>
+              <InputGroup>
+                <InputLeftAddon children='Status' />
+                <Select
+                  name='status'
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(Number(e.target.value))}
+                >
+                  <option value='-1'>All</option>
+                  <option value='1'>Unsolved</option>
+                  <option value='2'>Solved</option>
+                  <option value='3'>Deleted</option>
+                  <option value='4'>Canceled</option>
+                </Select>
               </InputGroup>
             </Box>
           </Flex>
@@ -244,8 +271,15 @@ function FeedbackPage() {
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
-                    Show {dynamicList.length}/{dynamicFilteredReportData.length}{' '}
-                    reports
+                    Show {dynamicList.length}/
+                    {
+                      dynamicFilteredReportData.filter((item) =>
+                        filterStatus !== -1
+                          ? item.status === filterStatus
+                          : true,
+                      ).length
+                    }{' '}
+                    feedback(s)
                   </Text>{' '}
                   <PaginationCustom
                     current={currentPage}
@@ -263,7 +297,7 @@ function FeedbackPage() {
                   <Th className={styles.cTh}>Application</Th>
                   <Th className={styles.cTh}>Title</Th>
                   <Th className={styles.cTh}>Start date</Th>
-                  <Th className={styles.cTh}>Deadline</Th>
+                  <Th className={styles.cTh}>Closed date</Th>
                   <Th className={styles.cTh}>Status</Th>
                 </Tr>
               </Thead>
@@ -282,7 +316,11 @@ function FeedbackPage() {
                     </Td>
                     <Td>{item.title}</Td>
                     <Td>{item.start_Date}</Td>
-                    <Td>{item.end_Date}</Td>
+                    <Td>
+                      {item.closedDate !== null
+                        ? item.closedDate
+                        : 'In processing'}
+                    </Td>
                     <Td>
                       {item?.status == 1
                         ? 'Unsolved'

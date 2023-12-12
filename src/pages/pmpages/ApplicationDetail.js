@@ -92,6 +92,9 @@ function SoftwarePage() {
       if (!accountDataDecode) {
         // router.push('http://localhost:3000');
       } else {
+        if (accountDataDecode.roleId !== 2) {
+          router.push('/page405');
+        }
         setAccount(accountDataDecode);
       }
     }
@@ -123,9 +126,16 @@ function SoftwarePage() {
   const [searchAddQuery, setSearchAddQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchQuery1, setSearchQuery1] = useState('');
+  const [searchQuery2, setSearchQuery2] = useState('');
+  const [searchQuery3, setSearchQuery3] = useState('');
   const [filteredDeviceData, setFilteredDeviceData] = useState([]);
   const [filteredLibraryData, setFilteredLibraryData] = useState([]);
   const [filteredAllAssetData, setFilteredAllAssetData] = useState([]);
+  const [filteredAllIssueData, setFilteredAllIssueData] = useState([]);
+  const [filteredAllFeedbackData, setFilteredAllFeedbackData] = useState([]);
+  const [filterStatus1, setFilterStatus1] = useState(-1);
+  const [filterStatus2, setFilterStatus2] = useState(-1);
+  const [filterStatus3, setFilterStatus3] = useState(-1);
   const [selectedRow, setSelectedRow] = useState(new Set());
   const [selectedRow1, setSelectedRow1] = useState(new Set());
   const [isButtonDisabled, setButtonDisabled] = useState(true);
@@ -157,7 +167,7 @@ function SoftwarePage() {
   const handleInputChange4 = (e) => {
     const { name, value } = e.target;
     setFormData4({ ...formData4, [name]: value });
-    console.log(formData4);
+    // console.log(formData4);
   };
   //
   const handleFileChange = (e) => {
@@ -350,6 +360,12 @@ function SoftwarePage() {
   const handleSaveAddLi = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      let status;
+      if (formData3.time == 0 || formData3.time == '0') {
+        status = 2;
+      } else {
+        status = 1;
+      }
       const response = await axios.post(
         `${BACK_END_PORT}/api/Library/CreateLibrary`,
         {
@@ -359,7 +375,7 @@ function SoftwarePage() {
           libraryKey: formData3.libraryKey,
           start_Date: formData3.start_Date,
           time: formData3.time,
-          status: formData3.time !== 0 ? 1 : 2,
+          status: status,
         },
       );
       console.log('Data saved:', response.data);
@@ -379,6 +395,12 @@ function SoftwarePage() {
   const handleSaveEditLi = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      let status;
+      if (formData1.time == 0 || formData1.time == '0') {
+        status = 2;
+      } else {
+        status = 1;
+      }
       const response = await axios.put(
         `${BACK_END_PORT}/api/Library/UpdateLibrary/` + formData1.libraryId,
         {
@@ -388,7 +410,7 @@ function SoftwarePage() {
           libraryKey: formData1.libraryKey,
           start_Date: formData1.start_Date,
           time: formData1.time,
-          status: formData1.time !== 0 ? 1 : 2,
+          status: status,
         },
       );
       console.log('Data saved:', response.data);
@@ -553,6 +575,12 @@ function SoftwarePage() {
   const handleSearchInputChange1 = (e) => {
     setSearchQuery1(e.target.value);
   };
+  const handleSearchInputChange2 = (e) => {
+    setSearchQuery2(e.target.value);
+  };
+  const handleSearchInputChange3 = (e) => {
+    setSearchQuery3(e.target.value);
+  };
   // Filter function to search for assets
   const filterAssets = () => {
     const query = searchQuery.toLowerCase();
@@ -588,6 +616,22 @@ function SoftwarePage() {
       });
     setFilteredAllAssetData(filteredData);
   };
+  const filterIssue = () => {
+    const query = searchQuery2.toLowerCase();
+    const filteredData = reportData.filter((item) => {
+      const title = item?.title.toLowerCase();
+      return title.includes(query);
+    });
+    setFilteredAllIssueData(filteredData);
+  };
+  const filterFeedback = () => {
+    const query = searchQuery3.toLowerCase();
+    const filteredData = feedbackData.filter((item) => {
+      const title = item?.title.toLowerCase();
+      return title.includes(query);
+    });
+    setFilteredAllFeedbackData(filteredData);
+  };
   // Update filtered data whenever the search query changes
   useEffect(() => {
     filterAssets1();
@@ -599,6 +643,12 @@ function SoftwarePage() {
   useEffect(() => {
     filterLibrary();
   }, [searchQuery1, libraryData]);
+  useEffect(() => {
+    filterIssue();
+  }, [searchQuery2, reportData]);
+  useEffect(() => {
+    filterFeedback();
+  }, [searchQuery3, feedbackData]);
   //
 
   const handleDetail = (item) => {
@@ -999,6 +1049,22 @@ function SoftwarePage() {
                       />
                     </InputGroup>
                   </Box>
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Status' />
+                      <Select
+                        name='status'
+                        value={filterStatus3}
+                        onChange={(e) =>
+                          setFilterStatus3(Number(e.target.value))
+                        }
+                      >
+                        <option value='-1'>All</option>
+                        <option value='1'>Active</option>
+                        <option value='2'>Inactive</option>
+                      </Select>
+                    </InputGroup>
+                  </Box>
                   <Spacer />
                   <Box>
                     <Tooltip label='Create'>
@@ -1041,12 +1107,14 @@ function SoftwarePage() {
                   >
                     <TableCaption className={styles.cTableCaption}>
                       Total{' '}
-                      {filteredDeviceData.filter((item) => item.status != 3)
-                        .length < 2
-                        ? filteredDeviceData.filter((item) => item.status != 3)
-                            .length + ' asset'
-                        : filteredDeviceData.filter((item) => item.status != 3)
-                            .length + ' assets'}
+                      {
+                        filteredDeviceData.filter((item) =>
+                          filterStatus3 !== -1
+                            ? item.status === filterStatus3
+                            : true,
+                        ).length
+                      }{' '}
+                      asset(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1063,7 +1131,11 @@ function SoftwarePage() {
                     </Thead>
                     <Tbody>
                       {filteredDeviceData
-                        .filter((item) => item.status != 3)
+                        .filter((item) =>
+                          filterStatus3 !== -1
+                            ? item.status === filterStatus3
+                            : true,
+                        )
                         .map((item, index) => (
                           <Tr
                             key={item.assetId}
@@ -1159,12 +1231,11 @@ function SoftwarePage() {
                   >
                     <TableCaption className={styles.cTableCaption}>
                       Total{' '}
-                      {filteredLibraryData.filter((item) => item.status != 3)
-                        .length < 2
-                        ? filteredLibraryData.filter((item) => item.status != 3)
-                            .length + ' license'
-                        : filteredLibraryData.filter((item) => item.status != 3)
-                            .length + ' licenses'}
+                      {
+                        filteredLibraryData.filter((item) => item.status != 3)
+                          .length
+                      }{' '}
+                      license(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1176,6 +1247,7 @@ function SoftwarePage() {
                         <Th className={styles.cTh}>License key</Th>
                         <Th className={styles.cTh}>Start date</Th>
                         <Th className={styles.cTh}>End date</Th>
+                        <Th className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -1198,6 +1270,11 @@ function SoftwarePage() {
                             <Td>
                               {calculateEndDate(item.start_Date, item.time)}
                             </Td>
+                            <Td>
+                              {item.status === 1
+                                ? 'Close source license'
+                                : 'Open source license'}
+                            </Td>
                           </Tr>
                         ))}
                     </Tbody>
@@ -1207,55 +1284,40 @@ function SoftwarePage() {
             </TabPanel>
             <TabPanel>
               <ListItem className={styles.list} pt={0}>
-                <TableContainer>
-                  <Table
-                    variant='striped'
-                    colorScheme='gray'
-                    className={styles.cTable}
-                  >
-                    <TableCaption>
-                      Total{' '}
-                      {reportData.length < 2
-                        ? reportData.length + ' issue'
-                        : reportData.length + ' issues'}
-                    </TableCaption>
-                    <Thead>
-                      <Tr>
-                        <Th className={styles.cTh} width='10px'>
-                          No
-                        </Th>
-                        <Th className={styles.cTh}>Title</Th>
-                        <Th className={styles.cTh}>Start date</Th>
-                        <Th className={styles.cTh}>End date</Th>
-                        <Th className={styles.cTh}>Status</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {reportData.map((item, index) => (
-                        <Tr key={item.reportId}>
-                          <Td>{index + 1}</Td>
-                          <Td>{item.title}</Td>
-                          <Td>{item.start_Date}</Td>
-                          <Td>{item.end_Date}</Td>
-                          <Td>
-                            {item.status === 1
-                              ? 'Unsolved'
-                              : item.status === 2
-                              ? 'Solved'
-                              : item.status === 3
-                              ? 'Deleted'
-                              : item.status === 4
-                              ? 'Canceled'
-                              : 'Unknown'}
-                          </Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
-                </TableContainer>
+                <Flex>
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Title' />
+                      <Input
+                        type='text'
+                        value={searchQuery2}
+                        onChange={handleSearchInputChange2}
+                        placeholder='search...'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                  </Box>
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Status' />
+                      <Select
+                        name='status'
+                        value={filterStatus1}
+                        onChange={(e) =>
+                          setFilterStatus1(Number(e.target.value))
+                        }
+                      >
+                        <option value='-1'>All</option>
+                        <option value='1'>Unsolved</option>
+                        <option value='2'>Solved</option>
+                        <option value='3'>Deleted</option>
+                        <option value='4'>Canceled</option>
+                      </Select>
+                    </InputGroup>
+                  </Box>
+                </Flex>
               </ListItem>
-            </TabPanel>
-            <TabPanel>
               <ListItem className={styles.list} pt={0}>
                 <TableContainer>
                   <Table
@@ -1265,9 +1327,14 @@ function SoftwarePage() {
                   >
                     <TableCaption>
                       Total{' '}
-                      {feedbackData.length < 2
-                        ? feedbackData.length + ' feedback'
-                        : feedbackData.length + ' feedbacks'}
+                      {
+                        filteredAllIssueData.filter((item) =>
+                          filterStatus1 !== -1
+                            ? item.status === filterStatus1
+                            : true,
+                        ).length
+                      }{' '}
+                      issue(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1276,30 +1343,142 @@ function SoftwarePage() {
                         </Th>
                         <Th className={styles.cTh}>Title</Th>
                         <Th className={styles.cTh}>Start date</Th>
-                        <Th className={styles.cTh}>End date</Th>
+                        <Th className={styles.cTh}>Deadline</Th>
+                        <Th className={styles.cTh}>Closed date</Th>
                         <Th className={styles.cTh}>Status</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {feedbackData.map((item, index) => (
-                        <Tr key={item.reportId}>
-                          <Td>{index + 1}</Td>
-                          <Td>{item.title}</Td>
-                          <Td>{item.start_Date}</Td>
-                          <Td>{item.end_Date}</Td>
-                          <Td>
-                            {item.status === 1
-                              ? 'Unsolved'
-                              : item.status === 2
-                              ? 'Solved'
-                              : item.status === 3
-                              ? 'Deleted'
-                              : item.status === 4
-                              ? 'Canceled'
-                              : 'Unknown'}
-                          </Td>
-                        </Tr>
-                      ))}
+                      {filteredAllIssueData
+                        .filter((item) =>
+                          filterStatus1 !== -1
+                            ? item.status === filterStatus1
+                            : true,
+                        )
+                        .map((item, index) => (
+                          <Tr key={item.reportId}>
+                            <Td>{index + 1}</Td>
+                            <Td>{item.title}</Td>
+                            <Td>{item.start_Date}</Td>
+                            <Td>{item.end_Date}</Td>
+                            <Td>
+                              {item.closedDate !== null
+                                ? item.end_Date
+                                : 'In processing'}
+                            </Td>
+                            <Td>
+                              {item.status === 1
+                                ? 'Unsolved'
+                                : item.status === 2
+                                ? 'Solved'
+                                : item.status === 3
+                                ? 'Deleted'
+                                : item.status === 4
+                                ? 'Canceled'
+                                : 'Unknown'}
+                            </Td>
+                          </Tr>
+                        ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </ListItem>
+            </TabPanel>
+            <TabPanel>
+              <ListItem className={styles.list} pt={0}>
+                <Flex>
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Title' />
+                      <Input
+                        type='text'
+                        value={searchQuery3}
+                        onChange={handleSearchInputChange3}
+                        placeholder='search...'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                  </Box>
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Status' />
+                      <Select
+                        name='status'
+                        value={filterStatus2}
+                        onChange={(e) =>
+                          setFilterStatus2(Number(e.target.value))
+                        }
+                      >
+                        <option value='-1'>All</option>
+                        <option value='1'>Unsolved</option>
+                        <option value='2'>Solved</option>
+                        <option value='3'>Deleted</option>
+                        <option value='4'>Canceled</option>
+                      </Select>
+                    </InputGroup>
+                  </Box>
+                </Flex>
+              </ListItem>
+              <ListItem className={styles.list} pt={0}>
+                <TableContainer>
+                  <Table
+                    variant='striped'
+                    colorScheme='gray'
+                    className={styles.cTable}
+                  >
+                    <TableCaption>
+                      Total{' '}
+                      {
+                        filteredAllFeedbackData.filter((item) =>
+                          filterStatus2 !== -1
+                            ? item.status === filterStatus2
+                            : true,
+                        ).length
+                      }{' '}
+                      feedback(s)
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
+                        <Th className={styles.cTh}>Title</Th>
+                        <Th className={styles.cTh}>Start date</Th>
+                        <Th className={styles.cTh}>Closed date</Th>
+                        <Th className={styles.cTh}>Status</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {filteredAllFeedbackData
+                        .filter((item) =>
+                          filterStatus2 !== -1
+                            ? item.status === filterStatus2
+                            : true,
+                        )
+                        .map((item, index) => (
+                          <Tr key={item.reportId}>
+                            <Td>{index + 1}</Td>
+                            <Td>{item.title}</Td>
+                            <Td>{item.start_Date}</Td>
+                            <Td>
+                              {item.end_Date !== null
+                                ? item.end_Date
+                                : 'In processing'}
+                            </Td>
+                            <Td>
+                              {item.status === 1
+                                ? 'Unsolved'
+                                : item.status === 2
+                                ? 'Solved'
+                                : item.status === 3
+                                ? 'Deleted'
+                                : item.status === 4
+                                ? 'Canceled'
+                                : 'Unknown'}
+                            </Td>
+                          </Tr>
+                        ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1327,17 +1506,29 @@ function SoftwarePage() {
             {showModalAdd ? (
               <Box>
                 <Box ml={6} mb={4}>
-                  <InputGroup>
-                    <InputLeftAddon children='Name / manufacturer' />
-                    <Input
-                      type='text'
-                      value={searchAddQuery}
-                      onChange={handleSearchAddInputChange}
-                      placeholder='search asset'
-                      w={300}
-                      mr={1}
-                    />
-                  </InputGroup>
+                  <Flex>
+                    <InputGroup>
+                      <InputLeftAddon children='Name / manufacturer' />
+                      <Input
+                        type='text'
+                        value={searchAddQuery}
+                        onChange={handleSearchAddInputChange}
+                        placeholder='search asset'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                    <Tooltip label='Create new asset'>
+                      <Button
+                        aria-label='Add'
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setShowModalAdd(false)}
+                      >
+                        Create
+                      </Button>
+                    </Tooltip>
+                  </Flex>
                 </Box>
                 <TableContainer>
                   <Table simple>
@@ -1374,20 +1565,6 @@ function SoftwarePage() {
                             <Td>{item.gpu}</Td>
                           </Tr>
                         ))}
-                      <Tr>
-                        <Td colSpan='6'>
-                          <Center>
-                            <Button
-                              w='100%'
-                              bgColor='white'
-                              border='1px solid gray'
-                              onClick={() => setShowModalAdd(false)}
-                            >
-                              Create new asset
-                            </Button>
-                          </Center>
-                        </Td>
-                      </Tr>
                     </Tbody>
                   </Table>
                 </TableContainer>

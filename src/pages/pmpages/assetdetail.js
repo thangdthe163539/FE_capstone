@@ -100,6 +100,7 @@ function AssetDetailPage() {
   const [listAllSoftware, setListAllSoftware] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchAppQuery, setSearchAppQuery] = useState('');
+  const [searchLiQuery, setSearchLiQuery] = useState('');
   const [searchAddQuery, setSearchAddQuery] = useState('');
   const [showModalTable, setShowModalTable] = useState(true);
   const [showModalAdd, setShowModalAdd] = useState(false);
@@ -113,6 +114,7 @@ function AssetDetailPage() {
   const [isButtonDisabled2, setButtonDisabled2] = useState(true);
   const [isButtonDisabled3, setButtonDisabled3] = useState(true);
   const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
+  const [filteredLicenseData, setFilteredLicenseData] = useState([]);
   const [filteredAllSoftwareData, setFilteredAllSoftwareData] = useState([]);
   const [selectedSoftware, setSelectedSoftware] = useState([]);
 
@@ -174,6 +176,9 @@ function AssetDetailPage() {
   const handleSearchAddInputChange = (e) => {
     setSearchAddQuery(e.target.value);
   };
+  const handleSearchLiInputChange = (e) => {
+    setSearchLiQuery(e.target.value);
+  };
   const handleRowClick1 = (item) => {
     if (selectedRow1 === item.softwareId) {
       setSelectedRow1(null); // Unselect the row if it's already selected
@@ -228,6 +233,12 @@ function AssetDetailPage() {
         curDate.getDate(),
       );
       const formattedStartDate = formatDate(formData.start_Date);
+      let status;
+      if (formData.time == 0 || formData.time == '0') {
+        status = 2;
+      } else {
+        status = 1;
+      }
       const response = await axios.post(
         `${BACK_END_PORT}/api/Software_Asset/CreateWithHaveLicenseAndSoftware`,
         {
@@ -242,7 +253,7 @@ function AssetDetailPage() {
           licenseKey: formData.licenseKey,
           start_Date: formattedStartDate,
           time: formData.time,
-          status_License: formData.time !== 0 ? 1 : 2,
+          status_License: status,
           status_Software: 1,
           status_AssetSoftware: 1,
         },
@@ -277,6 +288,12 @@ function AssetDetailPage() {
         curDate.getMonth(),
         curDate.getDate(),
       );
+      let status;
+      if (formData1.time == 0 || formData1.time == '0') {
+        status = 2;
+      } else {
+        status = 1;
+      }
       const response = await axios.post(
         `${BACK_END_PORT}/api/Software_Asset/CreateWithHaveLicense`,
         {
@@ -289,7 +306,7 @@ function AssetDetailPage() {
                 licenseKey: formData1.licenseKey,
                 start_Date: formatDate(formData1.start_Date),
                 time: formData1.time,
-                status_License: formData1.time !== 0 ? 1 : 2,
+                status_License: status,
               }
             : {
                 licenseKey: 'string',
@@ -465,6 +482,9 @@ function AssetDetailPage() {
       if (!accountDataDecode) {
         // router.push('http://localhost:3000');
       } else {
+        if (accountDataDecode.roleId !== 2) {
+          router.push('/page405');
+        }
         setAccount(accountDataDecode);
       }
     }
@@ -567,7 +587,24 @@ function AssetDetailPage() {
   // Update filtered data whenever the search query changes
   useEffect(() => {
     filterAssets1();
-  }, [isOpenAdd, searchAddQuery, data]);
+  }, [isOpenAdd, searchAddQuery, listAllSoftware]);
+  //
+  const filterLicense = () => {
+    const query = searchLiQuery.toLowerCase();
+    const filteredData = listLicense.filter((item) => {
+      try {
+        const name = item?.name.toLowerCase();
+        return name.includes(query);
+      } catch (error) {
+        return null;
+      }
+    });
+    setFilteredLicenseData(filteredData);
+  };
+  // Update filtered data whenever the search query changes
+  useEffect(() => {
+    filterLicense();
+  }, [searchLiQuery, listLicense]);
   //
   function calculateEndDate(startDate, months) {
     if (months !== 0) {
@@ -660,7 +697,7 @@ function AssetDetailPage() {
                 borderBottom: '1px solid #4d9ffe',
               }}
             >
-              License
+              Antivirus
             </Tab>
             <Tab
               className={styles.tab}
@@ -669,7 +706,7 @@ function AssetDetailPage() {
                 borderBottom: '1px solid #4d9ffe',
               }}
             >
-              Antivirus
+              License
             </Tab>
           </TabList>
           <TabPanels>
@@ -990,7 +1027,7 @@ function AssetDetailPage() {
                             item.type != 'Antivirus' && item.status != 3,
                         ).length
                       }{' '}
-                      softwares
+                      software(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1039,19 +1076,6 @@ function AssetDetailPage() {
             <TabPanel>
               <ListItem className={styles.list} pt={0}>
                 <Flex>
-                  <Box>
-                    <InputGroup>
-                      <InputLeftAddon children='Software' />
-                      <Input
-                        type='text'
-                        value={searchAppQuery}
-                        onChange={handleSearchAppInputChange}
-                        placeholder='search...'
-                        w={300}
-                        mr={1}
-                      />
-                    </InputGroup>
-                  </Box>
                   <Spacer />
                   <Box>
                     <Tooltip label='Edit'>
@@ -1060,59 +1084,22 @@ function AssetDetailPage() {
                         icon={<FaEdit />}
                         colorScheme='gray' // Choose an appropriate color
                         marginRight={1}
-                        onClick={() => setIsOpenEditLi(true)}
-                        isDisabled={isButtonDisabled2}
+                        onClick={() => setIsOpenEdit(true)}
+                        isDisabled={isButtonDisabled1}
+                      />
+                    </Tooltip>
+                    <Tooltip label='Delete'>
+                      <IconButton
+                        aria-label='Delete'
+                        icon={<FaTrash />}
+                        colorScheme='gray' // Choose an appropriate color
+                        onClick={() => setIsOpenDelete(true)}
+                        isDisabled={isButtonDisabled1}
                       />
                     </Tooltip>
                   </Box>
                 </Flex>
               </ListItem>
-              <ListItem className={styles.list}>
-                <TableContainer>
-                  <Table
-                    variant='striped'
-                    colorScheme='gray'
-                    className={styles.cTable}
-                  >
-                    <TableCaption className={styles.cTableCaption}>
-                      Total {listLicense.length} licenses
-                    </TableCaption>
-                    <Thead>
-                      <Tr>
-                        <Th className={styles.cTh} width='10px'>
-                          No
-                        </Th>
-                        <Th className={styles.cTh}>Software</Th>
-                        <Th className={styles.cTh}>License Key</Th>
-                        <Th className={styles.cTh}>Start Date</Th>
-                        <Th className={styles.cTh}>End Date</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {listLicense.map((item, index) => (
-                        <Tr
-                          cursor={'pointer'}
-                          key={item.licenseId}
-                          color={
-                            selectedRow2 === item.licenseId ? 'red' : 'black'
-                          } // Change background color for selected rows
-                          onClick={() => handleRowClick2(item)}
-                        >
-                          <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.licenseKey}</Td>
-                          <Td>{item.start_Date}</Td>
-                          <Td>
-                            {calculateEndDate(item.start_Date, item.time)}
-                          </Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
-                </TableContainer>
-              </ListItem>
-            </TabPanel>
-            <TabPanel>
               <ListItem className={styles.list} pt={0}>
                 <TableContainer>
                   <Table variant='striped' colorScheme='gray'>
@@ -1124,7 +1111,7 @@ function AssetDetailPage() {
                             item.type == 'Antivirus' && item.status != 3,
                         ).length
                       }{' '}
-                      antivirus
+                      antiviru(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1163,6 +1150,88 @@ function AssetDetailPage() {
                             {/* <Td>{item.status ? 'No Issues' : 'Have Issues'}</Td> */}
                           </Tr>
                         ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </ListItem>
+            </TabPanel>
+            <TabPanel>
+              <ListItem className={styles.list} pt={0}>
+                <Flex>
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Software / Antivirus' />
+                      <Input
+                        type='text'
+                        value={searchLiQuery}
+                        onChange={handleSearchLiInputChange}
+                        placeholder='search...'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                  </Box>
+                  <Spacer />
+                  <Box>
+                    <Tooltip label='Edit'>
+                      <IconButton
+                        aria-label='Edit'
+                        icon={<FaEdit />}
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setIsOpenEditLi(true)}
+                        isDisabled={isButtonDisabled2}
+                      />
+                    </Tooltip>
+                  </Box>
+                </Flex>
+              </ListItem>
+              <ListItem className={styles.list}>
+                <TableContainer>
+                  <Table
+                    variant='striped'
+                    colorScheme='gray'
+                    className={styles.cTable}
+                  >
+                    <TableCaption className={styles.cTableCaption}>
+                      Total {listLicense.length} license(s)
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
+                        <Th className={styles.cTh}>Software / Antivirus</Th>
+                        <Th className={styles.cTh}>License Key</Th>
+                        <Th className={styles.cTh}>Start Date</Th>
+                        <Th className={styles.cTh}>End Date</Th>
+                        <Th className={styles.cTh}>Type</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {filteredLicenseData.map((item, index) => (
+                        <Tr
+                          cursor={'pointer'}
+                          key={item.licenseId}
+                          color={
+                            selectedRow2 === item.licenseId ? 'red' : 'black'
+                          } // Change background color for selected rows
+                          onClick={() => handleRowClick2(item)}
+                        >
+                          <Td>{index + 1}</Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.licenseKey}</Td>
+                          <Td>{item.start_Date}</Td>
+                          <Td>
+                            {calculateEndDate(item.start_Date, item.time)}
+                          </Td>
+                          <Td>
+                            {item.status === 1
+                              ? 'Close source license'
+                              : 'Open source license'}
+                          </Td>
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1251,7 +1320,13 @@ function AssetDetailPage() {
       >
         <ModalOverlay />
         <ModalContent
-          w={showModalAdd ? '40vw' : showModalTable ? '100vw' : '45vw'}
+          w={
+            showModalAdd
+              ? 'fit-content'
+              : showModalTable
+              ? '100vw'
+              : 'fit-content'
+          }
         >
           <ModalHeader>
             {showModalAdd ? 'Create New Software' : 'Add Software'}
@@ -1360,17 +1435,29 @@ function AssetDetailPage() {
             ) : showModalTable ? (
               <Box>
                 <Box ml={6} mb={4}>
-                  <InputGroup>
-                    <InputLeftAddon children='Name / publisher' />
-                    <Input
-                      type='text'
-                      value={searchAddQuery}
-                      onChange={handleSearchAddInputChange}
-                      placeholder='search software'
-                      w={300}
-                      mr={1}
-                    />
-                  </InputGroup>
+                  <Flex>
+                    <InputGroup>
+                      <InputLeftAddon children='Name / publisher' />
+                      <Input
+                        type='text'
+                        value={searchAddQuery}
+                        onChange={handleSearchAddInputChange}
+                        placeholder='search software'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                    <Tooltip label='Create new software'>
+                      <Button
+                        aria-label='Add'
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => setShowModalAdd(true)}
+                      >
+                        Create
+                      </Button>
+                    </Tooltip>
+                  </Flex>
                 </Box>
                 <TableContainer>
                   <Table variant='simple'>
@@ -1381,7 +1468,6 @@ function AssetDetailPage() {
                         <Th className={styles.cTh}>Publisher</Th>
                         <Th className={styles.cTh}>Versions</Th>
                         <Th className={styles.cTh}>Release</Th>
-                        {/* <Th className={styles.cTh}>OS</Th> */}
                         <Th className={styles.cTh}>Type</Th>
                       </Tr>
                     </Thead>
@@ -1416,24 +1502,9 @@ function AssetDetailPage() {
                             <Td>{item.publisher}</Td>
                             <Td>{item.version}</Td>
                             <Td>{item.release}</Td>
-                            {/* <Td>{item.os}</Td> */}
                             <Td>{item.type}</Td>
                           </Tr>
                         ))}
-                      <Tr>
-                        <Td colSpan='6'>
-                          <Center>
-                            <Button
-                              w='100%'
-                              bgColor='white'
-                              border='1px solid gray'
-                              onClick={() => setShowModalAdd(true)}
-                            >
-                              Create new software
-                            </Button>
-                          </Center>
-                        </Td>
-                      </Tr>
                     </Tbody>
                   </Table>
                 </TableContainer>

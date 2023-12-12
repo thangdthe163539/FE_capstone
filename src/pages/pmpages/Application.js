@@ -78,6 +78,9 @@ function SoftwarePage() {
       if (!accountDataDecode) {
         // router.push('http://localhost:3000');
       } else {
+        if (accountDataDecode.roleId !== 2) {
+          router.push('/page405');
+        }
         setAccount(accountDataDecode);
       }
     }
@@ -384,7 +387,7 @@ function SoftwarePage() {
                   filteredSoftwareData.filter((item) => item.status !== 3)
                     .length
                 }{' '}
-                softwares
+                application(s)
               </TableCaption>
               <Thead>
                 <Tr>

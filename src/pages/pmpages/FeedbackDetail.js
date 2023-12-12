@@ -83,6 +83,9 @@ function ReportPage(title) {
       if (!accountDataDecode) {
         // router.push('http://localhost:3000');
       } else {
+        if (accountDataDecode.roleId !== 2) {
+          router.push('/page405');
+        }
         setAccount(accountDataDecode);
       }
     }
@@ -112,54 +115,51 @@ function ReportPage(title) {
   };
 
   const handleSaveEdit = async () => {
-    // if (formData.status === 1) {
-    //   // If status is 1, set endDate to an empty string
-    //   setFormData({
-    //     ...formData,
-    //     endDate: null, // Empty string
-    //   });
-    // } else {
-    //   // If status is not 1, set endDate to the current date
-    //   const currentDate = getCurrentDateString();
-    //   setFormData({
-    //     ...formData,
-    //     endDate: currentDate, // Empty string
-    //   });
-    // }
+    const url =
+      `${BACK_END_PORT}/api/Report/UpdateReport/` + formData?.reportId;
+
     const submitData = new FormData();
-    const currentDate = getCurrentDateString();
-    try {
-      fileObjects.forEach((file) => {
+    submitData.append('AppId', formData.appId);
+    submitData.append('UpdaterID', account?.accId);
+    submitData.append('Title', formData.title);
+    submitData.append('Description', formData.description);
+    submitData.append('Type', formData.type);
+    submitData.append('Start_Date', formData.start_Date);
+    submitData.append('End_Date', formData.end_Date);
+    submitData.append('Status', formData.status);
+    if (Array.isArray(image) && image.length !== 0) {
+      const fileObjects = await Promise.all(
+        image.map(async (image) => {
+          // Tạo một Blob từ dataURL
+          if (image.dataURL) {
+            const blob = dataURLtoBlob(image.dataURL);
+            return new File([blob], image.fileName, { type: blob.type });
+          } else {
+            console.log(image.image1 + '----111');
+
+            // Giữ nguyên ảnh khi dataURL không xác định
+            const fullImagePath = `/images/${image.image1}`;
+            const blob = await fetch(fullImagePath).then((res) => res.blob());
+            return new File([blob], image.fileName, { type: blob.type });
+          }
+        }),
+      );
+      fileObjects.forEach((file, index) => {
         submitData.append(`Images`, file);
       });
-      submitData.append('AppId', formData?.appId);
-      submitData.append('UpdaterID', account?.accId);
-      submitData.append('Title', formData?.title);
-      submitData.append('Description', formData?.description);
-      submitData.append('Type', formData?.type);
-      submitData.append('Start_Date', formData?.start_Date);
-      submitData.append('End_Date', formData?.end_Date);
-      submitData.append(
-        'ClosedDate',
-        formData?.status == 2 ? currentDate : formData?.closedDate,
-      );
-      submitData.append('Status', formData?.status);
-      // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const response = await axios.put(
-        `${BACK_END_PORT}/api/Report/UpdateReport/` + formData.reportId,
-        submitData,
-      );
-      console.log('Data saved:', response.data);
-      toast({
-        title: 'Edit Report',
-        description: 'The report has been successfully edited.',
-        status: 'success',
-        duration: 3000, // Duration in milliseconds
-        isClosable: true,
+    } else {
+      submitData.append(`Images`, ' ');
+    }
+
+    try {
+      const response = await axios.put(url, submitData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
       router.push('/pmpages/ListFeedback');
     } catch (error) {
-      console.error('Error saving data:', error);
+      console.error('Lỗi:', error);
     }
   };
 
@@ -170,23 +170,43 @@ function ReportPage(title) {
   const [error, setError] = useState('');
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomedIndex, setZoomedIndex] = useState(null);
-  const handleImageClick = (index) => {
-    setZoomedIndex(index);
-    setIsZoomed(true);
-  };
-  const handleZoomClose = () => {
-    setIsZoomed(false);
-    setZoomedIndex(null);
-  };
-  const handleDeleteClick = (index, event) => {
-    event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
-    handleRemoveImageU(index);
+
+  //Start image
+  const handleFileChangeU = (e) => {
+    const files = e.target.files;
+
+    if (files) {
+      const newImages = Array.from(files).map((file) => {
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (allowedExtensions.includes(extension)) {
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            setImage((prevImages) => [
+              ...(Array.isArray(prevImages) ? prevImages : []), // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
+              { fileName: file.name, dataURL: reader.result },
+            ]);
+            setError('');
+          };
+
+          reader.readAsDataURL(file);
+        } else {
+          setError('Invalid file type. Please select a JPG or PNG file.');
+          return null;
+        }
+      });
+
+      // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
+      setImage((prevImages) => [
+        ...(Array.isArray(prevImages) ? prevImages : []).filter(
+          (img) => img && img.dataURL,
+        ),
+        ...newImages.filter(Boolean),
+      ]);
+    }
   };
 
-  const handleDeleteClick_Add = (index, event) => {
-    event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
-    handleRemoveImage(index);
-  };
   const handleRemoveImageU = (index) => {
     setImage((prevImages) => {
       const newImages = [...prevImages];
@@ -196,12 +216,6 @@ function ReportPage(title) {
     setError('');
   };
 
-  const [imagesState, setImages] = useState([]);
-
-  // console.log(imagesState);
-  const handleImageMouseLeave = () => {
-    setIsHovered(null);
-  };
   function dataURLtoBlob(dataURL) {
     const parts = dataURL.split(';base64,');
     const contentType = parts[0].split(':')[1];
@@ -216,39 +230,35 @@ function ReportPage(title) {
     return new Blob([uInt8Array], { type: contentType });
   }
 
-  const fileObjects = imagesState.map((image) => {
-    // Tạo một Blob từ dataURL
-    const blob = dataURLtoBlob(image.dataURL);
-    // Tạo một File từ Blob
-    return new File([blob], image.fileName, { type: blob.type });
-    [];
-  });
+  useEffect(() => {
+    if (formData?.reportId) {
+      const url = `http://localhost:5001/api/Image/list_Images_by_Report/${formData.reportId}`;
 
-  const handleFileChange = (e) => {
-    const files = e.target.files;
-
-    if (files) {
-      const newImages = Array.from(files).map((file) => {
-        const extension = file.name.split('.').pop().toLowerCase();
-
-        if (allowedExtensions.includes(extension)) {
-          const reader = new FileReader();
-
-          reader.onload = () => {
-            setImages((prevImages) => [
-              ...prevImages,
-              { fileName: file.name, dataURL: reader.result },
-            ]);
-            setError('');
-          };
-
-          reader.readAsDataURL(file);
-        } else {
-          setError('Invalid file type. Please select a JPG or PNG file.');
-          return null;
-        }
-      });
+      fetch(url, {
+        method: 'GET',
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setImage(data);
+        })
+        .catch((error) => {
+          console.error('Lỗi:', error);
+        });
     }
+  }, [formData?.reportId]);
+
+  const handleImageClick = (index) => {
+    setZoomedIndex(index);
+    setIsZoomed(true);
+  };
+
+  const handleZoomClose = () => {
+    setIsZoomed(false);
+    setZoomedIndex(null);
+  };
+
+  const handleImageMouseLeave = () => {
+    setIsHovered(null);
   };
 
   const handleImageMouseEnter = (index, event) => {
@@ -256,57 +266,11 @@ function ReportPage(title) {
     setIsHovered(index);
   };
 
-  const handleFileChangeU = (e) => {
-    const files = e.target.files;
-
-    if (files) {
-      const newImages = Array.from(files).map((file) => {
-        const extension = file.name.split('.').pop().toLowerCase();
-
-        if (allowedExtensions.includes(extension)) {
-          const reader = new FileReader();
-
-          reader.onload = () => {
-            setImage((prevImages) => [
-              ...prevImages,
-              { fileName: file.name, dataURL: reader.result },
-            ]);
-            setError('');
-          };
-
-          reader.readAsDataURL(file);
-        } else {
-          setError('Invalid file type. Please select a JPG or PNG file.');
-          return null;
-        }
-      });
-
-      // Giữ lại cả ảnh cũ và thêm ảnh mới
-      setImage((prevImages) => [
-        ...prevImages.filter((img) => img.dataURL),
-        ...newImages.filter(Boolean),
-      ]);
-    }
+  const handleDeleteClick = (index, event) => {
+    event.stopPropagation(); // Ngăn chặn sự kiện lan toả lên các phần tử cha
+    handleRemoveImageU(index);
   };
-  useEffect(() => {
-    if (formData?.reportId) {
-      const url = `http://localhost:5001/api/Image/list_Images_by_Report/${formData?.reportId}`;
-
-      fetch(url, {
-        method: 'GET',
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data?.status !== 400 && data?.status !== 404) {
-            setImage(data);
-          }
-        })
-        .catch((error) => {
-          console.error('Lỗi:', error);
-        });
-    }
-  }, [formData]);
-  console.log(title);
+  //End image
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -343,12 +307,6 @@ function ReportPage(title) {
                 Start date:
               </Text>
               <Text className={styles.text1}>{formData?.start_Date}</Text>
-            </Flex>
-            <Flex direction='row' align='center'>
-              <Text className={`${styles.text1} ${styles.text2}`}>
-                Deadline:
-              </Text>
-              <Text className={styles.text1}>{formData?.end_Date}</Text>
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>
@@ -398,137 +356,101 @@ function ReportPage(title) {
               />
             </FormControl>
           </Box>
-          <Flex>
-            <FormLabel style={{ width: '50px' }}>Image</FormLabel>
-            <Input
-              style={{
-                width: '300px',
-                border: 'none',
-                textAlign: 'center',
-                height: '40px',
-              }}
-              id='file'
-              type='file'
-              onChange={handleFileChange}
-              multiple
-            />
-          </Flex>
-          <Box display='flex' flexWrap='wrap' gap={4}>
-            {!imagesState.length &&
-              image.map((image, index) => (
-                <Box
-                  key={index}
-                  position='relative'
-                  maxW='100px'
-                  maxH='200px'
-                  overflow='hidden'
-                  onClick={() => handleImageClick(index)}
-                  onMouseEnter={(event) => handleImageMouseEnter(index, event)}
-                  onMouseLeave={handleImageMouseLeave}
-                >
-                  <Image
-                    src={image.dataURL || `/images/${image.image1}`}
-                    alt={`Selected Image ${index}`}
-                    w='100%'
-                    h='100%'
-                    objectFit='cover'
-                    _hover={{ cursor: 'pointer' }}
-                  />
-                  {isHovered === index && (
-                    <>
-                      <DeleteIcon
-                        position='absolute'
-                        top='5px'
-                        color='black'
-                        right='5px'
-                        fontSize='15px'
-                        variant='ghost'
-                        onClick={(event) => handleDeleteClick(index, event)}
-                        _hover={{ color: 'black ' }}
+          <Grid templateColumns='repeat(1, 1fr)' gap={8}>
+            <GridItem>
+              <Flex>
+                <FormLabel style={{ width: '50px' }}>Image</FormLabel>
+                <Input
+                  style={{
+                    width: '300px',
+                    border: 'none',
+                    textAlign: 'center',
+                    height: '40px',
+                  }}
+                  id='file'
+                  type='file'
+                  onChange={handleFileChangeU}
+                  multiple
+                />
+              </Flex>
+              {Array.isArray(image) && image.length !== 0 && (
+                <Box display='flex' flexWrap='wrap' gap={4}>
+                  {image.map((image, index) => (
+                    <Box
+                      key={index}
+                      position='relative'
+                      maxW='100px'
+                      maxH='200px'
+                      overflow='hidden'
+                      onClick={() => handleImageClick(index)}
+                      onMouseEnter={(event) =>
+                        handleImageMouseEnter(index, event)
+                      }
+                      onMouseLeave={handleImageMouseLeave}
+                    >
+                      <Image
+                        src={image.dataURL || `/images/${image.image1}`}
+                        alt={`Selected Image ${index}`}
+                        w='100%'
+                        h='100%'
+                        objectFit='cover'
+                        _hover={{ cursor: 'pointer' }}
                       />
-                      <Text
-                        position='absolute'
-                        bottom='5px'
-                        left='5px'
-                        fontSize='10px'
-                        color='white'
+                      {isHovered === index && (
+                        <>
+                          <DeleteIcon
+                            position='absolute'
+                            top='5px'
+                            color='black'
+                            right='5px'
+                            fontSize='15px'
+                            variant='ghost'
+                            onClick={(event) => handleDeleteClick(index, event)}
+                            _hover={{ color: 'black ' }}
+                          />
+                          <Text
+                            position='absolute'
+                            bottom='5px'
+                            left='5px'
+                            fontSize='10px'
+                            color='white'
+                          >
+                            {image.fileName}
+                          </Text>
+                        </>
+                      )}
+                    </Box>
+                  ))}
+                  {isZoomed && (
+                    <div className='modal-overlay' onClick={handleZoomClose}>
+                      <Modal
+                        isOpen={isZoomed}
+                        onClose={handleZoomClose}
+                        size='xl'
+                        isCentered
                       >
-                        {image.fileName}
-                      </Text>
-                    </>
+                        <ModalOverlay />
+                        <ModalContent>
+                          <ModalBody>
+                            <Box className='zoomed-image-container'>
+                              <Image
+                                src={
+                                  image[zoomedIndex]?.dataURL ||
+                                  `/images/${image[zoomedIndex]?.image1}`
+                                }
+                                alt={`${zoomedIndex}`}
+                              />
+                            </Box>
+                          </ModalBody>
+                        </ModalContent>
+                      </Modal>
+                    </div>
                   )}
                 </Box>
-              ))}
-            {imagesState.map((image, index) => (
-              <Box
-                key={index}
-                position='relative'
-                maxW='100px'
-                maxH='200px'
-                overflow='hidden'
-                onClick={() => handleImageClick(index)}
-                onMouseEnter={(event) => handleImageMouseEnter(index, event)}
-                onMouseLeave={handleImageMouseLeave}
-              >
-                <Image
-                  src={image.dataURL || `/images/${image.image1}`}
-                  alt={`Selected Image ${index}`}
-                  w='100%'
-                  h='100%'
-                  objectFit='cover'
-                  _hover={{ cursor: 'pointer' }}
-                />
-                {isHovered === index && (
-                  <>
-                    <DeleteIcon
-                      position='absolute'
-                      top='5px'
-                      color='black'
-                      right='5px'
-                      fontSize='15px'
-                      variant='ghost'
-                      onClick={(event) => handleDeleteClick_Add(index, event)}
-                      _hover={{ color: 'black' }}
-                    />
-                    <Text
-                      position='absolute'
-                      bottom='5px'
-                      left='5px'
-                      fontSize='10px'
-                      color='white'
-                    >
-                      {image.fileName}
-                    </Text>
-                  </>
-                )}
-              </Box>
-            ))}
-            {isZoomed && (
-              <div className='modal-overlay' onClick={handleZoomClose}>
-                <Modal
-                  isOpen={isZoomed}
-                  onClose={handleZoomClose}
-                  size='xl'
-                  isCentered
-                >
-                  <ModalOverlay />
-                  <ModalContent>
-                    <ModalBody>
-                      <Box className='zoomed-image-container'>
-                        <Image
-                          src={imagesState[zoomedIndex]?.dataURL}
-                          alt={`${zoomedIndex}`}
-                          w='100%' // Thiết lập kích thước modal sao cho đủ lớn
-                          h='100%'
-                          objectFit='contain'
-                        />
-                      </Box>
-                    </ModalBody>
-                  </ModalContent>
-                </Modal>
-              </div>
-            )}
-          </Box>
+              )}
+              {error && <Text color='red'>{error}</Text>}
+            </GridItem>
+          </Grid>
           {error && <Text color='red'>{error}</Text>}
         </ListItem>
         <Button mt={2} onClick={handleSaveEdit}>

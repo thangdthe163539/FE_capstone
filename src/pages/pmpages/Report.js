@@ -52,6 +52,7 @@ function ReportPage() {
   const [assetData, setAssetData] = useState([]);
   const [softwareData, setSoftwareData] = useState([]);
   const [licenseData, setLicenseData] = useState([]);
+  const [libraryData, setLibraryData] = useState([]);
 
   useEffect(() => {
     // Access localStorage on the client side
@@ -62,6 +63,9 @@ function ReportPage() {
       if (!accountDataDecode) {
         // router.push('http://localhost:3000');
       } else {
+        if (accountDataDecode.roleId !== 2) {
+          router.push('/page405');
+        }
         setAccount(accountDataDecode);
       }
     }
@@ -93,29 +97,53 @@ function ReportPage() {
     const fetchData = async () => {
       try {
         const uniqueAssetIds = new Set();
+        const uniqueLibraryIds = new Set();
         const allAssets = [];
+        const allLibrary = [];
 
         await Promise.all(
           appData
             .filter((software) => software.status !== 3)
             .map(async (software) => {
               try {
-                const response2 = await axios.get(
-                  `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` +
-                    software?.appId,
-                );
+                try {
+                  const response = await axios.get(
+                    `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` +
+                      software?.appId,
+                  );
 
-                // Filter out duplicate assets based on device ID
+                  // Filter out duplicate assets based on device ID
 
-                const uniqueAssets = response2.data.filter((asset) => {
-                  if (!uniqueAssetIds.has(asset.assetId)) {
-                    uniqueAssetIds.add(asset.assetId);
-                    return true;
-                  }
-                  return false;
-                });
-                // Accumulate unique assets for each app
-                allAssets.push(...uniqueAssets);
+                  const uniqueAssets = response.data.filter((asset) => {
+                    if (!uniqueAssetIds.has(asset.assetId)) {
+                      uniqueAssetIds.add(asset.assetId);
+                      return true;
+                    }
+                    return false;
+                  });
+                  allAssets.push(...uniqueAssets);
+                } catch (error) {}
+
+                try {
+                  const response = await axios.get(
+                    `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` +
+                      software?.appId,
+                  );
+                  const response4 = await axios.get(
+                    `${BACK_END_PORT}/api/App/ListApps`,
+                  );
+                  // Add assetId to each license item
+                  const licenseDataWithAssetId = response.data.map(
+                    (license) => ({
+                      ...license,
+                      appName: response4.data.find(
+                        (software) => software.appId === license.appId,
+                      )?.name,
+                    }),
+                  );
+
+                  allLibrary.push(...licenseDataWithAssetId);
+                } catch (error) {}
 
                 return {
                   ...software,
@@ -132,6 +160,7 @@ function ReportPage() {
         );
 
         setAssetData(allAssets);
+        setLibraryData(allLibrary);
       } catch (error) {
         setAssetData([]);
         console.error('Error fetching data:', error);
@@ -295,7 +324,16 @@ function ReportPage() {
                 borderBottom: '1px solid #4d9ffe',
               }}
             >
-              License
+              Application License
+            </Tab>
+            <Tab
+              className={styles.tab}
+              _selected={{
+                color: '#4d9ffe',
+                borderBottom: '1px solid #4d9ffe',
+              }}
+            >
+              Software License
             </Tab>
           </TabList>
           <TabPanels>
@@ -308,7 +346,7 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption>
-                      Total {appData.length} softwares
+                      Total {appData.length} application(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -373,11 +411,8 @@ function ReportPage() {
                   >
                     <TableCaption className={styles.cTableCaption}>
                       Total{' '}
-                      {assetData.filter((item) => item.status != 3).length < 2
-                        ? assetData.filter((item) => item.status != 3).length +
-                          ' asset'
-                        : assetData.filter((item) => item.status != 3).length +
-                          ' assets'}
+                      {assetData.filter((item) => item.status != 3).length}{' '}
+                      asset(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -439,20 +474,17 @@ function ReportPage() {
                 <TableContainer>
                   <Table variant='striped' colorScheme='gray'>
                     <TableCaption>
-                      Total {softwareData.length} softwares
+                      Total {softwareData.length} software(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh} width='10px'>
-                          No
-                        </Th>
+                        <Th className={styles.cTh}>No</Th>
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Publisher</Th>
                         <Th className={styles.cTh}>Versions</Th>
                         <Th className={styles.cTh}>Release</Th>
                         <Th className={styles.cTh}>Type</Th>
                         <Th className={styles.cTh}>Install Date</Th>
-                        {/* <Th className={styles.cTh}>Status</Th> */}
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -465,7 +497,6 @@ function ReportPage() {
                           <Td>{item.release}</Td>
                           <Td>{item.type}</Td>
                           <Td>{item.installDate}</Td>
-                          {/* <Td>{item.status ? 'Have Issue' : 'No Issue'}</Td> */}
                         </Tr>
                       ))}
                     </Tbody>
@@ -497,7 +528,73 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      Total {licenseData.length} licenses
+                      Total {libraryData.length} license(s)
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th className={styles.cTh} width='10px'>
+                          No
+                        </Th>
+                        <Th className={styles.cTh}>Application</Th>
+                        <Th className={styles.cTh}>Name</Th>
+                        <Th className={styles.cTh}>Publisher</Th>
+                        <Th className={styles.cTh}>License Key</Th>
+                        <Th className={styles.cTh}>Start Date</Th>
+                        <Th className={styles.cTh}>End Date</Th>
+                        <Th className={styles.cTh}>Type</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {libraryData.map((item, index) => (
+                        <Tr cursor={'pointer'} key={item.licenseId}>
+                          <Td>{index + 1}</Td>
+                          <Td>{item.appName}</Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.publisher}</Td>
+                          <Td>{item.libraryKey}</Td>
+                          <Td>{item.start_Date}</Td>
+                          <Td>
+                            {calculateEndDate(item.start_Date, item.time)}
+                          </Td>
+                          <Td>
+                            {item.status == 1
+                              ? 'Closed source license'
+                              : item.status == 2
+                              ? 'Open source license'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </ListItem>
+            </TabPanel>
+            <TabPanel>
+              {/* <ListItem className={styles.list} pt={0}>
+                <Flex>
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Search' />
+                      <Input
+                        type='text'
+                        placeholder='software'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                  </Box>
+                </Flex>
+              </ListItem> */}
+              <ListItem className={styles.list}>
+                <TableContainer>
+                  <Table
+                    variant='striped'
+                    colorScheme='gray'
+                    className={styles.cTable}
+                  >
+                    <TableCaption className={styles.cTableCaption}>
+                      Total {licenseData.length} license(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -526,9 +623,9 @@ function ReportPage() {
                           </Td>
                           <Td>
                             {item.status == 1
-                              ? 'Closed source'
+                              ? 'Closed source license'
                               : item.status == 2
-                              ? 'Open source'
+                              ? 'Open source license'
                               : 'Unknown'}
                           </Td>
                         </Tr>
