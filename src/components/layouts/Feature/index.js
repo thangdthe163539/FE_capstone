@@ -39,7 +39,13 @@ function Feature() {
         </Box>
         <Spacer />
         <Box>
-          <Image className={`${styles.image}`} src='/image1.jpg' />
+          <Image
+            boxSize='350px'
+            objectFit='cover'
+            style={{ width: '550px', height: '300px' }}
+            className={`${styles.image}`}
+            src='/image1.jpg'
+          />
         </Box>
       </Flex>
       <Flex className={`${styles.formDe}`} color='white'>
@@ -52,6 +58,7 @@ function Feature() {
             src='/image.png'
           />
         </Box>
+        <Spacer />
         <Box w='50%' ml={10}>
           <Text className={`${styles.software}`}>Asset</Text>
           <Text className={`${styles.textSof}`}>

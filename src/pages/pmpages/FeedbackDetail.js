@@ -289,13 +289,13 @@ function ReportPage(title) {
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback Detail
         </ListItem>
         <ListItem className={styles.list}>
-          <Text fontSize='2xl'>Feedback Detail</Text>
+          <Text fontSize='2xl'>Feedback: {formData?.title}</Text>
         </ListItem>
         <ListItem className={styles.list}>
           <Flex direction='row' width='100%' justify='space-between'>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>Name:</Text>
-              <Text>{formData?.name}</Text>
+              <Text className={styles.text1}>{formData?.name}</Text>
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>Type:</Text>
@@ -340,19 +340,13 @@ function ReportPage(title) {
             </Flex>
           </Flex>
           <Box>
-            <Flex>
-              <Text className={`${styles.text1} ${styles.text2}`}>Title: </Text>
-              <Text className={styles.text1}>{formData?.title}</Text>
-            </Flex>
             <FormControl>
-              <Text className={`${styles.text1}`} fontWeight='bold'>
-                Description
-              </Text>
+              <Text className={`${styles.text1}`}>Description</Text>
               <Textarea
                 name='description'
                 value={formData?.description}
                 onChange={handleDescriptionChange} // Add onChange handler
-                minH={200}
+                minH={120}
               />
             </FormControl>
           </Box>

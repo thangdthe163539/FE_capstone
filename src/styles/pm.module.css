@@ -59,8 +59,11 @@
   padding: 10px;
 }
 .text2 {
-  font-weight: bold;
   text-align: right !important;
+  padding-right: 0px !important;
+}
+.text3 {
+  font-weight: bold;
 }
 
 .borderTop {

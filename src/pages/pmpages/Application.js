@@ -289,11 +289,28 @@ function SoftwarePage() {
   //
   const handleDelete = async () => {
     try {
-      await axios.delete(
-        `${BACK_END_PORT}/api/App/DeleteAppWith_key?Appid=` + formData2.appId,
+      const response = await axios.put(
+        `${BACK_END_PORT}/api/App/UpdateApplication/` + formData2.appId,
+        {
+          // accId: account.accId,
+          name: formData2.name,
+          publisher: formData2.publisher,
+          version: formData2.version,
+          release: formData2.release,
+          type: formData2.type,
+          os: formData2.os,
+          osversion: formData2.osversion,
+          description: formData2.description,
+          download: formData2.download,
+          docs: formData2.docs,
+          language: formData2.language,
+          db: formData2.db,
+          status: 3,
+        },
       );
       setIsOpenDelete(false); // Close the "Confirm Delete" modal
       setButtonDisabled(true);
+      setFormData2(defaultData);
       setSelectedRow(new Set());
 
       // Reload the data for the table after deletion

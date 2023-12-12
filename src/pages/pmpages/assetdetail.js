@@ -86,6 +86,7 @@ function AssetDetailPage() {
   const [device, setDevice] = useState();
   const [account, setAccount] = useState();
   const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [isOpenEditAsset, setIsOpenEditAsset] = useState(false);
   const [isOpenEditLi, setIsOpenEditLi] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
@@ -100,6 +101,7 @@ function AssetDetailPage() {
   const [listAllSoftware, setListAllSoftware] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchAppQuery, setSearchAppQuery] = useState('');
+  const [searchAppQuery1, setSearchAppQuery1] = useState('');
   const [searchLiQuery, setSearchLiQuery] = useState('');
   const [searchAddQuery, setSearchAddQuery] = useState('');
   const [showModalTable, setShowModalTable] = useState(true);
@@ -114,12 +116,11 @@ function AssetDetailPage() {
   const [isButtonDisabled2, setButtonDisabled2] = useState(true);
   const [isButtonDisabled3, setButtonDisabled3] = useState(true);
   const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
+  const [filteredAntivirusData, setFilteredAntivirusData] = useState([]);
   const [filteredLicenseData, setFilteredLicenseData] = useState([]);
   const [filteredAllSoftwareData, setFilteredAllSoftwareData] = useState([]);
-  const [selectedSoftware, setSelectedSoftware] = useState([]);
-
-  //
   const [software, setSoftware] = useState();
+  const [isAntivirus, setIsAntivirus] = useState(false);
 
   useEffect(() => {
     const data = localStorage.getItem('software');
@@ -173,6 +174,9 @@ function AssetDetailPage() {
   const handleSearchAppInputChange = (e) => {
     setSearchAppQuery(e.target.value);
   };
+  const handleSearchAppInputChange1 = (e) => {
+    setSearchAppQuery1(e.target.value);
+  };
   const handleSearchAddInputChange = (e) => {
     setSearchAddQuery(e.target.value);
   };
@@ -214,7 +218,7 @@ function AssetDetailPage() {
       setButtonDisabled3(true);
     } else {
       setSelectedRow3(item.softwareId);
-      setFormData(item);
+      setFormData1(item);
       setButtonDisabled3(false);
     }
   };
@@ -223,6 +227,7 @@ function AssetDetailPage() {
   };
 
   //all button handle
+
   const handleSaveCreate = async () => {
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
@@ -362,6 +367,7 @@ function AssetDetailPage() {
         },
       );
       console.log('Data saved:', response.data);
+      setIsOpenEditAsset(false); // Close the modal after successful save
       setShowEditAsset(true); // Close the modal after successful save
       // Reload new data for the table
       const newDataResponse = await axios.get(
@@ -536,7 +542,7 @@ function AssetDetailPage() {
     if (device?.assetId && account?.accId) {
       fetchData();
     }
-  }, [device, account, showEditAsset]);
+  }, [device, account, showEditAsset, isOpenEditAsset]);
   //
   const softwareIdsInAsset = data?.map((software) => software?.softwareId);
   //
@@ -557,7 +563,7 @@ function AssetDetailPage() {
   //
 
   // filter search asset data
-  const filterAssets = () => {
+  const filterSoftware = () => {
     const query = searchAppQuery.toLowerCase();
     const filteredData = data
       .filter((item) => item.type != 'Antivirus' && item.status != 3)
@@ -570,12 +576,30 @@ function AssetDetailPage() {
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
-    filterAssets();
+    filterSoftware();
   }, [searchAppQuery, data]);
+  const filterAntivirus = () => {
+    const query = searchAppQuery1.toLowerCase();
+    const filteredData = data
+      .filter((item) => item.type == 'Antivirus' && item.status != 3)
+      .filter((item) => {
+        const name = item?.name.toLowerCase();
+        const publisher = item?.publisher.toLowerCase();
+        return name.includes(query) || publisher.includes(query);
+      });
+    setFilteredAntivirusData(filteredData);
+  };
+  // Update filtered data whenever the search query changes
+  useEffect(() => {
+    filterAntivirus();
+  }, [searchAppQuery1, data]);
   // filter search add asset data
-  const filterAssets1 = () => {
+  const filterAssets = () => {
     const query = searchAddQuery.toLowerCase();
     const filteredData = listAllSoftware
+      .filter((item) =>
+        isAntivirus ? item.type === 'Antivirus' : item.type !== 'Antivirus',
+      )
       .filter((item) => item.status != 3)
       .filter((item) => {
         const name = item?.name.toLowerCase();
@@ -586,7 +610,7 @@ function AssetDetailPage() {
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
-    filterAssets1();
+    filterAssets();
   }, [isOpenAdd, searchAddQuery, listAllSoftware]);
   //
   const filterLicense = () => {
@@ -679,7 +703,25 @@ function AssetDetailPage() {
                 borderBottom: '1px solid #4d9ffe',
               }}
             >
+              System
+            </Tab>
+            <Tab
+              className={styles.tab}
+              _selected={{
+                color: '#4d9ffe',
+                borderBottom: '1px solid #4d9ffe',
+              }}
+            >
               Hardware
+            </Tab>
+            <Tab
+              className={styles.tab}
+              _selected={{
+                color: '#4d9ffe',
+                borderBottom: '1px solid #4d9ffe',
+              }}
+            >
+              System
             </Tab>
             <Tab
               className={styles.tab}
@@ -711,6 +753,136 @@ function AssetDetailPage() {
           </TabList>
           <TabPanels>
             <TabPanel>
+              <Center>
+                <Box
+                  borderWidth='1px'
+                  borderRadius='lg'
+                  p={4}
+                  boxShadow='md'
+                  width='fit-content'
+                >
+                  <TableContainer>
+                    <Table>
+                      <Tbody>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>Name:</Td>
+                          <Td
+                            className={`${styles.text3} ${styles.borderRight}`}
+                          >
+                            {assetData?.name}
+                          </Td>
+                          <Td className={styles.text2}>Manufacturer:</Td>
+                          <Td
+                            className={`${styles.text3} ${styles.borderRight}`}
+                          >
+                            {assetData?.manufacturer}
+                          </Td>
+                          <Td className={styles.text2}>Model:</Td>
+                          <Td
+                            className={`${styles.text3} ${styles.borderRight}`}
+                          >
+                            {assetData?.model}
+                          </Td>
+                          <Td className={styles.text2}>Serial number:</Td>
+                          <Td className={`${styles.text3}`}>
+                            {assetData?.serialNumber}
+                          </Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>OS:</Td>
+                          <Td
+                            className={`${styles.text3} ${styles.borderRight}`}
+                          >
+                            {assetData?.os}
+                          </Td>
+
+                          <Td className={styles.text2}>Version:</Td>
+                          <Td
+                            className={`${styles.text3} ${styles.borderRight}`}
+                          >
+                            {assetData?.version}
+                          </Td>
+
+                          <Td className={styles.text2}>Status:</Td>
+                          <Td
+                            className={`${styles.text3} ${styles.borderRight}`}
+                          >
+                            {assetData?.status === 1
+                              ? 'Active'
+                              : assetData?.status === 2
+                              ? 'Inactive'
+                              : assetData?.status === 3
+                              ? 'Deleted'
+                              : 'Unknown'}
+                          </Td>
+                          <Td className={styles.text2}>Last updated:</Td>
+                          <Td className={`${styles.text3}`}>
+                            {assetData?.lastSuccesfullScan}
+                          </Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </TableContainer>
+                  <Button
+                    colorScheme='gray'
+                    mt={3}
+                    onClick={() => setIsOpenEditAsset(true)}
+                  >
+                    Edit
+                  </Button>
+                </Box>
+              </Center>
+            </TabPanel>
+            <TabPanel>
+              <Center>
+                <Box
+                  borderWidth='1px'
+                  borderRadius='lg'
+                  p={4}
+                  boxShadow='md'
+                  width='fit-content'
+                >
+                  <TableContainer>
+                    <Table>
+                      <Tbody>
+                        <Tr className={styles.borderTop}>
+                          <Td className={styles.text2}>CPU:</Td>
+                          <Td
+                            className={`${styles.text3} ${styles.borderRight}`}
+                          >
+                            {assetData?.cpu}
+                          </Td>
+                          <Td className={styles.text2}>GPU:</Td>
+                          <Td className={`${styles.text3}`}>
+                            {assetData?.gpu}
+                          </Td>
+                        </Tr>
+                        <Tr>
+                          <Td className={styles.text2}>RAM:</Td>
+                          <Td
+                            className={`${styles.text3} ${styles.borderRight}`}
+                          >
+                            {assetData?.ram}GB
+                          </Td>
+                          <Td className={styles.text2}>Storage:</Td>
+                          <Td className={`${styles.text3}`}>
+                            {assetData?.memory}GB
+                          </Td>
+                        </Tr>
+                      </Tbody>
+                    </Table>
+                  </TableContainer>
+                  <Button
+                    colorScheme='gray'
+                    mt={3}
+                    onClick={() => setIsOpenEditAsset(true)}
+                  >
+                    Edit
+                  </Button>
+                </Box>
+              </Center>
+            </TabPanel>
+            <TabPanel>
               {showEditAsset ? (
                 <Center>
                   <Box
@@ -729,7 +901,7 @@ function AssetDetailPage() {
                               colSpan={4}
                               textAlign='center'
                             >
-                              Asset detail
+                              System
                             </Th>
                             <Th
                               className={styles.cTh}
@@ -742,48 +914,70 @@ function AssetDetailPage() {
                         </Thead>
                         <Tbody>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Name</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Name:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {assetData?.name}
                             </Td>
-                            <Td className={styles.text2}>OS</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>OS:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {assetData?.os}
                             </Td>
-                            <Td className={styles.text2}>CPU</Td>
-                            <Td>{assetData?.cpu}</Td>
+                            <Td className={styles.text2}>CPU:</Td>
+                            <Td className={`${styles.text3}`}>
+                              {assetData?.cpu}
+                            </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Manufacturer</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Manufacturer:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {assetData?.manufacturer}
                             </Td>
-                            <Td className={styles.text2}>Version</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Version:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {assetData?.version}
                             </Td>
-                            <Td className={styles.text2}>GPU</Td>
-                            <Td>{assetData?.gpu}</Td>
+                            <Td className={styles.text2}>GPU:</Td>
+                            <Td className={`${styles.text3}`}>
+                              {assetData?.gpu}
+                            </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Model</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Model:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {assetData?.model}
                             </Td>
-                            <Td className={styles.text2}>Last updated</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Last updated:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {assetData?.lastSuccesfullScan}
                             </Td>
-                            <Td className={styles.text2}>RAM</Td>
-                            <Td>{assetData?.ram}GB</Td>
+                            <Td className={styles.text2}>RAM:</Td>
+                            <Td className={`${styles.text3}`}>
+                              {assetData?.ram}GB
+                            </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Serial Number</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Serial number:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {assetData?.serialNumber}
                             </Td>
-                            <Td className={styles.text2}>Status</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Status:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {assetData?.status === 1
                                 ? 'Active'
                                 : assetData?.status === 2
@@ -792,8 +986,10 @@ function AssetDetailPage() {
                                 ? 'Deleted'
                                 : 'Unknown'}
                             </Td>
-                            <Td className={styles.text2}>Storage</Td>
-                            <Td>{assetData?.memory}GB</Td>
+                            <Td className={styles.text2}>Storage:</Td>
+                            <Td className={`${styles.text3}`}>
+                              {assetData?.memory}GB
+                            </Td>
                           </Tr>
                         </Tbody>
                       </Table>
@@ -825,7 +1021,7 @@ function AssetDetailPage() {
                               colSpan={4}
                               textAlign='center'
                             >
-                              Asset detail
+                              System
                             </Th>
                             <Th
                               className={styles.cTh}
@@ -838,110 +1034,128 @@ function AssetDetailPage() {
                         </Thead>
                         <Tbody>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Name</Td>
+                            <Td className={styles.text2}>Name:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.name}
                                 name='name'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               />
                             </Td>
-                            <Td className={styles.text2}>OS</Td>
-                            <Td>
-                              <Input
-                                value={assetData?.os}
-                                name='os'
-                                onChange={handleInputChange4}
-                              />
-                            </Td>
-                            <Td className={styles.text2}>CPU</Td>
+                            <Td className={styles.text2}>OS:</Td>
                             <Td className={styles.borderRight}>
+                              <Select
+                                name='os'
+                                value={assetData?.os}
+                                onChange={handleInputChange4}
+                                className={`${styles.text3}`}
+                              >
+                                <option value='Windows'>Windows</option>
+                                <option value='macOS'>macOS</option>
+                                <option value='Linux'>Linux</option>
+                                <option value='Android'>Android</option>
+                                <option value='iOS'>iOS</option>
+                              </Select>
+                            </Td>
+                            <Td className={styles.text2}>CPU:</Td>
+                            <Td>
                               <Input
                                 value={assetData?.cpu}
                                 name='cpu'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               />
                             </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Manufacturer</Td>
+                            <Td className={styles.text2}>Manufacturer:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.manufacturer}
                                 name='manufacturer'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               />
                             </Td>
-                            <Td className={styles.text2}>Version</Td>
-                            <Td>
+                            <Td className={styles.text2}>Version:</Td>
+                            <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.version}
                                 name='version'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               />
                             </Td>
-                            <Td className={styles.text2}>GPU</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>GPU:</Td>
+                            <Td>
                               <Input
                                 value={assetData?.gpu}
                                 name='gpu'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               />
                             </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Model</Td>
+                            <Td className={styles.text2}>Model:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.model}
                                 name='model'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               />
                             </Td>
-                            <Td className={styles.text2}>Last Updated</Td>
-                            <Td>
+                            <Td className={styles.text2}>Last updated:</Td>
+                            <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.lastSuccesfullScan}
                                 name='lastSuccesfullScan'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                                 disabled
                               />
                             </Td>
-                            <Td className={styles.text2}>RAM</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>RAM:</Td>
+                            <Td>
                               <Input
                                 value={assetData?.ram}
                                 name='ram'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               />
                             </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Serial Number</Td>
+                            <Td className={styles.text2}>Serial number:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.serialNumber}
                                 name='serialNumber'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               />
                             </Td>
-                            <Td className={styles.text2}>Status</Td>
-                            <Td>
+                            <Td className={styles.text2}>Status:</Td>
+                            <Td className={styles.borderRight}>
                               <Select
                                 name='status'
                                 value={assetData?.status}
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               >
                                 <option value='1'>Active</option>
                                 <option value='2'>Inactive</option>
                               </Select>
                             </Td>
-                            <Td className={styles.text2}>Memory</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Storage:</Td>
+                            <Td>
                               <Input
                                 value={assetData?.memory}
                                 name='memory'
                                 onChange={handleInputChange4}
+                                className={`${styles.text3}`}
                               />
                             </Td>
                           </Tr>
@@ -972,7 +1186,7 @@ function AssetDetailPage() {
                 <Flex>
                   <Box>
                     <InputGroup>
-                      <InputLeftAddon children='Name / publisher' />
+                      <InputLeftAddon children='Name / Publisher' />
                       <Input
                         type='text'
                         value={searchAppQuery}
@@ -991,7 +1205,9 @@ function AssetDetailPage() {
                         icon={<FaPlus />}
                         colorScheme='gray' // Choose an appropriate color
                         marginRight={1}
-                        onClick={() => setIsOpenAdd(true)}
+                        onClick={() => (
+                          setIsOpenAdd(true), setIsAntivirus(false)
+                        )}
                       />
                     </Tooltip>
                     <Tooltip label='Edit'>
@@ -1020,14 +1236,7 @@ function AssetDetailPage() {
                 <TableContainer>
                   <Table variant='striped' colorScheme='gray'>
                     <TableCaption>
-                      Total{' '}
-                      {
-                        filteredSoftwareData.filter(
-                          (item) =>
-                            item.type != 'Antivirus' && item.status != 3,
-                        ).length
-                      }{' '}
-                      software(s)
+                      Total {filteredSoftwareData.length} software(s)
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1044,30 +1253,25 @@ function AssetDetailPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredSoftwareData
-                        .filter(
-                          (item) =>
-                            item.type != 'Antivirus' && item.status != 3,
-                        )
-                        .map((item, index) => (
-                          <Tr
-                            cursor={'pointer'}
-                            key={item.softwareId}
-                            color={
-                              selectedRow1 === item.softwareId ? 'red' : 'black'
-                            } // Change background color for selected rows
-                            onClick={() => handleRowClick1(item)}
-                          >
-                            <Td>{index + 1}</Td>
-                            <Td>{item.name}</Td>
-                            <Td>{item.publisher}</Td>
-                            <Td>{item.version}</Td>
-                            <Td>{item.release}</Td>
-                            <Td>{item.type}</Td>
-                            <Td>{item.installDate}</Td>
-                            {/* <Td>{item.status ? 'Have Issue' : 'No Issue'}</Td> */}
-                          </Tr>
-                        ))}
+                      {filteredSoftwareData.map((item, index) => (
+                        <Tr
+                          cursor={'pointer'}
+                          key={item.softwareId}
+                          color={
+                            selectedRow3 === item.softwareId ? 'red' : 'black'
+                          } // Change background color for selected rows
+                          onClick={() => handleRowClick1(item)}
+                        >
+                          <Td>{index + 1}</Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.publisher}</Td>
+                          <Td>{item.version}</Td>
+                          <Td>{item.release}</Td>
+                          <Td>{item.type}</Td>
+                          <Td>{item.installDate}</Td>
+                          {/* <Td>{item.status ? 'Have Issue' : 'No Issue'}</Td> */}
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1076,8 +1280,32 @@ function AssetDetailPage() {
             <TabPanel>
               <ListItem className={styles.list} pt={0}>
                 <Flex>
+                  <Box>
+                    <InputGroup>
+                      <InputLeftAddon children='Name / Publisher' />
+                      <Input
+                        type='text'
+                        value={searchAppQuery1}
+                        onChange={handleSearchAppInputChange1}
+                        placeholder='search...'
+                        w={300}
+                        mr={1}
+                      />
+                    </InputGroup>
+                  </Box>
                   <Spacer />
                   <Box>
+                    <Tooltip label='Create'>
+                      <IconButton
+                        aria-label='Add'
+                        icon={<FaPlus />}
+                        colorScheme='gray' // Choose an appropriate color
+                        marginRight={1}
+                        onClick={() => (
+                          setIsOpenAdd(true), setIsAntivirus(true)
+                        )}
+                      />
+                    </Tooltip>
                     <Tooltip label='Edit'>
                       <IconButton
                         aria-label='Edit'
@@ -1085,7 +1313,7 @@ function AssetDetailPage() {
                         colorScheme='gray' // Choose an appropriate color
                         marginRight={1}
                         onClick={() => setIsOpenEdit(true)}
-                        isDisabled={isButtonDisabled1}
+                        isDisabled={isButtonDisabled3}
                       />
                     </Tooltip>
                     <Tooltip label='Delete'>
@@ -1094,7 +1322,7 @@ function AssetDetailPage() {
                         icon={<FaTrash />}
                         colorScheme='gray' // Choose an appropriate color
                         onClick={() => setIsOpenDelete(true)}
-                        isDisabled={isButtonDisabled1}
+                        isDisabled={isButtonDisabled3}
                       />
                     </Tooltip>
                   </Box>
@@ -1127,29 +1355,24 @@ function AssetDetailPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {data
-                        .filter(
-                          (item) =>
-                            item.type == 'Antivirus' && item.status != 3,
-                        )
-                        .map((item, index) => (
-                          <Tr
-                            cursor={'pointer'}
-                            key={item.softwareId}
-                            color={
-                              selectedRow1 === item.softwareId ? 'red' : 'black'
-                            } // Change background color for selected rows
-                            onClick={() => handleRowClick1(item)}
-                          >
-                            <Td>{index + 1}</Td>
-                            <Td>{item.name}</Td>
-                            <Td>{item.publisher}</Td>
-                            <Td>{item.version}</Td>
-                            <Td>{item.release}</Td>
-                            <Td>{item.installDate}</Td>
-                            {/* <Td>{item.status ? 'No Issues' : 'Have Issues'}</Td> */}
-                          </Tr>
-                        ))}
+                      {filteredAntivirusData.map((item, index) => (
+                        <Tr
+                          cursor={'pointer'}
+                          key={item.softwareId}
+                          color={
+                            selectedRow3 === item.softwareId ? 'red' : 'black'
+                          } // Change background color for selected rows
+                          onClick={() => handleRowClick3(item)}
+                        >
+                          <Td>{index + 1}</Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.publisher}</Td>
+                          <Td>{item.version}</Td>
+                          <Td>{item.release}</Td>
+                          <Td>{item.installDate}</Td>
+                          {/* <Td>{item.status ? 'No Issues' : 'Have Issues'}</Td> */}
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1240,6 +1463,155 @@ function AssetDetailPage() {
           </TabPanels>
         </Tabs>
       </List>
+
+      <Modal //Modal edit asset
+        isOpen={isOpenEditAsset}
+        onClose={() => setIsOpenEditAsset(false)}
+        closeOnOverlayClick={false}
+        size='4x1'
+      >
+        <ModalOverlay />
+        <ModalContent w='60ws'>
+          <ModalHeader>Edit Asset</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={8}>
+            <Grid templateColumns='repeat(3, 1fr)' gap={4}>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Name</FormLabel>
+                  <Input
+                    name='name'
+                    value={assetData.name}
+                    onChange={handleInputChange4}
+                    required
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Manufacturer</FormLabel>
+                  <Input
+                    name='manufacturer'
+                    value={assetData.manufacturer}
+                    onChange={handleInputChange4}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Model</FormLabel>
+                  <Input
+                    name='model'
+                    value={assetData.model}
+                    onChange={handleInputChange4}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Serial Number</FormLabel>
+                  <Input
+                    name='serialNumber'
+                    value={assetData.serialNumber}
+                    onChange={handleInputChange4}
+                  />
+                </FormControl>
+                {/* Add more fields for the first column */}
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>CPU</FormLabel>
+                  <Input
+                    name='cpu'
+                    value={assetData.cpu}
+                    onChange={handleInputChange4}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>GPU</FormLabel>
+                  <Input
+                    name='gpu'
+                    value={assetData.gpu}
+                    onChange={handleInputChange4}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>RAM</FormLabel>
+                  <Input
+                    name='ram'
+                    value={assetData.ram}
+                    onChange={handleInputChange4}
+                    type='number'
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Storage</FormLabel>
+                  <Input
+                    name='memory'
+                    value={assetData.memory}
+                    onChange={handleInputChange4}
+                    type='number'
+                  />
+                </FormControl>
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Operation System</FormLabel>
+                  <Select
+                    name='os'
+                    value={assetData.os}
+                    onChange={handleInputChange4}
+                  >
+                    <option value='Windows'>Windows</option>
+                    <option value='macOS'>macOS</option>
+                    <option value='Linux'>Linux</option>
+                    <option value='Android'>Android</option>
+                    <option value='iOS'>iOS</option>
+                  </Select>
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Version</FormLabel>
+                  <Input
+                    name='version'
+                    value={assetData.version}
+                    onChange={handleInputChange4}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>IP Address</FormLabel>
+                  <Input
+                    name='ipAddress'
+                    value={assetData.ipAddress}
+                    onChange={handleInputChange4}
+                  />
+                </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Bandwidth</FormLabel>
+                  <Input
+                    name='bandwidth'
+                    value={assetData.bandwidth}
+                    onChange={handleInputChange4}
+                  />
+                </FormControl>
+                {/* Add more fields for the second column */}
+              </GridItem>
+            </Grid>
+            {/* Additional fields can be added to the respective columns */}
+            <FormControl className={styles.formInput}>
+              <FormLabel>Status</FormLabel>
+              <Select
+                name='status'
+                value={assetData.status}
+                onChange={handleInputChange4}
+              >
+                <option value='1'>Active</option>
+                <option value='2'>Inactive</option>
+                {/* <option value='3'>Deleted</option> */}
+              </Select>
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={handleEditAsset}>
+              Save
+            </Button>
+            <Button onClick={() => setIsOpenEditAsset(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       <Modal //Modal edit license
         isOpen={isOpenEditLi}
@@ -1437,7 +1809,7 @@ function AssetDetailPage() {
                 <Box ml={6} mb={4}>
                   <Flex>
                     <InputGroup>
-                      <InputLeftAddon children='Name / publisher' />
+                      <InputLeftAddon children='Name / Publisher' />
                       <Input
                         type='text'
                         value={searchAddQuery}
@@ -1463,7 +1835,9 @@ function AssetDetailPage() {
                   <Table variant='simple'>
                     <Thead>
                       <Tr>
-                        <Th className={styles.cTh}>Add</Th>
+                        <Th className={styles.cTh} width='10px'>
+                          Add
+                        </Th>
                         <Th className={styles.cTh}>Name</Th>
                         <Th className={styles.cTh}>Publisher</Th>
                         <Th className={styles.cTh}>Versions</Th>
@@ -1477,6 +1851,11 @@ function AssetDetailPage() {
                           (item) =>
                             !softwareIdsInAsset.includes(item.softwareId),
                         )
+                        .filter((item) =>
+                          isAntivirus
+                            ? item.type === 'Antivirus'
+                            : item.type !== 'Antivirus',
+                        )
                         .filter(
                           (item) =>
                             item.status !== 3 &&
@@ -1489,14 +1868,16 @@ function AssetDetailPage() {
                         .map((item) => (
                           <Tr key={item.softwareId}>
                             <Td>
-                              <IconButton
-                                aria-label='Add'
-                                icon={<FaPlus />}
-                                colorScheme='gray' // Choose an appropriate color
-                                onClick={() => (
-                                  setShowModalTable(false), setFormData1(item)
-                                )}
-                              />
+                              <Tooltip label='Add software'>
+                                <IconButton
+                                  aria-label='Add'
+                                  icon={<FaPlus />}
+                                  colorScheme='gray' // Choose an appropriate color
+                                  onClick={() => (
+                                    setShowModalTable(false), setFormData1(item)
+                                  )}
+                                />
+                              </Tooltip>
                             </Td>
                             <Td>{item.name}</Td>
                             <Td>{item.publisher}</Td>

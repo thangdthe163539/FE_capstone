@@ -9,13 +9,13 @@
   width: 55%;
 }
 
-@media (max-width: 900px) {
+@media (min-width: 900px) {
   .homeBody {
     height: 70vh;
     /* background-color: #4d9ffe; */
   }
   .image1 {
-    width: 40%;
+    width: 50%;
   }
 }
 

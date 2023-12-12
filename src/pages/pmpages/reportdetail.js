@@ -281,10 +281,10 @@ function ReportPage(title) {
           <Link href='/pmpages/ListIssue' className={styles.listitem}>
             List Issue
           </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue formData
+          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue Detail
         </ListItem>
         <ListItem className={styles.list}>
-          <Text fontSize='2xl'>Issue formData</Text>
+          <Text fontSize='2xl'>Issue: {formData?.title}</Text>
         </ListItem>
         <ListItem className={styles.list}>
           <Flex direction='row' width='100%' justify='space-between'>
@@ -341,23 +341,17 @@ function ReportPage(title) {
             </Flex>
           </Flex>
           <Box>
-            <Flex>
-              <Text className={`${styles.text1} ${styles.text2}`}>Title: </Text>
-              <Text className={styles.text1}>{formData?.title}</Text>
-            </Flex>
             <FormControl>
-              <Text className={`${styles.text1}`} fontWeight='bold'>
-                Description
-              </Text>
+              <Text className={`${styles.text1}`}>Description</Text>
               <Textarea
                 name='description'
                 value={formData?.description}
                 onChange={handleDescriptionChange} // Add onChange handler
-                minH={200}
+                minH={120}
               />
             </FormControl>
           </Box>
-          <Grid templateColumns='repeat(1, 1fr)' gap={8}>
+          <Grid templateColumns='repeat(1, 1fr)' gap={8} mt={5}>
             <GridItem>
               <Flex>
                 <FormLabel style={{ width: '50px' }}>Image</FormLabel>

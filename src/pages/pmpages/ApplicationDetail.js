@@ -61,6 +61,7 @@ const defaultData = {
   assetId: '',
   libraryId: '',
   name: '',
+  os: 'Windows',
   version: '',
   publisher: '',
   type: '',
@@ -238,10 +239,8 @@ function SoftwarePage() {
       setIsOpenAdd(false); // Close the modal after successful save
       setShowModalAdd(true);
       setFormData4(defaultData);
-      // setSelectedRow1(new Set());
+      // setSelectedRow1(null);
       // Reload new data for the table
-
-      setData(newDataResponse.data);
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
       );
@@ -279,7 +278,8 @@ function SoftwarePage() {
         },
       );
       console.log('Data saved:', response.data);
-      setShowModalAdd(false);
+      setShowModalAdd(true);
+      setIsOpenAdd(true);
       setFormData4(defaultData);
       // Reload new data for the table
       const newDataResponse = await axios.get(
@@ -382,7 +382,7 @@ function SoftwarePage() {
       setIsOpenAddLi(false); // Close the modal after successful save
       setFormData3(defaultData2);
       setButtonDisabled1(true);
-      setSelectedRow1(new Set());
+      setSelectedRow1(null);
       // Reload new data for the table
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
@@ -417,7 +417,7 @@ function SoftwarePage() {
       setIsOpenEditLi(false); // Close the modal after successful save
       setButtonDisabled1(true);
       setFormData1(defaultData2);
-      setSelectedRow1(new Set());
+      setSelectedRow1(null);
       // Reload new data for the table
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
@@ -429,13 +429,21 @@ function SoftwarePage() {
   };
   const handleDeleteLi = async () => {
     try {
-      await axios.delete(
-        `${BACK_END_PORT}/api/Library/DeleteLibraryWith_key?libraryId=` +
-          formData1?.libraryId,
+      const response = await axios.put(
+        `${BACK_END_PORT}/api/Library/UpdateLibrary/` + formData1.libraryId,
+        {
+          appId: software.appId,
+          name: formData1.name,
+          publisher: formData1.publisher,
+          libraryKey: formData1.libraryKey,
+          start_Date: formData1.start_Date,
+          time: formData1.time,
+          status: 3,
+        },
       );
       setIsOpenDeleteLi(false); // Close the "Confirm Delete" modal
-      setSelectedRow1(new Set());
-
+      setSelectedRow1(null);
+      setButtonDisabled1(true);
       // Reload the data for the table after deletion
       const newDataResponse = await axios.get(
         `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
@@ -634,12 +642,16 @@ function SoftwarePage() {
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
-    filterAssets1();
-  }, [isOpenAdd, searchAddQuery, listAllAsset]);
+    if (deviceData.length || isOpenAdd || showModalAdd) {
+      filterAssets1();
+    }
+  }, [isOpenAdd, searchAddQuery, listAllAsset, showModalAdd]);
   // Update filtered data whenever the search query changes
   useEffect(() => {
-    filterAssets();
-  }, [searchQuery, deviceData]);
+    if (deviceData.length || isOpenAdd) {
+      filterAssets();
+    }
+  }, [searchQuery, deviceData, isOpenAdd]);
   useEffect(() => {
     filterLibrary();
   }, [searchQuery1, libraryData]);
@@ -812,40 +824,54 @@ function SoftwarePage() {
                       <Table>
                         <Tbody>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Name</Td>
-                            <Td className={styles.borderRight}>
-                              {appData?.name || 'loading'}
+                            <Td className={styles.text2}>Name:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
+                              {appData?.name}
                             </Td>
-                            <Td className={styles.text2}>Version</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Version:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {appData?.version}
                             </Td>
-                            <Td className={styles.text2}>OS</Td>
-                            <Td>{appData?.os}</Td>
+                            <Td className={styles.text2}>OS:</Td>
+                            <Td className={`${styles.text3}`}>{appData?.os}</Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Publisher</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Publisher:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {appData?.publisher}
                             </Td>
-                            <Td className={styles.text2}>Release</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Release:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {appData?.release}
                             </Td>
-                            <Td className={styles.text2}>OS version</Td>
-                            <Td>{appData?.osversion}</Td>
+                            <Td className={styles.text2}>OS Version:</Td>
+                            <Td className={`${styles.text3}`}>
+                              {appData?.osversion}
+                            </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Programming</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Programming:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {appData?.language}
                             </Td>
-                            <Td className={styles.text2}>Database</Td>
-                            <Td className={styles.borderRight}>
+                            <Td className={styles.text2}>Database:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
                               {appData?.db}
                             </Td>
-                            <Td className={styles.text2}>Status</Td>
-                            <Td>
+                            <Td className={styles.text2}>Status:</Td>
+                            <Td className={`${styles.text3}`}>
                               {appData?.status === 1
                                 ? 'Active'
                                 : appData?.status === 2
@@ -856,16 +882,20 @@ function SoftwarePage() {
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Download link</Td>
-                            <Td colSpan='5'>{appData?.download}</Td>
+                            <Td className={styles.text2}>Download link:</Td>
+                            <Td colSpan='5' className={`${styles.text3}`}>
+                              {appData?.download}
+                            </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Document link</Td>
-                            <Td colSpan='5'>{appData?.docs}</Td>
+                            <Td className={styles.text2}>Document link:</Td>
+                            <Td colSpan='5' className={`${styles.text3}`}>
+                              {appData?.docs}
+                            </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Description</Td>
-                            <Td colSpan='5' className={styles.truncate}>
+                            <Td className={styles.text2}>Description:</Td>
+                            <Td colSpan='5' className={`${styles.text3}`}>
                               {trimTextToMaxWidth(appData?.description, 800)}
                             </Td>
                           </Tr>
@@ -894,28 +924,31 @@ function SoftwarePage() {
                       <Table>
                         <Tbody>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Name</Td>
+                            <Td className={styles.text2}>Name:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 name='name'
                                 value={appData?.name}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
-                            <Td className={styles.text2}>Version</Td>
+                            <Td className={styles.text2}>Version:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 name='version'
                                 value={appData?.version}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
-                            <Td className={styles.text2}>OS</Td>
+                            <Td className={styles.text2}>OS:</Td>
                             <Td>
                               <Select
                                 name='os'
                                 value={appData?.os}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               >
                                 <option value='Windows'>Windows</option>
                                 <option value='macOS'>macOS</option>
@@ -926,54 +959,60 @@ function SoftwarePage() {
                             </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Publisher</Td>
+                            <Td className={styles.text2}>Publisher:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 name='publisher'
                                 value={appData?.publisher}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
-                            <Td className={styles.text2}>Release</Td>
+                            <Td className={styles.text2}>Release:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 name='release'
                                 value={appData?.release}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
-                            <Td className={styles.text2}>OS version</Td>
+                            <Td className={styles.text2}>OS Version:</Td>
                             <Td>
                               <Input
                                 name='osversion'
                                 value={appData?.osversion}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Programming</Td>
+                            <Td className={styles.text2}>Programming:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 name='language'
                                 value={appData?.language}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
-                            <Td className={styles.text2}>Database</Td>
+                            <Td className={styles.text2}>Database:</Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 name='db'
                                 value={appData?.db}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
-                            <Td className={styles.text2}>Status</Td>
+                            <Td className={styles.text2}>Status:</Td>
                             <Td>
                               <Select
                                 name='status'
                                 value={appData?.status}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               >
                                 <option value='1'>Active</option>
                                 <option value='2'>Inactive</option>
@@ -982,32 +1021,35 @@ function SoftwarePage() {
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Download link</Td>
+                            <Td className={styles.text2}>Download link:</Td>
                             <Td colSpan='5'>
                               <Input
                                 name='download'
                                 value={appData?.download}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Document link</Td>
+                            <Td className={styles.text2}>Document link:</Td>
                             <Td colSpan='5'>
                               <Input
                                 name='docs'
                                 value={appData?.docs}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Note</Td>
+                            <Td className={styles.text2}>Description:</Td>
                             <Td colSpan='5'>
                               <Input
                                 name='description'
                                 value={appData?.description}
                                 onChange={handleInputChange}
+                                className={styles.text3}
                               />
                             </Td>
                           </Tr>
@@ -1038,7 +1080,7 @@ function SoftwarePage() {
                 <Flex>
                   <Box>
                     <InputGroup>
-                      <InputLeftAddon children='Name / manufacturer / model' />
+                      <InputLeftAddon children='Name / Manufacturer / Model' />
                       <Input
                         type='text'
                         value={searchQuery}
@@ -1178,7 +1220,7 @@ function SoftwarePage() {
                 <Flex>
                   <Box>
                     <InputGroup>
-                      <InputLeftAddon children='Name / publisher' />
+                      <InputLeftAddon children='Name / Publisher' />
                       <Input
                         type='text'
                         value={searchQuery1}
@@ -1508,7 +1550,7 @@ function SoftwarePage() {
                 <Box ml={6} mb={4}>
                   <Flex>
                     <InputGroup>
-                      <InputLeftAddon children='Name / manufacturer' />
+                      <InputLeftAddon children='Name / Manufacturer' />
                       <Input
                         type='text'
                         value={searchAddQuery}
@@ -1645,11 +1687,17 @@ function SoftwarePage() {
                   <GridItem>
                     <FormControl>
                       <FormLabel>Operation System</FormLabel>
-                      <Input
+                      <Select
                         name='os'
                         value={formData4.os}
                         onChange={handleInputChange4}
-                      />
+                      >
+                        <option value='Windows'>Windows</option>
+                        <option value='macOS'>macOS</option>
+                        <option value='Linux'>Linux</option>
+                        <option value='Android'>Android</option>
+                        <option value='iOS'>iOS</option>
+                      </Select>
                     </FormControl>
                     <FormControl className={styles.formInput}>
                       <FormLabel>Version</FormLabel>
@@ -1933,6 +1981,7 @@ function SoftwarePage() {
                     name='ram'
                     value={formData2.ram}
                     onChange={handleInputChange2}
+                    type='number'
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1941,17 +1990,24 @@ function SoftwarePage() {
                     name='memory'
                     value={formData2.memory}
                     onChange={handleInputChange2}
+                    type='number'
                   />
                 </FormControl>
               </GridItem>
               <GridItem>
                 <FormControl>
                   <FormLabel>Operation System</FormLabel>
-                  <Input
+                  <Select
                     name='os'
                     value={formData2.os}
                     onChange={handleInputChange2}
-                  />
+                  >
+                    <option value='Windows'>Windows</option>
+                    <option value='macOS'>macOS</option>
+                    <option value='Linux'>Linux</option>
+                    <option value='Android'>Android</option>
+                    <option value='iOS'>iOS</option>
+                  </Select>
                 </FormControl>
                 <FormControl className={styles.formInput}>
                   <FormLabel>Version</FormLabel>
@@ -2003,7 +2059,7 @@ function SoftwarePage() {
         </ModalContent>
       </Modal>
 
-      <Modal //modal delete
+      <Modal //modal delete asset
         isOpen={isOpenDelete}
         onClose={() => setIsOpenDelete(false)}
       >
@@ -2023,7 +2079,7 @@ function SoftwarePage() {
         </ModalContent>
       </Modal>
 
-      <Modal //modal delete
+      <Modal //modal delete library
         isOpen={isOpenDeleteLi}
         onClose={() => setIsOpenDeleteLi(false)}
       >

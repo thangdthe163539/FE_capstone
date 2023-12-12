@@ -169,29 +169,37 @@ function SoftwarePage() {
       try {
         const mergedData = await Promise.all(
           data.map(async (software) => {
-            const response2 = await axios.get(
-              `${BACK_END_PORT}/api/Report/GetReportsForAppAndType/` +
-                software?.appId +
-                `/Feedback`,
-            );
-            const reports = response2.data;
-            const count1 = reports
-              .filter(
-                (report) =>
-                  report.type === 'Feedback' || report.type === 'feedback',
-              )
-              .filter((report) => report.status === 2).length;
-            const count2 = reports
-              .filter(
-                (report) =>
-                  report.type === 'Feedback' || report.type === 'feedback',
-              )
-              .filter((report) => report.status === 1).length;
-            return {
-              ...software,
-              done: count1 || 0, // Use '0' if count is falsy (including undefined)
-              doing: count2 || 0, // Use '0' if count is falsy (including undefined)
-            };
+            try {
+              const response2 = await axios.get(
+                `${BACK_END_PORT}/api/Report/GetReportsForAppAndType/` +
+                  software?.appId +
+                  `/Feedback`,
+              );
+              const reports = response2.data;
+              const count1 = reports
+                .filter(
+                  (report) =>
+                    report.type === 'Feedback' || report.type === 'feedback',
+                )
+                .filter((report) => report.status === 2).length;
+              const count2 = reports
+                .filter(
+                  (report) =>
+                    report.type === 'Feedback' || report.type === 'feedback',
+                )
+                .filter((report) => report.status === 1).length;
+              return {
+                ...software,
+                done: count1 || 0, // Use '0' if count is falsy (including undefined)
+                doing: count2 || 0, // Use '0' if count is falsy (including undefined)
+              };
+            } catch (error) {
+              return {
+                ...software,
+                done: 0, // Use '0' if count is falsy (including undefined)
+                doing: 0, // Use '0' if count is falsy (including undefined)
+              };
+            }
           }),
         );
         setSoftwareData(mergedData);
