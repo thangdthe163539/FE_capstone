@@ -567,7 +567,7 @@ function IssueDetailManagePage() {
                             {item.end_Date}
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
-                            {item.closedDate !== null ? item.closedDate : 'Null'}
+                            {item.closedDate !== null ? item.closedDate : 'In processing'}
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.status === 1

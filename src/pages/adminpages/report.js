@@ -288,7 +288,8 @@ function ReportPage() {
     })
       .then((response) => response.json())
       .then((data) => {
-        const sortedData = data.sort((a, b) => {
+        const filteredData = data.filter(item => item.status === 1 || item.status === 2);
+        const sortedData = filteredData.sort((a, b) => {
           if (a.status === 1 && b.status !== 1) {
             return -1;
           } else if (a.status !== 1 && b.status === 1) {
@@ -301,6 +302,7 @@ function ReportPage() {
         console.error('Lỗi:', error);
       });
   }, []);
+
 
   useEffect(() => {
     const url = 'http://localhost:5001/api/License/ListLicenses';
@@ -482,6 +484,7 @@ function ReportPage() {
           </TabList>
 
           <TabPanels>
+            {/* Application */}
             <TabPanel>
               <ListItem className={styles.list}>
                 <Flex marginBottom={5}>
@@ -601,8 +604,8 @@ function ReportPage() {
                             {app.status === 1
                               ? 'Active'
                               : app.status === 2
-                              ? 'Inactive'
-                              : 'Locked'}
+                                ? 'Inactive'
+                                : 'Deleted'}
                           </Td>
                         </Tr>
                       ))}
@@ -611,7 +614,7 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
-
+            {/* Asset */}
             <TabPanel>
               <ListItem className={styles.list}>
                 <Flex marginBottom={5}>
@@ -728,8 +731,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Active'
                               : item.status === 2
-                              ? 'Inactive'
-                              : 'Locked'}
+                                ? 'Inactive'
+                                : 'Deleted'}
                           </Td>
                         </Tr>
                       ))}
@@ -738,7 +741,7 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
-
+            {/* Feedback */}
             <TabPanel>
               <ListItem className={styles.list}>
                 <Flex marginBottom={5}>
@@ -864,16 +867,16 @@ function ReportPage() {
                           <Td style={{ textAlign: 'left' }}>
                             {item.closedDate !== null
                               ? item.closedDate
-                              : 'Null'}
+                              : 'In processing '}
                           </Td>
                           <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Unsolve'
                               : item.status === 2
-                              ? 'Solved'
-                              : item.status === 3
-                              ? 'Deleted'
-                              : 'Cancel'}
+                                ? 'Solved'
+                                : item.status === 3
+                                  ? 'Deleted'
+                                  : 'Cancel'}
                           </Td>
                         </Tr>
                       ))}
@@ -882,7 +885,7 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
-
+            {/* Issue */}
             <TabPanel>
               <ListItem className={styles.list}>
                 <Flex marginBottom={5}>
@@ -997,10 +1000,10 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Unsolve'
                               : item.status === 2
-                              ? 'Solved'
-                              : item.status === 3
-                              ? 'Deleted'
-                              : 'Cancel'}
+                                ? 'Solved'
+                                : item.status === 3
+                                  ? 'Deleted'
+                                  : 'Cancel'}
                           </Td>
                         </Tr>
                       ))}
@@ -1009,7 +1012,7 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
-
+            {/* App License */}
             <TabPanel>
               <ListItem className={styles.list}>
                 <Flex marginBottom={5}>
@@ -1124,8 +1127,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Closed source license '
                               : item.status === 2
-                              ? ' Open source license'
-                              : 'Not Determined'}
+                                ? ' Open source license'
+                                : 'Not Determined'}
                           </Td>
                         </Tr>
                       ))}
@@ -1246,8 +1249,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Closed source license '
                               : item.status === 2
-                              ? ' Open source license'
-                              : 'Not Determined'}
+                                ? ' Open source license'
+                                : 'Not Determined'}
                           </Td>
                         </Tr>
                       ))}
@@ -1277,7 +1280,7 @@ function ReportPage() {
                     }
                   </Text>
                   <Text style={{ marginLeft: '20px' }} color={'blue.400'}>
-                    Locked:
+                    Deleted:
                   </Text>
                   <Text style={{ marginLeft: '5px' }}>
                     {
@@ -1374,8 +1377,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Active'
                               : item.status === 2
-                              ? 'Inactive'
-                              : 'Locked'}
+                                ? 'Inactive'
+                                : 'Deleted'}
                           </Td>
                         </Tr>
                       ))}
@@ -1384,7 +1387,6 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
-
             {/* User */}
             <TabPanel>
               <ListItem className={styles.list}>
@@ -1483,8 +1485,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Active'
                               : item.status === 2
-                              ? 'Inactive'
-                              : 'Locked'}
+                                ? 'Inactive'
+                                : 'Locked'}
                           </Td>
                         </Tr>
                       ))}
