@@ -1258,7 +1258,7 @@ function AssetDetailPage() {
                           cursor={'pointer'}
                           key={item.softwareId}
                           color={
-                            selectedRow3 === item.softwareId ? 'red' : 'black'
+                            selectedRow1 === item.softwareId ? 'red' : 'black'
                           } // Change background color for selected rows
                           onClick={() => handleRowClick1(item)}
                         >

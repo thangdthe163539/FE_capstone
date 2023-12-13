@@ -1,4 +1,4 @@
-import { Box, Image, Flex, Button, Text } from '@chakra-ui/react';
+import { Box, Image, Flex, Button, Text, Spacer } from '@chakra-ui/react';
 import styles from '@/styles/Header.module.css';
 import Link from 'next/link';
 import { initializeApp } from 'firebase/app';
@@ -72,44 +72,37 @@ function Header() {
   return (
     <Box>
       <Flex className={`${styles.navbar}`}>
-        <Link className={`${styles.logo}`} href={'/'}>
-          <Image src='/lo-go.png' alt='SoftTrack Logo' boxSize='40px' />
-        </Link>
-        <Text className={`${styles.navbarLogo}`}>
-          <Link href={'/'}>SoftTrack</Link>
-        </Text>
-        <Text className={`${styles.navbarText}`}>You are not logged in.</Text>
-        <Text
-          style={{
-            fontSize: '20px',
-            textAlign: 'center',
-            marginTop: '-0.5%',
-            marginLeft: '0.5%',
-            color: '#344e74',
-          }}
-        >
-          (
-        </Text>
-        <Text onClick={handleGoogleLogin} className={`${styles.loggin}`}>
-          Login
-        </Text>
-        <Text
-          style={{
-            fontSize: '20px',
-            textAlign: 'center',
-            marginTop: '-0.5%',
-            color: '#344e74',
-          }}
-        >
-          )
-        </Text>
-        <Text style={{ paddingTop: '5px', position: 'fixed', right: '45%' }}>
-          {isSuccess === 'false' && (
-            <Text style={{ color: 'black' }}>
-              Login failed. Please try again!
+        <Box>
+          <Flex>
+            <Link className={`${styles.logo}`} href={'/'}>
+              <Image src='/lo-go.png' alt='SoftTrack Logo' boxSize='40px' />
+            </Link>
+            <Text className={`${styles.navbarLogo}`}>
+              <Link href={'/'}>SoftTrack</Link>
             </Text>
-          )}
-        </Text>
+          </Flex>
+        </Box>
+        <Spacer />
+        <Box>
+          <Flex>
+            <Text className={`${styles.navbarText}`}>
+              You are not logged in.(
+            </Text>
+            <Text onClick={handleGoogleLogin} className={`${styles.login}`}>
+              Login
+            </Text>
+            )
+            <Text
+              style={{ paddingTop: '5px', position: 'fixed', right: '45%' }}
+            >
+              {isSuccess === 'false' && (
+                <Text style={{ color: 'black' }}>
+                  Login failed. Please try again!
+                </Text>
+              )}
+            </Text>
+          </Flex>
+        </Box>
       </Flex>
     </Box>
   );

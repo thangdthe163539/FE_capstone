@@ -3,6 +3,7 @@
   align-items: center;
   position: fixed;
   width: 100%;
+  padding: 5px 20px;
 }
 
 .logo {
@@ -20,7 +21,7 @@
   line-height: normal;
   flex-shrink: 0;
   cursor: pointer;
-  margin-right: 3%;
+  /* margin-right: 3%; */
 }
 
 .navbarText {
@@ -33,11 +34,11 @@
   line-height: normal;
   flex-shrink: 0;
   cursor: pointer;
-  margin-left: 60%;
+  /* margin-left: 60%; */
   pointer-events: none;
 }
 
-.loggin {
+.login {
   color: rgb(232, 90, 90);
   text-align: center;
   font-family: Sanchez;
@@ -47,4 +48,8 @@
   line-height: normal;
   flex-shrink: 0;
   cursor: pointer;
+}
+
+.login:hover {
+  text-decoration: underline;
 }

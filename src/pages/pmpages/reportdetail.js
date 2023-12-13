@@ -290,7 +290,7 @@ function ReportPage(title) {
           <Flex direction='row' width='100%' justify='space-between'>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>Name:</Text>
-              <Text>{formData?.name}</Text>
+              <Text className={styles.text1}>{formData?.name}</Text>
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>Type:</Text>
@@ -333,6 +333,7 @@ function ReportPage(title) {
                 name='status'
                 value={formData?.status}
                 onChange={handleStatusChange} // Add onChange handler
+                border='none'
               >
                 <option value='1'>Unsolved</option>
                 <option value='2'>Solved</option>

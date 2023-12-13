@@ -19,7 +19,8 @@ function PaginationCustom({ current, onChange, total, pageSize, ...props }) {
         total={total}
         pageSize={pageSize ? pageSize : 10}
         itemRender={itemRender}
-      />
+        showSizeChanger={false}
+      /> 
     </Box>
   );
 }

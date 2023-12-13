@@ -332,6 +332,7 @@ function ReportPage(title) {
                 name='status'
                 value={formData?.status}
                 onChange={handleStatusChange} // Add onChange handler
+                border='none'
               >
                 <option value='1'>Unsolved</option>
                 <option value='2'>Solved</option>

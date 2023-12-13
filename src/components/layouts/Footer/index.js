@@ -26,7 +26,7 @@ function Footer() {
         <Box>
           <Text className={`${styles.contact}`}>Any question</Text>
           <Text>Phone number: 0974-421-458</Text>
-          <Text>Email: khangdt01001@gmail.com</Text>
+          <Text>Email: softtrackfpt@gmail.com</Text>
 
           {/* <Button className={`${styles.buttonContact}`} colorScheme='blue'>CONTACT US</Button> */}
         </Box>
