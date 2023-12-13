@@ -473,7 +473,7 @@ function FeedBackDetailManagePage() {
               children='Status'
             />
             <Select value={searchQueryTb} onChange={handleSearchTbInputChange} style={{ width: '100%' }}>
-              <option value="">All Feedback</option>
+              <option value="">All</option>
               <option value="Unsolve">Unsolve</option>
               <option value="Solved">Solved</option>
               <option value="Deleted">Deleted</option>
@@ -567,7 +567,7 @@ function FeedBackDetailManagePage() {
                             {item.start_Date}
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
-                            {item.closedDate !== null ? item.closedDate : 'Null'}
+                            {item.closedDate !== null ? item.closedDate : 'In processing'}
                           </Td>
                           <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
                             {item.status === 1
