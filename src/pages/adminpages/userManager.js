@@ -53,6 +53,23 @@ function UserManager() {
   const [searchQueryTb, setSearchQueryTb] = useState('');
   const notificationTimeout = 2000;
 
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        if (accountDataDecode.roleId !== 1) {
+          router.push('/page405');
+        }
+        // setAccount(accountDataDecode);
+      }
+    }
+  }, []);
+
   const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);

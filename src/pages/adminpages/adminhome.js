@@ -2,8 +2,28 @@ import { Box, ListItem, List, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import { Flex } from 'antd';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 function ADHomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        if (accountDataDecode.roleId !== 1) {
+          router.push('/page405');
+        }
+        // setAccount(accountDataDecode);
+      }
+    }
+  }, []);
   return (
     <Box className={styles.bodybox}>
       <List>

@@ -151,6 +151,13 @@ function ReportPage(title) {
           'Content-Type': 'multipart/form-data',
         },
       });
+      toast({
+        title: 'Issue Updated',
+        description: 'The issue has been successfully updated.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       router.push('/pmpages/ListIssue');
     } catch (error) {
       console.error('Lỗi:', error);

@@ -44,6 +44,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
+import PaginationCustom from '@/components/pagination';
 //
 function ReportPage() {
   const router = useRouter();
@@ -71,6 +72,147 @@ function ReportPage() {
     }
   }, []);
 
+  //pagination filteredDeviceData
+  const [appDataDynamic, setAppDataDynamic] = useState([]);
+  const itemPerPage = 6;
+  const [dynamicList1, setDynamicList1] = useState([]);
+  const [currentPage1, setCurrentPage1] = useState(1);
+  // filteredIssueData;
+  const handleChangePage1 = (page) => {
+    setCurrentPage1(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (appDataDynamic[i]) {
+        newList.push(appDataDynamic[i]);
+      }
+    }
+    setDynamicList1(newList);
+  };
+
+  const totalPages1 = appDataDynamic ? appDataDynamic?.length : 0;
+
+  useEffect(() => {
+    if (appDataDynamic.length) {
+      handleChangePage1(1);
+    } else {
+      setDynamicList1([]);
+    }
+  }, [appDataDynamic]);
+
+  //
+
+  //pagination filteredLibrary
+  const [assetDataDynamic, setAssetDataDynamic] = useState([]);
+  const [dynamicList2, setDynamicList2] = useState([]);
+  const [currentPage2, setCurrentPage2] = useState(1);
+  // filteredIssueData;
+  const handleChangePage2 = (page) => {
+    setCurrentPage2(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (assetDataDynamic[i]) {
+        newList.push(assetDataDynamic[i]);
+      }
+    }
+    setDynamicList2(newList);
+  };
+
+  const totalPages2 = assetDataDynamic ? assetDataDynamic?.length : 0;
+
+  useEffect(() => {
+    if (assetDataDynamic.length) {
+      handleChangePage2(1);
+    } else {
+      setDynamicList2([]);
+    }
+  }, [assetDataDynamic]);
+
+  //
+
+  //pagination filteredIssue
+  const [softwareDataDynamic, setSoftwareDataDynamic] = useState([]);
+  const [dynamicList3, setDynamicList3] = useState([]);
+  const [currentPage3, setCurrentPage3] = useState(1);
+  // filteredIssueData;
+  const handleChangePage3 = (page) => {
+    setCurrentPage3(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (softwareDataDynamic[i]) {
+        newList.push(softwareDataDynamic[i]);
+      }
+    }
+    setDynamicList3(newList);
+  };
+
+  const totalPages3 = softwareDataDynamic ? softwareDataDynamic?.length : 0;
+
+  useEffect(() => {
+    if (softwareDataDynamic.length) {
+      handleChangePage3(1);
+    } else {
+      setDynamicList3([]);
+    }
+  }, [softwareDataDynamic]);
+
+  //
+
+  //pagination filteredFeedback
+  const [libraryDataDynamic, setLibraryDataDynamic] = useState([]);
+  const [dynamicList4, setDynamicList4] = useState([]);
+  const [currentPage4, setCurrentPage4] = useState(1);
+  // filteredIssueData;
+  const handleChangePage4 = (page) => {
+    setCurrentPage4(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (libraryDataDynamic[i]) {
+        newList.push(libraryDataDynamic[i]);
+      }
+    }
+    setDynamicList4(newList);
+  };
+
+  const totalPages4 = libraryDataDynamic ? libraryDataDynamic?.length : 0;
+
+  useEffect(() => {
+    if (libraryDataDynamic.length) {
+      handleChangePage4(1);
+    } else {
+      setDynamicList4([]);
+    }
+  }, [libraryDataDynamic]);
+
+  //
+
+  //pagination AddIssue
+  const [licenseDataDynamic, setLicenseDataDynamic] = useState([]);
+  const [dynamicList5, setDynamicList5] = useState([]);
+  const [currentPage5, setCurrentPage5] = useState(1);
+  // filteredIssueData;
+  const handleChangePage5 = (page) => {
+    setCurrentPage5(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (licenseDataDynamic[i]) {
+        newList.push(licenseDataDynamic[i]);
+      }
+    }
+    setDynamicList5(newList);
+  };
+
+  const totalPages5 = licenseDataDynamic ? licenseDataDynamic?.length : 0;
+
+  useEffect(() => {
+    if (licenseDataDynamic.length) {
+      handleChangePage5(1);
+    } else {
+      setDynamicList5([]);
+    }
+  }, [licenseDataDynamic]);
+
+  //
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -78,6 +220,7 @@ function ReportPage() {
           `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
         );
         setAppData(response.data); // Assuming the API returns an array of objects
+        setAppDataDynamic(response.data);
         // const response2 = await axios.get(
         //   `${BACK_END_PORT}/api/Device/list_device_with_user` +
         //     account.accId,
@@ -160,7 +303,9 @@ function ReportPage() {
         );
 
         setAssetData(allAssets);
+        setAssetDataDynamic(allAssets);
         setLibraryData(allLibrary);
+        setLibraryDataDynamic(allLibrary);
       } catch (error) {
         setAssetData([]);
         console.error('Error fetching data:', error);
@@ -237,7 +382,9 @@ function ReportPage() {
             allSoftware[index] !== null && allLicense[index] !== null,
         );
         setSoftwareData(allSoftware);
+        setSoftwareDataDynamic(allSoftware);
         setLicenseData(allLicense);
+        setLicenseDataDynamic(allLicense);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -346,7 +493,20 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption>
-                      Total {appData.length} application(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {appDataDynamic.length} application(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage1}
+                          onChange={handleChangePage1}
+                          total={totalPages1}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -362,7 +522,7 @@ function ReportPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {appData.map((item, index) => (
+                      {dynamicList1.map((item, index) => (
                         <Tr key={item.appId}>
                           <Td>{index + 1}</Td>
                           <Td>{item.name}</Td>
@@ -410,9 +570,18 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      Total{' '}
-                      {assetData.filter((item) => item.status != 3).length}{' '}
-                      asset(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>Total {assetDataDynamic.length} asset(s)</Text>
+                        <PaginationCustom
+                          current={currentPage2}
+                          onChange={handleChangePage2}
+                          total={totalPages2}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -428,27 +597,25 @@ function ReportPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {assetData
-                        .filter((item) => item.status != 3)
-                        .map((item, index) => (
-                          <Tr key={item.assetId}>
-                            <Td>{index + 1}</Td>
-                            <Td>{item.name}</Td>
-                            <Td>{item.manufacturer}</Td>
-                            <Td>{item.model}</Td>
-                            <Td>{item.serialNumber}</Td>
-                            <Td>{item.lastSuccesfullScan}</Td>
-                            <Td>
-                              {item.status === 1
-                                ? 'Active'
-                                : item.status === 2
-                                ? 'Inactive'
-                                : item.status === 3
-                                ? 'Deleted'
-                                : 'Unknown'}
-                            </Td>
-                          </Tr>
-                        ))}
+                      {dynamicList2.map((item, index) => (
+                        <Tr key={item.assetId}>
+                          <Td>{index + 1}</Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.manufacturer}</Td>
+                          <Td>{item.model}</Td>
+                          <Td>{item.serialNumber}</Td>
+                          <Td>{item.lastSuccesfullScan}</Td>
+                          <Td>
+                            {item.status === 1
+                              ? 'Active'
+                              : item.status === 2
+                              ? 'Inactive'
+                              : item.status === 3
+                              ? 'Deleted'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -474,7 +641,20 @@ function ReportPage() {
                 <TableContainer>
                   <Table variant='striped' colorScheme='gray'>
                     <TableCaption>
-                      Total {softwareData.length} software(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {softwareDataDynamic.length} software(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage3}
+                          onChange={handleChangePage3}
+                          total={totalPages3}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -488,7 +668,7 @@ function ReportPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {softwareData.map((item, index) => (
+                      {dynamicList3.map((item, index) => (
                         <Tr cursor={'pointer'} key={item.softwareId}>
                           <Td>{index + 1}</Td>
                           <Td>{item.name}</Td>
@@ -528,7 +708,20 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      Total {libraryData.length} license(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {libraryDataDynamic.length} license(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage4}
+                          onChange={handleChangePage4}
+                          total={totalPages4}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -545,8 +738,8 @@ function ReportPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {libraryData.map((item, index) => (
-                        <Tr cursor={'pointer'} key={item.licenseId}>
+                      {dynamicList4.map((item, index) => (
+                        <Tr cursor={'pointer'} key={item.libraryId}>
                           <Td>{index + 1}</Td>
                           <Td>{item.appName}</Td>
                           <Td>{item.name}</Td>
@@ -594,7 +787,20 @@ function ReportPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      Total {licenseData.length} license(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {licenseDataDynamic.length} license(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage5}
+                          onChange={handleChangePage5}
+                          total={totalPages5}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -610,7 +816,7 @@ function ReportPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {licenseData.map((item, index) => (
+                      {dynamicList5.map((item, index) => (
                         <Tr cursor={'pointer'} key={item.licenseId}>
                           <Td>{index + 1}</Td>
                           <Td>{item.name}</Td>

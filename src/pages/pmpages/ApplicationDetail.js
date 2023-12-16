@@ -54,6 +54,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
+import PaginationCustom from '@/components/pagination';
 import Header2 from '@/components/layouts/Header/index2';
 //
 const defaultData = {
@@ -144,6 +145,163 @@ function SoftwarePage() {
   const [showEditApp, setShowEditApp] = useState(true);
   const toast = useToast();
   //
+  //pagination filteredDeviceData
+  const [filteredDeviceDataDynamic, setFilteredDeviceDataDynamic] = useState(
+    [],
+  );
+  const itemPerPage = 6;
+  const [dynamicList1, setDynamicList1] = useState([]);
+  const [currentPage1, setCurrentPage1] = useState(1);
+  // filteredIssueData;
+  const handleChangePage1 = (page) => {
+    setCurrentPage1(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredDeviceDataDynamic[i]) {
+        newList.push(filteredDeviceDataDynamic[i]);
+      }
+    }
+    setDynamicList1(newList);
+  };
+
+  const totalPages1 = filteredDeviceDataDynamic
+    ? filteredDeviceDataDynamic?.length
+    : 0;
+
+  useEffect(() => {
+    if (filteredDeviceDataDynamic.length) {
+      handleChangePage1(1);
+    } else {
+      setDynamicList1([]);
+    }
+  }, [filteredDeviceDataDynamic]);
+
+  //
+
+  //pagination filteredLibrary
+  const [filteredLibraryDataDynamic, setFilteredLibraryDataDynamic] = useState(
+    [],
+  );
+  const [dynamicList2, setDynamicList2] = useState([]);
+  const [currentPage2, setCurrentPage2] = useState(1);
+  // filteredIssueData;
+  const handleChangePage2 = (page) => {
+    setCurrentPage2(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredLibraryDataDynamic[i]) {
+        newList.push(filteredLibraryDataDynamic[i]);
+      }
+    }
+    setDynamicList2(newList);
+  };
+
+  const totalPages2 = filteredLibraryDataDynamic
+    ? filteredLibraryDataDynamic?.length
+    : 0;
+
+  useEffect(() => {
+    if (filteredLibraryDataDynamic.length) {
+      handleChangePage2(1);
+    } else {
+      setDynamicList2([]);
+    }
+  }, [filteredLibraryDataDynamic]);
+
+  //
+
+  //pagination filteredIssue
+  const [filteredAllIssueDataDynamic, setFilteredAllIssueDataDynamic] =
+    useState([]);
+  const [dynamicList3, setDynamicList3] = useState([]);
+  const [currentPage3, setCurrentPage3] = useState(1);
+  // filteredIssueData;
+  const handleChangePage3 = (page) => {
+    setCurrentPage3(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredAllIssueDataDynamic[i]) {
+        newList.push(filteredAllIssueDataDynamic[i]);
+      }
+    }
+    setDynamicList3(newList);
+  };
+
+  const totalPages3 = filteredAllIssueDataDynamic
+    ? filteredAllIssueDataDynamic?.length
+    : 0;
+
+  useEffect(() => {
+    if (filteredAllIssueDataDynamic.length) {
+      handleChangePage3(1);
+    } else {
+      setDynamicList3([]);
+    }
+  }, [filteredAllIssueDataDynamic]);
+
+  //
+
+  //pagination filteredFeedback
+  const [filteredAllFeedbackDataDynamic, setFilteredAllFeedbackDataDynamic] =
+    useState([]);
+  const [dynamicList4, setDynamicList4] = useState([]);
+  const [currentPage4, setCurrentPage4] = useState(1);
+  // filteredIssueData;
+  const handleChangePage4 = (page) => {
+    setCurrentPage4(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredAllFeedbackDataDynamic[i]) {
+        newList.push(filteredAllFeedbackDataDynamic[i]);
+      }
+    }
+    setDynamicList4(newList);
+  };
+
+  const totalPages4 = filteredAllFeedbackDataDynamic
+    ? filteredAllFeedbackDataDynamic?.length
+    : 0;
+
+  useEffect(() => {
+    if (filteredAllFeedbackDataDynamic.length) {
+      handleChangePage4(1);
+    } else {
+      setDynamicList4([]);
+    }
+  }, [filteredAllFeedbackDataDynamic]);
+
+  //
+
+  //pagination AddIssue
+  const [filteredAllAssetDataDynamic, setFilteredAllAssetDataDynamic] =
+    useState([]);
+  const [dynamicList5, setDynamicList5] = useState([]);
+  const [currentPage5, setCurrentPage5] = useState(1);
+  // filteredIssueData;
+  const handleChangePage5 = (page) => {
+    setCurrentPage5(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredAllAssetDataDynamic[i]) {
+        newList.push(filteredAllAssetDataDynamic[i]);
+      }
+    }
+    setDynamicList5(newList);
+  };
+
+  const totalPages5 = filteredAllAssetDataDynamic
+    ? filteredAllAssetDataDynamic?.length
+    : 0;
+
+  useEffect(() => {
+    if (filteredAllAssetDataDynamic.length) {
+      handleChangePage5(1);
+    } else {
+      setDynamicList5([]);
+    }
+  }, [filteredAllAssetDataDynamic]);
+
+  //
   //
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -212,6 +370,13 @@ function SoftwarePage() {
         `${BACK_END_PORT}/api/App/get_App_by_Id/` + software.appId,
       );
       setAppData(newDataResponse.data);
+      toast({
+        title: 'Application Updated',
+        description: 'The application has been successfully updated.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -245,6 +410,13 @@ function SoftwarePage() {
         `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
       );
       setDeviceData(newDataResponse.data);
+      toast({
+        title: 'Asset Added',
+        description: 'The asset has been successfully added.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -286,6 +458,13 @@ function SoftwarePage() {
         `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
       );
       setDeviceData(newDataResponse.data);
+      toast({
+        title: 'Asset Created',
+        description: 'The asset has been successfully created.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -323,6 +502,13 @@ function SoftwarePage() {
         `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
       );
       setDeviceData(newDataResponse.data);
+      toast({
+        title: 'Asset Updated',
+        description: 'The asset has been successfully updated.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -388,6 +574,13 @@ function SoftwarePage() {
         `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
       );
       setLibraryData(newDataResponse.data);
+      toast({
+        title: 'License Created',
+        description: 'The license has been successfully created.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -423,6 +616,13 @@ function SoftwarePage() {
         `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
       );
       setLibraryData(newDataResponse.data);
+      toast({
+        title: 'License Updated',
+        description: 'The license has been successfully updated.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -451,7 +651,7 @@ function SoftwarePage() {
       setLibraryData(newDataResponse.data);
       toast({
         title: 'License Deleted',
-        description: 'The asset has been successfully deleted.',
+        description: 'The license has been successfully deleted.',
         status: 'success',
         duration: 3000, // Duration in milliseconds
         isClosable: true,
@@ -603,6 +803,11 @@ function SoftwarePage() {
       );
     });
     setFilteredDeviceData(filteredData);
+    setFilteredDeviceDataDynamic(
+      filteredData.filter((item) =>
+        filterStatus3 !== -1 ? item.status === filterStatus3 : true,
+      ),
+    );
   };
   const filterLibrary = () => {
     const query = searchQuery1.toLowerCase();
@@ -612,6 +817,9 @@ function SoftwarePage() {
       return name.includes(query) || publisher.includes(query);
     });
     setFilteredLibraryData(filteredData);
+    setFilteredLibraryDataDynamic(
+      filteredData.filter((item) => item.status != 3),
+    );
   };
   const filterAssets1 = () => {
     const query = searchAddQuery.toLowerCase();
@@ -623,6 +831,11 @@ function SoftwarePage() {
         return name.includes(query) || manufacturer.includes(query);
       });
     setFilteredAllAssetData(filteredData);
+    setFilteredAllAssetDataDynamic(
+      filteredData
+        .filter((item) => !assetIdsInAsset.includes(item.assetId))
+        .filter((item) => item.status !== 3),
+    );
   };
   const filterIssue = () => {
     const query = searchQuery2.toLowerCase();
@@ -631,6 +844,11 @@ function SoftwarePage() {
       return title.includes(query);
     });
     setFilteredAllIssueData(filteredData);
+    setFilteredAllIssueDataDynamic(
+      filteredData.filter((item) =>
+        filterStatus1 !== -1 ? item.status === filterStatus1 : true,
+      ),
+    );
   };
   const filterFeedback = () => {
     const query = searchQuery3.toLowerCase();
@@ -639,6 +857,11 @@ function SoftwarePage() {
       return title.includes(query);
     });
     setFilteredAllFeedbackData(filteredData);
+    setFilteredAllFeedbackDataDynamic(
+      filteredData.filter((item) =>
+        filterStatus2 !== -1 ? item.status === filterStatus2 : true,
+      ),
+    );
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
@@ -651,16 +874,16 @@ function SoftwarePage() {
     if (deviceData.length || isOpenAdd) {
       filterAssets();
     }
-  }, [searchQuery, deviceData, isOpenAdd]);
+  }, [searchQuery, deviceData, isOpenAdd, filterStatus3]);
   useEffect(() => {
     filterLibrary();
   }, [searchQuery1, libraryData]);
   useEffect(() => {
     filterIssue();
-  }, [searchQuery2, reportData]);
+  }, [searchQuery2, reportData, filterStatus1]);
   useEffect(() => {
     filterFeedback();
-  }, [searchQuery3, feedbackData]);
+  }, [searchQuery3, feedbackData, filterStatus2]);
   //
 
   const handleDetail = (item) => {
@@ -828,33 +1051,35 @@ function SoftwarePage() {
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.name}
+                              {appData?.name ? appData?.name : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>Version:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.version}
+                              {appData?.version ? appData?.version : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>OS:</Td>
-                            <Td className={`${styles.text3}`}>{appData?.os}</Td>
+                            <Td className={`${styles.text3}`}>
+                              {appData?.os ? appData?.os : 'N/A'}
+                            </Td>
                           </Tr>
                           <Tr>
                             <Td className={styles.text2}>Publisher:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.publisher}
+                              {appData?.publisher ? appData?.publisher : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>Release:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.release}
+                              {appData?.release ? appData?.release : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>OS Version:</Td>
                             <Td className={`${styles.text3}`}>
-                              {appData?.osversion}
+                              {appData?.osversion ? appData?.osversion : 'N/A'}
                             </Td>
                           </Tr>
                           <Tr>
@@ -862,13 +1087,13 @@ function SoftwarePage() {
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.language}
+                              {appData?.language ? appData?.language : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>Database:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.db}
+                              {appData?.db ? appData?.db : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>Status:</Td>
                             <Td className={`${styles.text3}`}>
@@ -884,19 +1109,24 @@ function SoftwarePage() {
                           <Tr className={styles.borderTop}>
                             <Td className={styles.text2}>Download link:</Td>
                             <Td colSpan='5' className={`${styles.text3}`}>
-                              {appData?.download}
+                              {appData?.download ? appData?.download : 'N/A'}
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
                             <Td className={styles.text2}>Document link:</Td>
                             <Td colSpan='5' className={`${styles.text3}`}>
-                              {appData?.docs}
+                              {appData?.docs ? appData?.docs : 'N/A'}
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
                             <Td className={styles.text2}>Description:</Td>
                             <Td colSpan='5' className={`${styles.text3}`}>
-                              {trimTextToMaxWidth(appData?.description, 800)}
+                              {trimTextToMaxWidth(
+                                appData?.description
+                                  ? appData?.description
+                                  : 'N/A',
+                                800,
+                              )}
                             </Td>
                           </Tr>
                         </Tbody>
@@ -1148,15 +1378,20 @@ function SoftwarePage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      Total{' '}
-                      {
-                        filteredDeviceData.filter((item) =>
-                          filterStatus3 !== -1
-                            ? item.status === filterStatus3
-                            : true,
-                        ).length
-                      }{' '}
-                      asset(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {filteredDeviceDataDynamic.length} asset(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage1}
+                          onChange={handleChangePage1}
+                          total={totalPages1}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1172,44 +1407,44 @@ function SoftwarePage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredDeviceData
-                        .filter((item) =>
-                          filterStatus3 !== -1
-                            ? item.status === filterStatus3
-                            : true,
-                        )
-                        .map((item, index) => (
-                          <Tr
-                            key={item.assetId}
-                            color={
-                              selectedRow === item.assetId ? 'red' : 'black'
-                            }
-                            onClick={() => handleRowClick(item)}
-                          >
-                            <Td>{index + 1}</Td>
-                            <Td className={styles.listitem}>
-                              <Link
-                                href={'/pmpages/AssetDetail'}
-                                onClick={() => handleDetail(item)}
-                              >
-                                {item.name}
-                              </Link>
-                            </Td>
-                            <Td>{item.manufacturer}</Td>
-                            <Td>{item.model}</Td>
-                            <Td>{item.serialNumber}</Td>
-                            <Td>{item.lastSuccesfullScan}</Td>
-                            <Td>
-                              {item.status === 1
-                                ? 'Active'
-                                : item.status === 2
-                                ? 'Inactive'
-                                : item.status === 3
-                                ? 'Deleted'
-                                : 'Unknown'}
-                            </Td>
-                          </Tr>
-                        ))}
+                      {dynamicList1.map((item, index) => (
+                        <Tr
+                          key={item.assetId}
+                          color={selectedRow === item.assetId ? 'red' : 'black'}
+                          onClick={() => handleRowClick(item)}
+                        >
+                          <Td>{index + 1}</Td>
+                          <Td className={styles.listitem}>
+                            <Link
+                              href={'/pmpages/AssetDetail'}
+                              onClick={() => handleDetail(item)}
+                            >
+                              {item.name ? item.name : 'N/A'}
+                            </Link>
+                          </Td>
+                          <Td>
+                            {item.manufacturer ? item.manufacturer : 'N/A'}
+                          </Td>
+                          <Td>{item.model ? item.model : 'N/A'}</Td>
+                          <Td>
+                            {item.serialNumber ? item.serialNumber : 'N/A'}
+                          </Td>
+                          <Td>
+                            {item.lastSuccesfullScan
+                              ? item.lastSuccesfullScan
+                              : 'N/A'}
+                          </Td>
+                          <Td>
+                            {item.status === 1
+                              ? 'Active'
+                              : item.status === 2
+                              ? 'Inactive'
+                              : item.status === 3
+                              ? 'Deleted'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1272,12 +1507,20 @@ function SoftwarePage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      Total{' '}
-                      {
-                        filteredLibraryData.filter((item) => item.status != 3)
-                          .length
-                      }{' '}
-                      license(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {filteredLibraryDataDynamic.length} license(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage2}
+                          onChange={handleChangePage2}
+                          total={totalPages2}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1293,32 +1536,30 @@ function SoftwarePage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredLibraryData
-                        .filter((item) => item.status != 3)
-                        .map((item, index) => (
-                          <Tr
-                            cursor={'pointer'}
-                            key={item.libraryId}
-                            color={
-                              selectedRow1 === item.libraryId ? 'red' : 'black'
-                            }
-                            onClick={() => handleRowClick1(item)}
-                          >
-                            <Td>{index + 1}</Td>
-                            <Td>{item.name}</Td>
-                            <Td>{item.publisher}</Td>
-                            <Td>{item.libraryKey}</Td>
-                            <Td>{item.start_Date}</Td>
-                            <Td>
-                              {calculateEndDate(item.start_Date, item.time)}
-                            </Td>
-                            <Td>
-                              {item.status === 1
-                                ? 'Close source license'
-                                : 'Open source license'}
-                            </Td>
-                          </Tr>
-                        ))}
+                      {dynamicList2.map((item, index) => (
+                        <Tr
+                          cursor={'pointer'}
+                          key={item.libraryId}
+                          color={
+                            selectedRow1 === item.libraryId ? 'red' : 'black'
+                          }
+                          onClick={() => handleRowClick1(item)}
+                        >
+                          <Td>{index + 1}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>{item.publisher ? item.publisher : 'N/A'}</Td>
+                          <Td>{item.libraryKey ? item.libraryKey : 'N/A'}</Td>
+                          <Td>{item.start_Date ? item.start_Date : 'N/A'}</Td>
+                          <Td>
+                            {calculateEndDate(item.start_Date, item.time)}
+                          </Td>
+                          <Td>
+                            {item.status === 1
+                              ? 'Close source license'
+                              : 'Open source license'}
+                          </Td>
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1368,15 +1609,20 @@ function SoftwarePage() {
                     className={styles.cTable}
                   >
                     <TableCaption>
-                      Total{' '}
-                      {
-                        filteredAllIssueData.filter((item) =>
-                          filterStatus1 !== -1
-                            ? item.status === filterStatus1
-                            : true,
-                        ).length
-                      }{' '}
-                      issue(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {filteredAllIssueDataDynamic.length} issue(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage3}
+                          onChange={handleChangePage3}
+                          total={totalPages3}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1391,36 +1637,30 @@ function SoftwarePage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredAllIssueData
-                        .filter((item) =>
-                          filterStatus1 !== -1
-                            ? item.status === filterStatus1
-                            : true,
-                        )
-                        .map((item, index) => (
-                          <Tr key={item.reportId}>
-                            <Td>{index + 1}</Td>
-                            <Td>{item.title}</Td>
-                            <Td>{item.start_Date}</Td>
-                            <Td>{item.end_Date}</Td>
-                            <Td>
-                              {item.closedDate !== null
-                                ? item.end_Date
-                                : 'In processing'}
-                            </Td>
-                            <Td>
-                              {item.status === 1
-                                ? 'Unsolved'
-                                : item.status === 2
-                                ? 'Solved'
-                                : item.status === 3
-                                ? 'Deleted'
-                                : item.status === 4
-                                ? 'Canceled'
-                                : 'Unknown'}
-                            </Td>
-                          </Tr>
-                        ))}
+                      {dynamicList3.map((item, index) => (
+                        <Tr key={item.reportId}>
+                          <Td>{index + 1}</Td>
+                          <Td>{item.title ? item.title : 'N/A'}</Td>
+                          <Td>{item.start_Date ? item.start_Date : 'N/A'}</Td>
+                          <Td>{item.end_Date ? item.end_Date : 'N/A'}</Td>
+                          <Td>
+                            {item.closedDate !== null
+                              ? item.closedDate
+                              : 'In processing'}
+                          </Td>
+                          <Td>
+                            {item.status === 1
+                              ? 'Unsolved'
+                              : item.status === 2
+                              ? 'Solved'
+                              : item.status === 3
+                              ? 'Deleted'
+                              : item.status === 4
+                              ? 'Canceled'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1470,15 +1710,21 @@ function SoftwarePage() {
                     className={styles.cTable}
                   >
                     <TableCaption>
-                      Total{' '}
-                      {
-                        filteredAllFeedbackData.filter((item) =>
-                          filterStatus2 !== -1
-                            ? item.status === filterStatus2
-                            : true,
-                        ).length
-                      }{' '}
-                      feedback(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {filteredAllFeedbackDataDynamic.length}{' '}
+                          feedback(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage4}
+                          onChange={handleChangePage4}
+                          total={totalPages4}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1492,35 +1738,29 @@ function SoftwarePage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredAllFeedbackData
-                        .filter((item) =>
-                          filterStatus2 !== -1
-                            ? item.status === filterStatus2
-                            : true,
-                        )
-                        .map((item, index) => (
-                          <Tr key={item.reportId}>
-                            <Td>{index + 1}</Td>
-                            <Td>{item.title}</Td>
-                            <Td>{item.start_Date}</Td>
-                            <Td>
-                              {item.end_Date !== null
-                                ? item.end_Date
-                                : 'In processing'}
-                            </Td>
-                            <Td>
-                              {item.status === 1
-                                ? 'Unsolved'
-                                : item.status === 2
-                                ? 'Solved'
-                                : item.status === 3
-                                ? 'Deleted'
-                                : item.status === 4
-                                ? 'Canceled'
-                                : 'Unknown'}
-                            </Td>
-                          </Tr>
-                        ))}
+                      {dynamicList4.map((item, index) => (
+                        <Tr key={item.reportId}>
+                          <Td>{index + 1}</Td>
+                          <Td>{item.title ? item.title : 'N/A'}</Td>
+                          <Td>{item.start_Date ? item.start_Date : 'N/A'}</Td>
+                          <Td>
+                            {item.closedDate !== null
+                              ? item.closedDate
+                              : 'In processing'}
+                          </Td>
+                          <Td>
+                            {item.status === 1
+                              ? 'Unsolved'
+                              : item.status === 2
+                              ? 'Solved'
+                              : item.status === 3
+                              ? 'Deleted'
+                              : item.status === 4
+                              ? 'Canceled'
+                              : 'Unknown'}
+                          </Td>
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1541,7 +1781,7 @@ function SoftwarePage() {
         <ModalOverlay />
         <ModalContent w={showModalAdd ? 'fit-content' : '50vw'} maxW='100vw'>
           <ModalHeader>
-            {showModalAdd ? 'Add Asset' : 'Create New Asset'}
+            {showModalAdd ? 'Add asset' : 'Create new asset'}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
@@ -1574,6 +1814,14 @@ function SoftwarePage() {
                 </Box>
                 <TableContainer>
                   <Table simple>
+                    <TableCaption>
+                      <PaginationCustom
+                        current={currentPage5}
+                        onChange={handleChangePage5}
+                        total={totalPages5}
+                        pageSize={itemPerPage}
+                      />
+                    </TableCaption>
                     <Thead>
                       <Tr>
                         <Th className={styles.cTh}>Add</Th>
@@ -1582,31 +1830,32 @@ function SoftwarePage() {
                         <Th className={styles.cTh}>Model</Th>
                         <Th className={styles.cTh}>CPU</Th>
                         <Th className={styles.cTh}>GPU</Th>
+                        <Th className={styles.cTh}>RAM</Th>
+                        <Th className={styles.cTh}>Storage</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredAllAssetData
-                        .filter(
-                          (item) => !assetIdsInAsset.includes(item.assetId),
-                        )
-                        .filter((item) => item.status !== 3)
-                        .map((item) => (
-                          <Tr key={item.assetId}>
-                            <Td>
-                              <IconButton
-                                aria-label='Add'
-                                icon={<FaPlus />}
-                                colorScheme='gray' // Choose an appropriate color
-                                onClick={() => handleSaveAdd(item)}
-                              />
-                            </Td>
-                            <Td>{item.name}</Td>
-                            <Td>{item.manufacturer}</Td>
-                            <Td>{item.model}</Td>
-                            <Td>{item.cpu}</Td>
-                            <Td>{item.gpu}</Td>
-                          </Tr>
-                        ))}
+                      {dynamicList5.map((item) => (
+                        <Tr key={item.assetId}>
+                          <Td>
+                            <IconButton
+                              aria-label='Add'
+                              icon={<FaPlus />}
+                              colorScheme='gray' // Choose an appropriate color
+                              onClick={() => handleSaveAdd(item)}
+                            />
+                          </Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>
+                            {item.manufacturer ? item.manufacturer : 'N/A'}
+                          </Td>
+                          <Td>{item.model ? item.model : 'N/A'}</Td>
+                          <Td>{item.cpu ? item.cpu : 'N/A'}</Td>
+                          <Td>{item.gpu ? item.gpu : 'N/A'}</Td>
+                          <Td>{item.ram ? item.ram + 'GB' : 'N/A'}</Td>
+                          <Td>{item.memory ? item.memory + 'GB' : 'N/A'}</Td>
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1763,7 +2012,7 @@ function SoftwarePage() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New License</ModalHeader>
+          <ModalHeader>Add new license</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(2, 1fr)' gap={4}>
@@ -1837,7 +2086,7 @@ function SoftwarePage() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Edit License</ModalHeader>
+          <ModalHeader>Edit license</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(2, 1fr)' gap={4}>
@@ -1912,7 +2161,7 @@ function SoftwarePage() {
       >
         <ModalOverlay />
         <ModalContent w='60ws'>
-          <ModalHeader>Edit Asset</ModalHeader>
+          <ModalHeader>Edit asset</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={4}>
@@ -2065,7 +2314,7 @@ function SoftwarePage() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalHeader>Confirm delete</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Text>Are you sure you want to delete this asset?</Text>
@@ -2085,7 +2334,7 @@ function SoftwarePage() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalHeader>Confirm delete</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Text>Are you sure you want to delete this license?</Text>

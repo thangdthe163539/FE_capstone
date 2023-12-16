@@ -61,6 +61,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../../env';
+import PaginationCustom from '@/components/pagination';
 
 function AssetDetailPage() {
   //
@@ -121,6 +122,131 @@ function AssetDetailPage() {
   const [filteredAllSoftwareData, setFilteredAllSoftwareData] = useState([]);
   const [software, setSoftware] = useState();
   const [isAntivirus, setIsAntivirus] = useState(false);
+  //pagination software data
+  const itemPerPage = 6;
+  const [filteredSoftwareDataDynamic, setFilteredSoftwareDataDynamic] =
+    useState([]);
+  const [dynamicList1, setDynamicList1] = useState([]);
+  const [currentPage1, setCurrentPage1] = useState(1);
+  // filteredIssueData;
+  const handleChangePage1 = (page) => {
+    setCurrentPage1(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredSoftwareDataDynamic[i]) {
+        newList.push(filteredSoftwareDataDynamic[i]);
+      }
+    }
+    setDynamicList1(newList);
+  };
+
+  const totalPages1 = filteredSoftwareDataDynamic
+    ? filteredSoftwareDataDynamic?.length
+    : 0;
+
+  useEffect(() => {
+    if (filteredSoftwareDataDynamic.length) {
+      handleChangePage1(1);
+    } else {
+      setDynamicList1([]);
+    }
+  }, [filteredSoftwareDataDynamic]);
+
+  //
+
+  //pagination anti virus
+  const [filteredAntivirusDataDynamic, setFilteredAntivirusDataDynamic] =
+    useState([]);
+  const [dynamicList2, setDynamicList2] = useState([]);
+  const [currentPage2, setCurrentPage2] = useState(1);
+  // filteredIssueData;
+  const handleChangePage2 = (page) => {
+    setCurrentPage2(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredAntivirusDataDynamic[i]) {
+        newList.push(filteredAntivirusDataDynamic[i]);
+      }
+    }
+    setDynamicList2(newList);
+  };
+
+  const totalPages2 = filteredAntivirusDataDynamic
+    ? filteredAntivirusDataDynamic?.length
+    : 0;
+
+  useEffect(() => {
+    if (filteredAntivirusDataDynamic.length) {
+      handleChangePage2(1);
+    } else {
+      setDynamicList2([]);
+    }
+  }, [filteredAntivirusDataDynamic]);
+
+  //
+
+  //pagination lisence
+  const [filteredLicenseDataDynamic, setFilteredLicenseDataDynamic] = useState(
+    [],
+  );
+  const [dynamicList3, setDynamicList3] = useState([]);
+  const [currentPage3, setCurrentPage3] = useState(1);
+  // filteredIssueData;
+  const handleChangePage3 = (page) => {
+    setCurrentPage3(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredLicenseDataDynamic[i]) {
+        newList.push(filteredLicenseDataDynamic[i]);
+      }
+    }
+    setDynamicList3(newList);
+  };
+
+  const totalPages3 = filteredLicenseDataDynamic
+    ? filteredLicenseDataDynamic?.length
+    : 0;
+
+  useEffect(() => {
+    if (filteredLicenseDataDynamic.length) {
+      handleChangePage3(1);
+    } else {
+      setDynamicList3([]);
+    }
+  }, [filteredLicenseDataDynamic]);
+
+  //
+
+  //pagination add software
+  const [filteredAllSoftwareDataDynamic, setFilteredAllSoftwareDataDynamic] =
+    useState([]);
+  const [dynamicList4, setDynamicList4] = useState([]);
+  const [currentPage4, setCurrentPage4] = useState(1);
+  // filteredIssueData;
+  const handleChangePage4 = (page) => {
+    setCurrentPage4(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (filteredAllSoftwareDataDynamic[i]) {
+        newList.push(filteredAllSoftwareDataDynamic[i]);
+      }
+    }
+    setDynamicList4(newList);
+  };
+
+  const totalPages4 = filteredAllSoftwareDataDynamic
+    ? filteredAllSoftwareDataDynamic?.length
+    : 0;
+
+  useEffect(() => {
+    if (filteredAllSoftwareDataDynamic.length) {
+      handleChangePage4(1);
+    } else {
+      setDynamicList4([]);
+    }
+  }, [filteredAllSoftwareDataDynamic]);
+
+  //
 
   useEffect(() => {
     const data = localStorage.getItem('software');
@@ -245,26 +371,19 @@ function AssetDetailPage() {
         status = 1;
       }
       const response = await axios.post(
-        `${BACK_END_PORT}/api/Software_Asset/CreateWithHaveLicenseAndSoftware`,
+        `${BACK_END_PORT}/api/Software/CreateSoftware`,
         {
-          assetId: device.assetId,
           name: formData.name,
           publisher: formData.publisher,
           version: formData.version,
           release: formData.release,
           type: formData.type,
           os: formData.os,
-          installDate: currentDateOnly,
-          licenseKey: formData.licenseKey,
-          start_Date: formattedStartDate,
-          time: formData.time,
-          status_License: status,
-          status_Software: 1,
-          status_AssetSoftware: 1,
+          status: status,
         },
       );
       console.log('Data saved:', response.data);
-      setIsOpenAdd(false); // Close the modal after successful save
+      setIsOpenAdd(true); // Close the modal after successful save
       setShowModalAdd(false);
       setShowModalTable(true);
       setFormData(defaultData);
@@ -279,6 +398,13 @@ function AssetDetailPage() {
         `${BACK_END_PORT}/api/License/list_Licenses_by_Asset/` + device.assetId,
       );
       setDataLicense(response2.data);
+      toast({
+        title: 'Software Created',
+        description: 'The software has been successfully created.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -338,6 +464,13 @@ function AssetDetailPage() {
         `${BACK_END_PORT}/api/License/list_Licenses_by_Asset/` + device.assetId,
       );
       setDataLicense(response2.data);
+      toast({
+        title: 'Software Added',
+        description: 'The software has been successfully added.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -374,6 +507,13 @@ function AssetDetailPage() {
         `${BACK_END_PORT}/api/Asset/GetAssetsById/` + device?.assetId,
       );
       setAssetData(newDataResponse.data);
+      toast({
+        title: 'Asset Updated',
+        description: 'The asset has been successfully updated.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -409,6 +549,13 @@ function AssetDetailPage() {
         `${BACK_END_PORT}/api/License/list_Licenses_by_Asset/` + device.assetId,
       );
       setDataLicense(response2.data);
+      toast({
+        title: 'License Updated',
+        description: 'The license has been successfully updated.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -474,6 +621,13 @@ function AssetDetailPage() {
           device.assetId,
       );
       setData(newDataResponse.data);
+      toast({
+        title: 'Software Updated',
+        description: 'The software has been successfully updated.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -573,6 +727,7 @@ function AssetDetailPage() {
         return name.includes(query) || publisher.includes(query);
       });
     setFilteredSoftwareData(filteredData);
+    setFilteredSoftwareDataDynamic(filteredData);
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
@@ -588,6 +743,7 @@ function AssetDetailPage() {
         return name.includes(query) || publisher.includes(query);
       });
     setFilteredAntivirusData(filteredData);
+    setFilteredAntivirusDataDynamic(filteredData);
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
@@ -607,11 +763,33 @@ function AssetDetailPage() {
         return name.includes(query) || publisher.includes(query);
       });
     setFilteredAllSoftwareData(filteredData);
+    setFilteredAllSoftwareDataDynamic(
+      filteredData
+        .filter((item) => !softwareIdsInAsset.includes(item.softwareId))
+        .filter((item) =>
+          isAntivirus ? item.type === 'Antivirus' : item.type !== 'Antivirus',
+        )
+        .filter(
+          (item) =>
+            item.status !== 3 &&
+            item.os &&
+            device.os &&
+            device.os.toLowerCase().includes(item.os.toLowerCase()),
+        ),
+    );
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
-    filterAssets();
-  }, [isOpenAdd, searchAddQuery, listAllSoftware]);
+    if (listAllSoftware.length || isOpenAdd || showModalTable) {
+      filterAssets();
+    }
+  }, [
+    isOpenAdd,
+    searchAddQuery,
+    listAllSoftware,
+    showModalTable,
+    showModalAdd,
+  ]);
   //
   const filterLicense = () => {
     const query = searchLiQuery.toLowerCase();
@@ -624,6 +802,7 @@ function AssetDetailPage() {
       }
     });
     setFilteredLicenseData(filteredData);
+    setFilteredLicenseDataDynamic(filteredData);
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
@@ -769,23 +948,27 @@ function AssetDetailPage() {
                           <Td
                             className={`${styles.text3} ${styles.borderRight}`}
                           >
-                            {assetData?.name}
+                            {assetData?.name ? assetData?.name : 'N/A'}
                           </Td>
                           <Td className={styles.text2}>Manufacturer:</Td>
                           <Td
                             className={`${styles.text3} ${styles.borderRight}`}
                           >
-                            {assetData?.manufacturer}
+                            {assetData?.manufacturer
+                              ? assetData?.manufacturer
+                              : 'N/A'}
                           </Td>
                           <Td className={styles.text2}>Model:</Td>
                           <Td
                             className={`${styles.text3} ${styles.borderRight}`}
                           >
-                            {assetData?.model}
+                            {assetData?.model ? assetData?.model : 'N/A'}
                           </Td>
                           <Td className={styles.text2}>Serial number:</Td>
                           <Td className={`${styles.text3}`}>
-                            {assetData?.serialNumber}
+                            {assetData?.serialNumber
+                              ? assetData?.serialNumber
+                              : 'N/A'}
                           </Td>
                         </Tr>
                         <Tr>
@@ -793,14 +976,14 @@ function AssetDetailPage() {
                           <Td
                             className={`${styles.text3} ${styles.borderRight}`}
                           >
-                            {assetData?.os}
+                            {assetData?.os ? assetData?.os : 'N/A'}
                           </Td>
 
                           <Td className={styles.text2}>Version:</Td>
                           <Td
                             className={`${styles.text3} ${styles.borderRight}`}
                           >
-                            {assetData?.version}
+                            {assetData?.version ? assetData?.version : 'N/A'}
                           </Td>
 
                           <Td className={styles.text2}>Status:</Td>
@@ -817,7 +1000,9 @@ function AssetDetailPage() {
                           </Td>
                           <Td className={styles.text2}>Last updated:</Td>
                           <Td className={`${styles.text3}`}>
-                            {assetData?.lastSuccesfullScan}
+                            {assetData?.lastSuccesfullScan
+                              ? assetData?.lastSuccesfullScan
+                              : 'N/A'}
                           </Td>
                         </Tr>
                       </Tbody>
@@ -918,17 +1103,17 @@ function AssetDetailPage() {
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {assetData?.name}
+                              {assetData?.name ? assetData?.name : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>OS:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {assetData?.os}
+                              {assetData?.os ? assetData?.os : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>CPU:</Td>
                             <Td className={`${styles.text3}`}>
-                              {assetData?.cpu}
+                              {assetData?.cpu ? assetData?.cpu : 'N/A'}
                             </Td>
                           </Tr>
                           <Tr>
@@ -936,17 +1121,19 @@ function AssetDetailPage() {
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {assetData?.manufacturer}
+                              {assetData?.manufacturer
+                                ? assetData?.manufacturer
+                                : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>Version:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {assetData?.version}
+                              {assetData?.version ? assetData?.version : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>GPU:</Td>
                             <Td className={`${styles.text3}`}>
-                              {assetData?.gpu}
+                              {assetData?.gpu ? assetData?.gpu : 'N/A'}
                             </Td>
                           </Tr>
                           <Tr>
@@ -954,13 +1141,13 @@ function AssetDetailPage() {
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {assetData?.model}
+                              {assetData?.model ? assetData?.model : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>Last updated:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {assetData?.lastSuccesfullScan}
+                              {assetData?.lastSuccesfullScan ? assetData?.lastSuccesfullScan : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>RAM:</Td>
                             <Td className={`${styles.text3}`}>
@@ -1236,7 +1423,20 @@ function AssetDetailPage() {
                 <TableContainer>
                   <Table variant='striped' colorScheme='gray'>
                     <TableCaption>
-                      Total {filteredSoftwareData.length} software(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {filteredSoftwareDataDynamic.length} software(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage1}
+                          onChange={handleChangePage1}
+                          total={totalPages1}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1253,7 +1453,7 @@ function AssetDetailPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredSoftwareData.map((item, index) => (
+                      {dynamicList1.map((item, index) => (
                         <Tr
                           cursor={'pointer'}
                           key={item.softwareId}
@@ -1332,14 +1532,21 @@ function AssetDetailPage() {
                 <TableContainer>
                   <Table variant='striped' colorScheme='gray'>
                     <TableCaption>
-                      Total{' '}
-                      {
-                        data.filter(
-                          (item) =>
-                            item.type == 'Antivirus' && item.status != 3,
-                        ).length
-                      }{' '}
-                      antiviru(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {filteredAntivirusDataDynamic.length}{' '}
+                          antivirus(es)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage2}
+                          onChange={handleChangePage2}
+                          total={totalPages2}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1355,7 +1562,7 @@ function AssetDetailPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredAntivirusData.map((item, index) => (
+                      {dynamicList2.map((item, index) => (
                         <Tr
                           cursor={'pointer'}
                           key={item.softwareId}
@@ -1417,7 +1624,20 @@ function AssetDetailPage() {
                     className={styles.cTable}
                   >
                     <TableCaption className={styles.cTableCaption}>
-                      Total {listLicense.length} license(s)
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Total {filteredLicenseDataDynamic.length} license(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage3}
+                          onChange={handleChangePage3}
+                          total={totalPages3}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -1432,7 +1652,7 @@ function AssetDetailPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredLicenseData.map((item, index) => (
+                      {dynamicList3.map((item, index) => (
                         <Tr
                           cursor={'pointer'}
                           key={item.licenseId}
@@ -1472,7 +1692,7 @@ function AssetDetailPage() {
       >
         <ModalOverlay />
         <ModalContent w='60ws'>
-          <ModalHeader>Edit Asset</ModalHeader>
+          <ModalHeader>Edit asset</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={4}>
@@ -1621,7 +1841,7 @@ function AssetDetailPage() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Edit License</ModalHeader>
+          <ModalHeader>Edit license</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(2, 1fr)' gap={4}>
@@ -1701,7 +1921,7 @@ function AssetDetailPage() {
           }
         >
           <ModalHeader>
-            {showModalAdd ? 'Create New Software' : 'Add Software'}
+            {showModalAdd ? 'Create new software' : 'Add software'}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
@@ -1731,14 +1951,6 @@ function AssetDetailPage() {
                       <Input
                         name='release'
                         value={formData.release}
-                        onChange={handleInputChange}
-                      />
-                    </FormControl>
-                    <FormControl className={styles.formInput}>
-                      <FormLabel>License Key</FormLabel>
-                      <Input
-                        name='licenseKey'
-                        value={formData.licenseKey}
                         onChange={handleInputChange}
                       />
                     </FormControl>
@@ -1780,26 +1992,6 @@ function AssetDetailPage() {
                         <option value='iOS'>iOS</option>
                       </Select>
                     </FormControl>
-                    <FormControl className={styles.formInput}>
-                      <FormLabel>Start Date</FormLabel>
-                      <Input
-                        name='start_Date'
-                        value={formData.start_Date}
-                        onChange={handleInputChange}
-                        type='date'
-                        required
-                      />
-                    </FormControl>
-                    <FormControl className={styles.formInput}>
-                      <FormLabel>Time</FormLabel>
-                      <Input
-                        name='time'
-                        min={0}
-                        value={formData.time}
-                        onChange={handleInputChange}
-                        type='number'
-                      />
-                    </FormControl>
                     {/* Add more fields for the second column */}
                   </GridItem>
                 </Grid>
@@ -1833,6 +2025,14 @@ function AssetDetailPage() {
                 </Box>
                 <TableContainer>
                   <Table variant='simple'>
+                    <TableCaption>
+                      <PaginationCustom
+                        current={currentPage4}
+                        onChange={handleChangePage4}
+                        total={totalPages4}
+                        pageSize={itemPerPage}
+                      />
+                    </TableCaption>
                     <Thead>
                       <Tr>
                         <Th className={styles.cTh} width='10px'>
@@ -1846,46 +2046,27 @@ function AssetDetailPage() {
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {filteredAllSoftwareData
-                        .filter(
-                          (item) =>
-                            !softwareIdsInAsset.includes(item.softwareId),
-                        )
-                        .filter((item) =>
-                          isAntivirus
-                            ? item.type === 'Antivirus'
-                            : item.type !== 'Antivirus',
-                        )
-                        .filter(
-                          (item) =>
-                            item.status !== 3 &&
-                            item.os &&
-                            device.os &&
-                            device.os
-                              .toLowerCase()
-                              .includes(item.os.toLowerCase()),
-                        )
-                        .map((item) => (
-                          <Tr key={item.softwareId}>
-                            <Td>
-                              <Tooltip label='Add software'>
-                                <IconButton
-                                  aria-label='Add'
-                                  icon={<FaPlus />}
-                                  colorScheme='gray' // Choose an appropriate color
-                                  onClick={() => (
-                                    setShowModalTable(false), setFormData1(item)
-                                  )}
-                                />
-                              </Tooltip>
-                            </Td>
-                            <Td>{item.name}</Td>
-                            <Td>{item.publisher}</Td>
-                            <Td>{item.version}</Td>
-                            <Td>{item.release}</Td>
-                            <Td>{item.type}</Td>
-                          </Tr>
-                        ))}
+                      {dynamicList4.map((item) => (
+                        <Tr key={item.softwareId}>
+                          <Td>
+                            <Tooltip label='Add software'>
+                              <IconButton
+                                aria-label='Add'
+                                icon={<FaPlus />}
+                                colorScheme='gray' // Choose an appropriate color
+                                onClick={() => (
+                                  setShowModalTable(false), setFormData1(item)
+                                )}
+                              />
+                            </Tooltip>
+                          </Td>
+                          <Td>{item.name}</Td>
+                          <Td>{item.publisher}</Td>
+                          <Td>{item.version}</Td>
+                          <Td>{item.release}</Td>
+                          <Td>{item.type}</Td>
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
                 </TableContainer>
@@ -1995,7 +2176,7 @@ function AssetDetailPage() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Edit Software</ModalHeader>
+          <ModalHeader>Edit software</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(2, 1fr)' gap={4}>
@@ -2082,7 +2263,7 @@ function AssetDetailPage() {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalHeader>Confirm delete</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Text>Are you sure you want to delete this software?</Text>

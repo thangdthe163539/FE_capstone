@@ -43,6 +43,7 @@ import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import PaginationCustom from '@/components/pagination';
 import { BACK_END_PORT } from '../../../env';
 //
 const defaultData = {
@@ -99,6 +100,32 @@ function SoftwarePage() {
   const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
   const toast = useToast();
   //
+  //pagination
+  const itemPerPage = 6;
+  const [softwareDataDynamic, setSoftwareDataDynamic] = useState([]);
+  const [dynamicList, setDynamicList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  // filteredIssueData;
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (softwareDataDynamic[i]) {
+        newList.push(softwareDataDynamic[i]);
+      }
+    }
+    setDynamicList(newList);
+  };
+
+  const totalPages = softwareDataDynamic ? softwareDataDynamic?.length : 0;
+
+  useEffect(() => {
+    if (softwareDataDynamic.length) {
+      handleChangePage(1);
+    } else {
+      setDynamicList([]);
+    }
+  }, [softwareDataDynamic]);
   //
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -155,6 +182,13 @@ function SoftwarePage() {
         `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
       );
       setData(newDataResponse.data);
+      toast({
+        title: 'Application Created',
+        description: 'The application has been successfully created.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -192,6 +226,13 @@ function SoftwarePage() {
         `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
       );
       setData(newDataResponse.data);
+      toast({
+        title: 'Application Updated',
+        description: 'The application has been successfully updated.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -248,6 +289,7 @@ function SoftwarePage() {
           }),
         );
         // console.log(mergedData)
+        setSoftwareDataDynamic(mergedData.filter((item) => item.status !== 3));
         setSoftwareData(mergedData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -319,8 +361,8 @@ function SoftwarePage() {
       );
       setData(newDataResponse.data);
       toast({
-        title: 'Software Deleted',
-        description: 'The software has been successfully deleted.',
+        title: 'Application Deleted',
+        description: 'The application has been successfully deleted.',
         status: 'success',
         duration: 3000, // Duration in milliseconds
         isClosable: true,
@@ -399,12 +441,22 @@ function SoftwarePage() {
               className={styles.cTable}
             >
               <TableCaption>
-                Total{' '}
-                {
-                  filteredSoftwareData.filter((item) => item.status !== 3)
-                    .length
-                }{' '}
-                application(s)
+                <Flex alignItems={'center'} justifyContent={'space-between'}>
+                  <Text>
+                    Total{' '}
+                    {
+                      filteredSoftwareData.filter((item) => item.status !== 3)
+                        .length
+                    }{' '}
+                    application(s)
+                  </Text>
+                  <PaginationCustom
+                    current={currentPage}
+                    onChange={handleChangePage}
+                    total={totalPages}
+                    pageSize={itemPerPage}
+                  />
+                </Flex>
               </TableCaption>
               <Thead>
                 <Tr>
@@ -421,42 +473,40 @@ function SoftwarePage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredSoftwareData
-                  .filter((item) => item.status !== 3)
-                  .map((item, index) => (
-                    <Tr
-                      _hover={{
-                        cursor: 'pointer',
-                      }}
-                      key={item.appId}
-                      color={selectedRow === item.appId ? 'red' : 'black'}
-                      onClick={() => handleRowClick(item)}
-                    >
-                      <Td>{index + 1}</Td>
-                      <Td className={styles.listitem}>
-                        <Link
-                          href={'/pmpages/ApplicationDetail'}
-                          onClick={() => handleDetail(item)}
-                        >
-                          {item.name}
-                        </Link>
-                      </Td>
-                      <Td>{item.assets}</Td>
-                      <Td>{item.publisher}</Td>
-                      <Td>{item.version}</Td>
-                      <Td>{item.release}</Td>
-                      <Td>{item.type}</Td>
-                      <Td>
-                        {item.status === 1
-                          ? 'Active'
-                          : item.status === 2
-                          ? 'Inactive'
-                          : item.status === 3
-                          ? 'Deleted'
-                          : 'Unknown'}
-                      </Td>
-                    </Tr>
-                  ))}
+                {dynamicList.map((item, index) => (
+                  <Tr
+                    _hover={{
+                      cursor: 'pointer',
+                    }}
+                    key={item.appId}
+                    color={selectedRow === item.appId ? 'red' : 'black'}
+                    onClick={() => handleRowClick(item)}
+                  >
+                    <Td>{index + 1}</Td>
+                    <Td className={styles.listitem}>
+                      <Link
+                        href={'/pmpages/ApplicationDetail'}
+                        onClick={() => handleDetail(item)}
+                      >
+                        {item.name ? item.name : 'N/A'}
+                      </Link>
+                    </Td>
+                    <Td>{item.assets}</Td>
+                    <Td>{item.publisher ? item.publisher : 'N/A'}</Td>
+                    <Td>{item.version ? item.version : 'N/A'}</Td>
+                    <Td>{item.release ? item.release : 'N/A'}</Td>
+                    <Td>{item.type ? item.type : 'N/A'}</Td>
+                    <Td>
+                      {item.status === 1
+                        ? 'Active'
+                        : item.status === 2
+                        ? 'Inactive'
+                        : item.status === 3
+                        ? 'Deleted'
+                        : 'Unknown'}
+                    </Td>
+                  </Tr>
+                ))}
               </Tbody>
             </Table>
           </TableContainer>
@@ -471,7 +521,7 @@ function SoftwarePage() {
       >
         <ModalOverlay />
         <ModalContent w='60vw'>
-          <ModalHeader>Edit Application</ModalHeader>
+          <ModalHeader>Edit application</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={4}>
@@ -621,7 +671,7 @@ function SoftwarePage() {
       >
         <ModalOverlay />
         <ModalContent w='60ws'>
-          <ModalHeader>Create New Application</ModalHeader>
+          <ModalHeader>Create new application</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={4}>
@@ -756,10 +806,13 @@ function SoftwarePage() {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
+      <Modal // modal delete
+        isOpen={isOpenDelete}
+        onClose={() => setIsOpenDelete(false)}
+      >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalHeader>Confirm delete</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Text>Are you sure you want to delete this application?</Text>

@@ -41,6 +41,7 @@ import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Pagination from '@/components/pagination';
 
 const defaultData = {
@@ -73,6 +74,23 @@ function FeedBackPage() {
   const [isHovered, setIsHovered] = useState(null);
 
   const allowedExtensions = ['jpg', 'png'];
+  const router = useRouter();
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        if (accountDataDecode.roleId !== 1) {
+          router.push('/page405');
+        }
+        // setAccount(accountDataDecode);
+      }
+    }
+  }, []);
 
   //pagination
   const itemPerPage = 5;
@@ -376,7 +394,7 @@ function FeedBackPage() {
     formData.append(
       'Status',
       selectedOptionActive === '' ? detail.status : selectedOptionActive,
-    )
+    );
 
     if (Array.isArray(image) && image.length !== 0) {
       const fileObjects = await Promise.all(
@@ -614,12 +632,12 @@ function FeedBackPage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                            ? 'Solved'
-                            : status === 3
-                              ? 'Deleted'
-                              : status === 4
-                                ? 'Cancel'
-                                : 'Unknow'}
+                          ? 'Solved'
+                          : status === 3
+                          ? 'Deleted'
+                          : status === 4
+                          ? 'Cancel'
+                          : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}

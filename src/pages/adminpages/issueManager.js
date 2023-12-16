@@ -278,7 +278,10 @@ function IssuePage() {
       if (!accountDataDecode) {
         // router.push('http://localhost:3000');
       } else {
-        setAccount(accountDataDecode);
+        if (accountDataDecode.roleId !== 1) {
+          router.push('/page405');
+        }
+        // setAccount(accountDataDecode);
       }
     }
   }, []);

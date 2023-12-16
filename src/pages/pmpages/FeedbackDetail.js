@@ -158,6 +158,13 @@ function ReportPage(title) {
         },
       });
       router.push('/pmpages/ListFeedback');
+      toast({
+        title: 'Feedback Updated',
+        description: 'The feedback has been successfully updated.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Lỗi:', error);
     }

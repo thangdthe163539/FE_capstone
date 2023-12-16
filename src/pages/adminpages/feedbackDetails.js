@@ -1,7 +1,9 @@
 import {
-  Box, InputGroup,
+  Box,
+  InputGroup,
   Thead,
-  Textarea, InputLeftAddon,
+  Textarea,
+  InputLeftAddon,
   ListItem,
   Tr,
   FormControl,
@@ -29,6 +31,7 @@ import {
   ModalBody,
   Image,
   TableCaption,
+  Spacer,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { parse, isAfter } from 'date-fns';
@@ -74,6 +77,23 @@ function FeedBackDetailManagePage() {
   const handleSearchTbInputChange = (e) => {
     setSearchQueryTb(e.target.value);
   };
+
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        if (accountDataDecode.roleId !== 1) {
+          router.push('/page405');
+        }
+        // setAccount(accountDataDecode);
+      }
+    }
+  }, []);
   //pagination
   const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
@@ -90,9 +110,7 @@ function FeedBackDetailManagePage() {
     setDynamicList(newList);
   };
 
-  const totalPages = dynamicfilteredFb
-    ? dynamicfilteredFb?.length
-    : 0;
+  const totalPages = dynamicfilteredFb ? dynamicfilteredFb?.length : 0;
 
   useEffect(() => {
     if (dynamicfilteredFb.length) {
@@ -319,7 +337,6 @@ function FeedBackDetailManagePage() {
             const blob = dataURLtoBlob(image.dataURL);
             return new File([blob], image.fileName, { type: blob.type });
           } else {
-
             const fullImagePath = `/images/${image.image1}`;
             const blob = await fetch(fullImagePath).then((res) => res.blob());
             return new File([blob], image.fileName, { type: blob.type });
@@ -428,7 +445,6 @@ function FeedBackDetailManagePage() {
     }
   }, [isSuccess]);
 
-
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -460,24 +476,26 @@ function FeedBackDetailManagePage() {
         </ListItem>
 
         <Flex>
-          <Text fontSize='28px'>
+          <Text fontSize='24px'>
             <strong>
               {Apps.find((appItem) => appItem.appId == appId)?.name} -{' '}
               {Apps.find((appItem) => appItem.appId == appId)?.os} -{' '}
               {Apps.find((appItem) => appItem.appId == appId)?.version}
             </strong>
           </Text>
-          <InputGroup style={{ paddingTop: '5px', width: '20%', marginLeft: '800px' }}>
-            <InputLeftAddon
-              pointerEvents='none'
-              children='Status'
-            />
-            <Select value={searchQueryTb} onChange={handleSearchTbInputChange} style={{ width: '100%' }}>
-              <option value="">All</option>
-              <option value="Unsolve">Unsolve</option>
-              <option value="Solved">Solved</option>
-              <option value="Deleted">Deleted</option>
-              <option value="Cancel">Cancel</option>
+          <Spacer />
+          <InputGroup style={{ paddingTop: '5px', width: '20%' }}>
+            <InputLeftAddon pointerEvents='none' children='Status' />
+            <Select
+              value={searchQueryTb}
+              onChange={handleSearchTbInputChange}
+              style={{ width: '100%' }}
+            >
+              <option value=''>All</option>
+              <option value='Unsolve'>Unsolve</option>
+              <option value='Solved'>Solved</option>
+              <option value='Deleted'>Deleted</option>
+              <option value='Cancel'>Cancel</option>
             </Select>
           </InputGroup>
         </Flex>
@@ -494,7 +512,10 @@ function FeedBackDetailManagePage() {
                   className={styles.cTable}
                 >
                   <TableCaption>
-                    <Flex alignItems={'center'} justifyContent={'space-between'}>
+                    <Flex
+                      alignItems={'center'}
+                      justifyContent={'space-between'}
+                    >
                       <Text>
                         Show {dynamicList.length}/{filteredFb.length} result(s)
                       </Text>{' '}
@@ -546,11 +567,23 @@ function FeedBackDetailManagePage() {
                   <Tbody>
                     {dynamicList.map((item, index) => {
                       const currentDate = new Date();
-                      const endDate = parse(item.end_Date, 'dd/MM/yyyy', new Date());
-                      const isOverdue = item.status === 1 && isAfter(currentDate, endDate);
+                      const endDate = parse(
+                        item.end_Date,
+                        'dd/MM/yyyy',
+                        new Date(),
+                      );
+                      const isOverdue =
+                        item.status === 1 && isAfter(currentDate, endDate);
                       return (
                         <Tr key={index}>
-                          <Td style={{ width: '5%', color: isOverdue ? 'red' : 'black' }}>{index + 1}</Td>
+                          <Td
+                            style={{
+                              width: '5%',
+                              color: isOverdue ? 'red' : 'black',
+                            }}
+                          >
+                            {index + 1}
+                          </Td>
                           <Td
                             style={{ color: 'blue', textAlign: 'left' }}
                             onClick={() => {
@@ -560,31 +593,56 @@ function FeedBackDetailManagePage() {
                           >
                             {item.title}
                           </Td>
-                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
+                          <Td
+                            style={{
+                              width: '15%',
+                              textAlign: 'left',
+                              color: isOverdue ? 'red' : 'black',
+                            }}
+                          >
                             {item.emailSend}
                           </Td>
-                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
+                          <Td
+                            style={{
+                              width: '15%',
+                              textAlign: 'left',
+                              color: isOverdue ? 'red' : 'black',
+                            }}
+                          >
                             {item.start_Date}
                           </Td>
-                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
-                            {item.closedDate !== null ? item.closedDate : 'In processing'}
+                          <Td
+                            style={{
+                              width: '15%',
+                              textAlign: 'left',
+                              color: isOverdue ? 'red' : 'black',
+                            }}
+                          >
+                            {item.closedDate !== null
+                              ? item.closedDate
+                              : 'In processing'}
                           </Td>
-                          <Td style={{ width: '15%', textAlign: 'left', color: isOverdue ? 'red' : 'black' }}>
+                          <Td
+                            style={{
+                              width: '15%',
+                              textAlign: 'left',
+                              color: isOverdue ? 'red' : 'black',
+                            }}
+                          >
                             {item.status === 1
                               ? 'Unsolve '
                               : item.status === 2
-                                ? 'Solved '
-                                : item.status === 3
-                                  ? 'Deleted '
-                                  : item.status === 4
-                                    ? 'Cancel '
-                                    : 'Unknown Status'}
+                              ? 'Solved '
+                              : item.status === 3
+                              ? 'Deleted '
+                              : item.status === 4
+                              ? 'Cancel '
+                              : 'Unknown Status'}
                           </Td>
                         </Tr>
                       );
                     })}
                   </Tbody>
-
                 </Table>
               </TableContainer>
             </Box>
@@ -628,12 +686,12 @@ function FeedBackDetailManagePage() {
                         {status === 1
                           ? 'Unsolve'
                           : status === 2
-                            ? 'Solved'
-                            : status === 3
-                              ? 'Deleted'
-                              : status === 4
-                                ? 'Cancel'
-                                : 'Unknow'}
+                          ? 'Solved'
+                          : status === 3
+                          ? 'Deleted'
+                          : status === 4
+                          ? 'Cancel'
+                          : 'Unknow'}
                       </option>
                     ))}
                     {defaultOptions}
@@ -651,7 +709,6 @@ function FeedBackDetailManagePage() {
                   />
                 </Flex>
               </GridItem>
-             
             </Grid>
             <FormControl mt={4}>
               <FormLabel>Description</FormLabel>
