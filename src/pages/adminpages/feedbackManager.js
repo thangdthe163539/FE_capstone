@@ -5,6 +5,7 @@ import {
   InputLeftAddon,
   List,
   Text,
+  FormErrorMessage,
   Table,
   Thead,
   Tbody,
@@ -14,6 +15,7 @@ import {
   TableCaption,
   TableContainer,
   Flex,
+  Stack,
   Spacer,
   Textarea,
   Image,
@@ -43,6 +45,7 @@ import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Pagination from '@/components/pagination';
+import ToastCustom from '@/components/toast';
 
 const defaultData = {
   reportId: '',
@@ -373,7 +376,89 @@ function FeedBackPage() {
     }
   }, []);
 
+  const fetchDataAndUpdateState = () => {
+    const url = 'http://localhost:5001/api/Report/ReportsByType/Feedback';
+    fetch(url, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const filteredData = data.filter(
+          (item) =>
+            item.status !== -1 &&
+            item.status !== 3 &&
+            item.status !== 4 &&
+            item.status !== 2,
+        );
+        setIssues(filteredData);
+      })
+      .catch((error) => {
+        console.error('Lỗi:', error);
+      });
+  };
+
+  useEffect(() => {
+    fetchDataAndUpdateState();
+  }, []);
+
+  useEffect(() => {
+    if (isSuccess) {
+      const hideNotification = setTimeout(() => {
+        setIsSuccess('');
+        fetchDataAndUpdateState();
+      }, notificationTimeout);
+
+      return () => {
+        clearTimeout(hideNotification);
+      };
+    }
+  }, [isSuccess]);
+
+  const [dataSubmit, setDataSubmit] = useState({
+    title: detail?.title.trim(),
+    description: detail?.description.trim(),
+  });
+
+  const [isFirst, setIsFirst] = useState({
+    title: true,
+    description: true,
+  });
+
+  const handleChangeTitle = (e) => {
+    const value = e.target.value;
+    setIsFirst({ ...isFirst, title: false });
+    setDataSubmit({ ...dataSubmit, title: value });
+  };
+
+  const handleChangeDescription = (e) => {
+    const value = e.target.value;
+    setIsFirst({ ...isFirst, description: false });
+    setDataSubmit({ ...dataSubmit, description: value });
+  };
+
+  const [toast, setToast] = useState(false);
+
+  useEffect(() => {
+    if (detail) {
+      setDataSubmit({
+        title: detail?.title?.trim(),
+        description: detail?.description?.trim(),
+      });
+    }
+  }, [detail]);
+
   const handleUpdate = async () => {
+    if (
+      dataSubmit.description.trim() === '' ||
+      dataSubmit.title.trim() === ''
+    ) {
+      setToast(true);
+      setTimeout(() => {
+        setToast(false);
+      }, 500);
+      setIsFirst({ description: false, title: false });
+      return;
+    }
     const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
     const accId = account?.accId;
     const formData = new FormData();
@@ -381,13 +466,15 @@ function FeedBackPage() {
     formData.append('UpdaterID', accId);
     formData.append(
       'Title',
-      title.trim() === '' ? detail.title.trim() : title.trim(),
+      dataSubmit?.title.trim() === ''
+        ? detail.title.trim()
+        : dataSubmit?.title.trim(),
     );
     formData.append(
       'Description',
-      description.trim() === ''
+      dataSubmit?.description.trim() === ''
         ? detail.description.trim()
-        : description.trim(),
+        : dataSubmit?.description.trim(),
     );
     formData.append('Type', 'Feedback');
     formData.append('Start_Date', '11/11/2023');
@@ -434,346 +521,397 @@ function FeedBackPage() {
     }
   };
 
-  const fetchDataAndUpdateState = () => {
-    const url = 'http://localhost:5001/api/Report/ReportsByType/Feedback';
-    fetch(url, {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const filteredData = data.filter(
-          (item) =>
-            item.status !== -1 &&
-            item.status !== 3 &&
-            item.status !== 4 &&
-            item.status !== 2,
-        );
-        setIssues(filteredData);
-      })
-      .catch((error) => {
-        console.error('Lỗi:', error);
-      });
-  };
-
-  useEffect(() => {
-    fetchDataAndUpdateState();
-  }, []);
-
-  useEffect(() => {
-    if (isSuccess) {
-      const hideNotification = setTimeout(() => {
-        setIsSuccess('');
-        fetchDataAndUpdateState();
-      }, notificationTimeout);
-
-      return () => {
-        clearTimeout(hideNotification);
-      };
-    }
-  }, [isSuccess]);
-
   return (
-    <Box className={styles.bodybox}>
-      <List>
-        <ListItem className={styles.list}>
-          <Link href='/adminpages/adminhome' className={styles.listitem}>
-            Home
-          </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback management
-          <Text className={styles.alert}>
-            {isSuccess === 'true' && (
-              <Alert status='success'>
-                <AlertIcon />
-                Your request successfully!
-              </Alert>
-            )}
-            {isSuccess === 'false' && (
-              <Alert status='error' style={{ width: '320px' }}>
-                <AlertIcon />
-                Error processing your request.
-              </Alert>
-            )}
-          </Text>
-        </ListItem>
-        <ListItem className={styles.list}>
-          <Flex>
-            <Text fontSize='2xl'>
-              Feedback management -{' '}
-              <Link
-                href='/adminpages/feedbackhome'
-                style={{ color: '#4d9ffe', textDecoration: 'none' }}
-              >
-                List all feedback
-              </Link>
+    <>
+      <Box className={styles.bodybox}>
+        <List>
+          <ListItem className={styles.list}>
+            <Link href='/adminpages/adminhome' className={styles.listitem}>
+              Home
+            </Link>
+            <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback management
+            <Text className={styles.alert}>
+              {isSuccess === 'true' ? (
+                <ToastCustom
+                  title={'Your request successfully!'}
+                  description={''}
+                  status={'success'}
+                />
+              ) : null}
+              {isSuccess === 'false' ? (
+                <ToastCustom
+                  title={'Error processing your request.'}
+                  description={''}
+                  status={'error'}
+                />
+              ) : null}
             </Text>
-            <Spacer />
-            <InputGroup style={{ paddingTop: '', width: '35%' }}>
-              <InputLeftAddon
-                pointerEvents='none'
-                children='Title / Application'
-              />
-              <Input
-                style={{ width: '100%' }}
-                type='text'
-                value={searchQueryTb}
-                onChange={handleSearchTbInputChange}
-                placeholder='Search'
-                w={300}
-                mr={1}
-              />
-            </InputGroup>
-          </Flex>
-        </ListItem>
-        <ListItem className={styles.list}>
-          <TableContainer>
-            <Center>
-              <Text fontSize={30} mb={2}>
-                Open feedback
+          </ListItem>
+          <ListItem className={styles.list}>
+            <Flex>
+              <Text fontSize='2xl'>
+                Feedback management -{' '}
+                <Link
+                  href='/adminpages/feedbackhome'
+                  style={{ color: '#4d9ffe', textDecoration: 'none' }}
+                >
+                  List all feedback
+                </Link>
               </Text>
-            </Center>
-            <Table
-              variant='striped'
-              colorScheme='gray'
-              className={styles.cTable}
-            >
-              <TableCaption>
-                <Flex alignItems={'center'} justifyContent={'space-between'}>
-                  <Text>
-                    Show {dynamicList.length}/{filteredIssueData.length}{' '}
-                    result(s)
-                  </Text>{' '}
-                  <Pagination
-                    current={currentPage}
-                    onChange={handleChangePage}
-                    total={totalPages}
-                    pageSize={itemPerPage}
-                  />
-                </Flex>
-              </TableCaption>
-              <Thead>
-                <Tr>
-                  <Th className={styles.cTh}>No</Th>
-                  <Th className={styles.cTh}>Title</Th>
-                  <Th style={{ textAlign: 'left' }} className={styles.cTh}>
-                    Description
-                  </Th>
-                  <Th className={styles.cTh}>Application</Th>
-                  <Th className={styles.cTh}>Start Date</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {dynamicList.map((issue, index) => (
-                  <Tr key={issue.id}>
-                    <Td style={{ width: '5%' }}>{index + 1}</Td>
-                    <Td>
-                      <Button
-                        color={'blue'}
-                        variant='link'
+              <Spacer />
+              <InputGroup style={{ paddingTop: '', width: '35%' }}>
+                <InputLeftAddon
+                  pointerEvents='none'
+                  children='Title / Application'
+                />
+                <Input
+                  style={{ width: '100%' }}
+                  type='text'
+                  value={searchQueryTb}
+                  onChange={handleSearchTbInputChange}
+                  placeholder='Search'
+                  w={300}
+                  mr={1}
+                />
+              </InputGroup>
+            </Flex>
+          </ListItem>
+          <ListItem className={styles.list}>
+            <TableContainer>
+              <Center>
+                <Text fontSize={30} mb={2}>
+                  Open feedback
+                </Text>
+              </Center>
+              <Table
+                variant='striped'
+                colorScheme='gray'
+                className={styles.cTable}
+              >
+                <TableCaption>
+                  <Flex alignItems={'center'} justifyContent={'space-between'}>
+                    <Text>
+                      Show {dynamicList.length}/{filteredIssueData.length}{' '}
+                      result(s)
+                    </Text>{' '}
+                    <Pagination
+                      current={currentPage}
+                      onChange={handleChangePage}
+                      total={totalPages}
+                      pageSize={itemPerPage}
+                    />
+                  </Flex>
+                </TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th className={styles.cTh}>No</Th>
+                    <Th className={styles.cTh}>Title</Th>
+                    <Th style={{ textAlign: 'left' }} className={styles.cTh}>
+                      Description
+                    </Th>
+                    <Th className={styles.cTh}>Application</Th>
+                    <Th className={styles.cTh}>Start Date</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {dynamicList.map((issue, index) => (
+                    <Tr key={issue.id}>
+                      <Td style={{ width: '5%' }}>{index + 1}</Td>
+                      <Td>
+                        <Button
+                          color={'blue'}
+                          variant='link'
+                          onClick={() => {
+                            handleDetail();
+                            setDetails(issue);
+                          }}
+                        >
+                          {issue.title}
+                        </Button>
+                      </Td>
+                      <Td
+                        style={{ width: '45%' }}
                         onClick={() => {
                           handleDetail();
                           setDetails(issue);
                         }}
                       >
-                        {issue.title}
-                      </Button>
-                    </Td>
-                    <Td
-                      style={{ width: '45%' }}
-                      onClick={() => {
-                        handleDetail();
-                        setDetails(issue);
+                        {trimTextToMaxWidth(issue.description.trim(), 400)}
+                      </Td>
+                      <Td>
+                        {
+                          Apps.find((appItem) => appItem.appId === issue.appId)
+                            ?.name
+                        }
+                      </Td>
+                      <Td style={{ width: '10%' }}>{issue.start_Date}</Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </ListItem>
+        </List>
+
+        <Modal
+          isOpen={isOpenDetail}
+          onClose={() => setIsOpenDetail(false)}
+          closeOnOverlayClick={false}
+          size='lg'
+        >
+          <ModalOverlay />
+          <ModalContent maxW='1000px'>
+            <ModalHeader>Update feedback</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={8}>
+              <Grid
+                style={{ marginTop: '5px' }}
+                templateColumns='repeat(2, 1fr)'
+                gap={4}
+              >
+                <GridItem colSpan={1}>
+                  <Flex alignItems='center'>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      style={{ backgroundColor: 'white' }}
+                      value={selectedOptionActive}
+                      onChange={(e) => {
+                        setSelectedOptionActive(e.target.value);
                       }}
                     >
-                      {trimTextToMaxWidth(issue.description.trim(), 400)}
-                    </Td>
-                    <Td>
-                      {
-                        Apps.find((appItem) => appItem.appId === issue.appId)
-                          ?.name
-                      }
-                    </Td>
-                    <Td style={{ width: '10%' }}>{issue.start_Date}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </ListItem>
-      </List>
-
-      <Modal
-        isOpen={isOpenDetail}
-        onClose={() => setIsOpenDetail(false)}
-        closeOnOverlayClick={false}
-        size='lg'
-      >
-        <ModalOverlay />
-        <ModalContent maxW='1000px'>
-          <ModalHeader>Update feedback</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid
-              style={{ marginTop: '5px' }}
-              templateColumns='repeat(2, 1fr)'
-              gap={4}
-            >
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Status</FormLabel>
-                  <Select
-                    style={{ backgroundColor: 'white' }}
-                    value={selectedOptionActive}
-                    onChange={(e) => {
-                      setSelectedOptionActive(e.target.value);
-                    }}
+                      {sortedIssue.map((status) => (
+                        <option key={status} value={status}>
+                          {status === 1
+                            ? 'Unsolve'
+                            : status === 2
+                            ? 'Solved'
+                            : status === 3
+                            ? 'Deleted'
+                            : status === 4
+                            ? 'Cancel'
+                            : 'Unknow'}
+                        </option>
+                      ))}
+                      {defaultOptions}
+                    </Select>
+                  </Flex>
+                </GridItem>
+                <GridItem colSpan={1}>
+                  {/* <Flex alignItems='center'>
+                    <FormLabel>Title</FormLabel>
+                    <Input
+                      id='title'
+                      style={{ backgroundColor: 'white' }}
+                      defaultValue={detail?.title.trim()}
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
+                  </Flex> */}
+                  <FormControl
+                    isInvalid={
+                      isFirst?.title
+                        ? false
+                        : dataSubmit?.title === ''
+                        ? true
+                        : false
+                    }
                   >
-                    {sortedIssue.map((status) => (
-                      <option key={status} value={status}>
-                        {status === 1
-                          ? 'Unsolve'
-                          : status === 2
-                          ? 'Solved'
-                          : status === 3
-                          ? 'Deleted'
-                          : status === 4
-                          ? 'Cancel'
-                          : 'Unknow'}
-                      </option>
-                    ))}
-                    {defaultOptions}
-                  </Select>
-                </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Title</FormLabel>
-                  <Input
-                    id='title'
-                    style={{ backgroundColor: 'white' }}
-                    defaultValue={detail?.title.trim()}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                </Flex>
-              </GridItem>
-            </Grid>
-            <FormControl mt={4}>
-              <FormLabel>Description</FormLabel>
-              <Textarea
-                id='description'
-                defaultValue={detail?.description.trim()}
-                onChange={(e) => setDescription(e.target.value)}
-                width='100%'
-                minH={40}
-              />
-            </FormControl>
-            <br />
-            <Grid templateColumns='repeat(1, 1fr)' gap={8}>
-              <GridItem>
-                <Flex>
-                  <FormLabel style={{ width: '50px' }}>Image</FormLabel>
-                  <Input
-                    style={{
-                      width: '300px',
-                      border: 'none',
-                      textAlign: 'center',
-                      height: '40px',
-                    }}
-                    id='file'
-                    type='file'
-                    onChange={handleFileChangeU}
-                    multiple
-                  />
-                </Flex>
-                {Array.isArray(image) && image.length !== 0 && (
-                  <Box display='flex' flexWrap='wrap' gap={4}>
-                    {image.map((image, index) => (
-                      <Box
-                        key={index}
-                        position='relative'
-                        maxW='100px'
-                        maxH='200px'
-                        overflow='hidden'
-                        onClick={() => handleImageClick(index)}
-                        onMouseEnter={(event) =>
-                          handleImageMouseEnter(index, event)
-                        }
-                        onMouseLeave={handleImageMouseLeave}
-                      >
-                        <Image
-                          src={image.dataURL || `/images/${image.image1}`}
-                          alt={`Selected Image ${index}`}
-                          w='100%'
-                          h='100%'
-                          objectFit='cover'
-                          _hover={{ cursor: 'pointer' }}
+                    <Flex
+                      alignItems={
+                        (
+                          isFirst?.title
+                            ? false
+                            : dataSubmit?.title === ''
+                            ? true
+                            : false
+                        )
+                          ? 'start'
+                          : 'center'
+                      }
+                    >
+                      <FormLabel>Title</FormLabel>
+                      <Stack w={'100%'}>
+                        <Input
+                          defaultValue={detail?.title.trim()}
+                          style={{ backgroundColor: 'white' }}
+                          id='title'
+                          value={dataSubmit?.title}
+                          onChange={handleChangeTitle}
                         />
-                        {isHovered === index && (
-                          <>
-                            <DeleteIcon
-                              position='absolute'
-                              top='5px'
-                              color='black'
-                              right='5px'
-                              fontSize='15px'
-                              variant='ghost'
-                              onClick={(event) =>
-                                handleDeleteClick(index, event)
-                              }
-                              _hover={{ color: 'black ' }}
-                            />
-                            <Text
-                              position='absolute'
-                              bottom='5px'
-                              left='5px'
-                              fontSize='10px'
-                              color='white'
-                            >
-                              {image.fileName}
-                            </Text>
-                          </>
+                        {(isFirst?.title
+                          ? false
+                          : dataSubmit?.title === ''
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Title is required.
+                          </FormErrorMessage>
                         )}
-                      </Box>
-                    ))}
-                    {isZoomed && (
-                      <div className='modal-overlay' onClick={handleZoomClose}>
-                        <Modal
-                          isOpen={isZoomed}
-                          onClose={handleZoomClose}
-                          size='xl'
-                          isCentered
+                      </Stack>
+                    </Flex>
+                  </FormControl>
+                </GridItem>
+              </Grid>
+              {/* <FormControl mt={4}>
+                <FormLabel>Description</FormLabel>
+                <Textarea
+                  id='description'
+                  defaultValue={detail?.description.trim()}
+                  onChange={(e) => setDescription(e.target.value)}
+                  width='100%'
+                  minH={40}
+                />
+              </FormControl> */}
+              <FormControl
+                mt={4}
+                isRequired={true}
+                isInvalid={
+                  isFirst?.description
+                    ? false
+                    : dataSubmit?.description === ''
+                    ? true
+                    : false
+                }
+              >
+                <FormLabel>Description</FormLabel>
+                <Stack width='100%'>
+                  <Textarea
+                    id='description'
+                    defaultValue={detail?.description.trim()}
+                    onChange={handleChangeDescription}
+                    width='100%'
+                    value={dataSubmit?.description}
+                    minH={40}
+                  />
+                  {(isFirst?.description
+                    ? false
+                    : dataSubmit?.description === ''
+                    ? true
+                    : false) && (
+                    <FormErrorMessage mt={0}>
+                      Description is required.
+                    </FormErrorMessage>
+                  )}
+                </Stack>
+              </FormControl>
+              <br />
+              <Grid templateColumns='repeat(1, 1fr)' gap={8}>
+                <GridItem>
+                  <Flex>
+                    <FormLabel style={{ width: '50px' }}>Image</FormLabel>
+                    <Input
+                      style={{
+                        width: '300px',
+                        border: 'none',
+                        textAlign: 'center',
+                        height: '40px',
+                      }}
+                      id='file'
+                      type='file'
+                      onChange={handleFileChangeU}
+                      multiple
+                    />
+                  </Flex>
+                  {Array.isArray(image) && image.length !== 0 && (
+                    <Box display='flex' flexWrap='wrap' gap={4}>
+                      {image.map((image, index) => (
+                        <Box
+                          key={index}
+                          position='relative'
+                          maxW='100px'
+                          maxH='200px'
+                          overflow='hidden'
+                          onClick={() => handleImageClick(index)}
+                          onMouseEnter={(event) =>
+                            handleImageMouseEnter(index, event)
+                          }
+                          onMouseLeave={handleImageMouseLeave}
                         >
-                          <ModalOverlay />
-                          <ModalContent>
-                            <ModalBody>
-                              <Box className='zoomed-image-container'>
-                                <Image
-                                  src={
-                                    image[zoomedIndex]?.dataURL ||
-                                    `/images/${image[zoomedIndex]?.image1}`
-                                  }
-                                  alt={`${zoomedIndex}`}
-                                />
-                              </Box>
-                            </ModalBody>
-                          </ModalContent>
-                        </Modal>
-                      </div>
-                    )}
-                  </Box>
-                )}
-                {error && <Text color='red'>{error}</Text>}
-              </GridItem>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
-              Save
-            </Button>
-            <Button onClick={() => setIsOpenDetail(false)}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Box>
+                          <Image
+                            src={image.dataURL || `/images/${image.image1}`}
+                            alt={`Selected Image ${index}`}
+                            w='100%'
+                            h='100%'
+                            objectFit='cover'
+                            _hover={{ cursor: 'pointer' }}
+                          />
+                          {isHovered === index && (
+                            <>
+                              <DeleteIcon
+                                position='absolute'
+                                top='5px'
+                                color='black'
+                                right='5px'
+                                fontSize='15px'
+                                variant='ghost'
+                                onClick={(event) =>
+                                  handleDeleteClick(index, event)
+                                }
+                                _hover={{ color: 'black ' }}
+                              />
+                              <Text
+                                position='absolute'
+                                bottom='5px'
+                                left='5px'
+                                fontSize='10px'
+                                color='white'
+                              >
+                                {image.fileName}
+                              </Text>
+                            </>
+                          )}
+                        </Box>
+                      ))}
+                      {isZoomed && (
+                        <div
+                          className='modal-overlay'
+                          onClick={handleZoomClose}
+                        >
+                          <Modal
+                            isOpen={isZoomed}
+                            onClose={handleZoomClose}
+                            size='xl'
+                            isCentered
+                          >
+                            <ModalOverlay />
+                            <ModalContent>
+                              <ModalBody>
+                                <Box className='zoomed-image-container'>
+                                  <Image
+                                    src={
+                                      image[zoomedIndex]?.dataURL ||
+                                      `/images/${image[zoomedIndex]?.image1}`
+                                    }
+                                    alt={`${zoomedIndex}`}
+                                  />
+                                </Box>
+                              </ModalBody>
+                            </ModalContent>
+                          </Modal>
+                        </div>
+                      )}
+                    </Box>
+                  )}
+                  {error && <Text color='red'>{error}</Text>}
+                </GridItem>
+              </Grid>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
+                Save
+              </Button>
+              <Button onClick={() => setIsOpenDetail(false)}>Cancel</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
+      {toast ? (
+        <ToastCustom
+          title={'Some fields is empty'}
+          description={'Please re-check the fields'}
+          status='error'
+        />
+      ) : null}
+    </>
   );
 }
 

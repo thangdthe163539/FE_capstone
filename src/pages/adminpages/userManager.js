@@ -12,12 +12,14 @@ import {
   ListItem,
   ModalCloseButton,
   List,
+  FormErrorMessage,
   ModalHeader,
   Flex,
   ModalContent,
   Spacer,
   ModalOverlay,
   Text,
+  FormControl,
   Modal,
   Select,
   Td,
@@ -41,6 +43,7 @@ import Link from 'next/link';
 import { ArrowForwardIcon, EmailIcon } from '@chakra-ui/icons';
 import styles from '@/styles/admin.module.css';
 import { FaPlus } from 'react-icons/fa';
+import ToastCustom from '@/components/toast';
 function UserManager() {
   const router = useRouter();
   const [userData, setUserData] = useState([]);
@@ -110,44 +113,6 @@ function UserManager() {
   useEffect(() => {
     filteAcc();
   }, [searchQueryTb, userData]);
-
-  const handleAddUser = () => {
-    const url = 'http://localhost:5001/api/Account/Register';
-
-    const email = document.getElementById('email1').value;
-    const name = document.getElementById('name').value;
-    const isActive =
-      selectedOptionActive === '' ? 1 : parseInt(selectedOptionActive);
-    const roleId = selectedOptionRole === '' ? 1 : parseInt(selectedOptionRole);
-
-    const data = {
-      name: name,
-      email: email,
-      status: isActive,
-      roleId: roleId,
-    };
-
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => {
-        if (response.ok) {
-          setIsSuccess('true');
-          setIsOpenAdd(false);
-        } else {
-          setIsSuccess('false');
-          setIsOpenAdd(false);
-        }
-      })
-      .catch((error) => {
-        setIsSuccess('false');
-        console.error('Lỗi:', error);
-      });
-  };
 
   useEffect(() => {
     const url = 'http://localhost:5001/api/roles/listRole';
@@ -223,230 +188,374 @@ function UserManager() {
     }
   }, [isSuccess]);
 
+  const [dataSubmit, setDataSubmit] = useState({
+    email: '',
+    name: '',
+  });
+
+  const [isFirst, setIsFirst] = useState({
+    email: true,
+    name: true,
+  });
+
+  const handleChangeName = (e) => {
+    const value = e.target.value;
+    setIsFirst({ ...isFirst, name: false });
+    setDataSubmit({ ...dataSubmit, name: value });
+  };
+
+  const handleChangeEmail = (e) => {
+    const value = e.target.value;
+    setIsFirst({ ...isFirst, email: false });
+    setDataSubmit({ ...dataSubmit, email: value });
+  };
+
+  const [toast, setToast] = useState(false);
+
+  const handleAddUser = () => {
+    if (dataSubmit.email.trim() === '' || dataSubmit.name.trim() === '') {
+      setToast(true);
+      setTimeout(() => {
+        setToast(false);
+      }, 500);
+      setIsFirst({ name: false, email: false });
+      return;
+    }
+    const url = 'http://localhost:5001/api/Account/Register';
+
+    // const email = document.getElementById('email1').value;
+    // const name = document.getElementById('name').value;
+    const isActive =
+      selectedOptionActive === '' ? 1 : parseInt(selectedOptionActive);
+    const roleId = selectedOptionRole === '' ? 1 : parseInt(selectedOptionRole);
+
+    const data = {
+      name: dataSubmit?.name,
+      email: dataSubmit?.email,
+      status: isActive,
+      roleId: roleId,
+    };
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (response.ok) {
+          setIsSuccess('true');
+          setIsOpenAdd(false);
+        } else {
+          setIsSuccess('false');
+          setIsOpenAdd(false);
+        }
+      })
+      .catch((error) => {
+        setIsSuccess('false');
+        console.error('Lỗi:', error);
+      });
+  };
   return (
-    <Box className={styles.userBoxM}>
-      <List className={styles.userListM}>
-        <ListItem>
-          <Link
-            href='/adminpages/adminhome'
-            _hover={{ textDecor: 'underline' }}
-            style={{ color: '#4d9ffe' }}
-          >
-            Home
-          </Link>
-          <ArrowForwardIcon
-            margin={1}
-            style={{ color: 'black', pointerEvents: 'none' }}
-          ></ArrowForwardIcon>
-          User management
-          <Text className={styles.alert1}>
-            {isSuccess === 'true' && (
-              <Alert status='success'>
-                <AlertIcon />
-                Your request successfully!
-              </Alert>
-            )}
-            {isSuccess === 'false' && (
-              <Alert status='error'>
-                <AlertIcon />
-                Error processing your request.
-              </Alert>
-            )}
-          </Text>
-        </ListItem>
-
-        <hr className={styles.userHrM} />
-        <ListItem>
-          <Flex>
-            <Text style={{ width: '80vw' }} className={styles.userTitle}>
-              User management
-            </Text>
-            <InputGroup style={{ paddingTop: '0.6%', width: '25%' }}>
-              <InputLeftElement
-                pointerEvents='none'
-                children={<EmailIcon color='gray.300' boxSize={5} />}
-                style={{
-                  position: 'absolute',
-                  top: '60%',
-                  transform: 'translateY(-50%)',
-                  left: '2px',
-                }}
-              />
-              <Input
-                id='email'
-                value={searchQueryTb}
-                onChange={handleSearchTbInputChange}
-                placeholder='Email'
-                style={{ marginRight: '0%', width: '100%', marginTop: '0.7%' }}
-              />
-            </InputGroup>
-            <Button
-              style={{ marginTop: '0.7%' }}
-              className={styles.userSearchM}
-              onClick={handleSearchByEmail}
+    <>
+      <Box className={styles.userBoxM}>
+        <List className={styles.userListM}>
+          <ListItem>
+            <Link
+              href='/adminpages/adminhome'
+              _hover={{ textDecor: 'underline' }}
+              style={{ color: '#4d9ffe' }}
             >
-              Search
-            </Button>
-            <Box>
-              <IconButton
-                style={{ marginTop: '23%' }}
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray'
-                marginRight={1}
-                onClick={() => setIsOpenAdd(true)}
+              Home
+            </Link>
+            <ArrowForwardIcon
+              margin={1}
+              style={{ color: 'black', pointerEvents: 'none' }}
+            ></ArrowForwardIcon>
+            User management
+            {isSuccess === 'true' ? (
+              <ToastCustom
+                title={'Your request successfully!'}
+                description={''}
+                status={'success'}
               />
-            </Box>
-            <Spacer></Spacer>
-          </Flex>
-        </ListItem>
-      </List>
+            ) : null}
+            {isSuccess === 'false' ? (
+              <ToastCustom
+                title={'Error processing your request.'}
+                description={''}
+                status={'error'}
+              />
+            ) : null}
+          </ListItem>
 
-      <TableContainer>
-        <Text fontSize='20px' marginTop={2}>
-          Total {filteredAccData.length} user(s) found:{' '}
-        </Text>
-        <Center>
-          <Table variant='simple' style={{ marginTop: '2%', width: '80%' }}>
-            <TableCaption>
-              <Flex alignItems={'center'} justifyContent={'space-between'}>
-                <Text>
-                  Show {dynamicList.length}/{filteredAccData.length} result(s)
-                </Text>{' '}
-                <Pagination
-                  current={currentPage}
-                  onChange={handleChangePage}
-                  total={totalPages}
-                  pageSize={itemPerPage}
+          <hr className={styles.userHrM} />
+          <ListItem>
+            <Flex>
+              <Text style={{ width: '80vw' }} className={styles.userTitle}>
+                User management
+              </Text>
+              <InputGroup style={{ paddingTop: '0.6%', width: '25%' }}>
+                <InputLeftElement
+                  pointerEvents='none'
+                  children={<EmailIcon color='gray.300' boxSize={5} />}
+                  style={{
+                    position: 'absolute',
+                    top: '60%',
+                    transform: 'translateY(-50%)',
+                    left: '2px',
+                  }}
                 />
-              </Flex>
-            </TableCaption>
-            <Thead>
-              <Tr
-                style={{
-                  fontWeight: 'bold',
-                  color: '#344e74',
-                  fontFamilyfTo: 'Sanchez',
-                  backgroundColor: 'whitesmoke',
-                }}
+                <Input
+                  id='email'
+                  value={searchQueryTb}
+                  onChange={handleSearchTbInputChange}
+                  placeholder='Email'
+                  style={{
+                    marginRight: '0%',
+                    width: '100%',
+                    marginTop: '0.7%',
+                  }}
+                />
+              </InputGroup>
+              <Button
+                mt={'0.7%'}
+                ml={'10px'}
+                className={styles.userSearchM}
+                onClick={handleSearchByEmail}
               >
-                <Td>No</Td>
-                <Td>Name </Td>
-                <Td>Email</Td>
-                <Td>Role</Td>
-                <Td>Active</Td>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {dynamicList.map((user, index) => (
-                <Tr key={user.accId}>
-                  <Td style={{ width: '5%' }}>{index + 1}</Td>
-                  <Td style={{ width: '20%' }}>
-                    <Button
-                      color={'blue'}
-                      variant='link'
-                      onClick={() =>
-                        handleToUserDetails(
-                          user.email,
-                          user.roleName,
-                          user.roleId,
-                          user.status,
-                          user.name,
-                          user.accId,
-                        )
-                      }
-                    >
-                      {user.name}
-                    </Button>
-                  </Td>
-                  <Td style={{ width: '32%' }}>{user.email}</Td>
-                  <Td style={{ width: '25%' }}>{user.roleName}</Td>
-                  <Td style={{ width: '10%' }}>
-                    {user.status === 1
-                      ? 'Active'
-                      : user.status === 2
-                      ? 'Inactive'
-                      : user.status === 3
-                      ? 'Locked'
-                      : 'Deleted'}
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </Center>
-      </TableContainer>
+                Search
+              </Button>
+              <Box>
+                <IconButton
+                  style={{ marginTop: '23%' }}
+                  aria-label='Add'
+                  icon={<FaPlus />}
+                  colorScheme='gray'
+                  marginRight={1}
+                  onClick={() => setIsOpenAdd(true)}
+                />
+              </Box>
+              <Spacer></Spacer>
+            </Flex>
+          </ListItem>
+        </List>
 
-      <Modal
-        isOpen={isOpenAdd}
-        onClose={() => setIsOpenAdd(false)}
-        closeOnOverlayClick={false}
-        size='lg'
-      >
-        <ModalOverlay />
-        <ModalContent maxW='50%'>
-          <ModalHeader>Create new user</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid templateColumns='repeat(2, 1fr)' gap={8}>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel style={{ width: '15%' }}>Email</FormLabel>
-                  <Input id='email1' autoComplete='off' />
+        <TableContainer>
+          <Text fontSize='20px' marginTop={2}>
+            Total {filteredAccData.length} user(s) found:{' '}
+          </Text>
+          <Center>
+            <Table variant='simple' style={{ marginTop: '2%', width: '80%' }}>
+              <TableCaption>
+                <Flex alignItems={'center'} justifyContent={'space-between'}>
+                  <Text>
+                    Show {dynamicList.length}/{filteredAccData.length} result(s)
+                  </Text>{' '}
+                  <Pagination
+                    current={currentPage}
+                    onChange={handleChangePage}
+                    total={totalPages}
+                    pageSize={itemPerPage}
+                  />
                 </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel style={{ width: '15%' }}>Role</FormLabel>
-                  <Select
-                    value={selectedOptionRole}
-                    onChange={(e) => setSelectedOptionRole(e.target.value)}
+              </TableCaption>
+              <Thead>
+                <Tr
+                  style={{
+                    fontWeight: 'bold',
+                    color: '#344e74',
+                    fontFamilyfTo: 'Sanchez',
+                    backgroundColor: 'whitesmoke',
+                  }}
+                >
+                  <Td>No</Td>
+                  <Td>Name </Td>
+                  <Td>Email</Td>
+                  <Td>Role</Td>
+                  <Td>Active</Td>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {dynamicList.map((user, index) => (
+                  <Tr key={user.accId}>
+                    <Td style={{ width: '5%' }}>{index + 1}</Td>
+                    <Td style={{ width: '20%' }}>
+                      <Button
+                        color={'blue'}
+                        variant='link'
+                        onClick={() =>
+                          handleToUserDetails(
+                            user.email,
+                            user.roleName,
+                            user.roleId,
+                            user.status,
+                            user.name,
+                            user.accId,
+                          )
+                        }
+                      >
+                        {user.name}
+                      </Button>
+                    </Td>
+                    <Td style={{ width: '32%' }}>{user.email}</Td>
+                    <Td style={{ width: '25%' }}>{user.roleName}</Td>
+                    <Td style={{ width: '10%' }}>
+                      {user.status === 1
+                        ? 'Active'
+                        : user.status === 2
+                        ? 'Inactive'
+                        : user.status === 3
+                        ? 'Locked'
+                        : 'Deleted'}
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Center>
+        </TableContainer>
+
+        <Modal
+          isOpen={isOpenAdd}
+          onClose={() => setIsOpenAdd(false)}
+          closeOnOverlayClick={false}
+          size='lg'
+        >
+          <ModalOverlay />
+          <ModalContent maxW='50%'>
+            <ModalHeader>Create new user</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={8}>
+              <Grid templateColumns='repeat(2, 1fr)' gap={8}>
+                <GridItem colSpan={1}>
+                  <FormControl
+                    isRequired={true}
+                    isInvalid={
+                      isFirst?.email
+                        ? false
+                        : dataSubmit?.email === ''
+                        ? true
+                        : false
+                    }
                   >
-                    {roles.map((role) => (
-                      <option key={role.roleId} value={role.roleId}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </Select>
-                </Flex>
-              </GridItem>
-            </Grid>
-            <Grid
-              templateColumns='repeat(2, 1fr)'
-              gap={8}
-              style={{ marginTop: '10px' }}
-            >
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel style={{ width: '15%' }}>Name</FormLabel>
-                  <Input id='name' autoComplete='off' />
-                </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Active</FormLabel>
-                  <Select
-                    value={selectedOptionActive}
-                    onChange={(e) => {
-                      setSelectedOptionActive(e.target.value);
-                    }}
+                    <Flex alignItems='center'>
+                      <FormLabel style={{ width: '15%' }}>Email</FormLabel>
+                      <Stack>
+                        <Input
+                          id='email1'
+                          type='email'
+                          value={dataSubmit?.email}
+                          onChange={handleChangeEmail}
+                        />
+                        {(isFirst?.email
+                          ? false
+                          : dataSubmit?.email === ''
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Email is required.
+                          </FormErrorMessage>
+                        )}
+                      </Stack>
+                    </Flex>
+                  </FormControl>
+                  {/* <FormLabel style={{ width: '15%' }}>Email</FormLabel>
+                    <Input id='email1' autoComplete='off' /> */}
+                </GridItem>
+                <GridItem colSpan={1}>
+                  <Flex alignItems='center' justifyContent={'space-between'}>
+                    <FormLabel style={{ width: '15%' }}>Role</FormLabel>
+                    <Select
+                      width={'80%'}
+                      value={selectedOptionRole}
+                      onChange={(e) => setSelectedOptionRole(e.target.value)}
+                    >
+                      {roles.map((role) => (
+                        <option key={role.roleId} value={role.roleId}>
+                          {role.name}
+                        </option>
+                      ))}
+                    </Select>
+                  </Flex>
+                </GridItem>
+              </Grid>
+              <Grid
+                templateColumns='repeat(2, 1fr)'
+                gap={8}
+                style={{ marginTop: '10px' }}
+              >
+                <GridItem colSpan={1}>
+                  {/* <Flex alignItems='center'>
+                    <FormLabel style={{ width: '15%' }}>Name</FormLabel>
+                    <Input id='name' autoComplete='off' />
+                  </Flex> */}
+                  <FormControl
+                    isRequired={true}
+                    isInvalid={
+                      isFirst?.name
+                        ? false
+                        : dataSubmit?.name === ''
+                        ? true
+                        : false
+                    }
                   >
-                    <option value={1}>Active</option>
-                    <option value={2}>Inactive</option>
-                  </Select>
-                </Flex>
-              </GridItem>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleAddUser}>
-              Save
-            </Button>
-            <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Box>
+                    <Flex alignItems='center'>
+                      <FormLabel style={{ width: '15%' }}>Name</FormLabel>
+                      <Stack>
+                        <Input
+                          id='name'
+                          value={dataSubmit?.name}
+                          onChange={handleChangeName}
+                        />
+                        {(isFirst?.name
+                          ? false
+                          : dataSubmit?.name === ''
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Name is required.
+                          </FormErrorMessage>
+                        )}
+                      </Stack>
+                    </Flex>
+                  </FormControl>
+                </GridItem>
+                <GridItem colSpan={1}>
+                  <Flex alignItems='center' justifyContent={'space-between'}>
+                    <FormLabel>Active</FormLabel>
+                    <Select
+                      width={'80%'}
+                      value={selectedOptionActive}
+                      onChange={(e) => {
+                        setSelectedOptionActive(e.target.value);
+                      }}
+                    >
+                      <option value={1}>Active</option>
+                      <option value={2}>Inactive</option>
+                    </Select>
+                  </Flex>
+                </GridItem>
+              </Grid>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme='blue' mr={3} onClick={handleAddUser}>
+                Save
+              </Button>
+              <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
+      {toast ? (
+        <ToastCustom
+          title={'Some fields is empty'}
+          description={'Please re-check the fields'}
+          status='error'
+        />
+      ) : null}
+    </>
   );
 }
 

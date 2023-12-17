@@ -1,14 +1,25 @@
-import { Box, Image, Flex, Button, Text, Spacer } from '@chakra-ui/react';
+import {
+  Box,
+  Image,
+  Flex,
+  Button,
+  Text,
+  Spacer,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from '@chakra-ui/react';
 import styles from '@/styles/Header.module.css';
 import Link from 'next/link';
 import { initializeApp } from 'firebase/app';
 import { useRouter } from 'next/router';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import { useState, useEffect } from 'react';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
-import { Alert, AlertIcon } from '@chakra-ui/react';
-
 function Header() {
+  const [isLogin, setIsLogin] = useState({});
   const [isSuccess, setIsSuccess] = useState('');
   const router = useRouter();
   // start config firebase - login gg
@@ -43,10 +54,7 @@ function Header() {
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log(data);
             const id = data.roleId;
-            console.log('khang');
-            console.log(id);
             localStorage.setItem('account', JSON.stringify(data));
             if (id == 1) {
               router.push('adminpages/adminhome');
@@ -67,8 +75,20 @@ function Header() {
         console.log(error);
       });
   };
+  function handleLogout() {
+    localStorage.clear();
+    router.push('/');
+  }
   //end
-
+  useEffect(() => {
+    const storedAccount = localStorage.getItem('account');
+    if (storedAccount) {
+      const storedAccountEncode = JSON.parse(storedAccount);
+      if (storedAccountEncode) {
+        setIsLogin(storedAccountEncode);
+      }
+    }
+  }, []);
   return (
     <Box>
       <Flex className={`${styles.navbar}`}>
@@ -84,24 +104,68 @@ function Header() {
         </Box>
         <Spacer />
         <Box>
-          <Flex>
-            <Text className={`${styles.navbarText}`}>
-              You are not logged in.(
-            </Text>
-            <Text onClick={handleGoogleLogin} className={`${styles.login}`}>
-              Login
-            </Text>
-            )
-            <Text
-              style={{ paddingTop: '5px', position: 'fixed', right: '45%' }}
-            >
-              {isSuccess === 'false' && (
-                <Text style={{ color: 'black' }}>
-                  Login failed. Please try again!
-                </Text>
-              )}
-            </Text>
-          </Flex>
+          {isLogin && isLogin?.name ? (
+            <Flex alignItems={'center'}>
+              {isLogin?.roleName === 'Admin' ||
+                (isLogin?.roleName === 'Product owner' && (
+                  <>
+                    <Link
+                      style={{ marginRight: '2%', padding: '20px 12px' }}
+                      href={
+                        isLogin?.roleName === 'Admin'
+                          ? 'adminpages/adminhome'
+                          : '/pmpages/PoHome'
+                      }
+                    >
+                      Dashboard
+                    </Link>
+
+                    <Link
+                      style={{ marginRight: '2%', padding: '20px 12px', minWidth:"150px" }}
+                      href={'/ViewApplication'}
+                    >
+                      View Application
+                    </Link>
+                  </>
+                ))}
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  rightIcon={<ChevronDownIcon />}
+                  className={styles.menuButton}
+                  _active={{
+                    bg: '#4d9ffe',
+                    border: 'none',
+                    color: '#fff',
+                  }}
+                >
+                  {isLogin?.roleName}: {isLogin?.name}
+                </MenuButton>
+                <MenuList>
+                  <MenuItem onClick={handleLogout}>LOG OUT</MenuItem>
+                </MenuList>
+              </Menu>
+            </Flex>
+          ) : (
+            <Flex>
+              <Text className={`${styles.navbarText}`}>
+                You are not logged in.(
+              </Text>
+              <Text onClick={handleGoogleLogin} className={`${styles.login}`}>
+                Login
+              </Text>
+              )
+              <Text
+                style={{ paddingTop: '5px', position: 'fixed', right: '45%' }}
+              >
+                {isSuccess === 'false' && (
+                  <Text style={{ color: 'black' }}>
+                    Login failed. Please try again!
+                  </Text>
+                )}
+              </Text>
+            </Flex>
+          )}
         </Box>
       </Flex>
     </Box>

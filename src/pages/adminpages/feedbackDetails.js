@@ -12,6 +12,8 @@ import {
   Input,
   ModalFooter,
   Text,
+  Stack,
+  FormErrorMessage,
   Td,
   Select,
   Flex,
@@ -42,6 +44,7 @@ import styles from '@/styles/pm.module.css';
 import { Alert, AlertIcon } from '@chakra-ui/react';
 import axios from 'axios';
 import Pagination from '@/components/pagination';
+import ToastCustom from '@/components/toast';
 const defaultData = {
   reportId: '',
   type: '',
@@ -307,64 +310,6 @@ function FeedBackDetailManagePage() {
     }
   }, []);
 
-  const handleUpdate = async () => {
-    const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
-
-    const accId = account?.accId;
-    const formData = new FormData();
-    formData.append('AppId', detail.appId);
-    formData.append('UpdaterID', accId);
-    formData.append(
-      'Title',
-      title.trim() === '' ? detail.title.trim() : title.trim(),
-    );
-    formData.append(
-      'Description',
-      description.trim() === ''
-        ? detail.description.trim()
-        : description.trim(),
-    );
-    formData.append('Type', 'Feedback');
-    formData.append('Start_Date', '11/11/2023');
-    formData.append(
-      'Status',
-      selectedOptionActive === '' ? detail.status : selectedOptionActive,
-    );
-    if (Array.isArray(image) && image.length !== 0) {
-      const fileObjects = await Promise.all(
-        image.map(async (image) => {
-          if (image.dataURL) {
-            const blob = dataURLtoBlob(image.dataURL);
-            return new File([blob], image.fileName, { type: blob.type });
-          } else {
-            const fullImagePath = `/images/${image.image1}`;
-            const blob = await fetch(fullImagePath).then((res) => res.blob());
-            return new File([blob], image.fileName, { type: blob.type });
-          }
-        }),
-      );
-
-      fileObjects.forEach((file, index) => {
-        formData.append(`Images`, file);
-      });
-    } else {
-      formData.append(`Images`, ' ');
-    }
-    try {
-      const response = await axios.put(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setIsSuccess('true');
-      setIsOpenAdd(false);
-    } catch (error) {
-      setIsSuccess('false');
-      setIsOpenAdd(false);
-      console.error('Lỗi:', error);
-    }
-  };
-
   useEffect(() => {
     if (detail?.reportId) {
       const url = `http://localhost:5001/api/Image/list_Images_by_Report/${detail.reportId}`;
@@ -445,389 +390,586 @@ function FeedBackDetailManagePage() {
     }
   }, [isSuccess]);
 
-  return (
-    <Box className={styles.bodybox}>
-      <List>
-        <ListItem className={styles.list}>
-          <Flex>
-            <Link href='/adminpages/adminhome' className={styles.listitem}>
-              Home
-            </Link>
-            <ArrowForwardIcon margin={1}></ArrowForwardIcon>
-            <Link href='/adminpages/feedbackhome' className={styles.listitem}>
-              Feedback management
-            </Link>
-            <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback detail
-          </Flex>
-          <Text className={styles.alert}>
-            {isSuccess === 'true' && (
-              <Alert status='success'>
-                <AlertIcon />
-                Your request successfully!
-              </Alert>
-            )}
-            {isSuccess === 'false' && (
-              <Alert status='error'>
-                <AlertIcon />
-                Error processing your request.
-              </Alert>
-            )}
-          </Text>
-        </ListItem>
+  const [dataSubmit, setDataSubmit] = useState({
+    title: detail?.title.trim(),
+    description: detail?.description.trim(),
+  });
 
-        <Flex>
-          <Text fontSize='24px'>
-            <strong>
-              {Apps.find((appItem) => appItem.appId == appId)?.name} -{' '}
-              {Apps.find((appItem) => appItem.appId == appId)?.os} -{' '}
-              {Apps.find((appItem) => appItem.appId == appId)?.version}
-            </strong>
-          </Text>
-          <Spacer />
-          <InputGroup style={{ paddingTop: '5px', width: '20%' }}>
-            <InputLeftAddon pointerEvents='none' children='Status' />
-            <Select
-              value={searchQueryTb}
-              onChange={handleSearchTbInputChange}
-              style={{ width: '100%' }}
-            >
-              <option value=''>All</option>
-              <option value='Unsolve'>Unsolve</option>
-              <option value='Solved'>Solved</option>
-              <option value='Deleted'>Deleted</option>
-              <option value='Cancel'>Cancel</option>
-            </Select>
-          </InputGroup>
-        </Flex>
-        <Flex>
-          <Text fontSize='20px'>Total {issue.length} feedback(s) found:</Text>
-        </Flex>
-        <ListItem className={styles.list}>
-          <Center>
-            <Box width='90%'>
-              <TableContainer>
-                <Table
-                  variant='striped'
-                  colorScheme='gray'
-                  className={styles.cTable}
-                >
-                  <TableCaption>
-                    <Flex
-                      alignItems={'center'}
-                      justifyContent={'space-between'}
-                    >
-                      <Text>
-                        Show {dynamicList.length}/{filteredFb.length} result(s)
-                      </Text>{' '}
-                      <Pagination
-                        current={currentPage}
-                        onChange={handleChangePage}
-                        total={totalPages}
-                        pageSize={itemPerPage}
-                      />
-                    </Flex>
-                  </TableCaption>
-                  <Thead>
-                    <Tr>
-                      <Th style={{ width: '5%' }} className={styles.cTh}>
-                        No
-                      </Th>
-                      <Th
-                        style={{ width: '15%', textAlign: 'left' }}
-                        className={styles.cTh}
-                      >
-                        Title
-                      </Th>
-                      <Th
-                        style={{ width: '5%', textAlign: 'left' }}
-                        className={styles.cTh}
-                      >
-                        Create By
-                      </Th>
-                      <Th
-                        style={{ width: '5%', textAlign: 'left' }}
-                        className={styles.cTh}
-                      >
-                        Start Date
-                      </Th>
-                      <Th
-                        style={{ width: '5%', textAlign: 'left' }}
-                        className={styles.cTh}
-                      >
-                        Closed Date
-                      </Th>
-                      <Th
-                        style={{ width: '5%', textAlign: 'left' }}
-                        className={styles.cTh}
-                      >
-                        Status
-                      </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {dynamicList.map((item, index) => {
-                      const currentDate = new Date();
-                      const endDate = parse(
-                        item.end_Date,
-                        'dd/MM/yyyy',
-                        new Date(),
-                      );
-                      const isOverdue =
-                        item.status === 1 && isAfter(currentDate, endDate);
-                      return (
-                        <Tr key={index}>
-                          <Td
-                            style={{
-                              width: '5%',
-                              color: isOverdue ? 'red' : 'black',
-                            }}
-                          >
-                            {index + 1}
-                          </Td>
-                          <Td
-                            style={{ color: 'blue', textAlign: 'left' }}
-                            onClick={() => {
-                              handleAdd();
-                              setDetails(item);
-                            }}
-                          >
-                            {item.title}
-                          </Td>
-                          <Td
-                            style={{
-                              width: '15%',
-                              textAlign: 'left',
-                              color: isOverdue ? 'red' : 'black',
-                            }}
-                          >
-                            {item.emailSend}
-                          </Td>
-                          <Td
-                            style={{
-                              width: '15%',
-                              textAlign: 'left',
-                              color: isOverdue ? 'red' : 'black',
-                            }}
-                          >
-                            {item.start_Date}
-                          </Td>
-                          <Td
-                            style={{
-                              width: '15%',
-                              textAlign: 'left',
-                              color: isOverdue ? 'red' : 'black',
-                            }}
-                          >
-                            {item.closedDate !== null
-                              ? item.closedDate
-                              : 'In processing'}
-                          </Td>
-                          <Td
-                            style={{
-                              width: '15%',
-                              textAlign: 'left',
-                              color: isOverdue ? 'red' : 'black',
-                            }}
-                          >
-                            {item.status === 1
-                              ? 'Unsolve '
-                              : item.status === 2
-                              ? 'Solved '
-                              : item.status === 3
-                              ? 'Deleted '
-                              : item.status === 4
-                              ? 'Cancel '
-                              : 'Unknown Status'}
-                          </Td>
-                        </Tr>
-                      );
-                    })}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            </Box>
-          </Center>
-          <Button
-            style={{ marginLeft: '0%', marginTop: '2%' }}
-            onClick={handleBackToList}
-          >
-            Back to List
-          </Button>
-        </ListItem>
-      </List>
-      <Modal
-        isOpen={isOpenAdd}
-        onClose={() => setIsOpenAdd(false)}
-        closeOnOverlayClick={false}
-        size='lg'
-      >
-        <ModalOverlay />
-        <ModalContent maxW='1000px'>
-          <ModalHeader>Update feedback</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid
-              style={{ marginTop: '5px' }}
-              templateColumns='repeat(2, 1fr)'
-              gap={4}
-            >
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Status</FormLabel>
-                  <Select
-                    style={{ backgroundColor: 'white' }}
-                    value={selectedOptionActive}
-                    onChange={(e) => {
-                      setSelectedOptionActive(e.target.value);
-                    }}
+  const [isFirst, setIsFirst] = useState({
+    title: true,
+    description: true,
+  });
+
+  const handleChangeTitle = (e) => {
+    const value = e.target.value;
+    setIsFirst({ ...isFirst, title: false });
+    setDataSubmit({ ...dataSubmit, title: value });
+  };
+
+  const handleChangeDescription = (e) => {
+    const value = e.target.value;
+    setIsFirst({ ...isFirst, description: false });
+    setDataSubmit({ ...dataSubmit, description: value });
+  };
+
+  const [toast, setToast] = useState(false);
+
+  useEffect(() => {
+    if (detail) {
+      setDataSubmit({
+        title: detail?.title?.trim(),
+        description: detail?.description?.trim(),
+      });
+    }
+  }, [detail]);
+
+  const handleUpdate = async () => {
+    if (
+      dataSubmit.description.trim() === '' ||
+      dataSubmit.title.trim() === ''
+    ) {
+      setToast(true);
+      setTimeout(() => {
+        setToast(false);
+      }, 500);
+      setIsFirst({ description: false, title: false });
+      return;
+    }
+    const url = `http://localhost:5001/api/Report/UpdateReport/${detail.reportId}`;
+
+    const accId = account?.accId;
+    const formData = new FormData();
+    formData.append('AppId', detail.appId);
+    formData.append('UpdaterID', accId);
+    formData.append(
+      'Title',
+      dataSubmit?.title.trim() === ''
+        ? detail.title.trim()
+        : dataSubmit?.title.trim(),
+    );
+    formData.append(
+      'Description',
+      dataSubmit?.description.trim() === ''
+        ? detail.description.trim()
+        : dataSubmit?.description.trim(),
+    );
+    formData.append('Type', 'Feedback');
+    formData.append('Start_Date', '11/11/2023');
+    formData.append(
+      'Status',
+      selectedOptionActive === '' ? detail.status : selectedOptionActive,
+    );
+    if (Array.isArray(image) && image.length !== 0) {
+      const fileObjects = await Promise.all(
+        image.map(async (image) => {
+          if (image.dataURL) {
+            const blob = dataURLtoBlob(image.dataURL);
+            return new File([blob], image.fileName, { type: blob.type });
+          } else {
+            const fullImagePath = `/images/${image.image1}`;
+            const blob = await fetch(fullImagePath).then((res) => res.blob());
+            return new File([blob], image.fileName, { type: blob.type });
+          }
+        }),
+      );
+
+      fileObjects.forEach((file, index) => {
+        formData.append(`Images`, file);
+      });
+    } else {
+      formData.append(`Images`, ' ');
+    }
+    try {
+      const response = await axios.put(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setIsSuccess('true');
+      setIsOpenAdd(false);
+    } catch (error) {
+      setIsSuccess('false');
+      setIsOpenAdd(false);
+      console.error('Lỗi:', error);
+    }
+  };
+
+  return (
+    <>
+      <Box className={styles.bodybox}>
+        <List>
+          <ListItem className={styles.list}>
+            <Flex>
+              <Link href='/adminpages/adminhome' className={styles.listitem}>
+                Home
+              </Link>
+              <ArrowForwardIcon margin={1}></ArrowForwardIcon>
+              <Link href='/adminpages/feedbackhome' className={styles.listitem}>
+                Feedback management
+              </Link>
+              <ArrowForwardIcon margin={1}></ArrowForwardIcon>Feedback detail
+            </Flex>
+            <Text className={styles.alert}>
+              {isSuccess === 'true' ? (
+                <ToastCustom
+                  title={'Your request successfully!'}
+                  description={''}
+                  status={'success'}
+                />
+              ) : null}
+              {isSuccess === 'false' ? (
+                <ToastCustom
+                  title={'Error processing your request.'}
+                  description={''}
+                  status={'error'}
+                />
+              ) : null}
+            </Text>
+          </ListItem>
+
+          <Flex>
+            <Text fontSize='24px'>
+              <strong>
+                {Apps.find((appItem) => appItem.appId == appId)?.name} -{' '}
+                {Apps.find((appItem) => appItem.appId == appId)?.os} -{' '}
+                {Apps.find((appItem) => appItem.appId == appId)?.version}
+              </strong>
+            </Text>
+            <Spacer />
+            <InputGroup style={{ paddingTop: '5px', width: '20%' }}>
+              <InputLeftAddon pointerEvents='none' children='Status' />
+              <Select
+                value={searchQueryTb}
+                onChange={handleSearchTbInputChange}
+                style={{ width: '100%' }}
+              >
+                <option value=''>All</option>
+                <option value='Unsolve'>Unsolve</option>
+                <option value='Solved'>Solved</option>
+                <option value='Deleted'>Deleted</option>
+                <option value='Cancel'>Cancel</option>
+              </Select>
+            </InputGroup>
+          </Flex>
+          <Flex>
+            <Text fontSize='20px'>Total {issue.length} feedback(s) found:</Text>
+          </Flex>
+          <ListItem className={styles.list}>
+            <Center>
+              <Box width='90%'>
+                <TableContainer>
+                  <Table
+                    variant='striped'
+                    colorScheme='gray'
+                    className={styles.cTable}
                   >
-                    {sortedIssue.map((status) => (
-                      <option key={status} value={status}>
-                        {status === 1
-                          ? 'Unsolve'
-                          : status === 2
-                          ? 'Solved'
-                          : status === 3
-                          ? 'Deleted'
-                          : status === 4
-                          ? 'Cancel'
-                          : 'Unknow'}
-                      </option>
-                    ))}
-                    {defaultOptions}
-                  </Select>
-                </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Title</FormLabel>
-                  <Input
-                    id='title'
-                    defaultValue={detail?.title.trim()}
-                    style={{ backgroundColor: 'white' }}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                </Flex>
-              </GridItem>
-            </Grid>
-            <FormControl mt={4}>
-              <FormLabel>Description</FormLabel>
-              <Textarea
-                id='description'
-                defaultValue={detail?.description}
-                onChange={(e) => setDescription(e.target.value)}
-                width='100%'
-                minH={40}
-              />
-            </FormControl>
-            <br />
-            <Grid templateColumns='repeat(1, 1fr)' gap={8}>
-              <GridItem>
-                <Flex>
-                  <FormLabel style={{ width: '50px' }}>Image</FormLabel>
-                  <Input
-                    style={{
-                      width: '300px',
-                      border: 'none',
-                      textAlign: 'center',
-                      height: '40px',
-                    }}
-                    id='file'
-                    type='file'
-                    onChange={handleFileChangeU}
-                    multiple
-                  />
-                </Flex>
-                {Array.isArray(image) && image.length !== 0 && (
-                  <Box display='flex' flexWrap='wrap' gap={4}>
-                    {image.map((image, index) => (
-                      <Box
-                        key={index}
-                        position='relative'
-                        maxW='100px'
-                        maxH='200px'
-                        overflow='hidden'
-                        onClick={() => handleImageClick(index)}
-                        onMouseEnter={(event) =>
-                          handleImageMouseEnter(index, event)
-                        }
-                        onMouseLeave={handleImageMouseLeave}
+                    <TableCaption>
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
                       >
-                        <Image
-                          src={image.dataURL || `/images/${image.image1}`}
-                          alt={`Selected Image ${index}`}
-                          w='100%'
-                          h='100%'
-                          objectFit='cover'
-                          _hover={{ cursor: 'pointer' }}
+                        <Text>
+                          Show {dynamicList.length}/{filteredFb.length}{' '}
+                          result(s)
+                        </Text>{' '}
+                        <Pagination
+                          current={currentPage}
+                          onChange={handleChangePage}
+                          total={totalPages}
+                          pageSize={itemPerPage}
                         />
-                        {isHovered === index && (
-                          <>
-                            <DeleteIcon
-                              position='absolute'
-                              top='5px'
-                              color='black'
-                              right='5px'
-                              fontSize='15px'
-                              variant='ghost'
-                              onClick={(event) =>
-                                handleDeleteClick(index, event)
-                              }
-                              _hover={{ color: 'black ' }}
-                            />
-                            <Text
-                              position='absolute'
-                              bottom='5px'
-                              left='5px'
-                              fontSize='10px'
-                              color='white'
-                            >
-                              {image.fileName}
-                            </Text>
-                          </>
-                        )}
-                      </Box>
-                    ))}
-                    {isZoomed && (
-                      <div className='modal-overlay' onClick={handleZoomClose}>
-                        <Modal
-                          isOpen={isZoomed}
-                          onClose={handleZoomClose}
-                          size='xl'
-                          isCentered
+                      </Flex>
+                    </TableCaption>
+                    <Thead>
+                      <Tr>
+                        <Th style={{ width: '5%' }} className={styles.cTh}>
+                          No
+                        </Th>
+                        <Th
+                          style={{ width: '15%', textAlign: 'left' }}
+                          className={styles.cTh}
                         >
-                          <ModalOverlay />
-                          <ModalContent>
-                            <ModalBody>
-                              <Box className='zoomed-image-container'>
-                                <Image
-                                  src={
-                                    image[zoomedIndex]?.dataURL ||
-                                    `/images/${image[zoomedIndex]?.image1}`
-                                  }
-                                  alt={`${zoomedIndex}`}
-                                />
-                              </Box>
-                            </ModalBody>
-                          </ModalContent>
-                        </Modal>
-                      </div>
-                    )}
-                  </Box>
-                )}
-                {error && <Text color='red'>{error}</Text>}
-              </GridItem>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
-              Save
+                          Title
+                        </Th>
+                        <Th
+                          style={{ width: '5%', textAlign: 'left' }}
+                          className={styles.cTh}
+                        >
+                          Create By
+                        </Th>
+                        <Th
+                          style={{ width: '5%', textAlign: 'left' }}
+                          className={styles.cTh}
+                        >
+                          Start Date
+                        </Th>
+                        <Th
+                          style={{ width: '5%', textAlign: 'left' }}
+                          className={styles.cTh}
+                        >
+                          Closed Date
+                        </Th>
+                        <Th
+                          style={{ width: '5%', textAlign: 'left' }}
+                          className={styles.cTh}
+                        >
+                          Status
+                        </Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {dynamicList.map((item, index) => {
+                        const currentDate = new Date();
+                        const endDate = parse(
+                          item.end_Date,
+                          'dd/MM/yyyy',
+                          new Date(),
+                        );
+                        const isOverdue =
+                          item.status === 1 && isAfter(currentDate, endDate);
+                        return (
+                          <Tr key={index}>
+                            <Td
+                              style={{
+                                width: '5%',
+                                color: isOverdue ? 'red' : 'black',
+                              }}
+                            >
+                              {index + 1}
+                            </Td>
+                            <Td
+                              cursor={'pointer'}
+                              style={{ color: 'blue', textAlign: 'left' }}
+                              onClick={() => {
+                                handleAdd();
+                                setDetails(item);
+                              }}
+                            >
+                              {item.title}
+                            </Td>
+                            <Td
+                              style={{
+                                width: '15%',
+                                textAlign: 'left',
+                                color: isOverdue ? 'red' : 'black',
+                              }}
+                            >
+                              {item.emailSend}
+                            </Td>
+                            <Td
+                              style={{
+                                width: '15%',
+                                textAlign: 'left',
+                                color: isOverdue ? 'red' : 'black',
+                              }}
+                            >
+                              {item.start_Date}
+                            </Td>
+                            <Td
+                              style={{
+                                width: '15%',
+                                textAlign: 'left',
+                                color: isOverdue ? 'red' : 'black',
+                              }}
+                            >
+                              {item.closedDate !== null
+                                ? item.closedDate
+                                : 'In processing'}
+                            </Td>
+                            <Td
+                              style={{
+                                width: '15%',
+                                textAlign: 'left',
+                                color: isOverdue ? 'red' : 'black',
+                              }}
+                            >
+                              {item.status === 1
+                                ? 'Unsolve '
+                                : item.status === 2
+                                ? 'Solved '
+                                : item.status === 3
+                                ? 'Deleted '
+                                : item.status === 4
+                                ? 'Cancel '
+                                : 'Unknown Status'}
+                            </Td>
+                          </Tr>
+                        );
+                      })}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            </Center>
+            <Button
+              style={{ marginLeft: '0%', marginTop: '2%' }}
+              onClick={handleBackToList}
+            >
+              Back to List
             </Button>
-            <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Box>
+          </ListItem>
+        </List>
+        <Modal
+          isOpen={isOpenAdd}
+          onClose={() => setIsOpenAdd(false)}
+          closeOnOverlayClick={false}
+          size='lg'
+        >
+          <ModalOverlay />
+          <ModalContent maxW='1000px'>
+            <ModalHeader>Update feedback</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={8}>
+              <Grid
+                style={{ marginTop: '5px' }}
+                templateColumns='repeat(2, 1fr)'
+                gap={4}
+              >
+                <GridItem colSpan={1}>
+                  <Flex alignItems='center'>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      style={{ backgroundColor: 'white' }}
+                      value={selectedOptionActive}
+                      onChange={(e) => {
+                        setSelectedOptionActive(e.target.value);
+                      }}
+                    >
+                      {sortedIssue.map((status) => (
+                        <option key={status} value={status}>
+                          {status === 1
+                            ? 'Unsolve'
+                            : status === 2
+                            ? 'Solved'
+                            : status === 3
+                            ? 'Deleted'
+                            : status === 4
+                            ? 'Cancel'
+                            : 'Unknow'}
+                        </option>
+                      ))}
+                      {defaultOptions}
+                    </Select>
+                  </Flex>
+                </GridItem>
+                <GridItem colSpan={1}>
+                  {/* <Flex alignItems='center'>
+                    <FormLabel>Title</FormLabel>
+                    <Input
+                      id='title'
+                      defaultValue={detail?.title.trim()}
+                      style={{ backgroundColor: 'white' }}
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
+                  </Flex> */}
+
+                  <FormControl
+                    isRequired={true}
+                    isInvalid={
+                      isFirst?.title
+                        ? false
+                        : dataSubmit?.title === ''
+                        ? true
+                        : false
+                    }
+                  >
+                    <Flex
+                      alignItems={
+                        (
+                          isFirst?.title
+                            ? false
+                            : dataSubmit?.title === ''
+                            ? true
+                            : false
+                        )
+                          ? 'start'
+                          : 'center'
+                      }
+                    >
+                      <FormLabel>Title</FormLabel>
+                      <Stack w={'100%'}>
+                        <Input
+                          defaultValue={detail?.title.trim()}
+                          style={{ backgroundColor: 'white' }}
+                          id='title'
+                          value={dataSubmit?.title}
+                          onChange={handleChangeTitle}
+                        />
+                        {(isFirst?.title
+                          ? false
+                          : dataSubmit?.title === ''
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Title is required.
+                          </FormErrorMessage>
+                        )}
+                      </Stack>
+                    </Flex>
+                  </FormControl>
+                </GridItem>
+              </Grid>
+              {/* <FormControl mt={4}>
+                <FormLabel>Description</FormLabel>
+                <Textarea
+                  id='description'
+                  defaultValue={detail?.description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  width='100%'
+                  minH={40}
+                />
+              </FormControl> */}
+              <FormControl
+                isRequired={true}
+                mt={4}
+                isInvalid={
+                  isFirst?.description
+                    ? false
+                    : dataSubmit?.description === ''
+                    ? true
+                    : false
+                }
+              >
+                <FormLabel>Description</FormLabel>
+                <Stack width='100%'>
+                  <Textarea
+                    id='description'
+                    defaultValue={detail?.description.trim()}
+                    onChange={handleChangeDescription}
+                    width='100%'
+                    value={dataSubmit?.description}
+                    minH={40}
+                  />
+                  {(isFirst?.description
+                    ? false
+                    : dataSubmit?.description === ''
+                    ? true
+                    : false) && (
+                    <FormErrorMessage mt={0}>
+                      Description is required.
+                    </FormErrorMessage>
+                  )}
+                </Stack>
+              </FormControl>
+              <br />
+              <Grid templateColumns='repeat(1, 1fr)' gap={8}>
+                <GridItem>
+                  <Flex>
+                    <FormLabel style={{ width: '50px' }}>Image</FormLabel>
+                    <Input
+                      style={{
+                        width: '300px',
+                        border: 'none',
+                        textAlign: 'center',
+                        height: '40px',
+                      }}
+                      id='file'
+                      type='file'
+                      onChange={handleFileChangeU}
+                      multiple
+                    />
+                  </Flex>
+                  {Array.isArray(image) && image.length !== 0 && (
+                    <Box display='flex' flexWrap='wrap' gap={4}>
+                      {image.map((image, index) => (
+                        <Box
+                          key={index}
+                          position='relative'
+                          maxW='100px'
+                          maxH='200px'
+                          overflow='hidden'
+                          onClick={() => handleImageClick(index)}
+                          onMouseEnter={(event) =>
+                            handleImageMouseEnter(index, event)
+                          }
+                          onMouseLeave={handleImageMouseLeave}
+                        >
+                          <Image
+                            src={image.dataURL || `/images/${image.image1}`}
+                            alt={`Selected Image ${index}`}
+                            w='100%'
+                            h='100%'
+                            objectFit='cover'
+                            _hover={{ cursor: 'pointer' }}
+                          />
+                          {isHovered === index && (
+                            <>
+                              <DeleteIcon
+                                position='absolute'
+                                top='5px'
+                                color='black'
+                                right='5px'
+                                fontSize='15px'
+                                variant='ghost'
+                                onClick={(event) =>
+                                  handleDeleteClick(index, event)
+                                }
+                                _hover={{ color: 'black ' }}
+                              />
+                              <Text
+                                position='absolute'
+                                bottom='5px'
+                                left='5px'
+                                fontSize='10px'
+                                color='white'
+                              >
+                                {image.fileName}
+                              </Text>
+                            </>
+                          )}
+                        </Box>
+                      ))}
+                      {isZoomed && (
+                        <div
+                          className='modal-overlay'
+                          onClick={handleZoomClose}
+                        >
+                          <Modal
+                            isOpen={isZoomed}
+                            onClose={handleZoomClose}
+                            size='xl'
+                            isCentered
+                          >
+                            <ModalOverlay />
+                            <ModalContent>
+                              <ModalBody>
+                                <Box className='zoomed-image-container'>
+                                  <Image
+                                    src={
+                                      image[zoomedIndex]?.dataURL ||
+                                      `/images/${image[zoomedIndex]?.image1}`
+                                    }
+                                    alt={`${zoomedIndex}`}
+                                  />
+                                </Box>
+                              </ModalBody>
+                            </ModalContent>
+                          </Modal>
+                        </div>
+                      )}
+                    </Box>
+                  )}
+                  {error && <Text color='red'>{error}</Text>}
+                </GridItem>
+              </Grid>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme='blue' mr={3} onClick={handleUpdate}>
+                Save
+              </Button>
+              <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
+      {toast ? (
+        <ToastCustom
+          title={'Some fields is empty'}
+          description={'Please re-check the fields'}
+          status='error'
+        />
+      ) : null}
+    </>
   );
 }
 export default FeedBackDetailManagePage;

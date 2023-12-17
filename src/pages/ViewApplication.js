@@ -3,22 +3,13 @@ import {
   ListItem,
   List,
   Text,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
   Flex,
-  Spacer,
-  IconButton,
-  useDisclosure,
-  Icon,
-  useToast,
   Center,
+  InputGroup,
+  InputLeftElement,
+  Input,
 } from '@chakra-ui/react';
+import { SearchIcon } from '@chakra-ui/icons';
 import {
   Modal,
   ModalOverlay,
@@ -29,9 +20,7 @@ import {
   ModalCloseButton,
   FormControl,
   FormLabel,
-  Input,
   Button,
-  Select,
   Grid,
   GridItem,
   Textarea,
@@ -44,6 +33,7 @@ import styles from '@/styles/pm.module.css';
 import axios from 'axios';
 import { BACK_END_PORT } from '../../env';
 import { Inter } from 'next/font/google';
+import PaginationCustom from '@/components/pagination';
 const inter = Inter({ subsets: ['latin'] });
 
 const defaultData = {
@@ -92,7 +82,8 @@ function ApplicationPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${BACK_END_PORT}/api/App/ListApps`);
-        setData(response.data); // Assuming the API returns an array of objects
+        setData(response.data);
+        setDataDynamicList(response.data); // Assuming the API returns an array of objects
         const response2 = await axios.get(
           `${BACK_END_PORT}/api/Account/ListAccount`,
         );
@@ -249,6 +240,49 @@ function ApplicationPage() {
     return new Blob([uInt8Array], { type: contentType });
   }
 
+  //pagination
+  const itemPerPage = 10;
+  const [dynamicList, setDynamicList] = useState([]);
+  const [dataDynamicList, setDataDynamicList] = useState([]);
+  const [totalPages, setTotalPages] = useState(data ? data?.length : 0);
+  const [currentPage, setCurrentPage] = useState(1);
+  // filteredIssueData;
+  const handleChangePage = (page = 1, list = dataDynamicList) => {
+    setCurrentPage(page);
+    let newList = [];
+    for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
+      if (list[i]) {
+        newList.push(list[i]);
+      }
+    }
+    setTotalPages(list ? list?.length : 0);
+    setDynamicList(newList);
+  };
+
+  useEffect(() => {
+    if (data.length) {
+      handleChangePage(1);
+    } else {
+      setDynamicList([]);
+    }
+  }, [data]);
+  const [querySearch, setQuerySearch] = useState('');
+  const handleSearchApplication = (query) => {
+    if (query) {
+      const value = query.toLowerCase().trim();
+      const filterList = data.filter((item) =>
+        item?.name.toLowerCase().trim().includes(value),
+      );
+      setDataDynamicList(filterList);
+      handleChangePage(1, filterList);
+      setQuerySearch(query);
+    } else {
+      setQuerySearch('');
+      setDataDynamicList(data);
+      handleChangePage(1, data);
+    }
+  };
+
   return (
     <Box className={styles.bodybox}>
       <List>
@@ -287,16 +321,38 @@ function ApplicationPage() {
             </Box>
           </Box>
         </ListItem>
-        <ListItem>
+        <ListItem my={5}>
+          {
+            <Flex p={'0 62px'} justifyContent={'space-between'}>
+              <InputGroup w={'20%'}>
+                <InputLeftElement pointerEvents='none'>
+                  <SearchIcon color='gray.300' />
+                </InputLeftElement>
+                <Input
+                  type='text'
+                  placeholder='Search'
+                  value={querySearch}
+                  onChange={(e) => handleSearchApplication(e.target.value)}
+                />
+              </InputGroup>
+              <PaginationCustom
+                current={currentPage}
+                onChange={handleChangePage}
+                total={totalPages}
+                pageSize={itemPerPage}
+              />
+            </Flex>
+          }
           <Center>
-            <Grid templateColumns='repeat(3, 1fr)' gap={4} mt={5}>
-              {data.map((item) => (
+            <Grid templateColumns='repeat(5, 1fr)' gap={4} mt={5}>
+              {dynamicList.map((item) => (
                 <Box
                   key={item.id}
                   borderWidth='1px'
                   borderRadius='lg'
                   overflow='hidden'
                   p={4}
+                  maxH={'220px'}
                   width='300px'
                   boxShadow='md'
                 >
@@ -304,7 +360,14 @@ function ApplicationPage() {
                     <Text fontSize='lg' fontWeight='bold' mb={2}>
                       {item.name}
                     </Text>
-                    <Text>{item.description}</Text>
+                    <Text
+                      h={'95px'}
+                      textOverflow={'ellipsis'}
+                      overflow={'hidden'}
+                      noOfLines={4}
+                    >
+                      {item.description}
+                    </Text>
                     <HStack justify='space-between' mt={8}>
                       <Text
                         className={styles.listitem}

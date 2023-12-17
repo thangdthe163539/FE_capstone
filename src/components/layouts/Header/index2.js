@@ -23,7 +23,6 @@ function Header2() {
     // Access localStorage on the client side
     const storedAccount = JSON.parse(localStorage.getItem('account'));
     if (storedAccount) {
-      console.log(storedAccount);
       setAccount2(storedAccount); // Set the account state
     }
   }, []);
