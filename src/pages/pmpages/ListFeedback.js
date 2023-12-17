@@ -67,19 +67,25 @@ function FeedbackPage() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 2) {
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
           router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+          setAccount(accountDataDecode);
         }
-        setAccount(accountDataDecode);
+      } catch (error) {
+        router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
+  
   const [software, setSoftware] = useState();
 
   useEffect(() => {
@@ -311,11 +317,11 @@ function FeedbackPage() {
                         href={'/pmpages/FeedbackDetail'}
                         onClick={() => handleDetail(item)}
                       >
-                        {item.name}
+                        {item.name ? item.name : 'N/A'}
                       </Link>
                     </Td>
-                    <Td>{item.title}</Td>
-                    <Td>{item.start_Date}</Td>
+                    <Td>{item.title ? item.title : 'N/A'}</Td>
+                    <Td>{item.start_Date ? item.start_Date : 'N/A'}</Td>
                     <Td>
                       {item.closedDate !== null
                         ? item.closedDate

@@ -58,17 +58,22 @@ function ReportPage() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 2) {
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
           router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+          setAccount(accountDataDecode);
         }
-        setAccount(accountDataDecode);
+      } catch (error) {
+        router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
 
@@ -525,11 +530,11 @@ function ReportPage() {
                       {dynamicList1.map((item, index) => (
                         <Tr key={item.appId}>
                           <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.publisher}</Td>
-                          <Td>{item.version}</Td>
-                          <Td>{item.release}</Td>
-                          <Td>{item.type}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>{item.publisher ? item.publisher : 'N/A'}</Td>
+                          <Td>{item.version ? item.version : 'N/A'}</Td>
+                          <Td>{item.release ? item.release : 'N/A'}</Td>
+                          <Td>{item.type ? item.type : 'N/A'}</Td>
                           <Td>
                             {item.status === 1
                               ? 'Active'
@@ -600,11 +605,19 @@ function ReportPage() {
                       {dynamicList2.map((item, index) => (
                         <Tr key={item.assetId}>
                           <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.manufacturer}</Td>
-                          <Td>{item.model}</Td>
-                          <Td>{item.serialNumber}</Td>
-                          <Td>{item.lastSuccesfullScan}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>
+                            {item.manufacturer ? item.manufacturer : 'N/A'}
+                          </Td>
+                          <Td>{item.model ? item.model : 'N/A'}</Td>
+                          <Td>
+                            {item.serialNumber ? item.serialNumber : 'N/A'}
+                          </Td>
+                          <Td>
+                            {item.lastSuccesfullScan
+                              ? item.lastSuccesfullScan
+                              : 'N/A'}
+                          </Td>
                           <Td>
                             {item.status === 1
                               ? 'Active'
@@ -669,14 +682,14 @@ function ReportPage() {
                     </Thead>
                     <Tbody>
                       {dynamicList3.map((item, index) => (
-                        <Tr cursor={'pointer'} key={item.softwareId}>
+                        <Tr key={item.softwareId}>
                           <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.publisher}</Td>
-                          <Td>{item.version}</Td>
-                          <Td>{item.release}</Td>
-                          <Td>{item.type}</Td>
-                          <Td>{item.installDate}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>{item.publisher ? item.publisher : 'N/A'}</Td>
+                          <Td>{item.version ? item.version : 'N/A'}</Td>
+                          <Td>{item.release ? item.release : 'N/A'}</Td>
+                          <Td>{item.type ? item.type : 'N/A'}</Td>
+                          <Td>{item.installDate ? item.installDate : 'N/A'}</Td>
                         </Tr>
                       ))}
                     </Tbody>
@@ -739,13 +752,13 @@ function ReportPage() {
                     </Thead>
                     <Tbody>
                       {dynamicList4.map((item, index) => (
-                        <Tr cursor={'pointer'} key={item.libraryId}>
+                        <Tr key={item.libraryId}>
                           <Td>{index + 1}</Td>
-                          <Td>{item.appName}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.publisher}</Td>
-                          <Td>{item.libraryKey}</Td>
-                          <Td>{item.start_Date}</Td>
+                          <Td>{item.appName ? item.appName : 'N/A'}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>{item.publisher ? item.publisher : 'N/A'}</Td>
+                          <Td>{item.libraryKey ? item.libraryKey : 'N/A'}</Td>
+                          <Td>{item.start_Date ? item.start_Date : 'N/A'}</Td>
                           <Td>
                             {calculateEndDate(item.start_Date, item.time)}
                           </Td>
@@ -817,12 +830,12 @@ function ReportPage() {
                     </Thead>
                     <Tbody>
                       {dynamicList5.map((item, index) => (
-                        <Tr cursor={'pointer'} key={item.licenseId}>
+                        <Tr key={item.licenseId}>
                           <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.asset}</Td>
-                          <Td>{item.licenseKey}</Td>
-                          <Td>{item.start_Date}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>{item.asset ? item.asset : 'N/A'}</Td>
+                          <Td>{item.licenseKey ? item.licenseKey : 'N/A'}</Td>
+                          <Td>{item.start_Date ? item.start_Date : 'N/A'}</Td>
                           <Td>
                             {calculateEndDate(item.start_Date, item.time)}
                             {/* {item.time} */}

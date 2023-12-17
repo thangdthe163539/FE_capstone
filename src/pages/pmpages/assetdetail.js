@@ -636,17 +636,22 @@ function AssetDetailPage() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 2) {
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
           router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+          setAccount(accountDataDecode);
         }
-        setAccount(accountDataDecode);
+      } catch (error) {
+        router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
 
@@ -1147,7 +1152,9 @@ function AssetDetailPage() {
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {assetData?.lastSuccesfullScan ? assetData?.lastSuccesfullScan : 'N/A'}
+                              {assetData?.lastSuccesfullScan
+                                ? assetData?.lastSuccesfullScan
+                                : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>RAM:</Td>
                             <Td className={`${styles.text3}`}>
@@ -1159,7 +1166,9 @@ function AssetDetailPage() {
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {assetData?.serialNumber}
+                              {assetData?.serialNumber
+                                ? assetData?.serialNumber
+                                : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>Status:</Td>
                             <Td
@@ -1175,7 +1184,7 @@ function AssetDetailPage() {
                             </Td>
                             <Td className={styles.text2}>Storage:</Td>
                             <Td className={`${styles.text3}`}>
-                              {assetData?.memory}GB
+                              {assetData?.memory ? assetData?.memory : 'N/A'}GB
                             </Td>
                           </Tr>
                         </Tbody>
@@ -1463,12 +1472,12 @@ function AssetDetailPage() {
                           onClick={() => handleRowClick1(item)}
                         >
                           <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.publisher}</Td>
-                          <Td>{item.version}</Td>
-                          <Td>{item.release}</Td>
-                          <Td>{item.type}</Td>
-                          <Td>{item.installDate}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>{item.publisher ? item.publisher : 'N/A'}</Td>
+                          <Td>{item.version ? item.version : 'N/A'}</Td>
+                          <Td>{item.release ? item.release : 'N/A'}</Td>
+                          <Td>{item.type ? item.type : 'N/A'}</Td>
+                          <Td>{item.installDate ? item.installDate : 'N/A'}</Td>
                           {/* <Td>{item.status ? 'Have Issue' : 'No Issue'}</Td> */}
                         </Tr>
                       ))}
@@ -1572,11 +1581,11 @@ function AssetDetailPage() {
                           onClick={() => handleRowClick3(item)}
                         >
                           <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.publisher}</Td>
-                          <Td>{item.version}</Td>
-                          <Td>{item.release}</Td>
-                          <Td>{item.installDate}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>{item.publisher ? item.publisher : 'N/A'}</Td>
+                          <Td>{item.version ? item.version : 'N/A'}</Td>
+                          <Td>{item.release ? item.release : 'N/A'}</Td>
+                          <Td>{item.installDate ? item.installDate : 'N/A'}</Td>
                           {/* <Td>{item.status ? 'No Issues' : 'Have Issues'}</Td> */}
                         </Tr>
                       ))}
@@ -1662,9 +1671,9 @@ function AssetDetailPage() {
                           onClick={() => handleRowClick2(item)}
                         >
                           <Td>{index + 1}</Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.licenseKey}</Td>
-                          <Td>{item.start_Date}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>{item.licenseKey ? item.licenseKey : 'N/A'}</Td>
+                          <Td>{item.start_Date ? item.start_Date : 'N/A'}</Td>
                           <Td>
                             {calculateEndDate(item.start_Date, item.time)}
                           </Td>
@@ -2060,11 +2069,11 @@ function AssetDetailPage() {
                               />
                             </Tooltip>
                           </Td>
-                          <Td>{item.name}</Td>
-                          <Td>{item.publisher}</Td>
-                          <Td>{item.version}</Td>
-                          <Td>{item.release}</Td>
-                          <Td>{item.type}</Td>
+                          <Td>{item.name ? item.name : 'N/A'}</Td>
+                          <Td>{item.publisher ? item.publisher : 'N/A'}</Td>
+                          <Td>{item.version ? item.version : 'N/A'}</Td>
+                          <Td>{item.release ? item.release : 'N/A'}</Td>
+                          <Td>{item.type ? item.type : 'N/A'}</Td>
                         </Tr>
                       ))}
                     </Tbody>
