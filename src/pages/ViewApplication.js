@@ -241,7 +241,7 @@ function ApplicationPage() {
   }
 
   //pagination
-  const itemPerPage = 10;
+  const itemPerPage = 8;
   const [dynamicList, setDynamicList] = useState([]);
   const [dataDynamicList, setDataDynamicList] = useState([]);
   const [totalPages, setTotalPages] = useState(data ? data?.length : 0);
@@ -344,7 +344,7 @@ function ApplicationPage() {
             </Flex>
           }
           <Center>
-            <Grid templateColumns='repeat(5, 1fr)' gap={4} mt={5}>
+            <Grid templateColumns='repeat(4, 1fr)' gap={4} mt={5}>
               {dynamicList.map((item) => (
                 <Box
                   key={item.id}

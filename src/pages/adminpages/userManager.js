@@ -441,7 +441,7 @@ function UserManager() {
                     }
                   >
                     <Flex alignItems='center'>
-                      <FormLabel style={{ width: '15%' }}>Email</FormLabel>
+                      <FormLabel style={{ width: '16%' }}>Email</FormLabel>
                       <Stack>
                         <Input
                           id='email1'
@@ -502,7 +502,7 @@ function UserManager() {
                     }
                   >
                     <Flex alignItems='center'>
-                      <FormLabel style={{ width: '15%' }}>Name</FormLabel>
+                      <FormLabel style={{ width: '16%' }}>Name</FormLabel>
                       <Stack>
                         <Input
                           id='name'

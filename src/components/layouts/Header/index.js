@@ -78,6 +78,7 @@ function Header() {
   function handleLogout() {
     localStorage.clear();
     router.push('/');
+    window.location.reload();
   }
   //end
   useEffect(() => {
