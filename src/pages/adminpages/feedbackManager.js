@@ -37,7 +37,6 @@ import {
   Grid,
   GridItem,
 } from '@chakra-ui/react';
-import { Alert, AlertIcon } from '@chakra-ui/react';
 import axios from 'axios';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
@@ -59,7 +58,6 @@ const defaultData = {
 
 function FeedBackPage() {
   const [isOpenDetail, setIsOpenDetail] = useState(false);
-  const [formData, setFormData] = useState(defaultData);
   const [searchQueryTb, setSearchQueryTb] = useState('');
   const [filteredIssueData, setFilteredIssueData] = useState([]);
   const [Issues, setIssues] = useState([]);
@@ -68,8 +66,6 @@ function FeedBackPage() {
   const notificationTimeout = 2000;
   const [detail, setDetail] = useState(null);
   const [selectedOptionActive, setSelectedOptionActive] = useState('');
-  const [description, setDescription] = useState('');
-  const [title, setTitle] = useState('');
   const [error, setError] = useState('');
   const [image, setImage] = useState([]);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -90,7 +86,7 @@ function FeedBackPage() {
         if (accountDataDecode.roleId !== 1) {
           router.push('/page405');
         }
-        // setAccount(accountDataDecode);
+        setAccount(accountDataDecode);
       }
     }
   }, []);
@@ -265,12 +261,6 @@ function FeedBackPage() {
         console.error('Lỗi:', error);
       });
   }, []);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   //lọc
   const filteIssue = () => {
     const query = searchQueryTb.toLowerCase();
@@ -329,37 +319,6 @@ function FeedBackPage() {
         {getStatusLabel(status)}
       </option>
     ));
-
-  // const convertToISODate = (dateString) => {
-  //   const [day, month, year] = dateString.split('/');
-  //   return `${year}-${month}-${day}`;
-  // };
-  //End
-
-  const handleSendMail = () => {
-    const url = `http://localhost:5001/api/Report/SendReportByEmail/${detail.reportId}`;
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        accept: '*/*',
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          setIsOpenDetail(false);
-          setIsSuccess('true');
-        } else {
-          setIsOpenDetail(false);
-          setIsSuccess('false');
-        }
-      })
-      .catch((error) => {
-        setIsOpenDetail(false);
-        setIsSuccess('false');
-        console.error('Lỗi:', error);
-      });
-  };
 
   const [account, setAccount] = useState();
   useEffect(() => {

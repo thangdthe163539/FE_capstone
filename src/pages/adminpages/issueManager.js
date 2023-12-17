@@ -84,8 +84,6 @@ function IssuePage() {
   const notificationTimeout = 2000;
   const allowedExtensions = ['jpg', 'png'];
   const [mode, setMode] = useState('Application');
-  const [account, setAccount] = useState();
-
   const [searchQueryHw, setSearchQueryHw] = useState('');
   const [searchQuerySw, setSearchQuerySw] = useState('');
   const [searchQueryAnti, setSearchQueryAnti] = useState('');
@@ -97,6 +95,21 @@ function IssuePage() {
   const [filteredAntiData, setFilteredAntiData] = useState([]);
   const [Hardware, setHardware] = useState([]);
   const [Software, setSoftware] = useState([]);
+  const [account, setAccount] = useState();
+  useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+
+    if (storedAccount) {
+      const accountDataDecode = JSON.parse(storedAccount);
+      if (!accountDataDecode) {
+        // router.push('http://localhost:3000');
+      } else {
+        setAccount(accountDataDecode);
+      }
+    }
+  }, []);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {

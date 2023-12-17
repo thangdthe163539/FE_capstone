@@ -117,7 +117,7 @@ function IssuePage() {
         if (accountDataDecode.roleId !== 1) {
           router.push('/page405');
         }
-        // setAccount(accountDataDecode);
+        setAccount(accountDataDecode);
       }
     }
   }, []);

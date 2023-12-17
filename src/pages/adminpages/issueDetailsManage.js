@@ -74,6 +74,7 @@ function IssueDetailManagePage() {
   const [isHovered, setIsHovered] = useState(null);
   const allowedExtensions = ['jpg', 'png'];
 
+  const [account, setAccount] = useState();
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
@@ -83,10 +84,7 @@ function IssueDetailManagePage() {
       if (!accountDataDecode) {
         // router.push('http://localhost:3000');
       } else {
-        if (accountDataDecode.roleId !== 1) {
-          router.push('/page405');
-        }
-        // setAccount(accountDataDecode);
+        setAccount(accountDataDecode);
       }
     }
   }, []);
