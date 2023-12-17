@@ -72,17 +72,22 @@ function SoftwarePage() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 2) {
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
           router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+          setAccount(accountDataDecode);
         }
-        setAccount(accountDataDecode);
+      } catch (error) {
+        router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
   //
@@ -309,26 +314,19 @@ function SoftwarePage() {
               </Thead>
               <Tbody>
                 {dynamicList.map((item, index) => (
-                  <Tr
-                    _hover={{
-                      cursor: 'pointer',
-                    }}
-                    key={item.appId}
-                    color={selectedRow === item.appId ? 'red' : 'black'}
-                    onClick={() => handleRowClick(item)}
-                  >
+                  <Tr key={item.appId}>
                     <Td>{index + 1}</Td>
                     <Td className={styles.listitem}>
                       <Link
                         href={'/pmpages/ListFeedback'}
                         onClick={() => handleDetail(item)}
                       >
-                        {item.name}
+                        {item.name ? item.name : 'N/A'}
                       </Link>
                     </Td>
-                    <Td>{item.version}</Td>
-                    <Td>{item.os}</Td>
-                    <Td>{item.osversion}</Td>
+                    <Td>{item.version ? item.version : 'N/A'}</Td>
+                    <Td>{item.os ? item.os : 'N/A'}</Td>
+                    <Td>{item.osversion ? item.osversion : 'N/A'}</Td>
                     <Td>{item.done}</Td>
                     <Td>{item.doing}</Td>
                   </Tr>
