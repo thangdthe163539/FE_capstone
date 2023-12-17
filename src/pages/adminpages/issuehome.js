@@ -1297,7 +1297,7 @@ function IssuePage() {
                     isRequired
                     isInvalid={isFirst?.title ? false : !title ? true : false}
                   >
-                    <Flex alignItems=''>
+                    <Flex alignItems='center'>
                       <FormLabel>Title</FormLabel>
                       <Stack gap={0}>
                         <Input

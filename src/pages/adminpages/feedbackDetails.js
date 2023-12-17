@@ -552,7 +552,7 @@ function FeedBackDetailManagePage() {
             </InputGroup>
           </Flex>
           <Flex>
-            <Text fontSize='20px'>Total {issue.length} feedback(s) found:</Text>
+            <Text fontSize='20px'>Total {dynamicList.length} feedback(s) found:</Text>
           </Flex>
           <ListItem className={styles.list}>
             <Center>

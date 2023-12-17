@@ -142,7 +142,7 @@ function UserDetail() {
         setIsFirst({ name: false, name: false });
         return;
       }
-      const url = `http://localhost:5001/api/Account/Update_Accpunt${accid}`;
+      const url = `http://localhost:5001/api/Account/Update_Account${accid}`;
 
       const email = document.getElementById('email1').value;
       const isActive = selectedOptionActive ? selectedOptionActive : status;
@@ -199,20 +199,20 @@ function UserDetail() {
           >
             User detail
           </Text>
-          {isSuccess === 'true' && (
+          {isSuccess === 'true' ? (
             <ToastCustom
               title={'Your request successfully!'}
               description={''}
               status={'success'}
             />
-          )}
-          {isSuccess === 'false' && (
+          ): null}
+          {isSuccess === 'false' ? (
             <ToastCustom
               title={'Error processing your request.'}
               description={''}
               status={'error'}
             />
-          )}
+          ): null}
         </Flex>
 
         <hr
@@ -330,7 +330,7 @@ function UserDetail() {
               <Grid templateColumns='repeat(2, 1fr)' gap={8}>
                 <GridItem colSpan={1}>
                   <Flex alignItems='center'>
-                    <FormLabel style={{ width: '50px' }}>Email</FormLabel>
+                    <FormLabel style={{ width: '70px' }}>Email</FormLabel>
                     <Input
                       id='email1'
                       value={email}
@@ -386,7 +386,7 @@ function UserDetail() {
                     }
                   >
                     <Flex alignItems='center'>
-                      <FormLabel style={{ width: '50px' }}>Name</FormLabel>
+                      <FormLabel style={{ width: '60px' }}>Name</FormLabel>
                       <Stack w={'100%'}>
                         <Input
                           id='name'
