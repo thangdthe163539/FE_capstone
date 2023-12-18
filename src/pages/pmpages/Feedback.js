@@ -146,6 +146,8 @@ function SoftwarePage() {
   useEffect(() => {
     if (dynamicFilteredSoftwareData.length) {
       handleChangePage(1);
+    } else {
+      setDynamicList([]);
     }
   }, [dynamicFilteredSoftwareData]);
 

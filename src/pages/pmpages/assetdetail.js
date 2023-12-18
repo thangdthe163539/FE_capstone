@@ -902,15 +902,12 @@ function AssetDetailPage() {
   const filterLicense = () => {
     const query = searchLiQuery.toLowerCase();
     const filteredData = listLicense.filter((item) => {
-      try {
-        const name = item?.name.toLowerCase();
-        return name.includes(query);
-      } catch (error) {
-        return null;
-      }
+      const name = item?.name.toLowerCase();
+      return name.includes(query);
     });
-    setFilteredLicenseData(filteredData);
-    setFilteredLicenseDataDynamic(filteredData);
+    setFilteredLicenseDataDynamic(
+      filteredData.filter((item) => item.licenseId !== null),
+    );
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
@@ -1656,7 +1653,8 @@ function AssetDetailPage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredSoftwareDataDynamic.length} software(s)
+                          Show {dynamicList1.length}/
+                          {filteredSoftwareDataDynamic.length} software(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage1}
@@ -1769,8 +1767,8 @@ function AssetDetailPage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredAntivirusDataDynamic.length}{' '}
-                          antivirus(es)
+                          Show {dynamicList2.length}/
+                          {filteredAntivirusDataDynamic.length} antivirus(es)
                         </Text>
                         <PaginationCustom
                           current={currentPage2}
@@ -1861,7 +1859,8 @@ function AssetDetailPage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredLicenseDataDynamic.length} license(s)
+                          Show {dynamicList3.length}/
+                          {filteredLicenseDataDynamic.length} license(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage3}
@@ -2321,12 +2320,22 @@ function AssetDetailPage() {
                 <TableContainer>
                   <Table variant='simple'>
                     <TableCaption>
-                      <PaginationCustom
-                        current={currentPage4}
-                        onChange={handleChangePage4}
-                        total={totalPages4}
-                        pageSize={itemPerPage}
-                      />
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Show {dynamicList4.length}/
+                          {filteredAllSoftwareDataDynamic.length}{' '}
+                          {isAntivirus ? 'antivirus' : 'software'}(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage4}
+                          onChange={handleChangePage4}
+                          total={totalPages4}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>

@@ -391,7 +391,9 @@ function ReportPage() {
         setSoftwareData(allSoftware);
         setSoftwareDataDynamic(allSoftware);
         setLicenseData(allLicense);
-        setLicenseDataDynamic(allLicense);
+        setLicenseDataDynamic(
+          allLicense.filter((item) => item.licenseId !== null),
+        );
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -505,7 +507,8 @@ function ReportPage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {appDataDynamic.length} application(s)
+                          Show {dynamicList1.length}/{appDataDynamic.length}{' '}
+                          application(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage1}
@@ -581,7 +584,10 @@ function ReportPage() {
                         alignItems={'center'}
                         justifyContent={'space-between'}
                       >
-                        <Text>Total {assetDataDynamic.length} asset(s)</Text>
+                        <Text>
+                          Show {dynamicList2.length}/{assetDataDynamic.length}{' '}
+                          asset(s)
+                        </Text>
                         <PaginationCustom
                           current={currentPage2}
                           onChange={handleChangePage2}
@@ -661,7 +667,8 @@ function ReportPage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {softwareDataDynamic.length} software(s)
+                          Show {dynamicList3.length}/
+                          {softwareDataDynamic.length} software(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage3}
@@ -728,7 +735,8 @@ function ReportPage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {libraryDataDynamic.length} license(s)
+                          Show {dynamicList4.length}/{libraryDataDynamic.length}{' '}
+                          license(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage4}
@@ -807,7 +815,8 @@ function ReportPage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {licenseDataDynamic.length} license(s)
+                          Show {dynamicList5.length}/{licenseDataDynamic.length}{' '}
+                          license(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage5}
