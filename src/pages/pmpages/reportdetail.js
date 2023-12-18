@@ -78,17 +78,22 @@ function ReportPage(title) {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 2) {
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
           router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+          setAccount(accountDataDecode);
         }
-        setAccount(accountDataDecode);
+      } catch (error) {
+        router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
   //
@@ -291,30 +296,40 @@ function ReportPage(title) {
           <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue Detail
         </ListItem>
         <ListItem className={styles.list}>
-          <Text fontSize='2xl'>Issue: {formData?.title}</Text>
+          <Text fontSize='2xl'>
+            Issue: {formData?.title ? formData.title : 'N/A'}
+          </Text>
         </ListItem>
         <ListItem className={styles.list}>
           <Flex direction='row' width='100%' justify='space-between'>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>Name:</Text>
-              <Text className={styles.text1}>{formData?.name}</Text>
+              <Text className={styles.text1}>
+                {formData?.name ? formData.name : 'N/A'}
+              </Text>
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>Type:</Text>
-              <Text className={styles.text1}>{formData?.type}</Text>
+              <Text className={styles.text1}>
+                {formData?.type ? formData.type : 'N/A'}
+              </Text>
             </Flex>
 
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>
                 Start date:
               </Text>
-              <Text className={styles.text1}>{formData?.start_Date}</Text>
+              <Text className={styles.text1}>
+                {formData?.start_Date ? formData.start_Date : 'N/A'}
+              </Text>
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>
                 Deadline:
               </Text>
-              <Text className={styles.text1}>{formData?.end_Date}</Text>
+              <Text className={styles.text1}>
+                {formData?.end_Date ? formData.end_Date : 'N/A'}
+              </Text>
             </Flex>
             <Flex direction='row' align='center'>
               <Text className={`${styles.text1} ${styles.text2}`}>

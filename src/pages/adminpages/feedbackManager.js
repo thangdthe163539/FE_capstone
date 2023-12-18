@@ -666,7 +666,8 @@ function FeedBackPage() {
                     />
                   </Flex> */}
                   <FormControl
-                    isInvalid={
+                   isRequired
+                   isInvalid={
                       isFirst?.title
                         ? false
                         : dataSubmit?.title === ''

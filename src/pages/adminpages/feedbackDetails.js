@@ -543,7 +543,7 @@ function FeedBackDetailManagePage() {
                 onChange={handleSearchTbInputChange}
                 style={{ width: '100%' }}
               >
-                <option value=''>All</option>
+                <option value=''>All Feedback</option>
                 <option value='Unsolve'>Unsolve</option>
                 <option value='Solved'>Solved</option>
                 <option value='Deleted'>Deleted</option>
@@ -552,7 +552,7 @@ function FeedBackDetailManagePage() {
             </InputGroup>
           </Flex>
           <Flex>
-            <Text fontSize='20px'>Total {issue.length} feedback(s) found:</Text>
+            <Text fontSize='20px'>Total {dynamicList.length} feedback(s) found:</Text>
           </Flex>
           <ListItem className={styles.list}>
             <Center>

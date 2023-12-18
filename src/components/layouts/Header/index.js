@@ -143,7 +143,7 @@ function Header() {
                     border: 'none',
                     color: '#fff',
                   }}
-                  minW={'155px'}
+                  minW={'170px'}
                 >
                   {isLogin?.roleName}: {isLogin?.name}
                 </MenuButton>
