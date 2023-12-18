@@ -747,27 +747,17 @@ function IssueDetailManagePage() {
                   </Flex>
                 </GridItem>
                 <GridItem colSpan={1}>
-                  {/* <Flex alignItems='center'>
-                    <FormLabel>Title</FormLabel>
-                    <Input
-                      id='title'
-                      defaultValue={detail?.title.trim()}
-                      style={{ backgroundColor: 'white' }}
-                      onChange={(e) => setTitle(e.target.value)}
-                    />
-                  </Flex> */}
                   <FormControl
                     isRequired
                     isInvalid={isFirst?.title ? false : !title ? true : false}
                   >
-                    <Flex alignItems=''>
+                    <Flex alignItems='center' marginLeft={69}>
                       <FormLabel>Title</FormLabel>
                       <Stack gap={0}>
                         <Input
                           id='title'
                           style={{ backgroundColor: 'white' }}
                           defaultValue={detail?.title.trim()}
-                          // value={title}
                           onChange={(e) => {
                             setTitle(e.target.value);
                             setIsFirst({ ...isFirst, title: false });
@@ -783,21 +773,6 @@ function IssueDetailManagePage() {
                   </FormControl>
                 </GridItem>
                 <GridItem colSpan={1}>
-                  {/* <Flex alignItems='center'>
-                    <FormLabel>Deadline</FormLabel>
-                    <Input
-                      style={{
-                        marginLeft: '-7px',
-                        backgroundColor: 'white',
-                      }}
-                      type='date'
-                      name='endDate'
-                      defaultValue={
-                        detail ? convertToISODate(detail.end_Date) : ''
-                      }
-                      onChange={handleInputChange}
-                    />
-                  </Flex> */}
                   <FormControl
                     isRequired
                     isInvalid={
@@ -808,7 +783,7 @@ function IssueDetailManagePage() {
                         : false
                     }
                   >
-                    <Flex alignItems='center'>
+                    <Flex alignItems='center' marginLeft={20}>
                       <FormLabel>Deadline</FormLabel>
                       <Stack gap={0}>
                         <Input

@@ -81,7 +81,7 @@ function ReportPage() {
 
   //pagination filteredDeviceData
   const [appDataDynamic, setAppDataDynamic] = useState([]);
-  const itemPerPage = 6;
+  const itemPerPage = 4;
   const [dynamicList1, setDynamicList1] = useState([]);
   const [currentPage1, setCurrentPage1] = useState(1);
   // filteredIssueData;

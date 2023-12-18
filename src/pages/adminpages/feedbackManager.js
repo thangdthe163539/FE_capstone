@@ -650,15 +650,6 @@ function FeedBackPage() {
                   </Flex>
                 </GridItem>
                 <GridItem colSpan={1}>
-                  {/* <Flex alignItems='center'>
-                    <FormLabel>Title</FormLabel>
-                    <Input
-                      id='title'
-                      style={{ backgroundColor: 'white' }}
-                      defaultValue={detail?.title.trim()}
-                      onChange={(e) => setTitle(e.target.value)}
-                    />
-                  </Flex> */}
                   <FormControl
                     isRequired
                     isInvalid={
@@ -705,16 +696,6 @@ function FeedBackPage() {
                   </FormControl>
                 </GridItem>
               </Grid>
-              {/* <FormControl mt={4}>
-                <FormLabel>Description</FormLabel>
-                <Textarea
-                  id='description'
-                  defaultValue={detail?.description.trim()}
-                  onChange={(e) => setDescription(e.target.value)}
-                  width='100%'
-                  minH={40}
-                />
-              </FormControl> */}
               <FormControl
                 mt={4}
                 isRequired={true}

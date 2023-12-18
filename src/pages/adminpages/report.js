@@ -20,8 +20,10 @@ import styles from '@/styles/pm.module.css';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { useState, useEffect } from 'react';
 import Pagination from '@/components/pagination';
+import { useRouter } from 'next/router';
 
 function ReportPage() {
+  const router = useRouter();
   const itemPerPage = 5;
   const [Apps, setApps] = useState([]);
   const [Asset, setAsset] = useState([]);
@@ -616,14 +618,14 @@ function ReportPage() {
                       {dynamicList.map((app, index) => (
                         <Tr key={app.appId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'left' }}>{app.name}</Td>
-                          <Td style={{ textAlign: 'left' }}>{app.version}</Td>
-                          <Td style={{ textAlign: 'left' }}>{app.release}</Td>
-                          <Td style={{ textAlign: 'left' }}>{app.type}</Td>
-                          <Td style={{ textAlign: 'left' }}>{app.os}</Td>
-                          <Td style={{ textAlign: 'left' }}>{app.osversion}</Td>
-                          <Td style={{ textAlign: 'left' }}>{app.language}</Td>
-                          <Td style={{ textAlign: 'left' }}>{app.db}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.name ? app.name : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.version ? app.version : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.release ? app.release : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.type ? app.type : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.os ? app.os : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.osversion ? app.osversion : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.language ? app.language : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{app.db ? app.db : 'N/A'}</Td>
                           <Td style={{ width: '10%', textAlign: 'left' }}>
                             {app.status === 1
                               ? 'Active'
@@ -638,6 +640,7 @@ function ReportPage() {
                 </TableContainer>
               </ListItem>
             </TabPanel>
+
             {/* Asset */}
             <TabPanel>
               <ListItem className={styles.list}>
@@ -740,17 +743,17 @@ function ReportPage() {
                       {dynamicListAs.map((item, index) => (
                         <Tr key={item.assetId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.name}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.cpu}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.ram}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.memory}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.name ? item.name : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.cpu ? item.cpu : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.ram ? item.ram : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.memory ? item.memory : 'N/A'}</Td>
                           <Td style={{ textAlign: 'left' }}>
-                            {item.ipAddress}
+                            {item.ipAddress ? item.ipAddress : 'N/A'}
                           </Td>
                           <Td style={{ textAlign: 'left' }}>
-                            {item.bandwidth}
+                            {item.bandwidth ? item.bandwidth : 'N/A'}
                           </Td>
-                          <Td style={{ textAlign: 'left' }}>{item.model}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.model ? item.model : 'N/A'}</Td>
                           <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Active'
@@ -1127,7 +1130,7 @@ function ReportPage() {
                       {dynamicListLib.map((item, index) => (
                         <Tr key={item.libraryId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.name}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.name ? item.name : 'N/A'}</Td>
                           <Td style={{ textAlign: 'left' }}>
                             {
                               Apps.find(
@@ -1136,13 +1139,13 @@ function ReportPage() {
                             }
                           </Td>
                           <Td style={{ textAlign: 'left' }}>
-                            {item.publisher}
+                            {item.publisher ? item.publisher : 'N/A'}
                           </Td>
                           <Td style={{ textAlign: 'left' }}>
-                            {item.libraryKey}
+                            {item.libraryKey ? item.libraryKey : 'N/A'}
                           </Td>
                           <Td style={{ textAlign: 'left' }}>
-                            {item.start_Date}
+                            {item.start_Date ? item.start_Date : 'N/A'}
                           </Td>
                           <Td style={{ textAlign: 'left' }}>
                             {calculateEndDate(item.start_Date, item.time)}
@@ -1247,7 +1250,7 @@ function ReportPage() {
                         <Tr key={item.licenseId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
                           <Td style={{ textAlign: 'left' }}>
-                            {item.licenseKey}
+                            {item.licenseKey ? item.licenseKey : 'N/A'}
                           </Td>
                           <Td style={{ textAlign: 'left' }}>
                             {
@@ -1264,7 +1267,7 @@ function ReportPage() {
                             }
                           </Td>
                           <Td style={{ textAlign: 'left' }}>
-                            {item.start_Date}
+                            {item.start_Date ? item.start_Date : 'N/A'}
                           </Td>
                           <Td style={{ textAlign: 'left' }}>
                             {calculateEndDate(item.start_Date, item.time)}
@@ -1389,14 +1392,14 @@ function ReportPage() {
                       {dynamicListSw.map((item, index) => (
                         <Tr key={item.appId}>
                           <Td style={{ width: '5px' }}>{index + 1}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.name}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.name ? item.name : 'N/A'}</Td>
                           <Td style={{ textAlign: 'left' }}>
-                            {item.publisher}
+                            {item.publisher ? item.publisher : 'N/A'}
                           </Td>
-                          <Td style={{ textAlign: 'left' }}>{item.version}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.release}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.type}</Td>
-                          <Td style={{ textAlign: 'left' }}>{item.os}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.version ? item.version : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.release ? item.release : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.type ? item.type : 'N/A'}</Td>
+                          <Td style={{ textAlign: 'left' }}>{item.os ? item.os : 'N/A'}</Td>
                           <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
                               ? 'Active'
