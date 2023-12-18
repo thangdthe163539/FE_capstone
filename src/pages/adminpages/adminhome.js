@@ -11,17 +11,21 @@ function ADHomePage() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 1) {
-          router.push('/page405');
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
+          // router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
         }
-        // setAccount(accountDataDecode);
+      } catch (error) {
+        // router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
   return (

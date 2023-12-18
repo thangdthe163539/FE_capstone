@@ -81,22 +81,6 @@ function FeedBackDetailManagePage() {
     setSearchQueryTb(e.target.value);
   };
 
-  useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
-
-    if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 1) {
-          router.push('/page405');
-        }
-        // setAccount(accountDataDecode);
-      }
-    }
-  }, []);
   //pagination
   const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
@@ -271,42 +255,26 @@ function FeedBackDetailManagePage() {
     setDetail(item);
   };
 
-  // const handleSendMail = () => {
-  //   const url = `http://localhost:5001/api/Report/SendReportByEmail/${detail.reportId}`;
-  //   fetch(url, {
-  //     method: 'POST',
-  //     headers: {
-  //       accept: '*/*',
-  //       'Content-Type': 'application/json',
-  //     },
-  //   })
-  //     .then((response) => {
-  //       if (response.ok) {
-  //         setIsOpenDetail(false);
-  //         setIsSuccess('true');
-  //       } else {
-  //         setIsOpenDetail(false);
-  //         setIsSuccess('false');
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       setIsOpenDetail(false);
-  //       setIsSuccess('false');
-  //       console.error('Lỗi:', error);
-  //     });
-  // };
   const [account, setAccount] = useState();
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        setAccount(accountDataDecode);
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
+          // router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+          setAccount(accountDataDecode);
+        }
+      } catch (error) {
+        // router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
 
@@ -543,7 +511,7 @@ function FeedBackDetailManagePage() {
                 onChange={handleSearchTbInputChange}
                 style={{ width: '100%' }}
               >
-                <option value=''>All</option>
+                <option value=''>All Feedback</option>
                 <option value='Unsolve'>Unsolve</option>
                 <option value='Solved'>Solved</option>
                 <option value='Deleted'>Deleted</option>
@@ -552,7 +520,9 @@ function FeedBackDetailManagePage() {
             </InputGroup>
           </Flex>
           <Flex>
-            <Text fontSize='20px'>Total {dynamicList.length} feedback(s) found:</Text>
+            <Text fontSize='20px'>
+              Total {dynamicList.length} feedback(s) found:
+            </Text>
           </Flex>
           <ListItem className={styles.list}>
             <Center>

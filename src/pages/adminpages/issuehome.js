@@ -108,17 +108,22 @@ function IssuePage() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 1) {
-          router.push('/page405');
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
+          // router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+          setAccount(accountDataDecode);
         }
-        setAccount(accountDataDecode);
+      } catch (error) {
+        // router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
 
@@ -362,7 +367,6 @@ function IssuePage() {
   };
 
   const handleInputChange = (e) => {
-    console.log(isFirst);
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     if (name === 'title' || name === 'endDate') {
@@ -919,8 +923,6 @@ function IssuePage() {
     searchQueryTb: true,
     searchQuery: true,
   });
-
- 
 
   const [toast, setToast] = useState(false);
 

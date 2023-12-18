@@ -74,22 +74,6 @@ function FeedBackPage() {
 
   const allowedExtensions = ['jpg', 'png'];
   const router = useRouter();
-  useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
-
-    if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 1) {
-          router.push('/page405');
-        }
-        setAccount(accountDataDecode);
-      }
-    }
-  }, []);
 
   //pagination
   const itemPerPage = 5;
@@ -324,14 +308,22 @@ function FeedBackPage() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        setAccount(accountDataDecode);
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
+          // router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+          setAccount(accountDataDecode);
+        }
+      } catch (error) {
+        // router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
 
@@ -666,8 +658,8 @@ function FeedBackPage() {
                     />
                   </Flex> */}
                   <FormControl
-                   isRequired
-                   isInvalid={
+                    isRequired
+                    isInvalid={
                       isFirst?.title
                         ? false
                         : dataSubmit?.title === ''

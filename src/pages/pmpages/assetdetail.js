@@ -30,6 +30,7 @@ import {
   ModalBody,
   ModalCloseButton,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   Button,
@@ -120,6 +121,10 @@ function AssetDetailPage() {
   const [filteredAntivirusData, setFilteredAntivirusData] = useState([]);
   const [filteredLicenseData, setFilteredLicenseData] = useState([]);
   const [filteredAllSoftwareData, setFilteredAllSoftwareData] = useState([]);
+  const [invalidFields, setInvalidFields] = useState([]);
+  const [invalidFields1, setInvalidFields1] = useState([]);
+  const [invalidFields2, setInvalidFields2] = useState([]);
+  const [invalidFields3, setInvalidFields3] = useState([]);
   const [software, setSoftware] = useState();
   const [isAntivirus, setIsAntivirus] = useState(false);
   //pagination software data
@@ -273,29 +278,88 @@ function AssetDetailPage() {
   //
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    validateInputs();
     setFormData({ ...formData, [name]: value });
     // console.log(formData);
   };
   const handleInputChange1 = (e) => {
     const { name, value } = e.target;
+    validateInputs1();
     setFormData1({ ...formData1, [name]: value });
     // console.log(formData1);
   };
-
   const handleInputChange2 = (e) => {
     const { name, value } = e.target;
+    validateInputs2();
     setFormData2({ ...formData2, [name]: value });
     // console.log(formData2);
   };
   const handleInputChange3 = (e) => {
     const { name, value } = e.target;
-    setFormData3({ ...formData3, [name]: value });
-    // console.log(formData);
-  };
-  const handleInputChange4 = (e) => {
-    const { name, value } = e.target;
+    validateInputs3();
     setAssetData({ ...assetData, [name]: value });
     // console.log(formData);
+  };
+  const validateInputs = () => {
+    const requiredFields = ['name', 'publisher'];
+    const errors = [];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        errors.push(field);
+      }
+    }
+    // Update state to mark fields as invalid
+    setInvalidFields(errors);
+    return errors;
+  };
+  const validateInputs1 = () => {
+    const requiredFields = [
+      'name',
+      'publisher',
+      'licenseKey',
+      'start_Date',
+      'time',
+    ];
+    const errors = [];
+    for (const field of requiredFields) {
+      if (!formData1[field] && !(formData1[field] === 0)) {
+        errors.push(field);
+      }
+    }
+    // Update state to mark fields as invalid
+    setInvalidFields1(errors);
+    return errors;
+  };
+  const validateInputs2 = () => {
+    const requiredFields = ['start_Date', 'licenseKey', 'time'];
+    const errors = [];
+    for (const field of requiredFields) {
+      if (!formData2[field] && !(formData2[field] === 0)) {
+        errors.push(field);
+      }
+    }
+    // Update state to mark fields as invalid
+    setInvalidFields2(errors);
+    return errors;
+  };
+  const validateInputs3 = () => {
+    const requiredFields = [
+      'name',
+      'manufacturer',
+      'cpu',
+      'ram',
+      'memory',
+      'version',
+    ];
+    const errors = [];
+    for (const field of requiredFields) {
+      if (!assetData[field]) {
+        errors.push(field);
+      }
+    }
+    // Update state to mark fields as invalid
+    setInvalidFields3(errors);
+    return errors;
   };
   const handleSearchAppInputChange = (e) => {
     setSearchAppQuery(e.target.value);
@@ -353,23 +417,17 @@ function AssetDetailPage() {
   };
 
   //all button handle
-
   const handleSaveCreate = async () => {
+    // Validate inputs before saving
+    const validationErrors = validateInputs();
+    if (validationErrors.length > 0) {
+      // You can handle validation errors as needed
+      console.error('Validation Errors:', validationErrors);
+      return;
+    }
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const curDate = new Date();
-      const currentDateOnly = new Date(
-        curDate.getFullYear(),
-        curDate.getMonth(),
-        curDate.getDate(),
-      );
-      const formattedStartDate = formatDate(formData.start_Date);
-      let status;
-      if (formData.time == 0 || formData.time == '0') {
-        status = 2;
-      } else {
-        status = 1;
-      }
       const response = await axios.post(
         `${BACK_END_PORT}/api/Software/CreateSoftware`,
         {
@@ -379,7 +437,7 @@ function AssetDetailPage() {
           release: formData.release,
           type: formData.type,
           os: formData.os,
-          status: status,
+          status: 1,
         },
       );
       console.log('Data saved:', response.data);
@@ -411,6 +469,15 @@ function AssetDetailPage() {
   };
   //
   const handleSaveAdd = async () => {
+    // Validate inputs before saving
+    const validationErrors = validateInputs1();
+    if (haveLicense) {
+      if (validationErrors.length > 0) {
+        // You can handle validation errors as needed
+        console.error('Validation Errors:', validationErrors);
+        return;
+      }
+    }
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const curDate = new Date();
@@ -477,6 +544,13 @@ function AssetDetailPage() {
   };
   //
   const handleEditAsset = async () => {
+    // Validate inputs before saving
+    const validationErrors = validateInputs3();
+    if (validationErrors.length > 0) {
+      // You can handle validation errors as needed
+      console.error('Validation Errors:', validationErrors);
+      return;
+    }
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const curDate = new Date();
@@ -520,6 +594,13 @@ function AssetDetailPage() {
   };
   //
   const handleSaveEdit = async () => {
+    // Validate inputs before saving
+    const validationErrors = validateInputs2();
+    if (validationErrors.length > 0) {
+      // You can handle validation errors as needed
+      console.error('Validation Errors:', validationErrors);
+      return;
+    }
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
@@ -596,6 +677,13 @@ function AssetDetailPage() {
   };
   //
   const handleEditSoftware = async () => {
+    // Validate inputs before saving
+    const validationErrors = validateInputs1();
+    if (validationErrors.length > 0) {
+      // You can handle validation errors as needed
+      console.error('Validation Errors:', validationErrors);
+      return;
+    }
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
@@ -880,7 +968,7 @@ function AssetDetailPage() {
         </ListItem>
         <Tabs>
           <TabList>
-            <Tab
+            {/* <Tab
               className={styles.tab}
               _selected={{
                 color: '#4d9ffe',
@@ -897,7 +985,7 @@ function AssetDetailPage() {
               }}
             >
               Hardware
-            </Tab>
+            </Tab> */}
             <Tab
               className={styles.tab}
               _selected={{
@@ -936,7 +1024,7 @@ function AssetDetailPage() {
             </Tab>
           </TabList>
           <TabPanels>
-            <TabPanel>
+            {/* <TabPanel>
               <Center>
                 <Box
                   borderWidth='1px'
@@ -1071,7 +1159,7 @@ function AssetDetailPage() {
                   </Button>
                 </Box>
               </Center>
-            </TabPanel>
+            </TabPanel> */}
             <TabPanel>
               {showEditAsset ? (
                 <Center>
@@ -1230,21 +1318,39 @@ function AssetDetailPage() {
                         </Thead>
                         <Tbody>
                           <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Name:</Td>
-                            <Td className={styles.borderRight}>
-                              <Input
-                                value={assetData?.name}
-                                name='name'
-                                onChange={handleInputChange4}
-                                className={`${styles.text3}`}
-                              />
+                            <Td className={styles.text2}>
+                              <FormControl isRequired>
+                                <FormLabel>Name:</FormLabel>
+                              </FormControl>
                             </Td>
-                            <Td className={styles.text2}>OS:</Td>
+                            <Td className={styles.borderRight}>
+                              <FormControl
+                                isInvalid={invalidFields3.includes('name')}
+                              >
+                                <Input
+                                  value={assetData?.name}
+                                  name='name'
+                                  onChange={handleInputChange3}
+                                  className={`${styles.text3}`}
+                                />
+                                <Flex>
+                                  <Spacer />
+                                  <FormErrorMessage>
+                                    Name is required!
+                                  </FormErrorMessage>
+                                </Flex>
+                              </FormControl>
+                            </Td>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>OS:</FormLabel>
+                              </FormControl>
+                            </Td>
                             <Td className={styles.borderRight}>
                               <Select
                                 name='os'
                                 value={assetData?.os}
-                                onChange={handleInputChange4}
+                                onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                               >
                                 <option value='Windows'>Windows</option>
@@ -1254,105 +1360,197 @@ function AssetDetailPage() {
                                 <option value='iOS'>iOS</option>
                               </Select>
                             </Td>
-                            <Td className={styles.text2}>CPU:</Td>
+                            <Td className={styles.text2}>
+                              <FormControl isRequired>
+                                <FormLabel>CPU:</FormLabel>
+                              </FormControl>
+                            </Td>
                             <Td>
-                              <Input
-                                value={assetData?.cpu}
-                                name='cpu'
-                                onChange={handleInputChange4}
-                                className={`${styles.text3}`}
-                              />
+                              <FormControl
+                                isInvalid={invalidFields3.includes('cpu')}
+                              >
+                                <Input
+                                  value={assetData?.cpu}
+                                  name='cpu'
+                                  onChange={handleInputChange3}
+                                  className={`${styles.text3}`}
+                                />
+                                <Flex>
+                                  <Spacer />
+                                  <FormErrorMessage>
+                                    CPU is required!
+                                  </FormErrorMessage>
+                                </Flex>
+                              </FormControl>
                             </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Manufacturer:</Td>
-                            <Td className={styles.borderRight}>
-                              <Input
-                                value={assetData?.manufacturer}
-                                name='manufacturer'
-                                onChange={handleInputChange4}
-                                className={`${styles.text3}`}
-                              />
+                            <Td className={styles.text2}>
+                              <FormControl isRequired>
+                                <FormLabel>Manufacturer:</FormLabel>
+                              </FormControl>
                             </Td>
-                            <Td className={styles.text2}>Version:</Td>
                             <Td className={styles.borderRight}>
-                              <Input
-                                value={assetData?.version}
-                                name='version'
-                                onChange={handleInputChange4}
-                                className={`${styles.text3}`}
-                              />
+                              <FormControl
+                                isInvalid={invalidFields3.includes(
+                                  'manufacturer',
+                                )}
+                              >
+                                <Input
+                                  value={assetData?.manufacturer}
+                                  name='manufacturer'
+                                  onChange={handleInputChange3}
+                                  className={`${styles.text3}`}
+                                />
+                                <Flex>
+                                  <Spacer />
+                                  <FormErrorMessage>
+                                    Manufacturer is required!
+                                  </FormErrorMessage>
+                                </Flex>
+                              </FormControl>
                             </Td>
-                            <Td className={styles.text2}>GPU:</Td>
+                            <Td className={styles.text2}>
+                              <FormControl isRequired>
+                                <FormLabel>Version:</FormLabel>
+                              </FormControl>
+                            </Td>
+                            <Td className={styles.borderRight}>
+                              <FormControl
+                                isInvalid={invalidFields3.includes('version')}
+                              >
+                                <Input
+                                  value={assetData?.version}
+                                  name='version'
+                                  onChange={handleInputChange3}
+                                  className={`${styles.text3}`}
+                                />
+                                <Flex>
+                                  <Spacer />
+                                  <FormErrorMessage>
+                                    Version is required!
+                                  </FormErrorMessage>
+                                </Flex>
+                              </FormControl>
+                            </Td>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>GPU:</FormLabel>
+                              </FormControl>
+                            </Td>
                             <Td>
                               <Input
                                 value={assetData?.gpu}
                                 name='gpu'
-                                onChange={handleInputChange4}
+                                onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                               />
                             </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Model:</Td>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>Model:</FormLabel>
+                              </FormControl>
+                            </Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.model}
                                 name='model'
-                                onChange={handleInputChange4}
+                                onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                               />
                             </Td>
-                            <Td className={styles.text2}>Last updated:</Td>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>Last updated:</FormLabel>
+                              </FormControl>
+                            </Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.lastSuccesfullScan}
                                 name='lastSuccesfullScan'
-                                onChange={handleInputChange4}
+                                onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                                 disabled
                               />
                             </Td>
-                            <Td className={styles.text2}>RAM:</Td>
+                            <Td className={styles.text2}>
+                              <FormControl isRequired>
+                                <FormLabel>RAM:</FormLabel>
+                              </FormControl>
+                            </Td>
                             <Td>
-                              <Input
-                                value={assetData?.ram}
-                                name='ram'
-                                onChange={handleInputChange4}
-                                className={`${styles.text3}`}
-                              />
+                              <FormControl
+                                isInvalid={invalidFields3.includes('ram')}
+                              >
+                                <Input
+                                  value={assetData?.ram}
+                                  name='ram'
+                                  onChange={handleInputChange3}
+                                  className={`${styles.text3}`}
+                                />
+                                <Flex>
+                                  <Spacer />
+                                  <FormErrorMessage>
+                                    RAM is required!
+                                  </FormErrorMessage>
+                                </Flex>
+                              </FormControl>
                             </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Serial number:</Td>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>Serial number:</FormLabel>
+                              </FormControl>
+                            </Td>
                             <Td className={styles.borderRight}>
                               <Input
                                 value={assetData?.serialNumber}
                                 name='serialNumber'
-                                onChange={handleInputChange4}
+                                onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                               />
                             </Td>
-                            <Td className={styles.text2}>Status:</Td>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>Status:</FormLabel>
+                              </FormControl>
+                            </Td>
                             <Td className={styles.borderRight}>
                               <Select
                                 name='status'
                                 value={assetData?.status}
-                                onChange={handleInputChange4}
+                                onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                               >
                                 <option value='1'>Active</option>
                                 <option value='2'>Inactive</option>
                               </Select>
                             </Td>
-                            <Td className={styles.text2}>Storage:</Td>
+                            <Td className={styles.text2}>
+                              <FormControl isRequired>
+                                <FormLabel>Storage:</FormLabel>
+                              </FormControl>
+                            </Td>
                             <Td>
-                              <Input
-                                value={assetData?.memory}
-                                name='memory'
-                                onChange={handleInputChange4}
-                                className={`${styles.text3}`}
-                              />
+                              <FormControl
+                                isInvalid={invalidFields3.includes('memory')}
+                              >
+                                <Input
+                                  value={assetData?.memory}
+                                  name='memory'
+                                  onChange={handleInputChange3}
+                                  className={`${styles.text3}`}
+                                />
+                                <Flex>
+                                  <Spacer />
+                                  <FormErrorMessage>
+                                    Storage is required!
+                                  </FormErrorMessage>
+                                </Flex>
+                              </FormControl>
                             </Td>
                           </Tr>
                         </Tbody>
@@ -1369,7 +1567,9 @@ function AssetDetailPage() {
                     <Button
                       colorScheme='gray'
                       mt={3}
-                      onClick={() => setShowEditAsset(true)}
+                      onClick={() => (
+                        setShowEditAsset(true), setInvalidFields3([])
+                      )}
                     >
                       Back
                     </Button>
@@ -1412,7 +1612,9 @@ function AssetDetailPage() {
                         icon={<FaEdit />}
                         colorScheme='gray' // Choose an appropriate color
                         marginRight={1}
-                        onClick={() => setIsOpenEdit(true)}
+                        onClick={() => (
+                          setIsOpenEdit(true), setIsAntivirus(false)
+                        )}
                         isDisabled={isButtonDisabled1}
                       />
                     </Tooltip>
@@ -1421,7 +1623,9 @@ function AssetDetailPage() {
                         aria-label='Delete'
                         icon={<FaTrash />}
                         colorScheme='gray' // Choose an appropriate color
-                        onClick={() => setIsOpenDelete(true)}
+                        onClick={() => (
+                          setIsOpenDelete(true), setIsAntivirus(false)
+                        )}
                         isDisabled={isButtonDisabled1}
                       />
                     </Tooltip>
@@ -1521,7 +1725,9 @@ function AssetDetailPage() {
                         icon={<FaEdit />}
                         colorScheme='gray' // Choose an appropriate color
                         marginRight={1}
-                        onClick={() => setIsOpenEdit(true)}
+                        onClick={() => (
+                          setIsOpenEdit(true), setIsAntivirus(true)
+                        )}
                         isDisabled={isButtonDisabled3}
                       />
                     </Tooltip>
@@ -1530,7 +1736,9 @@ function AssetDetailPage() {
                         aria-label='Delete'
                         icon={<FaTrash />}
                         colorScheme='gray' // Choose an appropriate color
-                        onClick={() => setIsOpenDelete(true)}
+                        onClick={() => (
+                          setIsOpenDelete(true), setIsAntivirus(true)
+                        )}
                         isDisabled={isButtonDisabled3}
                       />
                     </Tooltip>
@@ -1711,7 +1919,7 @@ function AssetDetailPage() {
                   <Input
                     name='name'
                     value={assetData.name}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                     required
                   />
                 </FormControl>
@@ -1720,7 +1928,7 @@ function AssetDetailPage() {
                   <Input
                     name='manufacturer'
                     value={assetData.manufacturer}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1728,7 +1936,7 @@ function AssetDetailPage() {
                   <Input
                     name='model'
                     value={assetData.model}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1736,7 +1944,7 @@ function AssetDetailPage() {
                   <Input
                     name='serialNumber'
                     value={assetData.serialNumber}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                   />
                 </FormControl>
                 {/* Add more fields for the first column */}
@@ -1747,7 +1955,7 @@ function AssetDetailPage() {
                   <Input
                     name='cpu'
                     value={assetData.cpu}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1755,7 +1963,7 @@ function AssetDetailPage() {
                   <Input
                     name='gpu'
                     value={assetData.gpu}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1763,7 +1971,7 @@ function AssetDetailPage() {
                   <Input
                     name='ram'
                     value={assetData.ram}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                     type='number'
                   />
                 </FormControl>
@@ -1772,7 +1980,7 @@ function AssetDetailPage() {
                   <Input
                     name='memory'
                     value={assetData.memory}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                     type='number'
                   />
                 </FormControl>
@@ -1783,7 +1991,7 @@ function AssetDetailPage() {
                   <Select
                     name='os'
                     value={assetData.os}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                   >
                     <option value='Windows'>Windows</option>
                     <option value='macOS'>macOS</option>
@@ -1797,7 +2005,7 @@ function AssetDetailPage() {
                   <Input
                     name='version'
                     value={assetData.version}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1805,7 +2013,7 @@ function AssetDetailPage() {
                   <Input
                     name='ipAddress'
                     value={assetData.ipAddress}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                   />
                 </FormControl>
                 <FormControl className={styles.formInput}>
@@ -1813,7 +2021,7 @@ function AssetDetailPage() {
                   <Input
                     name='bandwidth'
                     value={assetData.bandwidth}
-                    onChange={handleInputChange4}
+                    onChange={handleInputChange3}
                   />
                 </FormControl>
                 {/* Add more fields for the second column */}
@@ -1825,7 +2033,7 @@ function AssetDetailPage() {
               <Select
                 name='status'
                 value={assetData.status}
-                onChange={handleInputChange4}
+                onChange={handleInputChange3}
               >
                 <option value='1'>Active</option>
                 <option value='2'>Inactive</option>
@@ -1844,9 +2052,9 @@ function AssetDetailPage() {
 
       <Modal //Modal edit license
         isOpen={isOpenEditLi}
-        onClose={() => setIsOpenEditLi(false)}
+        onClose={() => (setIsOpenEditLi(false), setInvalidFields2([]))}
         closeOnOverlayClick={false}
-        size='lg'
+        size='xl'
       >
         <ModalOverlay />
         <ModalContent>
@@ -1868,8 +2076,18 @@ function AssetDetailPage() {
                     isDisabled
                   />
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>License Key</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields2.includes('licenseKey')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>License key</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      License key is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='licenseKey'
                     value={formData2.licenseKey}
@@ -1878,8 +2096,17 @@ function AssetDetailPage() {
                 </FormControl>
               </GridItem>
               <GridItem>
-                <FormControl>
-                  <FormLabel>Start Date</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields2.includes('start_Date')}
+                >
+                  <Flex>
+                    <FormLabel>Start date</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Start date is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='startDate'
                     value={formData2.start_Date}
@@ -1888,8 +2115,18 @@ function AssetDetailPage() {
                     required
                   />
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Time</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields2.includes('time')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>Time</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Time is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='time'
                     min={0}
@@ -1906,7 +2143,11 @@ function AssetDetailPage() {
             <Button colorScheme='blue' mr={3} onClick={handleSaveEdit}>
               Save
             </Button>
-            <Button onClick={() => setIsOpenEditLi(false)}>Cancel</Button>
+            <Button
+              onClick={() => (setIsOpenEditLi(false), setInvalidFields2([]))}
+            >
+              Cancel
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -1914,7 +2155,12 @@ function AssetDetailPage() {
       <Modal // Modal add software
         isOpen={isOpenAdd}
         onClose={() => (
-          setIsOpenAdd(false), setShowModalAdd(false), setShowModalTable(true)
+          setIsOpenAdd(false),
+          setShowModalAdd(false),
+          setShowModalTable(true),
+          setFormData(defaultData),
+          setInvalidFields([]),
+          setInvalidFields1([])
         )}
         closeOnOverlayClick={false}
         size='6xl'
@@ -1930,7 +2176,13 @@ function AssetDetailPage() {
           }
         >
           <ModalHeader>
-            {showModalAdd ? 'Create new software' : 'Add software'}
+            {showModalAdd
+              ? isAntivirus
+                ? 'Create new antivirus'
+                : ' Create new software'
+              : isAntivirus
+              ? 'Add antivirus'
+              : 'Add software'}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
@@ -1938,8 +2190,17 @@ function AssetDetailPage() {
               <>
                 <Grid templateColumns='repeat(2, 1fr)' gap={4}>
                   <GridItem>
-                    <FormControl>
-                      <FormLabel>Name</FormLabel>
+                    <FormControl
+                      isRequired
+                      isInvalid={invalidFields.includes('name')}
+                    >
+                      <Flex>
+                        <FormLabel>Name</FormLabel>
+                        <Spacer />
+                        <FormErrorMessage mt={-2}>
+                          Name is required!
+                        </FormErrorMessage>
+                      </Flex>
                       <Input
                         name='name'
                         value={formData.name}
@@ -1966,8 +2227,17 @@ function AssetDetailPage() {
                     {/* Add more fields for the first column */}
                   </GridItem>
                   <GridItem>
-                    <FormControl>
-                      <FormLabel>Publisher</FormLabel>
+                    <FormControl
+                      isRequired
+                      isInvalid={invalidFields.includes('publisher')}
+                    >
+                      <Flex>
+                        <FormLabel>Publisher</FormLabel>
+                        <Spacer />
+                        <FormErrorMessage mt={-2}>
+                          Publisher is required!
+                        </FormErrorMessage>
+                      </Flex>
                       <Input
                         name='publisher'
                         value={formData.publisher}
@@ -2109,8 +2379,18 @@ function AssetDetailPage() {
                 {haveLicense ? (
                   <Grid templateColumns='repeat(2, 1fr)' gap={4}>
                     <GridItem>
-                      <FormControl className={styles.formInput}>
-                        <FormLabel>License Key</FormLabel>
+                      <FormControl
+                        isRequired
+                        isInvalid={invalidFields1.includes('licenseKey')}
+                        className={styles.formInput}
+                      >
+                        <Flex>
+                          <FormLabel>License key</FormLabel>
+                          <Spacer />
+                          <FormErrorMessage mt={-2}>
+                            License key is required!
+                          </FormErrorMessage>
+                        </Flex>
                         <Input
                           name='licenseKey'
                           value={formData1.licenseKey}
@@ -2119,8 +2399,18 @@ function AssetDetailPage() {
                       </FormControl>
                     </GridItem>
                     <GridItem>
-                      <FormControl className={styles.formInput}>
-                        <FormLabel>Start Date</FormLabel>
+                      <FormControl
+                        isRequired
+                        isInvalid={invalidFields1.includes('start_Date')}
+                        className={styles.formInput}
+                      >
+                        <Flex>
+                          <FormLabel>Start date</FormLabel>
+                          <Spacer />
+                          <FormErrorMessage mt={-2}>
+                            Start date is required!
+                          </FormErrorMessage>
+                        </Flex>
                         <Input
                           name='start_Date'
                           value={formData1.start_Date}
@@ -2129,8 +2419,18 @@ function AssetDetailPage() {
                           required
                         />
                       </FormControl>
-                      <FormControl className={styles.formInput}>
-                        <FormLabel>Time</FormLabel>
+                      <FormControl
+                        isRequired
+                        isInvalid={invalidFields1.includes('time')}
+                        className={styles.formInput}
+                      >
+                        <Flex>
+                          <FormLabel>Time</FormLabel>
+                          <Spacer />
+                          <FormErrorMessage mt={-2}>
+                            Time is required!
+                          </FormErrorMessage>
+                        </Flex>
                         <Input
                           min={0}
                           name='time'
@@ -2155,7 +2455,10 @@ function AssetDetailPage() {
                 </Button>
                 <Button
                   onClick={() => (
-                    setShowModalAdd(false), setShowModalTable(true)
+                    setShowModalAdd(false),
+                    setShowModalTable(true),
+                    setFormData(defaultData),
+                    setInvalidFields([])
                   )}
                 >
                   Back
@@ -2170,7 +2473,13 @@ function AssetDetailPage() {
                 <Button mr={3} colorScheme='blue' onClick={handleSaveAdd}>
                   Save
                 </Button>
-                <Button onClick={() => setShowModalTable(true)}>Back</Button>
+                <Button
+                  onClick={() => (
+                    setShowModalTable(true), setInvalidFields1([])
+                  )}
+                >
+                  Back
+                </Button>
               </>
             )}
           </ModalFooter>
@@ -2179,19 +2488,30 @@ function AssetDetailPage() {
 
       <Modal // Modal edit software
         isOpen={isOpenEdit}
-        onClose={() => setIsOpenEdit(false)}
+        onClose={() => (setIsOpenEdit(false), setInvalidFields1([]))}
         closeOnOverlayClick={false}
         size='lg'
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Edit software</ModalHeader>
+          <ModalHeader>
+            Edit {isAntivirus ? 'antivirus' : 'software'}
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(2, 1fr)' gap={4}>
               <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields1.includes('name')}
+                >
+                  <Flex>
+                    <FormLabel>Name</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Name is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='name'
                     value={formData1.name}
@@ -2218,8 +2538,17 @@ function AssetDetailPage() {
                 {/* Add more fields for the first column */}
               </GridItem>
               <GridItem>
-                <FormControl>
-                  <FormLabel>Publisher</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields1.includes('publisher')}
+                >
+                  <Flex>
+                    <FormLabel>Publisher</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Publisher is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='publisher'
                     value={formData1.publisher}
@@ -2261,7 +2590,11 @@ function AssetDetailPage() {
             <Button colorScheme='blue' mr={3} onClick={handleEditSoftware}>
               Save
             </Button>
-            <Button onClick={() => setIsOpenEdit(false)}>Cancel</Button>
+            <Button
+              onClick={() => (setIsOpenEdit(false), setInvalidFields1([]))}
+            >
+              Cancel
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -2275,7 +2608,10 @@ function AssetDetailPage() {
           <ModalHeader>Confirm delete</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>Are you sure you want to delete this software?</Text>
+            <Text>
+              Are you sure you want to delete this{' '}
+              {isAntivirus ? 'antivirus' : 'software'}?
+            </Text>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme='red' mr={3} onClick={handleDelete}>

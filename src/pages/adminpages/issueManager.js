@@ -10,6 +10,8 @@ import {
   Th,
   Td,
   TableCaption,
+  FormErrorMessage,
+  Stack,
   TableContainer,
   Flex,
   Spacer,
@@ -47,6 +49,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import PaginationCustom from '@/components/pagination';
 import { BACK_END_PORT } from '../../../env';
+import ToastCustom from '@/components/toast';
 const defaultData = {
   reportId: '',
   softwareId: '',
@@ -96,20 +99,7 @@ function IssuePage() {
   const [Hardware, setHardware] = useState([]);
   const [Software, setSoftware] = useState([]);
   const [account, setAccount] = useState();
-  useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
 
-    if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        setAccount(accountDataDecode);
-      }
-    }
-  }, []);
-  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -285,17 +275,22 @@ function IssuePage() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 1) {
-          router.push('/page405');
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
+          // router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+          setAccount(accountDataDecode);
         }
-        // setAccount(accountDataDecode);
+      } catch (error) {
+        // router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
 
@@ -705,9 +700,28 @@ function IssuePage() {
       });
   }, []);
 
+  const [deadline, setDeadline] = useState();
+
+  const handleDeadline = (e) => {
+    const { value } = e.target;
+    setDeadline(value);
+    setFormData({ ...formData, endDate: value });
+    setIsFirst({ ...isFirst, endDate: false });
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    if (name === 'title' || name === 'endDate') {
+      setIsFirst({ ...isFirst, [name]: false });
+    }
+  };
+
+  const [description2, setDescription2] = useState('');
+
+  const handleChangeDescription = (e) => {
+    setDescription2(e.target.value);
+    setIsFirst({ ...isFirst, description: false });
   };
 
   const countIssue = (appId) => {
@@ -764,14 +778,76 @@ function IssuePage() {
   const [os, setOs] = useState('');
   const [osversion, setOsversion] = useState('');
 
+  const fetchDataAndUpdateState = () => {
+    const url = 'http://localhost:5001/api/Report/ReportsByType/Issue';
+    fetch(url, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          setIssues(data);
+        }
+      })
+      .catch((error) => {
+        console.error('Lỗi:', error);
+      });
+  };
+
+  useEffect(() => {
+    fetchDataAndUpdateState();
+  }, []);
+
+  useEffect(() => {
+    if (isSuccess) {
+      const hideNotification = setTimeout(() => {
+        setIsSuccess('');
+        fetchDataAndUpdateState();
+      }, notificationTimeout);
+      return () => {
+        clearTimeout(hideNotification);
+      };
+    }
+  }, [isSuccess]);
+
+  const [isFirst, setIsFirst] = useState({
+    title: true,
+    description: true,
+    endDate: true,
+    searchQuerySw: true,
+    searchQueryAnti: true,
+    searchQueryHw: true,
+    searchQueryTb: true,
+    searchQuery: true,
+  });
+
+  const [toast, setToast] = useState(false);
+
   const handleSaveAdd = async () => {
     const url = 'http://localhost:5001/api/Report/CreateReport_appids';
 
     // const appIds = appId.join(',');
     const accId = account?.accId;
-    const desc = document.getElementById('description').value;
+    const desc = description2;
     const title = formData.title;
-    const endDate = document.getElementsByName('endDate')[0].value;
+    const endDate = deadline;
+    if (!endDate || !title || !desc) {
+      setToast(true);
+      setTimeout(() => {
+        setToast(false);
+      }, 500);
+      setIsFirst({
+        title: false,
+        description: false,
+        endDate: false,
+        searchQuerySw: false,
+        searchQueryAnti: false,
+        searchQueryHw: false,
+        searchQueryTb: false,
+        searchQuery: false,
+      });
+      return;
+    }
     const dateParts = endDate.split('-');
     let formattedDate = '';
     if (dateParts.length === 3) {
@@ -823,559 +899,664 @@ function IssuePage() {
     }
   };
 
-  const fetchDataAndUpdateState = () => {
-    const url = 'http://localhost:5001/api/Report/ReportsByType/Issue';
-    fetch(url, {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data) {
-          setIssues(data);
-        }
-      })
-      .catch((error) => {
-        console.error('Lỗi:', error);
-      });
-  };
-
-  useEffect(() => {
-    fetchDataAndUpdateState();
-  }, []);
-
-  useEffect(() => {
-    if (isSuccess) {
-      const hideNotification = setTimeout(() => {
-        setIsSuccess('');
-        fetchDataAndUpdateState();
-      }, notificationTimeout);
-      return () => {
-        clearTimeout(hideNotification);
-      };
-    }
-  }, [isSuccess]);
-
   return (
-    <Box className={styles.bodybox}>
-      <List>
-        <ListItem className={styles.list}>
-          <Link href='/adminpages/adminhome' className={styles.listitem}>
-            Home
-          </Link>
-          <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue management
-          <Text className={styles.alert}>
-            {isSuccess === 'true' && (
-              <Alert status='success'>
-                <AlertIcon />
-                Your request successfully!
-              </Alert>
-            )}
-            {isSuccess === 'false' && (
-              <Alert status='error' style={{ width: '350px' }}>
-                <AlertIcon />
-                Error processing your request.
-              </Alert>
-            )}
-          </Text>
-        </ListItem>
-        <ListItem className={styles.list}>
-          <Flex>
-            <Text fontSize='2xl'>
-              Issue management -{' '}
-              <Link
-                href='/adminpages/issuehome'
-                style={{ color: '#4d9ffe', textDecoration: 'none' }}
-              >
-                List open issue
-              </Link>
-            </Text>
-            <Spacer />
-            <InputGroup style={{ paddingTop: '', width: '35%' }}>
-              <InputLeftAddon pointerEvents='none' children='Application' />
-              <Input
-                style={{ width: '100%' }}
-                type='text'
-                value={searchQueryTb}
-                onChange={handleSearchTbInputChange}
-                placeholder='Search'
-                w={300}
-                mr={1}
-              />
-            </InputGroup>
-            <Box>
-              <IconButton
-                aria-label='Add'
-                icon={<FaPlus />}
-                colorScheme='gray'
-                marginRight={1}
-                onClick={() => setIsOpenAdd(true)}
-              />
-            </Box>
-          </Flex>
-        </ListItem>
-        <ListItem className={styles.list}>
-          <TableContainer>
-            <Center>
-              <Text fontSize={30} mb={2}>
-                All issue
-              </Text>
-            </Center>
-            <Table
-              variant='striped'
-              colorScheme='gray'
-              className={styles.cTable}
-            >
-              <TableCaption>
-                <Flex alignItems={'center'} justifyContent={'space-between'}>
-                  <Text>
-                    Show {dynamicList.length}/{filteredAppData.length} result(s)
-                  </Text>{' '}
-                  <PaginationCustom
-                    current={currentPage}
-                    onChange={handleChangePage}
-                    total={totalPages}
-                    pageSize={itemPerPage}
-                  />
-                </Flex>
-              </TableCaption>
-              <Thead>
-                <Tr>
-                  <Th className={styles.cTh}>No</Th>
-                  <Th className={styles.cTh}>Application</Th>
-                  <Th className={styles.cTh}>Release</Th>
-                  <Th className={styles.cTh}>OS</Th>
-                  <Th className={styles.cTh}>Os Version</Th>
-                  <Th className={styles.cTh}>Language</Th>
-                  <Th className={styles.cTh}>Database</Th>
-                  <Th className={styles.cTh}>Publisher</Th>
-                  <Th className={styles.cTh}>Status</Th>
-                  <Th className={styles.cTh}>No.Issue</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {dynamicList.map(
-                  (app, index) =>
-                    countIssue(app.appId) !== 0 && (
-                      <Tr key={app.id}>
-                        <Td style={{ width: '5%' }}>{index + 1}</Td>
-                        <Td>
-                          <Button
-                            color={'blue'}
-                            variant='link'
-                            onClick={() => handleIssuerDetails(app.appId)}
-                          >
-                            {app.name.trim()}
-                          </Button>
-                        </Td>
-                        <Td>{app.release.trim()}</Td>
-                        <Td>{app.os.trim()}</Td>
-                        <Td>{app.osversion.trim()}</Td>
-                        <Td>{app.language.trim()}</Td>
-                        <Td>{app.db.trim()}</Td>
-                        <Td>{app.publisher.trim()}</Td>
-                        <Td>Active</Td>
-                        <Td>{countIssue(app.appId)}</Td>
-                      </Tr>
-                    ),
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </ListItem>
-      </List>
-      <Modal
-        isOpen={isOpenAdd}
-        onClose={() => (
-          setIsOpenAdd(false),
-          setFormData(defaultData),
-          setSearchQuery(''),
-          setSearchQueryAnti(''),
-          setSearchQueryHw(''),
-          setSearchQuerySw(''),
-          setMode('Application')
-        )}
-        closeOnOverlayClick={false}
-        size='lg'
-      >
-        <ModalOverlay />
-        <ModalContent maxW='1100px'>
-          <ModalHeader>Create new issue</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid templateColumns='repeat(3, 1fr)' gap={8}>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <Select value={mode} onChange={toggleMode} width='140px'>
-                    <option value='Application'>Application</option>
-                    <option value='Hardware'>Hardware</option>
-                    <option value='Software'>Software</option>
-                    <option value='Antivirus'>Antivirus</option>
-                  </Select>
-                  <div
-                    style={{
-                      position: 'relative',
-                      display: 'inline-block',
-                      backgroundColor: 'white',
-                      width: '300px',
-                    }}
-                  >
-                    {mode === 'Application' ? (
-                      <React.Fragment>
-                        <Input
-                          type='text'
-                          style={{ backgroundColor: 'white', width: '270px' }}
-                          value={searchQuery}
-                          onChange={(e) => {
-                            handleSearchInputChange(e);
-                            setShowOptions(e.target.value !== '');
-                          }}
-                          placeholder={'Name - Os - Version'}
-                          w={300}
-                          mr={1}
-                        />
-                        {showOptions && (
-                          <div
-                            style={{
-                              position: 'absolute',
-                              top: '100%',
-                              left: 0,
-                              width: '270px',
-                              border: '2px solid whitesmoke',
-                              background: '#fff',
-                              zIndex: 1,
-                              borderRadius: '5px',
-                            }}
-                          >
-                            {filteredAppData.map((app) => (
-                              <Box
-                                key={app.appId}
-                                style={{ padding: '8px', cursor: 'pointer' }}
-                              >
-                                <Flex>
-                                  <Text
-                                    className={styles.listitem}
-                                    onClick={() => handleSelectAppName(app)}
-                                  >
-                                    {app.name.trim()}
-                                  </Text>
-                                  <Spacer />
-                                  <Text
-                                    className={styles.listitem}
-                                    onClick={() => handleSelectAppOs(app)}
-                                  >
-                                    {app.os.trim()} - {app.osversion.trim()}
-                                  </Text>
-                                </Flex>
-                              </Box>
-                            ))}
-                          </div>
-                        )}
-                      </React.Fragment>
-                    ) : mode === 'Hardware' ? (
-                      <React.Fragment>
-                        <Input
-                          type='text'
-                          style={{ backgroundColor: 'white', width: '270px' }}
-                          value={searchQueryHw}
-                          onChange={(e) => {
-                            handleSearchInputChangeHw(e);
-                            setShowOptionsHw(e.target.value !== '');
-                          }}
-                          placeholder={'Model - CPU - GPU'}
-                          w={300}
-                          mr={1}
-                        />
-                        {showOptionsHw && (
-                          <div
-                            style={{
-                              position: 'absolute',
-                              top: '100%',
-                              left: 0,
-                              width: '600px',
-                              border: '2px solid whitesmoke',
-                              background: '#fff',
-                              zIndex: 1,
-                              borderRadius: '5px',
-                            }}
-                          >
-                            {filteredHwData.map((item) => (
-                              <Box
-                                key={item.assetId}
-                                style={{ padding: '8px', cursor: 'pointer' }}
-                              >
-                                <Flex>
-                                  <Text
-                                    className={styles.listitem}
-                                    onClick={() => handleSelectHwModel(item)}
-                                  >
-                                    {item.model.trim()}
-                                  </Text>
-                                  <Spacer />
-                                  <Text
-                                    className={styles.listitem}
-                                    onClick={() => handleSelectHwCPU(item)}
-                                  >
-                                    {item.cpu.trim()}
-                                  </Text>
-                                  <Spacer />
-                                  <Text
-                                    className={styles.listitem}
-                                    onClick={() => handleSelectHwGPU(item)}
-                                  >
-                                    {item.gpu.trim()}
-                                  </Text>
-                                </Flex>
-                              </Box>
-                            ))}
-                          </div>
-                        )}
-                      </React.Fragment>
-                    ) : mode === 'Software' ? (
-                      <React.Fragment>
-                        <Input
-                          type='text'
-                          style={{ backgroundColor: 'white', width: '270px' }}
-                          value={searchQuerySw}
-                          onChange={(e) => {
-                            handleSearchInputChangeSw(e);
-                            setShowOptionsSw(e.target.value !== '');
-                          }}
-                          placeholder={'Name - Version - Os'}
-                          w={300}
-                          mr={1}
-                        />
-                        {showOptionsSw && (
-                          <div
-                            style={{
-                              position: 'absolute',
-                              top: '100%',
-                              left: 0,
-                              width: '300px',
-                              border: '2px solid whitesmoke',
-                              background: '#fff',
-                              zIndex: 1,
-                              borderRadius: '5px',
-                            }}
-                          >
-                            {filteredSwData.map((item) => (
-                              <Box
-                                key={item.softwareId}
-                                style={{ padding: '8px', cursor: 'pointer' }}
-                              >
-                                <Text
-                                  className={styles.listitem}
-                                  onClick={() => handleSelectSwName(item)}
-                                >
-                                  {item.name.trim()} - {item.version.trim()} -{' '}
-                                  {item.os.trim()}
-                                </Text>
-                              </Box>
-                            ))}
-                          </div>
-                        )}
-                      </React.Fragment>
-                    ) : (
-                      <React.Fragment>
-                        <Input
-                          type='text'
-                          style={{ backgroundColor: 'white', width: '270px' }}
-                          value={searchQueryAnti}
-                          onChange={(e) => {
-                            handleSearchInputChangeAnti(e);
-                            setShowOptionsAnti(e.target.value !== '');
-                          }}
-                          placeholder={'Name - Version - Os'}
-                          w={300}
-                          mr={1}
-                        />
-                        {showOptionsAnti && (
-                          <div
-                            style={{
-                              position: 'absolute',
-                              top: '100%',
-                              left: 0,
-                              width: '300px',
-                              border: '2px solid whitesmoke',
-                              background: '#fff',
-                              zIndex: 1,
-                              borderRadius: '5px',
-                            }}
-                          >
-                            {filteredAntiData.map((item) => (
-                              <Box
-                                key={item.softwareId}
-                                style={{ padding: '8px', cursor: 'pointer' }}
-                              >
-                                <Text
-                                  className={styles.listitem}
-                                  onClick={() => handleSelectAntiName(item)}
-                                >
-                                  {item.name.trim()} - {item.version.trim()} -{' '}
-                                  {item.os.trim()}
-                                </Text>
-                              </Box>
-                            ))}
-                          </div>
-                        )}
-                      </React.Fragment>
-                    )}
-                  </div>
-                </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Title</FormLabel>
-                  <Input
-                    placeholder='Title'
-                    name='title'
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    style={{ backgroundColor: 'white' }}
-                  />
-                </Flex>
-              </GridItem>
-              <GridItem colSpan={1}>
-                <Flex alignItems='center'>
-                  <FormLabel>Deadline</FormLabel>
-                  <Input
-                    style={{
-                      marginLeft: '-7px',
-                      backgroundColor: 'white',
-                    }}
-                    type='date'
-                    name='endDate'
-                    onChange={handleInputChange}
-                  />
-                </Flex>
-              </GridItem>
-            </Grid>
-            <FormControl mt={4}>
-              <FormLabel>Description</FormLabel>
-              <Textarea
-                id='description'
-                placeholder='Description...'
-                width='100%'
-                minH={40}
-              />
-            </FormControl>
-            <br />
-            <Grid templateColumns='repeat(1, 1fr)' gap={8}>
-              <GridItem>
-                <Flex>
-                  <FormLabel style={{ width: '50px' }}>Image</FormLabel>
-                  <Input
-                    style={{
-                      width: '300px',
-                      border: 'none',
-                      textAlign: 'center',
-                      height: '40px',
-                    }}
-                    id='file'
-                    type='file'
-                    onChange={handleFileChange}
-                    multiple
-                  />
-                </Flex>
-                <Box display='flex' flexWrap='wrap' gap={4}>
-                  {imagesState.map((image, index) => (
-                    <Box
-                      key={index}
-                      position='relative'
-                      maxW='100px'
-                      maxH='200px'
-                      overflow='hidden'
-                      onClick={() => handleImageClick(index)}
-                      onMouseEnter={(event) =>
-                        handleImageMouseEnter(index, event)
-                      }
-                      onMouseLeave={handleImageMouseLeave}
-                    >
-                      <Image
-                        src={image.dataURL}
-                        alt={`Selected Image ${index}`}
-                        w='100%'
-                        h='100%'
-                        objectFit='cover'
-                        _hover={{ cursor: 'pointer' }}
-                      />
-                      {isHovered === index && (
-                        <>
-                          <DeleteIcon
-                            position='absolute'
-                            top='5px'
-                            color='black'
-                            right='5px'
-                            fontSize='15px'
-                            variant='ghost'
-                            onClick={(event) =>
-                              handleDeleteClick_Add(index, event)
-                            }
-                            _hover={{ color: 'black' }}
-                          />
-                          <Text
-                            position='absolute'
-                            bottom='5px'
-                            left='5px'
-                            fontSize='10px'
-                            color='white'
-                          >
-                            {image.fileName}
-                          </Text>
-                        </>
-                      )}
-                    </Box>
-                  ))}
-                  {isZoomed && (
-                    <div className='modal-overlay' onClick={handleZoomClose}>
-                      <Modal
-                        isOpen={isZoomed}
-                        onClose={handleZoomClose}
-                        size='xl'
-                        isCentered
-                      >
-                        <ModalOverlay />
-                        <ModalContent>
-                          <ModalBody>
-                            <Box className='zoomed-image-container'>
-                              <Image
-                                src={imagesState[zoomedIndex]?.dataURL}
-                                alt={`${zoomedIndex}`}
-                                w='100%' // Thiết lập kích thước modal sao cho đủ lớn
-                                h='100%'
-                                objectFit='contain'
-                              />
-                            </Box>
-                          </ModalBody>
-                        </ModalContent>
-                      </Modal>
-                    </div>
-                  )}
-                </Box>
-                {error && <Text color='red'>{error}</Text>}
-              </GridItem>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
-              Save
-            </Button>
-            <Button
-              onClick={() => (
-                setIsOpenAdd(false),
-                setFormData(defaultData),
-                setSearchQuery(''),
-                setSearchQueryAnti(''),
-                setSearchQueryHw(''),
-                setSearchQuerySw(''),
-                setMode('Application')
+    <>
+      <Box className={styles.bodybox}>
+        <List>
+          <ListItem className={styles.list}>
+            <Link href='/adminpages/adminhome' className={styles.listitem}>
+              Home
+            </Link>
+            <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue management
+            <Text className={styles.alert}>
+              {isSuccess === 'true' && (
+                <Alert status='success'>
+                  <AlertIcon />
+                  Your request successfully!
+                </Alert>
               )}
-            >
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Box>
+              {isSuccess === 'false' && (
+                <Alert status='error' style={{ width: '350px' }}>
+                  <AlertIcon />
+                  Error processing your request.
+                </Alert>
+              )}
+            </Text>
+          </ListItem>
+          <ListItem className={styles.list}>
+            <Flex>
+              <Text fontSize='2xl'>
+                Issue management -{' '}
+                <Link
+                  href='/adminpages/issuehome'
+                  style={{ color: '#4d9ffe', textDecoration: 'none' }}
+                >
+                  List open issue
+                </Link>
+              </Text>
+              <Spacer />
+              <InputGroup style={{ paddingTop: '', width: '35%' }}>
+                <InputLeftAddon pointerEvents='none' children='Application' />
+                <Input
+                  style={{ width: '100%' }}
+                  type='text'
+                  value={searchQueryTb}
+                  onChange={handleSearchTbInputChange}
+                  placeholder='Search'
+                  w={300}
+                  mr={1}
+                />
+              </InputGroup>
+              <Box>
+                <IconButton
+                  aria-label='Add'
+                  icon={<FaPlus />}
+                  colorScheme='gray'
+                  marginRight={1}
+                  onClick={() => setIsOpenAdd(true)}
+                />
+              </Box>
+            </Flex>
+          </ListItem>
+          <ListItem className={styles.list}>
+            <TableContainer>
+              <Center>
+                <Text fontSize={30} mb={2}>
+                  All issue
+                </Text>
+              </Center>
+              <Table
+                variant='striped'
+                colorScheme='gray'
+                className={styles.cTable}
+              >
+                <TableCaption>
+                  <Flex alignItems={'center'} justifyContent={'space-between'}>
+                    <Text>
+                      Show {dynamicList.length}/{filteredAppData.length}{' '}
+                      result(s)
+                    </Text>{' '}
+                    <PaginationCustom
+                      current={currentPage}
+                      onChange={handleChangePage}
+                      total={totalPages}
+                      pageSize={itemPerPage}
+                    />
+                  </Flex>
+                </TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th className={styles.cTh}>No</Th>
+                    <Th className={styles.cTh}>Application</Th>
+                    <Th className={styles.cTh}>Release</Th>
+                    <Th className={styles.cTh}>OS</Th>
+                    <Th className={styles.cTh}>Os Version</Th>
+                    <Th className={styles.cTh}>Language</Th>
+                    <Th className={styles.cTh}>Database</Th>
+                    <Th className={styles.cTh}>Publisher</Th>
+                    <Th className={styles.cTh}>Status</Th>
+                    <Th className={styles.cTh}>No.Issue</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {dynamicList.map(
+                    (app, index) =>
+                      countIssue(app.appId) !== 0 && (
+                        <Tr key={app.id}>
+                          <Td style={{ width: '5%' }}>{index + 1}</Td>
+                          <Td>
+                            <Button
+                              color={'blue'}
+                              variant='link'
+                              onClick={() => handleIssuerDetails(app.appId)}
+                            >
+                              {app.name.trim()}
+                            </Button>
+                          </Td>
+                          <Td>{app.release.trim()}</Td>
+                          <Td>{app.os.trim()}</Td>
+                          <Td>{app.osversion.trim()}</Td>
+                          <Td>{app.language.trim()}</Td>
+                          <Td>{app.db.trim()}</Td>
+                          <Td>{app.publisher.trim()}</Td>
+                          <Td>Active</Td>
+                          <Td>{countIssue(app.appId)}</Td>
+                        </Tr>
+                      ),
+                  )}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </ListItem>
+        </List>
+        <Modal
+          isOpen={isOpenAdd}
+          onClose={() => (
+            setIsOpenAdd(false),
+            setFormData(defaultData),
+            setSearchQuery(''),
+            setSearchQueryAnti(''),
+            setSearchQueryHw(''),
+            setSearchQuerySw(''),
+            setMode('Application')
+          )}
+          closeOnOverlayClick={false}
+          size='lg'
+        >
+          <ModalOverlay />
+          <ModalContent maxW='1100px'>
+            <ModalHeader>Create new issue</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={8}>
+              <Grid templateColumns='repeat(3, 1fr)' gap={8}>
+                <GridItem colSpan={1}>
+                  <Flex alignItems=''>
+                    <Select value={mode} onChange={toggleMode} width='140px'>
+                      <option value='Application'>Application</option>
+                      <option value='Hardware'>Hardware</option>
+                      <option value='Software'>Software</option>
+                      <option value='Antivirus'>Antivirus</option>
+                    </Select>
+                    <div
+                      style={{
+                        position: 'relative',
+                        display: 'inline-block',
+                        backgroundColor: 'white',
+                        width: '300px',
+                      }}
+                    >
+                      {mode === 'Application' ? (
+                        <FormControl
+                          isInvalid={
+                            isFirst?.searchQuery
+                              ? false
+                              : !searchQuery
+                              ? true
+                              : false
+                          }
+                          isRequired={true}
+                        >
+                          <Input
+                            type='text'
+                            style={{ backgroundColor: 'white', width: '270px' }}
+                            value={searchQuery}
+                            onChange={(e) => {
+                              handleSearchInputChange(e);
+                              setShowOptions(e.target.value !== '');
+                              setIsFirst({ ...isFirst, searchQuery: false });
+                            }}
+                            placeholder={'Name - Os - Version'}
+                            w={300}
+                            mr={1}
+                          />
+                          {(isFirst?.searchQuery
+                            ? false
+                            : !searchQuery
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              This field is required.
+                            </FormErrorMessage>
+                          )}
+                          {showOptions && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                width: '270px',
+                                border: '2px solid whitesmoke',
+                                background: '#fff',
+                                zIndex: 1,
+                                borderRadius: '5px',
+                              }}
+                            >
+                              {filteredAppData.map((app) => (
+                                <Box
+                                  key={app.appId}
+                                  style={{ padding: '8px', cursor: 'pointer' }}
+                                >
+                                  <Flex>
+                                    <Text
+                                      className={styles.listitem}
+                                      onClick={() => handleSelectAppName(app)}
+                                    >
+                                      {app.name.trim()}
+                                    </Text>
+                                    <Spacer />
+                                    <Text
+                                      className={styles.listitem}
+                                      onClick={() => handleSelectAppOs(app)}
+                                    >
+                                      {app.os.trim()} - {app.osversion.trim()}
+                                    </Text>
+                                  </Flex>
+                                </Box>
+                              ))}
+                            </div>
+                          )}
+                        </FormControl>
+                      ) : mode === 'Hardware' ? (
+                        <FormControl
+                          isInvalid={
+                            isFirst?.searchQueryHw
+                              ? false
+                              : !searchQueryHw
+                              ? true
+                              : false
+                          }
+                          isRequired={true}
+                        >
+                          <Input
+                            type='text'
+                            style={{ backgroundColor: 'white', width: '270px' }}
+                            value={searchQueryHw}
+                            onChange={(e) => {
+                              handleSearchInputChangeHw(e);
+                              setShowOptionsHw(e.target.value !== '');
+                              setIsFirst({ ...isFirst, searchQueryHw: false });
+                            }}
+                            placeholder={'Model - CPU - GPU'}
+                            w={300}
+                            mr={1}
+                          />
+                          {(isFirst?.searchQueryHw
+                            ? false
+                            : !searchQueryHw
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              This field is required.
+                            </FormErrorMessage>
+                          )}
+                          {showOptionsHw && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                width: '600px',
+                                border: '2px solid whitesmoke',
+                                background: '#fff',
+                                zIndex: 1,
+                                borderRadius: '5px',
+                              }}
+                            >
+                              {filteredHwData.map((item) => (
+                                <Box
+                                  key={item.assetId}
+                                  style={{ padding: '8px', cursor: 'pointer' }}
+                                >
+                                  <Flex>
+                                    <Text
+                                      className={styles.listitem}
+                                      onClick={() => handleSelectHwModel(item)}
+                                    >
+                                      {item.model.trim()}
+                                    </Text>
+                                    <Spacer />
+                                    <Text
+                                      className={styles.listitem}
+                                      onClick={() => handleSelectHwCPU(item)}
+                                    >
+                                      {item.cpu.trim()}
+                                    </Text>
+                                    <Spacer />
+                                    <Text
+                                      className={styles.listitem}
+                                      onClick={() => handleSelectHwGPU(item)}
+                                    >
+                                      {item.gpu.trim()}
+                                    </Text>
+                                  </Flex>
+                                </Box>
+                              ))}
+                            </div>
+                          )}
+                        </FormControl>
+                      ) : mode === 'Software' ? (
+                        <FormControl
+                          isInvalid={
+                            isFirst?.searchQuerySw
+                              ? false
+                              : !searchQuerySw
+                              ? true
+                              : false
+                          }
+                          isRequired={true}
+                        >
+                          <Input
+                            type='text'
+                            style={{ backgroundColor: 'white', width: '270px' }}
+                            value={searchQuerySw}
+                            onChange={(e) => {
+                              handleSearchInputChangeSw(e);
+                              setShowOptionsSw(e.target.value !== '');
+                              setIsFirst({ ...isFirst, searchQuerySw: false });
+                            }}
+                            placeholder={'Name - Version - Os'}
+                            w={300}
+                            mr={1}
+                          />
+                          {!searchQuerySw && (
+                            <FormErrorMessage mt={0}>
+                              This field is required.
+                            </FormErrorMessage>
+                          )}
+                          {showOptionsSw && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                width: '300px',
+                                border: '2px solid whitesmoke',
+                                background: '#fff',
+                                zIndex: 1,
+                                borderRadius: '5px',
+                              }}
+                            >
+                              {filteredSwData.map((item) => (
+                                <Box
+                                  key={item.softwareId}
+                                  style={{ padding: '8px', cursor: 'pointer' }}
+                                >
+                                  <Text
+                                    className={styles.listitem}
+                                    onClick={() => handleSelectSwName(item)}
+                                  >
+                                    {item.name.trim()} - {item.version.trim()} -{' '}
+                                    {item.os.trim()}
+                                  </Text>
+                                </Box>
+                              ))}
+                            </div>
+                          )}
+                        </FormControl>
+                      ) : (
+                        <FormControl
+                          isInvalid={
+                            isFirst?.searchQueryAnti
+                              ? false
+                              : !searchQueryAnti
+                              ? true
+                              : false
+                          }
+                          isRequired={true}
+                        >
+                          <Input
+                            type='text'
+                            style={{ backgroundColor: 'white', width: '270px' }}
+                            value={searchQueryAnti}
+                            onChange={(e) => {
+                              handleSearchInputChangeAnti(e);
+                              setShowOptionsAnti(e.target.value !== '');
+                              setIsFirst({
+                                ...isFirst,
+                                searchQueryAnti: false,
+                              });
+                            }}
+                            placeholder={'Name - Version - Os'}
+                            w={300}
+                            mr={1}
+                          />
+                          {(isFirst?.searchQueryAnti
+                            ? false
+                            : !searchQueryAnti
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              This field is required.
+                            </FormErrorMessage>
+                          )}
+                          {showOptionsAnti && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                width: '300px',
+                                border: '2px solid whitesmoke',
+                                background: '#fff',
+                                zIndex: 1,
+                                borderRadius: '5px',
+                              }}
+                            >
+                              {filteredAntiData.map((item) => (
+                                <Box
+                                  key={item.softwareId}
+                                  style={{ padding: '8px', cursor: 'pointer' }}
+                                >
+                                  <Text
+                                    className={styles.listitem}
+                                    onClick={() => handleSelectAntiName(item)}
+                                  >
+                                    {item.name.trim()} - {item.version.trim()} -{' '}
+                                    {item.os.trim()}
+                                  </Text>
+                                </Box>
+                              ))}
+                            </div>
+                          )}
+                        </FormControl>
+                      )}
+                    </div>
+                  </Flex>
+                </GridItem>
+                <GridItem colSpan={1}>
+                  <FormControl
+                    isInvalid={
+                      isFirst?.title ? false : !formData.title ? true : false
+                    }
+                    isRequired
+                  >
+                    <Flex alignItems=''>
+                      <FormLabel>Title</FormLabel>
+                      <Stack alignItems={'start'} gap={0}>
+                        <Input
+                          placeholder='Title'
+                          name='title'
+                          value={formData.title}
+                          onChange={handleInputChange}
+                          style={{ backgroundColor: 'white' }}
+                        />
+                        {(isFirst?.title
+                          ? false
+                          : !formData.title
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Title is required
+                          </FormErrorMessage>
+                        )}
+                      </Stack>
+                    </Flex>
+                  </FormControl>
+                </GridItem>
+                <GridItem colSpan={1}>
+                  <FormControl
+                    isInvalid={
+                      isFirst?.endDate ? false : !deadline ? true : false
+                    }
+                    isRequired
+                  >
+                    <Flex alignItems='' justifyContent={'space-evenly'}>
+                      <FormLabel>Deadline</FormLabel>
+                      <Stack gap={0}>
+                        <Input
+                          style={{
+                            marginLeft: '-7px',
+                            backgroundColor: 'white',
+                          }}
+                          type='date'
+                          name='endDate'
+                          value={deadline}
+                          onChange={(e) => handleDeadline(e)}
+                        />
+                        {(isFirst?.endDate
+                          ? false
+                          : !deadline
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Deadline is required
+                          </FormErrorMessage>
+                        )}
+                      </Stack>
+                    </Flex>
+                  </FormControl>
+                </GridItem>
+              </Grid>
+              <FormControl
+                mt={4}
+                isInvalid={
+                  isFirst?.description ? false : !description2 ? true : false
+                }
+                isRequired
+              >
+                <FormLabel>Description</FormLabel>
+                <Textarea
+                  id='description'
+                  placeholder='Description...'
+                  value={description2}
+                  onChange={(e) => handleChangeDescription(e)}
+                  width='100%'
+                  minH={40}
+                />
+                {(isFirst?.description
+                  ? false
+                  : !description2
+                  ? true
+                  : false) && (
+                  <FormErrorMessage>Description is required</FormErrorMessage>
+                )}
+              </FormControl>
+              <br />
+              <Grid templateColumns='repeat(1, 1fr)' gap={8}>
+                <GridItem>
+                  <Flex>
+                    <FormLabel style={{ width: '50px' }}>Image</FormLabel>
+                    <Input
+                      style={{
+                        width: '300px',
+                        border: 'none',
+                        textAlign: 'center',
+                        height: '40px',
+                      }}
+                      id='file'
+                      type='file'
+                      onChange={handleFileChange}
+                      multiple
+                    />
+                  </Flex>
+                  <Box display='flex' flexWrap='wrap' gap={4}>
+                    {imagesState.map((image, index) => (
+                      <Box
+                        key={index}
+                        position='relative'
+                        maxW='100px'
+                        maxH='200px'
+                        overflow='hidden'
+                        onClick={() => handleImageClick(index)}
+                        onMouseEnter={(event) =>
+                          handleImageMouseEnter(index, event)
+                        }
+                        onMouseLeave={handleImageMouseLeave}
+                      >
+                        <Image
+                          src={image.dataURL}
+                          alt={`Selected Image ${index}`}
+                          w='100%'
+                          h='100%'
+                          objectFit='cover'
+                          _hover={{ cursor: 'pointer' }}
+                        />
+                        {isHovered === index && (
+                          <>
+                            <DeleteIcon
+                              position='absolute'
+                              top='5px'
+                              color='black'
+                              right='5px'
+                              fontSize='15px'
+                              variant='ghost'
+                              onClick={(event) =>
+                                handleDeleteClick_Add(index, event)
+                              }
+                              _hover={{ color: 'black' }}
+                            />
+                            <Text
+                              position='absolute'
+                              bottom='5px'
+                              left='5px'
+                              fontSize='10px'
+                              color='white'
+                            >
+                              {image.fileName}
+                            </Text>
+                          </>
+                        )}
+                      </Box>
+                    ))}
+                    {isZoomed && (
+                      <div className='modal-overlay' onClick={handleZoomClose}>
+                        <Modal
+                          isOpen={isZoomed}
+                          onClose={handleZoomClose}
+                          size='xl'
+                          isCentered
+                        >
+                          <ModalOverlay />
+                          <ModalContent>
+                            <ModalBody>
+                              <Box className='zoomed-image-container'>
+                                <Image
+                                  src={imagesState[zoomedIndex]?.dataURL}
+                                  alt={`${zoomedIndex}`}
+                                  w='100%' // Thiết lập kích thước modal sao cho đủ lớn
+                                  h='100%'
+                                  objectFit='contain'
+                                />
+                              </Box>
+                            </ModalBody>
+                          </ModalContent>
+                        </Modal>
+                      </div>
+                    )}
+                  </Box>
+                  {error && <Text color='red'>{error}</Text>}
+                </GridItem>
+              </Grid>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme='blue' mr={3} onClick={handleSaveAdd}>
+                Save
+              </Button>
+              <Button
+                onClick={() => (
+                  setIsOpenAdd(false),
+                  setFormData(defaultData),
+                  setSearchQuery(''),
+                  setSearchQueryAnti(''),
+                  setSearchQueryHw(''),
+                  setSearchQuerySw(''),
+                  setMode('Application')
+                )}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
+      {toast ? (
+        <ToastCustom
+          title={'Some fields is empty'}
+          description={'Please re-check the fields'}
+          status='error'
+        />
+      ) : null}
+    </>
   );
 }
 
