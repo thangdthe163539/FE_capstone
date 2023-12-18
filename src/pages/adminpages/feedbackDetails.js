@@ -238,11 +238,6 @@ function FeedBackDetailManagePage() {
       </option>
     ));
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   const handleBackToList = () => {
     router.push('feedbackhome');
   };
@@ -725,16 +720,6 @@ function FeedBackDetailManagePage() {
                   </Flex>
                 </GridItem>
                 <GridItem colSpan={1}>
-                  {/* <Flex alignItems='center'>
-                    <FormLabel>Title</FormLabel>
-                    <Input
-                      id='title'
-                      defaultValue={detail?.title.trim()}
-                      style={{ backgroundColor: 'white' }}
-                      onChange={(e) => setTitle(e.target.value)}
-                    />
-                  </Flex> */}
-
                   <FormControl
                     isRequired={true}
                     isInvalid={
@@ -781,16 +766,6 @@ function FeedBackDetailManagePage() {
                   </FormControl>
                 </GridItem>
               </Grid>
-              {/* <FormControl mt={4}>
-                <FormLabel>Description</FormLabel>
-                <Textarea
-                  id='description'
-                  defaultValue={detail?.description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  width='100%'
-                  minH={40}
-                />
-              </FormControl> */}
               <FormControl
                 isRequired={true}
                 mt={4}

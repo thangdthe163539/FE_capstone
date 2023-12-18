@@ -129,7 +129,7 @@ function AssetDetailPage() {
   const [software, setSoftware] = useState();
   const [isAntivirus, setIsAntivirus] = useState(false);
   //pagination software data
-  const itemPerPage = 6;
+  const itemPerPage = 4;
   const [filteredSoftwareDataDynamic, setFilteredSoftwareDataDynamic] =
     useState([]);
   const [dynamicList1, setDynamicList1] = useState([]);

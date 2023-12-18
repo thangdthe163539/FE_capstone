@@ -123,7 +123,7 @@ function UserDetail() {
   }, [isSuccess]);
 
   const [dataSubmit, setDataSubmit] = useState({
-    name: '',
+    name: name,
   });
 
   const [isFirst, setIsFirst] = useState({
@@ -386,7 +386,6 @@ function UserDetail() {
                       <Stack w={'100%'}>
                         <Input
                           id='name'
-                          defaultValue={name}
                           value={dataSubmit?.name}
                           onChange={handleChangeName}
                         />

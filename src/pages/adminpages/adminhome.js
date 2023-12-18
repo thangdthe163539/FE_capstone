@@ -2,20 +2,18 @@ import { Box, ListItem, List, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
 import { Flex } from 'antd';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 function ADHomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
         if (!accountDataDecode) {
-          // router.push('/page405');
         } else {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
@@ -24,7 +22,6 @@ function ADHomePage() {
           }
         }
       } catch (error) {
-        // router.push('/page405');
       }
     } else {
       router.push('/page405');

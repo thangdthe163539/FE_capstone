@@ -890,6 +890,7 @@ function IssuePage() {
           'Content-Type': 'multipart/form-data',
         },
       });
+      
       setIsSuccess('true');
       setIsOpenAdd(false);
       setSearchQuery('');
@@ -912,16 +913,18 @@ function IssuePage() {
             <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue management
             <Text className={styles.alert}>
               {isSuccess === 'true' && (
-                <Alert status='success'>
-                  <AlertIcon />
-                  Your request successfully!
-                </Alert>
+                <ToastCustom
+                title={'Your request successfully!'}
+                description={''}
+                status={'success'}
+              />
               )}
               {isSuccess === 'false' && (
-                <Alert status='error' style={{ width: '350px' }}>
-                  <AlertIcon />
-                  Error processing your request.
-                </Alert>
+                <ToastCustom
+                title={'Error processing your request.'}
+                description={''}
+                status={'error'}
+              />
               )}
             </Text>
           </ListItem>
@@ -1352,7 +1355,7 @@ function IssuePage() {
                     }
                     isRequired
                   >
-                    <Flex alignItems=''>
+                    <Flex alignItems='center'>
                       <FormLabel>Title</FormLabel>
                       <Stack alignItems={'start'} gap={0}>
                         <Input
@@ -1382,7 +1385,7 @@ function IssuePage() {
                     }
                     isRequired
                   >
-                    <Flex alignItems='' justifyContent={'space-evenly'}>
+                    <Flex alignItems='center' justifyContent={'space-evenly'}>
                       <FormLabel>Deadline</FormLabel>
                       <Stack gap={0}>
                         <Input
