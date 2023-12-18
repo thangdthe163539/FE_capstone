@@ -72,7 +72,7 @@ function AssetDetailPage() {
     assetId: '',
     licenseKey: '',
     startDate: '',
-    time: '0',
+    time: '',
     status_License: '',
     name: '',
     version: '',
@@ -125,6 +125,7 @@ function AssetDetailPage() {
   const [invalidFields1, setInvalidFields1] = useState([]);
   const [invalidFields2, setInvalidFields2] = useState([]);
   const [invalidFields3, setInvalidFields3] = useState([]);
+  const [invalidFields4, setInvalidFields4] = useState([]);
   const [software, setSoftware] = useState();
   const [isAntivirus, setIsAntivirus] = useState(false);
   //pagination software data
@@ -300,6 +301,12 @@ function AssetDetailPage() {
     setAssetData({ ...assetData, [name]: value });
     // console.log(formData);
   };
+  const handleInputChange4 = (e) => {
+    const { name, value } = e.target;
+    validateInputs4();
+    setFormData3({ ...formData3, [name]: value });
+    // console.log(formData);
+  };
   const validateInputs = () => {
     const requiredFields = ['name', 'publisher'];
     const errors = [];
@@ -313,16 +320,10 @@ function AssetDetailPage() {
     return errors;
   };
   const validateInputs1 = () => {
-    const requiredFields = [
-      'name',
-      'publisher',
-      'licenseKey',
-      'start_Date',
-      'time',
-    ];
+    const requiredFields = ['name', 'publisher'];
     const errors = [];
     for (const field of requiredFields) {
-      if (!formData1[field] && !(formData1[field] === 0)) {
+      if (!formData1[field]) {
         errors.push(field);
       }
     }
@@ -359,6 +360,18 @@ function AssetDetailPage() {
     }
     // Update state to mark fields as invalid
     setInvalidFields3(errors);
+    return errors;
+  };
+  const validateInputs4 = () => {
+    const requiredFields = ['licenseKey', 'start_Date', 'time'];
+    const errors = [];
+    for (const field of requiredFields) {
+      if (!formData3[field] && !(formData3 === 0)) {
+        errors.push(field);
+      }
+    }
+    // Update state to mark fields as invalid
+    setInvalidFields4(errors);
     return errors;
   };
   const handleSearchAppInputChange = (e) => {
@@ -470,8 +483,8 @@ function AssetDetailPage() {
   //
   const handleSaveAdd = async () => {
     // Validate inputs before saving
-    const validationErrors = validateInputs1();
     if (haveLicense) {
+      const validationErrors = validateInputs4();
       if (validationErrors.length > 0) {
         // You can handle validation errors as needed
         console.error('Validation Errors:', validationErrors);
@@ -732,6 +745,8 @@ function AssetDetailPage() {
         } else {
           if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }
@@ -2159,8 +2174,9 @@ function AssetDetailPage() {
           setShowModalAdd(false),
           setShowModalTable(true),
           setFormData(defaultData),
+          setFormData3(defaultData),
           setInvalidFields([]),
-          setInvalidFields1([])
+          setInvalidFields4([])
         )}
         closeOnOverlayClick={false}
         size='6xl'
@@ -2381,7 +2397,7 @@ function AssetDetailPage() {
                     <GridItem>
                       <FormControl
                         isRequired
-                        isInvalid={invalidFields1.includes('licenseKey')}
+                        isInvalid={invalidFields4.includes('licenseKey')}
                         className={styles.formInput}
                       >
                         <Flex>
@@ -2393,15 +2409,15 @@ function AssetDetailPage() {
                         </Flex>
                         <Input
                           name='licenseKey'
-                          value={formData1.licenseKey}
-                          onChange={handleInputChange1}
+                          value={formData3.licenseKey}
+                          onChange={handleInputChange4}
                         />
                       </FormControl>
                     </GridItem>
                     <GridItem>
                       <FormControl
                         isRequired
-                        isInvalid={invalidFields1.includes('start_Date')}
+                        isInvalid={invalidFields4.includes('start_Date')}
                         className={styles.formInput}
                       >
                         <Flex>
@@ -2413,15 +2429,15 @@ function AssetDetailPage() {
                         </Flex>
                         <Input
                           name='start_Date'
-                          value={formData1.start_Date}
-                          onChange={handleInputChange1}
+                          value={formData3.start_Date}
+                          onChange={handleInputChange4}
                           type='date'
                           required
                         />
                       </FormControl>
                       <FormControl
                         isRequired
-                        isInvalid={invalidFields1.includes('time')}
+                        isInvalid={invalidFields4.includes('time')}
                         className={styles.formInput}
                       >
                         <Flex>
@@ -2432,10 +2448,9 @@ function AssetDetailPage() {
                           </FormErrorMessage>
                         </Flex>
                         <Input
-                          min={0}
                           name='time'
-                          value={formData1.time}
-                          onChange={handleInputChange1}
+                          value={formData3.time}
+                          onChange={handleInputChange4}
                           type='number'
                         />
                       </FormControl>
@@ -2475,7 +2490,9 @@ function AssetDetailPage() {
                 </Button>
                 <Button
                   onClick={() => (
-                    setShowModalTable(true), setInvalidFields1([])
+                    setShowModalTable(true),
+                    setInvalidFields4([]),
+                    setFormData3(defaultData)
                   )}
                 >
                   Back
