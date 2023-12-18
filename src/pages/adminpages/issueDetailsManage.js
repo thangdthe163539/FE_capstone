@@ -518,7 +518,7 @@ function IssueDetailManagePage() {
             </InputGroup>
           </Flex>
           <Flex>
-            <Text fontSize='20px'>Total {issue.length} issue(s) found:</Text>
+            <Text fontSize='20px'>Total {dynamicList.length} issue(s) found:</Text>
           </Flex>
           <ListItem className={styles.list}>
             <Center>
