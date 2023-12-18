@@ -54,16 +54,23 @@ function Header() {
         })
           .then((response) => response.json())
           .then((data) => {
-            const id = data.roleId;
+            const roleId = data.roleId;
+            const status = data.status;
             localStorage.setItem('account', JSON.stringify(data));
-            if (id == 1) {
-              router.push('adminpages/adminhome');
-            } else if (id == 2) {
-              router.push('/pmpages/PoHome');
-            } else if (id == 3) {
-              router.push('/userpages/userhome');
-            } else {
+            if (status == 3) {
               router.push('http://localhost:3000/');
+            } else if (status == 2) {
+              router.push('/ViewApplication');
+            } else if (status == 1) {
+              if (roleId == 1) {
+                router.push('adminpages/adminhome');
+              } else if (roleId == 2) {
+                router.push('/pmpages/PoHome');
+              } else if (roleId == 3) {
+                router.push('/ViewApplication');
+              } else {
+                router.push('http://localhost:3000/');
+              }
             }
           })
           .catch((error) => {

@@ -30,6 +30,7 @@ import {
   ModalCloseButton,
   FormControl,
   FormLabel,
+  FormErrorMessage,
   Input,
   Button,
   Select,
@@ -103,6 +104,8 @@ function SoftwarePage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
+  const [invalidFields1, setInvalidFields1] = useState([]);
+  const [invalidFields2, setInvalidFields2] = useState([]);
   const toast = useToast();
   //
   //pagination
@@ -134,12 +137,60 @@ function SoftwarePage() {
   //
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    validateInputs1();
     setFormData({ ...formData, [name]: value });
   };
   const handleInputChange2 = (e) => {
     const { name, value } = e.target;
+    validateInputs2();
     setFormData2({ ...formData2, [name]: value });
     // console.log(formData2);
+  };
+  const validateInputs1 = () => {
+    const requiredFields = [
+      'name',
+      'publisher',
+      'osversion',
+      'description',
+      'language',
+      'db',
+      'description',
+    ];
+    const errors = [];
+
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        errors.push(field);
+      }
+    }
+
+    // Update state to mark fields as invalid
+    setInvalidFields1(errors);
+
+    return errors;
+  };
+  const validateInputs2 = () => {
+    const requiredFields = [
+      'name',
+      'publisher',
+      'osversion',
+      'description',
+      'language',
+      'db',
+      'description',
+    ];
+    const errors = [];
+
+    for (const field of requiredFields) {
+      if (!formData2[field]) {
+        errors.push(field);
+      }
+    }
+
+    // Update state to mark fields as invalid
+    setInvalidFields2(errors);
+
+    return errors;
   };
   //
   //
@@ -159,6 +210,13 @@ function SoftwarePage() {
   };
   //
   const handleSaveAdd = async () => {
+    // Validate inputs before saving
+    const validationErrors = validateInputs1();
+    if (validationErrors.length > 0) {
+      // You can handle validation errors as needed
+      console.error('Validation Errors:', validationErrors);
+      return;
+    }
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.post(`${BACK_END_PORT}/api/App/CreateApp`, {
@@ -176,7 +234,6 @@ function SoftwarePage() {
         language: formData.language,
         db: formData.db,
         status: 1,
-        // deviceId: formData.deviceId,
       });
       console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
@@ -200,6 +257,13 @@ function SoftwarePage() {
   };
   //
   const handleSaveEdit = async () => {
+    // Validate inputs before saving
+    const validationErrors = validateInputs2();
+    if (validationErrors.length > 0) {
+      // You can handle validation errors as needed
+      console.error('Validation Errors:', validationErrors);
+      return;
+    }
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
       const response = await axios.put(
@@ -520,19 +584,28 @@ function SoftwarePage() {
 
       <Modal //Modal edit software
         isOpen={isOpenEdit}
-        onClose={() => setIsOpenEdit(false)}
+        onClose={() => (setIsOpenEdit(false), setInvalidFields2([]))}
         closeOnOverlayClick={false}
         size='4x1'
       >
         <ModalOverlay />
-        <ModalContent w='60vw'>
+        <ModalContent w='70vw'>
           <ModalHeader>Edit application</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={4}>
               <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields2.includes('name')}
+                >
+                  <Flex>
+                    <FormLabel>Name</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Name is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='name'
                     value={formData2.name}
@@ -540,8 +613,18 @@ function SoftwarePage() {
                     required
                   />
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Publisher</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields2.includes('publisher')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>Publisher</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Publisher is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='publisher'
                     value={formData2.publisher}
@@ -581,8 +664,18 @@ function SoftwarePage() {
                     <option value='iOS'>iOS</option>
                   </Select>
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>OS Version</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields2.includes('osversion')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>OS Version</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      OS Version is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='osversion'
                     value={formData2.osversion}
@@ -620,16 +713,36 @@ function SoftwarePage() {
                     <option value='Mobile App'>Mobile App</option>
                   </Select>
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Programming</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields2.includes('language')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>Programming</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Programming is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='language'
                     value={formData2.language}
                     onChange={handleInputChange2}
                   />
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Database</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields2.includes('db')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>Database</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Database is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='db'
                     value={formData2.db}
@@ -649,8 +762,18 @@ function SoftwarePage() {
                 </FormControl>
               </GridItem>
             </Grid>
-            <FormControl className={styles.formInput}>
-              <FormLabel>Description</FormLabel>
+            <FormControl
+              isRequired
+              isInvalid={invalidFields2.includes('description')}
+              className={styles.formInput}
+            >
+              <Flex>
+                <FormLabel>Description</FormLabel>
+                <Spacer />
+                <FormErrorMessage mt={-2}>
+                  Description is required!
+                </FormErrorMessage>
+              </Flex>
               <Input
                 name='description'
                 value={formData2.description}
@@ -663,26 +786,41 @@ function SoftwarePage() {
             <Button colorScheme='blue' mr={3} onClick={handleSaveEdit}>
               Save
             </Button>
-            <Button onClick={() => setIsOpenEdit(false)}>Cancel</Button>
+            <Button
+              onClick={() => (setIsOpenEdit(false), setInvalidFields2([]))}
+            >
+              Cancel
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
 
       <Modal // Modal add new application
         isOpen={isOpenAdd}
-        onClose={() => (setIsOpenAdd(false), setFormData(defaultData))}
+        onClose={() => (
+          setIsOpenAdd(false), setFormData(defaultData), setInvalidFields1([])
+        )}
         closeOnOverlayClick={false}
-        size='4x2'
+        size='4x1'
       >
         <ModalOverlay />
-        <ModalContent w='60ws'>
+        <ModalContent w='70ws'>
           <ModalHeader>Create new application</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={4}>
               <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields1.includes('name')}
+                >
+                  <Flex>
+                    <FormLabel>Name</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Name is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='name'
                     value={formData.name}
@@ -690,8 +828,18 @@ function SoftwarePage() {
                     required
                   />
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Publisher</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields1.includes('publisher')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>Publisher</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Publisher is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='publisher'
                     value={formData.publisher}
@@ -731,8 +879,18 @@ function SoftwarePage() {
                     <option value='iOS'>iOS</option>
                   </Select>
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>OS Version</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields1.includes('osversion')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>OS Version</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      OS Version is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='osversion'
                     value={formData.osversion}
@@ -770,26 +928,67 @@ function SoftwarePage() {
                     <option value='Mobile App'>Mobile App</option>
                   </Select>
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Programming</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields1.includes('language')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>Programming</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Programming is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='language'
                     value={formData.language}
                     onChange={handleInputChange}
                   />
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Database</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields1.includes('db')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>Database</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      Database is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='db'
                     value={formData.db}
                     onChange={handleInputChange}
                   />
                 </FormControl>
+                <FormControl className={styles.formInput}>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    name='status'
+                    value={formData.status}
+                    onChange={handleInputChange}
+                  >
+                    <option value='1'>Active</option>
+                    <option value='2'>Inactive</option>
+                  </Select>
+                </FormControl>
               </GridItem>
             </Grid>
-            <FormControl className={styles.formInput}>
-              <FormLabel>Description</FormLabel>
+            <FormControl
+              isRequired
+              isInvalid={invalidFields1.includes('description')}
+              className={styles.formInput}
+            >
+              <Flex>
+                <FormLabel>Description</FormLabel>
+                <Spacer />
+                <FormErrorMessage mt={-2}>
+                  Description is required!
+                </FormErrorMessage>
+              </Flex>
               <Input
                 name='description'
                 value={formData.description}
@@ -803,7 +1002,11 @@ function SoftwarePage() {
               Save
             </Button>
             <Button
-              onClick={() => (setIsOpenAdd(false), setFormData(defaultData))}
+              onClick={() => (
+                setIsOpenAdd(false),
+                setFormData(defaultData),
+                setInvalidFields1([])
+              )}
             >
               Cancel
             </Button>

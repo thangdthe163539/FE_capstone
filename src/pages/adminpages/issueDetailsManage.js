@@ -78,14 +78,21 @@ function IssueDetailManagePage() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        setAccount(accountDataDecode);
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
+          // router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+        }
+      } catch (error) {
+        // router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
 
@@ -518,7 +525,9 @@ function IssueDetailManagePage() {
             </InputGroup>
           </Flex>
           <Flex>
-            <Text fontSize='20px'>Total {dynamicList.length} issue(s) found:</Text>
+            <Text fontSize='20px'>
+              Total {dynamicList.length} issue(s) found:
+            </Text>
           </Flex>
           <ListItem className={styles.list}>
             <Center>
