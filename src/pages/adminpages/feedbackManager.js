@@ -317,6 +317,7 @@ function FeedBackPage() {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
           }
+          setAccount(accountDataDecode);
         }
       } catch (error) {
         // router.push('/page405');

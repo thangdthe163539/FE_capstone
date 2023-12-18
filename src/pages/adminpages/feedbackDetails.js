@@ -255,30 +255,6 @@ function FeedBackDetailManagePage() {
     setDetail(item);
   };
 
-  // const handleSendMail = () => {
-  //   const url = `http://localhost:5001/api/Report/SendReportByEmail/${detail.reportId}`;
-  //   fetch(url, {
-  //     method: 'POST',
-  //     headers: {
-  //       accept: '*/*',
-  //       'Content-Type': 'application/json',
-  //     },
-  //   })
-  //     .then((response) => {
-  //       if (response.ok) {
-  //         setIsOpenDetail(false);
-  //         setIsSuccess('true');
-  //       } else {
-  //         setIsOpenDetail(false);
-  //         setIsSuccess('false');
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       setIsOpenDetail(false);
-  //       setIsSuccess('false');
-  //       console.error('Lỗi:', error);
-  //     });
-  // };
   const [account, setAccount] = useState();
   useEffect(() => {
     // Access localStorage on the client side
@@ -292,6 +268,7 @@ function FeedBackDetailManagePage() {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
           }
+          setAccount(accountDataDecode);
         }
       } catch (error) {
         // router.push('/page405');
