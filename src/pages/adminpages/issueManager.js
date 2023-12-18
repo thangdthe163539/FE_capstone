@@ -283,6 +283,7 @@ function IssuePage() {
           } else if (accountDataDecode.status == 2) {
             router.push('/ViewApplication');
           }
+          setAccount(accountDataDecode);
         }
       } catch (error) {
         // router.push('/page405');

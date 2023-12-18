@@ -255,30 +255,6 @@ function FeedBackDetailManagePage() {
     setDetail(item);
   };
 
-  // const handleSendMail = () => {
-  //   const url = `http://localhost:5001/api/Report/SendReportByEmail/${detail.reportId}`;
-  //   fetch(url, {
-  //     method: 'POST',
-  //     headers: {
-  //       accept: '*/*',
-  //       'Content-Type': 'application/json',
-  //     },
-  //   })
-  //     .then((response) => {
-  //       if (response.ok) {
-  //         setIsOpenDetail(false);
-  //         setIsSuccess('true');
-  //       } else {
-  //         setIsOpenDetail(false);
-  //         setIsSuccess('false');
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       setIsOpenDetail(false);
-  //       setIsSuccess('false');
-  //       console.error('Lỗi:', error);
-  //     });
-  // };
   const [account, setAccount] = useState();
   useEffect(() => {
     // Access localStorage on the client side
@@ -294,6 +270,7 @@ function FeedBackDetailManagePage() {
           } else if (accountDataDecode.status == 2) {
             router.push('/ViewApplication');
           }
+          setAccount(accountDataDecode);
         }
       } catch (error) {
         // router.push('/page405');
@@ -536,7 +513,7 @@ function FeedBackDetailManagePage() {
                 onChange={handleSearchTbInputChange}
                 style={{ width: '100%' }}
               >
-                <option value=''>All</option>
+                <option value=''>All Feedback</option>
                 <option value='Unsolve'>Unsolve</option>
                 <option value='Solved'>Solved</option>
                 <option value='Deleted'>Deleted</option>

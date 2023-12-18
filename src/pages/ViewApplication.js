@@ -248,6 +248,9 @@ function ApplicationPage() {
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
   const handleChangePage = (page = 1, list = dataDynamicList) => {
+    if (list && !Array.isArray(list)) {
+      list = dataDynamicList;
+    }
     setCurrentPage(page);
     let newList = [];
     for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
@@ -322,67 +325,74 @@ function ApplicationPage() {
           </Box>
         </ListItem>
         <ListItem my={5}>
-          {
-            <Flex p={'0 62px'} justifyContent={'space-between'}>
-              <InputGroup w={'20%'}>
-                <InputLeftElement pointerEvents='none'>
-                  <SearchIcon color='gray.300' />
-                </InputLeftElement>
-                <Input
-                  type='text'
-                  placeholder='Search'
-                  value={querySearch}
-                  onChange={(e) => handleSearchApplication(e.target.value)}
-                />
-              </InputGroup>
-              <PaginationCustom
-                current={currentPage}
-                onChange={handleChangePage}
-                total={totalPages}
-                pageSize={itemPerPage}
+          <Flex justifyContent={'space-between'}>
+            <InputGroup w={'24%'} minWidth={'340px'}>
+              <InputLeftElement pointerEvents='none'>
+                <SearchIcon color='gray.300' />
+              </InputLeftElement>
+              <Input
+                type='text'
+                placeholder='Search'
+                value={querySearch}
+                onChange={(e) => handleSearchApplication(e.target.value)}
               />
-            </Flex>
-          }
-          <Center>
-            <Grid templateColumns='repeat(4, 1fr)' gap={4} mt={5}>
-              {dynamicList.map((item) => (
-                <Box
-                  key={item.id}
-                  borderWidth='1px'
-                  borderRadius='lg'
-                  overflow='hidden'
-                  p={4}
-                  maxH={'220px'}
-                  width='300px'
-                  boxShadow='md'
-                >
-                  <Box>
-                    <Text fontSize='lg' fontWeight='bold' mb={2}>
-                      {item.name}
-                    </Text>
+            </InputGroup>
+            <PaginationCustom
+              current={currentPage}
+              onChange={handleChangePage}
+              total={totalPages}
+              pageSize={itemPerPage}
+            />
+          </Flex>
+
+          <Grid
+            templateColumns={{
+              base: 'repeat(2, minmax(150px, 1fr))', // Responsive cho mobile và các thiết bị nhỏ hơn
+              md: 'repeat(3, minmax(200px, 1fr))', // Responsive cho màn hình lớn hơn medium
+              lg: 'repeat(4, minmax(250px, 1fr))', // Responsive cho màn hình lớn
+            }}
+            mt={5}
+            gap={'20px'}
+            justifyItems={'center'}
+          >
+            {dynamicList.map((item, i) => (
+              <Box
+                key={item.id}
+                borderWidth='1px'
+                borderRadius='lg'
+                overflow='hidden'
+                p={4}
+                maxH={'220px'}
+                w={'100%'}
+                boxShadow='md'
+                mb={'3%'}
+              >
+                <Box>
+                  <Text fontSize='lg' fontWeight='bold' mb={2}>
+                    {item.name}
+                  </Text>
+                  <Text
+                    h={'95px'}
+                    textOverflow={'ellipsis'}
+                    overflow={'hidden'}
+                    noOfLines={4}
+                  >
+                    {item.description}
+                  </Text>
+                  <HStack justify='space-between' mt={8}>
                     <Text
-                      h={'95px'}
-                      textOverflow={'ellipsis'}
-                      overflow={'hidden'}
-                      noOfLines={4}
+                      className={styles.listitem}
+                      onClick={() => (
+                        setIsShowFeedback(true), setSelectedApp(item)
+                      )}
                     >
-                      {item.description}
+                      Send feedback
                     </Text>
-                    <HStack justify='space-between' mt={8}>
-                      <Text
-                        className={styles.listitem}
-                        onClick={() => (
-                          setIsShowFeedback(true), setSelectedApp(item)
-                        )}
-                      >
-                        Send feedback
-                      </Text>
-                    </HStack>
-                  </Box>
+                  </HStack>
                 </Box>
-              ))}
-            </Grid>
-          </Center>
+              </Box>
+            ))}
+          </Grid>
         </ListItem>
       </List>
       <Modal

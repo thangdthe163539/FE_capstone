@@ -371,16 +371,6 @@ function UserDetail() {
                 style={{ marginTop: '10px' }}
               >
                 <GridItem colSpan={1}>
-                  {/* <Flex alignItems='center'>
-                    <FormLabel style={{ width: '50px' }}>Name</FormLabel>
-                    <Input
-                      id='name'
-                      autoComplete='off'
-                      value={name1}
-                      placeholder=''
-                      onChange={handleNameChange}
-                    />
-                  </Flex> */}
                   <FormControl
                     isRequired={true}
                     isInvalid={
@@ -396,6 +386,7 @@ function UserDetail() {
                       <Stack w={'100%'}>
                         <Input
                           id='name'
+                          defaultValue={name}
                           value={dataSubmit?.name}
                           onChange={handleChangeName}
                         />

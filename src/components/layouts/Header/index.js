@@ -114,32 +114,32 @@ function Header() {
         <Box>
           {isLogin && isLogin?.name ? (
             <Flex alignItems={'center'}>
-              {isLogin?.roleName === 'Admin' ||
-                (isLogin?.roleName === 'Product owner' && (
-                  <>
-                    <Link
-                      style={{ marginRight: '2%', padding: '20px 12px' }}
-                      href={
-                        isLogin?.roleName === 'Admin'
-                          ? 'adminpages/adminhome'
-                          : '/pmpages/PoHome'
-                      }
-                    >
-                      Dashboard
-                    </Link>
+              {(isLogin?.roleName === 'Admin' ||
+                isLogin?.roleName === 'Product owner') && (
+                <>
+                  <Link
+                    style={{ marginRight: '2%', padding: '20px 12px' }}
+                    href={
+                      isLogin?.roleName === 'Admin'
+                        ? 'adminpages/adminhome'
+                        : '/pmpages/PoHome'
+                    }
+                  >
+                    Dashboard
+                  </Link>
 
-                    <Link
-                      style={{
-                        marginRight: '2%',
-                        padding: '20px 12px',
-                        minWidth: '150px',
-                      }}
-                      href={'/ViewApplication'}
-                    >
-                      View Application
-                    </Link>
-                  </>
-                ))}
+                  <Link
+                    style={{
+                      marginRight: '2%',
+                      padding: '20px 12px',
+                      minWidth: '150px',
+                    }}
+                    href={'/ViewApplication'}
+                  >
+                    View Application
+                  </Link>
+                </>
+              )}
               <Menu>
                 <MenuButton
                   as={Button}
@@ -150,6 +150,7 @@ function Header() {
                     border: 'none',
                     color: '#fff',
                   }}
+                  minW={'170px'}
                 >
                   {isLogin?.roleName}: {isLogin?.name}
                 </MenuButton>
