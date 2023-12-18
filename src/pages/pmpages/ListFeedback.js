@@ -75,6 +75,8 @@ function FeedbackPage() {
         } else {
           if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }
@@ -85,7 +87,7 @@ function FeedbackPage() {
       router.push('/page405');
     }
   }, []);
-  
+
   const [software, setSoftware] = useState();
 
   useEffect(() => {

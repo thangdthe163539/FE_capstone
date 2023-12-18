@@ -97,6 +97,8 @@ function SoftwarePage() {
         } else {
           if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }
@@ -1653,7 +1655,8 @@ function SoftwarePage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredDeviceDataDynamic.length} asset(s)
+                          Show {dynamicList1.length}/
+                          {filteredDeviceDataDynamic.length} asset(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage1}
@@ -1782,7 +1785,8 @@ function SoftwarePage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredLibraryDataDynamic.length} license(s)
+                          Show {dynamicList2.length}/
+                          {filteredLibraryDataDynamic.length} license(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage2}
@@ -1884,7 +1888,8 @@ function SoftwarePage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredAllIssueDataDynamic.length} issue(s)
+                          Show {dynamicList3.length}/
+                          {filteredAllIssueDataDynamic.length} issue(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage3}
@@ -1985,8 +1990,8 @@ function SoftwarePage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredAllFeedbackDataDynamic.length}{' '}
-                          feedback(s)
+                          Show {dynamicList4.length}/
+                          {filteredAllFeedbackDataDynamic.length} feedback(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage4}
@@ -2088,12 +2093,21 @@ function SoftwarePage() {
                 <TableContainer>
                   <Table simple>
                     <TableCaption>
-                      <PaginationCustom
-                        current={currentPage5}
-                        onChange={handleChangePage5}
-                        total={totalPages5}
-                        pageSize={itemPerPage}
-                      />
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Show {dynamicList5.length}/
+                          {filteredAllAssetDataDynamic.length} asset(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage5}
+                          onChange={handleChangePage5}
+                          total={totalPages5}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
