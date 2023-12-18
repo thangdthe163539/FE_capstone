@@ -404,7 +404,7 @@ function UserDetail() {
                 </GridItem>
                 <GridItem colSpan={1}>
                   <Flex alignItems='center'>
-                    <FormLabel>Active</FormLabel>
+                    <FormLabel>Status</FormLabel>
                     <Select
                       value={selectedOptionActive}
                       onChange={(e) => {

@@ -377,10 +377,10 @@ function UserManager() {
                   }}
                 >
                   <Td>No</Td>
-                  <Td>Name </Td>
+                  <Td>Name</Td>
                   <Td>Email</Td>
                   <Td>Role</Td>
-                  <Td>Active</Td>
+                  <Td>Status</Td>
                 </Tr>
               </Thead>
               <Tbody>
@@ -530,7 +530,7 @@ function UserManager() {
                 </GridItem>
                 <GridItem colSpan={1}>
                   <Flex alignItems='center' justifyContent={'space-between'}>
-                    <FormLabel>Active</FormLabel>
+                    <FormLabel>Status</FormLabel>
                     <Select
                       width={'80%'}
                       value={selectedOptionActive}
