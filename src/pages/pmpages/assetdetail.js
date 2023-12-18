@@ -448,7 +448,7 @@ function AssetDetailPage() {
           publisher: formData.publisher,
           version: formData.version,
           release: formData.release,
-          type: formData.type,
+          type: isAntivirus ? 'Antivirus' : formData.type,
           os: formData.os,
           status: 1,
         },
@@ -514,9 +514,9 @@ function AssetDetailPage() {
           status_AssetSoftware: 1,
           ...(haveLicense
             ? {
-                licenseKey: formData1.licenseKey,
-                start_Date: formatDate(formData1.start_Date),
-                time: formData1.time,
+                licenseKey: formData3.licenseKey,
+                start_Date: formatDate(formData3.start_Date),
+                time: formData3.time,
                 status_License: status,
               }
             : {
@@ -804,7 +804,7 @@ function AssetDetailPage() {
     if (device?.assetId && account?.accId) {
       fetchData();
     }
-  }, [device, account, showEditAsset, isOpenEditAsset]);
+  }, [device, account, showEditAsset, showModalTable, showModalAdd, isOpenAdd]);
   //
   const softwareIdsInAsset = data?.map((software) => software?.softwareId);
   //
@@ -834,7 +834,6 @@ function AssetDetailPage() {
         const publisher = item?.publisher.toLowerCase();
         return name.includes(query) || publisher.includes(query);
       });
-    setFilteredSoftwareData(filteredData);
     setFilteredSoftwareDataDynamic(filteredData);
   };
   // Update filtered data whenever the search query changes
@@ -850,7 +849,6 @@ function AssetDetailPage() {
         const publisher = item?.publisher.toLowerCase();
         return name.includes(query) || publisher.includes(query);
       });
-    setFilteredAntivirusData(filteredData);
     setFilteredAntivirusDataDynamic(filteredData);
   };
   // Update filtered data whenever the search query changes
@@ -858,7 +856,7 @@ function AssetDetailPage() {
     filterAntivirus();
   }, [searchAppQuery1, data]);
   // filter search add asset data
-  const filterAssets = () => {
+  const filterAdd = () => {
     const query = searchAddQuery.toLowerCase();
     const filteredData = listAllSoftware
       .filter((item) =>
@@ -870,7 +868,6 @@ function AssetDetailPage() {
         const publisher = item?.publisher.toLowerCase();
         return name.includes(query) || publisher.includes(query);
       });
-    setFilteredAllSoftwareData(filteredData);
     setFilteredAllSoftwareDataDynamic(
       filteredData
         .filter((item) => !softwareIdsInAsset.includes(item.softwareId))
@@ -888,9 +885,7 @@ function AssetDetailPage() {
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
-    if (listAllSoftware.length || isOpenAdd || showModalTable) {
-      filterAssets();
-    }
+    filterAdd();
   }, [
     isOpenAdd,
     searchAddQuery,
@@ -2175,7 +2170,8 @@ function AssetDetailPage() {
           setFormData(defaultData),
           setFormData3(defaultData),
           setInvalidFields([]),
-          setInvalidFields4([])
+          setInvalidFields4([]),
+          setSearchAddQuery('')
         )}
         closeOnOverlayClick={false}
         size='6xl'
@@ -2261,16 +2257,26 @@ function AssetDetailPage() {
                     </FormControl>
                     <FormControl className={styles.formInput}>
                       <FormLabel>Type</FormLabel>
-                      <Select
-                        name='type'
-                        value={formData.type}
-                        onChange={handleInputChange}
-                      >
-                        <option value='Web app'>Web app</option>
-                        <option value='Desktop app'>Desktop app</option>
-                        <option value='Service'>Service</option>
-                        <option value='Antivirus'>Antivirus</option>
-                      </Select>
+                      {!isAntivirus ? (
+                        <Select
+                          name='type'
+                          value={formData.type}
+                          onChange={handleInputChange}
+                        >
+                          <option value='Web app'>Web app</option>
+                          <option value='Desktop app'>Desktop app</option>
+                          <option value='Service'>Service</option>
+                        </Select>
+                      ) : (
+                        <Select
+                          name='type'
+                          value={formData.type}
+                          onChange={handleInputChange}
+                          disabled
+                        >
+                          <option value='Antivirus'>Antivirus</option>
+                        </Select>
+                      )}
                     </FormControl>
                     <FormControl className={styles.formInput}>
                       <FormLabel>OS</FormLabel>
@@ -2490,7 +2496,11 @@ function AssetDetailPage() {
               </>
             ) : showModalTable ? (
               <>
-                <Button onClick={() => setIsOpenAdd(false)}>Cancel</Button>
+                <Button
+                  onClick={() => (setIsOpenAdd(false), setSearchAddQuery(''))}
+                >
+                  Cancel
+                </Button>
               </>
             ) : (
               <>
