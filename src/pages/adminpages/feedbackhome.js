@@ -87,7 +87,10 @@ function FeedbackPage() {
   }, [dynamicFilteredAppData]);
 
   const handleIssuerDetails = (appId) => {
-    router.push(`feedbackDetails?appId=${appId}`);
+    const encodedAppId = encodeURIComponent(appId);
+    const randomParameter = Math.random().toString(36).substring(2);
+    const url = `feedbackDetails?appId=${encodedAppId}&r=${randomParameter}`;
+    router.push(url);
   };
 
   const handleSearchTbInputChange = (e) => {

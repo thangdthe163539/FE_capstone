@@ -677,7 +677,10 @@ function IssuePage() {
   //End
 
   const handleIssuerDetails = (appId) => {
-    router.push(`issueDetailsManage?appId=${appId}`);
+    const encodedAppId = encodeURIComponent(appId);
+    const randomParameter = Math.random().toString(36).substring(2);
+    const url = `issueDetailsManage?appId=${encodedAppId}&r=${randomParameter}`;
+    router.push(url);
   };
 
   const handleSearchInputChange = (e) => {

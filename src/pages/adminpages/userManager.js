@@ -176,9 +176,17 @@ function UserManager() {
     name,
     accid,
   ) => {
-    router.push(
-      `userDetail?email=${email}&role=${roleName}&roleid=${roleid}&status=${status}&name=${name}&accid=${accid}`,
-    );
+    // Mã hóa các tham số
+    const encodedEmail = encodeURIComponent(email);
+    const encodedRoleName = encodeURIComponent(roleName);
+    const encodedRoleid = encodeURIComponent(roleid);
+    const encodedStatus = encodeURIComponent(status);
+    const encodedName = encodeURIComponent(name);
+    const encodedAccid = encodeURIComponent(accid);
+    const randomParameter = Math.random().toString(36).substring(2);
+    const url = `userDetail?email=${encodedEmail}&role=${encodedRoleName}&roleid=${encodedRoleid}&r=${randomParameter}&status=${encodedStatus}&name=${encodedName}&accid=${encodedAccid}`;
+  
+    router.push(url);
   };
 
   useEffect(() => {
