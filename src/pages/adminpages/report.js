@@ -50,6 +50,27 @@ function ReportPage() {
   const totalPagesUs = User ? User?.length : 0;
 
   useEffect(() => {
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
+    if (storedAccount) {
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
+          // router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
+        }
+      } catch (error) {
+        // router.push('/page405');
+      }
+    } else {
+      router.push('/page405');
+    }
+  }, []);
+
+  useEffect(() => {
     if (Apps.length) {
       handleChangePage(1);
     } else {
@@ -288,7 +309,9 @@ function ReportPage() {
     })
       .then((response) => response.json())
       .then((data) => {
-        const filteredData = data.filter(item => item.status === 1 || item.status === 2);
+        const filteredData = data.filter(
+          (item) => item.status === 1 || item.status === 2,
+        );
         const sortedData = filteredData.sort((a, b) => {
           if (a.status === 1 && b.status !== 1) {
             return -1;
@@ -302,7 +325,6 @@ function ReportPage() {
         console.error('Lỗi:', error);
       });
   }, []);
-
 
   useEffect(() => {
     const url = 'http://localhost:5001/api/License/ListLicenses';
@@ -604,8 +626,8 @@ function ReportPage() {
                             {app.status === 1
                               ? 'Active'
                               : app.status === 2
-                                ? 'Inactive'
-                                : 'Deleted'}
+                              ? 'Inactive'
+                              : 'Deleted'}
                           </Td>
                         </Tr>
                       ))}
@@ -731,8 +753,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Active'
                               : item.status === 2
-                                ? 'Inactive'
-                                : 'Deleted'}
+                              ? 'Inactive'
+                              : 'Deleted'}
                           </Td>
                         </Tr>
                       ))}
@@ -873,10 +895,10 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Unsolve'
                               : item.status === 2
-                                ? 'Solved'
-                                : item.status === 3
-                                  ? 'Deleted'
-                                  : 'Cancel'}
+                              ? 'Solved'
+                              : item.status === 3
+                              ? 'Deleted'
+                              : 'Cancel'}
                           </Td>
                         </Tr>
                       ))}
@@ -1000,10 +1022,10 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Unsolve'
                               : item.status === 2
-                                ? 'Solved'
-                                : item.status === 3
-                                  ? 'Deleted'
-                                  : 'Cancel'}
+                              ? 'Solved'
+                              : item.status === 3
+                              ? 'Deleted'
+                              : 'Cancel'}
                           </Td>
                         </Tr>
                       ))}
@@ -1127,8 +1149,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Closed source license '
                               : item.status === 2
-                                ? ' Open source license'
-                                : 'Not Determined'}
+                              ? ' Open source license'
+                              : 'Not Determined'}
                           </Td>
                         </Tr>
                       ))}
@@ -1249,8 +1271,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Closed source license '
                               : item.status === 2
-                                ? ' Open source license'
-                                : 'Not Determined'}
+                              ? ' Open source license'
+                              : 'Not Determined'}
                           </Td>
                         </Tr>
                       ))}
@@ -1377,8 +1399,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Active'
                               : item.status === 2
-                                ? 'Inactive'
-                                : 'Deleted'}
+                              ? 'Inactive'
+                              : 'Deleted'}
                           </Td>
                         </Tr>
                       ))}
@@ -1485,8 +1507,8 @@ function ReportPage() {
                             {item.status === 1
                               ? 'Active'
                               : item.status === 2
-                                ? 'Inactive'
-                                : 'Locked'}
+                              ? 'Inactive'
+                              : 'Locked'}
                           </Td>
                         </Tr>
                       ))}

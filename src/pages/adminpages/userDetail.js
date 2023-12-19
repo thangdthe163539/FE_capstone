@@ -46,17 +46,21 @@ function UserDetail() {
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
-
     if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
-      } else {
-        if (accountDataDecode.roleId !== 1) {
-          router.push('/page405');
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
+          // router.push('/page405');
+        } else {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+            router.push('/page405');
+          }
         }
-        // setAccount(accountDataDecode);
+      } catch (error) {
+        // router.push('/page405');
       }
+    } else {
+      router.push('/page405');
     }
   }, []);
 
@@ -205,14 +209,14 @@ function UserDetail() {
               description={''}
               status={'success'}
             />
-          ): null}
+          ) : null}
           {isSuccess === 'false' ? (
             <ToastCustom
               title={'Error processing your request.'}
               description={''}
               status={'error'}
             />
-          ): null}
+          ) : null}
         </Flex>
 
         <hr
@@ -365,16 +369,6 @@ function UserDetail() {
                 style={{ marginTop: '10px' }}
               >
                 <GridItem colSpan={1}>
-                  {/* <Flex alignItems='center'>
-                    <FormLabel style={{ width: '50px' }}>Name</FormLabel>
-                    <Input
-                      id='name'
-                      autoComplete='off'
-                      value={name1}
-                      placeholder=''
-                      onChange={handleNameChange}
-                    />
-                  </Flex> */}
                   <FormControl
                     isRequired={true}
                     isInvalid={
@@ -390,6 +384,7 @@ function UserDetail() {
                       <Stack w={'100%'}>
                         <Input
                           id='name'
+                          defaultValue={name}
                           value={dataSubmit?.name}
                           onChange={handleChangeName}
                         />

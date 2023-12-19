@@ -30,6 +30,7 @@ import {
   ModalBody,
   ModalCloseButton,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   Button,
@@ -57,6 +58,7 @@ function ReportPage(title) {
   const router = useRouter();
   const [formData, setFormData] = useState();
   const toast = useToast();
+  const [invalidFields, setInvalidFields] = useState([]);
   const [typePage, setTypePage] = useState(title);
 
   useEffect(() => {
@@ -101,6 +103,19 @@ function ReportPage(title) {
       ...formData,
       description: e.target.value,
     });
+    validateInputs();
+  };
+  const validateInputs = () => {
+    const requiredFields = ['description'];
+    const errors = [];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        errors.push(field);
+      }
+    }
+    // Update state to mark fields as invalid
+    setInvalidFields(errors);
+    return errors;
   };
 
   // Define an onChange handler for the Status Select
@@ -120,6 +135,13 @@ function ReportPage(title) {
   };
 
   const handleSaveEdit = async () => {
+    // Validate inputs before saving
+    const validationErrors = validateInputs();
+    if (validationErrors.length > 0) {
+      // You can handle validation errors as needed
+      console.error('Validation Errors:', validationErrors);
+      return;
+    }
     const url =
       `${BACK_END_PORT}/api/Report/UpdateReport/` + formData?.reportId;
 
@@ -362,9 +384,16 @@ function ReportPage(title) {
               </Select>
             </Flex>
           </Flex>
-          <Box>
-            <FormControl>
-              <Text className={`${styles.text1}`}>Description</Text>
+          <Box mb={2}>
+            <FormControl
+              isRequired
+              isInvalid={invalidFields.includes('description')}
+            >
+              <Flex>
+                <FormLabel className={`${styles.text1}`}>Description</FormLabel>
+                <Spacer />
+                <FormErrorMessage>Description is required!</FormErrorMessage>
+              </Flex>
               <Textarea
                 name='description'
                 value={formData?.description}
