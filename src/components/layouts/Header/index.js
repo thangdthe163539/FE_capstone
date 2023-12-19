@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { initializeApp } from 'firebase/app';
 import { useRouter } from 'next/router';
 import { ChevronDownIcon } from '@chakra-ui/icons';
+import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
@@ -37,51 +38,71 @@ function Header() {
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  const handleGoogleLogin = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const mail = result.user.email;
-        const url = 'http://localhost:5001/api/Account/login';
-
-        const requestData = mail;
-
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestData),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            const roleId = data.roleId;
-            const status = data.status;
-            localStorage.setItem('account', JSON.stringify(data));
-            if (status == 3) {
-              router.push('http://localhost:3000/');
-            } else if (status == 2) {
-              router.push('/ViewApplication');
-            } else if (status == 1) {
-              if (roleId == 1) {
-                router.push('adminpages/adminhome');
-              } else if (roleId == 2) {
-                router.push('/pmpages/PoHome');
-              } else if (roleId == 3) {
-                router.push('/ViewApplication');
-              } else {
-                router.push('http://localhost:3000/');
-              }
-            }
-          })
-          .catch((error) => {
-            setIsSuccess('false');
-            console.error('Lỗi:', error);
-          });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const tokenDecode = async (token) => {
+    //decode token base64
+    const [, payloadBase64] = token.split('.');
+    const decodedPayload = JSON.parse(atob(payloadBase64));
+    const id = decodedPayload.nameid;
+    const response = await axios.get(
+      `http://localhost:5001/api/Account/ListAccount`,
+    );
+    const account = response.data.find((item) => item.accId === parseInt(id));
+    // console.log('1: ' + account.name);
+    // console.log('2: ' + id);
+    if (account) {
+      return account;
+    } else {
+      return null;
+    }
   };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const mail = result.user.email;
+      const url = 'http://localhost:5001/api/Account/login';
+      const requestData = mail;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+      const data = await response.json();
+
+      // const roleId = data.roleId;
+      // const status = data.status;
+      // Wait for the tokenDecode function to complete
+      const account = await tokenDecode(data.token);
+      if (account) {
+        localStorage.setItem('account', JSON.stringify(account));
+
+        if (account.status == 3) {
+          router.push('http://localhost:3000/');
+        } else if (account.status == 2) {
+          router.push('/ViewApplication');
+        } else if (account.status == 1) {
+          if (account.roleId == 1) {
+            router.push('adminpages/adminhome');
+          } else if (account.roleId == 2) {
+            router.push('/pmpages/PoHome');
+          } else if (account.roleId == 3) {
+            router.push('/ViewApplication');
+          } else {
+            router.push('http://localhost:3000/');
+          }
+        }
+      } else {
+        setIsSuccess('false');
+      }
+    } catch (error) {
+      setIsSuccess('false');
+      // console.error('Lỗi:', error);
+    }
+  };
+
   function handleLogout() {
     localStorage.clear();
     router.push('/');

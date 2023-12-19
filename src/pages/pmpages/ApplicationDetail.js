@@ -111,8 +111,6 @@ function SoftwarePage() {
   }, []);
   //
   const [software, setSoftware] = useState();
-
-  //
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenAddLi, setIsOpenAddLi] = useState(false);
@@ -500,6 +498,14 @@ function SoftwarePage() {
         isClosable: true,
       });
     } catch (error) {
+      setShowEditApp(true); // Close the modal after successful save
+      toast({
+        title: 'Application Updated Fail',
+        description: 'The application has been fail when updated.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -540,6 +546,16 @@ function SoftwarePage() {
         isClosable: true,
       });
     } catch (error) {
+      setIsOpenAdd(false); // Close the modal after successful save
+      setShowModalAdd(true);
+      setFormData4(defaultData);
+      toast({
+        title: 'Asset Added Fail',
+        description: 'The asset has been fail when added.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -595,6 +611,16 @@ function SoftwarePage() {
         isClosable: true,
       });
     } catch (error) {
+      setShowModalAdd(true);
+      setIsOpenAdd(true);
+      setFormData4(defaultData);
+      toast({
+        title: 'Asset Created Fail',
+        description: 'The asset has been fail when created.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -646,6 +672,17 @@ function SoftwarePage() {
         isClosable: true,
       });
     } catch (error) {
+      setIsOpenEdit(false); // Close the modal after successful save
+      setFormData2(defaultData);
+      setButtonDisabled(true);
+      setSelectedRow(new Set());
+      toast({
+        title: 'Asset Updated Fail',
+        description: 'The asset has been fail when updated.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -774,6 +811,17 @@ function SoftwarePage() {
         isClosable: true,
       });
     } catch (error) {
+      setIsOpenEditLi(false); // Close the modal after successful save
+      setButtonDisabled1(true);
+      setFormData1(defaultData2);
+      setSelectedRow1(null);
+      toast({
+        title: 'License Updated Fail',
+        description: 'The license has been fail when updated.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -981,7 +1029,14 @@ function SoftwarePage() {
     setFilteredAllAssetDataDynamic(
       filteredData
         .filter((item) => !assetIdsInAsset.includes(item.assetId))
-        .filter((item) => item.status !== 3),
+        .filter((item) => item.status !== 3)
+        .filter(
+          (item) =>
+            item.status !== 3 &&
+            item.os &&
+            software.os &&
+            software.os.toLowerCase().includes(item.os.toLowerCase()),
+        ),
     );
   };
   const filterIssue = () => {
@@ -1131,7 +1186,6 @@ function SoftwarePage() {
         <ListItem className={styles.list}>
           <Text fontSize='2xl'>{software?.name}</Text>
         </ListItem>
-
         <Tabs>
           <TabList>
             <Tab
@@ -1314,6 +1368,7 @@ function SoftwarePage() {
                               >
                                 <Input
                                   name='name'
+                                  maxLength={255}
                                   value={appData?.name}
                                   onChange={handleInputChange}
                                   className={styles.text3}
@@ -1334,6 +1389,7 @@ function SoftwarePage() {
                             <Td className={styles.borderRight}>
                               <Input
                                 name='version'
+                                maxLength={255}
                                 value={appData?.version}
                                 onChange={handleInputChange}
                                 className={styles.text3}
@@ -1372,6 +1428,7 @@ function SoftwarePage() {
                               >
                                 <Input
                                   name='publisher'
+                                  maxLength={255}
                                   value={appData?.publisher}
                                   onChange={handleInputChange}
                                   className={styles.text3}
@@ -1392,6 +1449,7 @@ function SoftwarePage() {
                             <Td className={styles.borderRight}>
                               <Input
                                 name='release'
+                                maxLength={255}
                                 value={appData?.release}
                                 onChange={handleInputChange}
                                 className={styles.text3}
@@ -1409,6 +1467,7 @@ function SoftwarePage() {
                               >
                                 <Input
                                   name='osversion'
+                                  maxLength={255}
                                   value={appData?.osversion}
                                   onChange={handleInputChange}
                                   className={styles.text3}
@@ -1435,6 +1494,7 @@ function SoftwarePage() {
                               >
                                 <Input
                                   name='language'
+                                  maxLength={255}
                                   value={appData?.language}
                                   onChange={handleInputChange}
                                   className={styles.text3}
@@ -1459,6 +1519,7 @@ function SoftwarePage() {
                               >
                                 <Input
                                   name='db'
+                                  maxLength={255}
                                   value={appData?.db}
                                   onChange={handleInputChange}
                                   className={styles.text3}
@@ -1498,6 +1559,7 @@ function SoftwarePage() {
                             <Td colSpan='5'>
                               <Input
                                 name='download'
+                                maxLength={255}
                                 value={appData?.download}
                                 onChange={handleInputChange}
                                 className={styles.text3}
@@ -1513,6 +1575,7 @@ function SoftwarePage() {
                             <Td colSpan='5'>
                               <Input
                                 name='docs'
+                                maxLength={255}
                                 value={appData?.docs}
                                 onChange={handleInputChange}
                                 className={styles.text3}
@@ -1534,6 +1597,7 @@ function SoftwarePage() {
                               >
                                 <Input
                                   name='description'
+                                  maxLength={1000}
                                   value={appData?.description}
                                   onChange={handleInputChange}
                                   className={styles.text3}
@@ -1582,6 +1646,7 @@ function SoftwarePage() {
                         value={searchQuery}
                         onChange={handleSearchInputChange}
                         placeholder='search...'
+                        maxLength={100}
                         w={300}
                         mr={1}
                       />
@@ -1728,6 +1793,7 @@ function SoftwarePage() {
                         value={searchQuery1}
                         onChange={handleSearchInputChange1}
                         placeholder='search...'
+                        maxLength={100}
                         w={300}
                         mr={1}
                       />
@@ -1844,6 +1910,7 @@ function SoftwarePage() {
                         value={searchQuery2}
                         onChange={handleSearchInputChange2}
                         placeholder='search...'
+                        maxLength={100}
                         w={300}
                         mr={1}
                       />
@@ -1946,6 +2013,7 @@ function SoftwarePage() {
                         value={searchQuery3}
                         onChange={handleSearchInputChange3}
                         placeholder='search...'
+                        maxLength={100}
                         w={300}
                         mr={1}
                       />
@@ -2069,6 +2137,7 @@ function SoftwarePage() {
                         value={searchAddQuery}
                         onChange={handleSearchAddInputChange}
                         placeholder='search asset'
+                        maxLength={100}
                         w={300}
                         mr={1}
                       />
@@ -2159,6 +2228,7 @@ function SoftwarePage() {
                       </Flex>
                       <Input
                         name='name'
+                        maxLength={255}
                         value={formData4.name}
                         onChange={handleInputChange4}
                         required
@@ -2178,6 +2248,7 @@ function SoftwarePage() {
                       </Flex>
                       <Input
                         name='manufacturer'
+                        maxLength={255}
                         value={formData4.manufacturer}
                         onChange={handleInputChange4}
                       />
@@ -2186,6 +2257,7 @@ function SoftwarePage() {
                       <FormLabel>Model</FormLabel>
                       <Input
                         name='model'
+                        maxLength={255}
                         value={formData4.model}
                         onChange={handleInputChange4}
                       />
@@ -2194,6 +2266,7 @@ function SoftwarePage() {
                       <FormLabel>Serial Number</FormLabel>
                       <Input
                         name='serialNumber'
+                        maxLength={255}
                         value={formData4.serialNumber}
                         onChange={handleInputChange4}
                       />
@@ -2214,6 +2287,7 @@ function SoftwarePage() {
                       </Flex>
                       <Input
                         name='cpu'
+                        maxLength={255}
                         value={formData4.cpu}
                         onChange={handleInputChange4}
                       />
@@ -2222,6 +2296,7 @@ function SoftwarePage() {
                       <FormLabel>GPU</FormLabel>
                       <Input
                         name='gpu'
+                        maxLength={255}
                         value={formData4.gpu}
                         onChange={handleInputChange4}
                       />
@@ -2240,6 +2315,7 @@ function SoftwarePage() {
                       </Flex>
                       <Input
                         name='ram'
+                        maxLength={255}
                         type='number'
                         value={formData4.ram}
                         onChange={handleInputChange4}
@@ -2259,6 +2335,7 @@ function SoftwarePage() {
                       </Flex>
                       <Input
                         name='memory'
+                        maxLength={255}
                         type='number'
                         value={formData4.memory}
                         onChange={handleInputChange4}
@@ -2294,6 +2371,7 @@ function SoftwarePage() {
                       </Flex>
                       <Input
                         name='version'
+                        maxLength={255}
                         value={formData4.version}
                         onChange={handleInputChange4}
                       />
@@ -2312,6 +2390,7 @@ function SoftwarePage() {
                       </Flex>
                       <Input
                         name='ipAddress'
+                        maxLength={255}
                         value={formData4.ipAddress}
                         onChange={handleInputChange4}
                       />
@@ -2320,6 +2399,7 @@ function SoftwarePage() {
                       <FormLabel>Bandwidth</FormLabel>
                       <Input
                         name='bandwidth'
+                        maxLength={255}
                         value={formData4.bandwidth}
                         onChange={handleInputChange4}
                       />
@@ -2395,6 +2475,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='name'
+                    maxLength={255}
                     value={formData3.name}
                     onChange={handleInputChange3}
                     required
@@ -2414,6 +2495,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='publisher'
+                    maxLength={255}
                     value={formData3.publisher}
                     onChange={handleInputChange3}
                     required
@@ -2434,6 +2516,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='libraryKey'
+                    maxLength={255}
                     value={formData3.libraryKey}
                     onChange={handleInputChange3}
                     required
@@ -2453,6 +2536,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='start_Date'
+                    maxLength={255}
                     value={formData3.start_Date}
                     onChange={handleInputChange3}
                     type='date'
@@ -2473,6 +2557,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='time'
+                    maxLength={255}
                     value={formData3.time}
                     onChange={handleInputChange3}
                     type='number'
@@ -2525,6 +2610,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='name'
+                    maxLength={255}
                     value={formData1.name}
                     onChange={handleInputChange1}
                     required
@@ -2544,6 +2630,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='publisher'
+                    maxLength={255}
                     value={formData1.publisher}
                     onChange={handleInputChange1}
                     required
@@ -2564,6 +2651,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='libraryKey'
+                    maxLength={255}
                     value={formData1.libraryKey}
                     onChange={handleInputChange1}
                     required
@@ -2573,6 +2661,7 @@ function SoftwarePage() {
                   <FormLabel>Start date</FormLabel>
                   <Input
                     name='start_Date'
+                    maxLength={255}
                     value={formData1.start_Date}
                     onChange={handleInputChange1}
                     type='date'
@@ -2594,6 +2683,7 @@ function SoftwarePage() {
                   <Input
                     name='time'
                     value={formData1.time}
+                    maxLength={10}
                     onChange={handleInputChange1}
                     type='number'
                     required
@@ -2627,12 +2717,6 @@ function SoftwarePage() {
           <ModalCloseButton />
           <ModalBody pb={8}>
             <Grid templateColumns='repeat(3, 1fr)' gap={4}>
-              <Input
-                name='assetId'
-                value={formData2.assetId}
-                onChange={handleInputChange2}
-                display='none'
-              />
               <GridItem>
                 <FormControl
                   isRequired
@@ -2647,6 +2731,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='name'
+                    maxLength={255}
                     value={formData2.name}
                     onChange={handleInputChange2}
                     required
@@ -2666,6 +2751,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='manufacturer'
+                    maxLength={255}
                     value={formData2.manufacturer}
                     onChange={handleInputChange2}
                   />
@@ -2674,6 +2760,7 @@ function SoftwarePage() {
                   <FormLabel>Model</FormLabel>
                   <Input
                     name='model'
+                    maxLength={255}
                     value={formData2.model}
                     onChange={handleInputChange2}
                   />
@@ -2682,6 +2769,7 @@ function SoftwarePage() {
                   <FormLabel>Serial Number</FormLabel>
                   <Input
                     name='serialNumber'
+                    maxLength={255}
                     value={formData2.serialNumber}
                     onChange={handleInputChange2}
                   />
@@ -2702,6 +2790,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='cpu'
+                    maxLength={255}
                     value={formData2.cpu}
                     onChange={handleInputChange2}
                   />
@@ -2710,6 +2799,7 @@ function SoftwarePage() {
                   <FormLabel>GPU</FormLabel>
                   <Input
                     name='gpu'
+                    maxLength={255}
                     value={formData2.gpu}
                     onChange={handleInputChange2}
                   />
@@ -2728,6 +2818,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='ram'
+                    maxLength={10}
                     value={formData2.ram}
                     onChange={handleInputChange2}
                     type='number'
@@ -2747,6 +2838,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='memory'
+                    maxLength={10}
                     value={formData2.memory}
                     onChange={handleInputChange2}
                     type='number'
@@ -2782,6 +2874,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='version'
+                    maxLength={255}
                     value={formData2.version}
                     onChange={handleInputChange2}
                   />
@@ -2800,6 +2893,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='ipAddress'
+                    maxLength={255}
                     value={formData2.ipAddress}
                     onChange={handleInputChange2}
                   />
@@ -2808,6 +2902,7 @@ function SoftwarePage() {
                   <FormLabel>Bandwidth</FormLabel>
                   <Input
                     name='bandwidth'
+                    maxLength={255}
                     value={formData2.bandwidth}
                     onChange={handleInputChange2}
                   />
