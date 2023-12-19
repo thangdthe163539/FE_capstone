@@ -282,7 +282,7 @@ function FeedBackPage() {
   const getStatusLabel = (status) => {
     switch (status) {
       case 1:
-        return 'Unsolve';
+        return 'Unsolved';
       case 2:
         return 'Solved';
       case 3:
@@ -635,14 +635,14 @@ function FeedBackPage() {
                       {sortedIssue.map((status) => (
                         <option key={status} value={status}>
                           {status === 1
-                            ? 'Unsolve'
+                            ? 'Unsolved'
                             : status === 2
-                            ? 'Solved'
-                            : status === 3
-                            ? 'Deleted'
-                            : status === 4
-                            ? 'Cancel'
-                            : 'Unknow'}
+                              ? 'Solved'
+                              : status === 3
+                                ? 'Deleted'
+                                : status === 4
+                                  ? 'Cancel'
+                                  : 'Unknow'}
                         </option>
                       ))}
                       {defaultOptions}
@@ -656,8 +656,8 @@ function FeedBackPage() {
                       isFirst?.title
                         ? false
                         : dataSubmit?.title === ''
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex
@@ -666,8 +666,8 @@ function FeedBackPage() {
                           isFirst?.title
                             ? false
                             : dataSubmit?.title === ''
-                            ? true
-                            : false
+                              ? true
+                              : false
                         )
                           ? 'start'
                           : 'center'
@@ -676,6 +676,7 @@ function FeedBackPage() {
                       <FormLabel>Title</FormLabel>
                       <Stack w={'100%'}>
                         <Input
+                          maxLength={255}
                           defaultValue={detail?.title.trim()}
                           style={{ backgroundColor: 'white' }}
                           id='title'
@@ -685,12 +686,12 @@ function FeedBackPage() {
                         {(isFirst?.title
                           ? false
                           : dataSubmit?.title === ''
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Title is required.
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Title is required.
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -703,13 +704,14 @@ function FeedBackPage() {
                   isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                    ? true
-                    : false
+                      ? true
+                      : false
                 }
               >
                 <FormLabel>Description</FormLabel>
                 <Stack width='100%'>
                   <Textarea
+                    maxLength={1000}
                     id='description'
                     defaultValue={detail?.description.trim()}
                     onChange={handleChangeDescription}
@@ -720,12 +722,12 @@ function FeedBackPage() {
                   {(isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                    ? true
-                    : false) && (
-                    <FormErrorMessage mt={0}>
-                      Description is required.
-                    </FormErrorMessage>
-                  )}
+                      ? true
+                      : false) && (
+                      <FormErrorMessage mt={0}>
+                        Description is required.
+                      </FormErrorMessage>
+                    )}
                 </Stack>
               </FormControl>
               <br />

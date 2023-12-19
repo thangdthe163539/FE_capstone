@@ -111,7 +111,7 @@ function IssuePage() {
             try {
               const response2 = await axios.get(
                 `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
-                  asset?.assetId,
+                asset?.assetId,
               );
               // Filter out duplicate software based on assetID
               const uniqueSoftware = response2.data.filter((sw) => {
@@ -497,7 +497,7 @@ function IssuePage() {
             // Extract appIds from the response data
             const response2 = await axios.get(
               `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
-                asset.assetId,
+              asset.assetId,
             );
 
             // Check if the list of software includes the target softwareId
@@ -547,7 +547,7 @@ function IssuePage() {
             // Extract appIds from the response data
             const response2 = await axios.get(
               `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
-                asset.assetId,
+              asset.assetId,
             );
 
             // Check if the list of software includes the target softwareId
@@ -893,7 +893,7 @@ function IssuePage() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      
+
       setIsSuccess('true');
       setIsOpenAdd(false);
       setSearchQuery('');
@@ -917,17 +917,17 @@ function IssuePage() {
             <Text className={styles.alert}>
               {isSuccess === 'true' && (
                 <ToastCustom
-                title={'Your request successfully!'}
-                description={''}
-                status={'success'}
-              />
+                  title={'Your request successfully!'}
+                  description={''}
+                  status={'success'}
+                />
               )}
               {isSuccess === 'false' && (
                 <ToastCustom
-                title={'Error processing your request.'}
-                description={''}
-                status={'error'}
-              />
+                  title={'Error processing your request.'}
+                  description={''}
+                  status={'error'}
+                />
               )}
             </Text>
           </ListItem>
@@ -1079,8 +1079,8 @@ function IssuePage() {
                             isFirst?.searchQuery
                               ? false
                               : !searchQuery
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1100,12 +1100,12 @@ function IssuePage() {
                           {(isFirst?.searchQuery
                             ? false
                             : !searchQuery
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              This field is required.
-                            </FormErrorMessage>
-                          )}
+                              ? true
+                              : false) && (
+                              <FormErrorMessage mt={0}>
+                                This field is required.
+                              </FormErrorMessage>
+                            )}
                           {showOptions && (
                             <div
                               style={{
@@ -1150,8 +1150,8 @@ function IssuePage() {
                             isFirst?.searchQueryHw
                               ? false
                               : !searchQueryHw
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1171,12 +1171,12 @@ function IssuePage() {
                           {(isFirst?.searchQueryHw
                             ? false
                             : !searchQueryHw
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              This field is required.
-                            </FormErrorMessage>
-                          )}
+                              ? true
+                              : false) && (
+                              <FormErrorMessage mt={0}>
+                                This field is required.
+                              </FormErrorMessage>
+                            )}
                           {showOptionsHw && (
                             <div
                               style={{
@@ -1228,8 +1228,8 @@ function IssuePage() {
                             isFirst?.searchQuerySw
                               ? false
                               : !searchQuerySw
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1287,8 +1287,8 @@ function IssuePage() {
                             isFirst?.searchQueryAnti
                               ? false
                               : !searchQueryAnti
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1311,12 +1311,12 @@ function IssuePage() {
                           {(isFirst?.searchQueryAnti
                             ? false
                             : !searchQueryAnti
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              This field is required.
-                            </FormErrorMessage>
-                          )}
+                              ? true
+                              : false) && (
+                              <FormErrorMessage mt={0}>
+                                This field is required.
+                              </FormErrorMessage>
+                            )}
                           {showOptionsAnti && (
                             <div
                               style={{
@@ -1362,6 +1362,7 @@ function IssuePage() {
                       <FormLabel>Title</FormLabel>
                       <Stack alignItems={'start'} gap={0}>
                         <Input
+                          maxLength={255}
                           placeholder='Title'
                           name='title'
                           value={formData.title}
@@ -1371,12 +1372,12 @@ function IssuePage() {
                         {(isFirst?.title
                           ? false
                           : !formData.title
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Title is required
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Title is required
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -1404,12 +1405,12 @@ function IssuePage() {
                         {(isFirst?.endDate
                           ? false
                           : !deadline
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Deadline is required
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Deadline is required
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -1424,6 +1425,7 @@ function IssuePage() {
               >
                 <FormLabel>Description</FormLabel>
                 <Textarea
+                  maxLength={1000}
                   id='description'
                   placeholder='Description...'
                   value={description2}
@@ -1434,10 +1436,10 @@ function IssuePage() {
                 {(isFirst?.description
                   ? false
                   : !description2
-                  ? true
-                  : false) && (
-                  <FormErrorMessage>Description is required</FormErrorMessage>
-                )}
+                    ? true
+                    : false) && (
+                    <FormErrorMessage>Description is required</FormErrorMessage>
+                  )}
               </FormControl>
               <br />
               <Grid templateColumns='repeat(1, 1fr)' gap={8}>

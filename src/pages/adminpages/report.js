@@ -772,7 +772,7 @@ function ReportPage() {
             <TabPanel>
               <ListItem className={styles.list}>
                 <Flex marginBottom={5}>
-                  <Text color={'blue.400'}>Unsolve:</Text>
+                  <Text color={'blue.400'}>Unsolved:</Text>
                   <Text style={{ marginLeft: '5px' }}>
                     {
                       Feedback.filter((feedback) => feedback.status === 1)
@@ -898,7 +898,7 @@ function ReportPage() {
                           </Td>
                           <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
-                              ? 'Unsolve'
+                              ? 'Unsolved'
                               : item.status === 2
                               ? 'Solved'
                               : item.status === 3
@@ -916,7 +916,7 @@ function ReportPage() {
             <TabPanel>
               <ListItem className={styles.list}>
                 <Flex marginBottom={5}>
-                  <Text color={'blue.400'}>Unsolve:</Text>
+                  <Text color={'blue.400'}>Unsolved:</Text>
                   <Text style={{ marginLeft: '5px' }}>
                     {Issue.filter((feedback) => feedback.status === 1).length}
                   </Text>
@@ -1025,7 +1025,7 @@ function ReportPage() {
                           <Td style={{ textAlign: 'left' }}>{item.end_Date}</Td>
                           <Td style={{ width: '10%', textAlign: 'left' }}>
                             {item.status === 1
-                              ? 'Unsolve'
+                              ? 'Unsolved'
                               : item.status === 2
                               ? 'Solved'
                               : item.status === 3

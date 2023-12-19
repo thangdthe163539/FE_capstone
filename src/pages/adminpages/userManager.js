@@ -185,7 +185,7 @@ function UserManager() {
     const encodedAccid = encodeURIComponent(accid);
     const randomParameter = Math.random().toString(36).substring(2);
     const url = `userDetail?email=${encodedEmail}&role=${encodedRoleName}&roleid=${encodedRoleid}&r=${randomParameter}&status=${encodedStatus}&name=${encodedName}&accid=${encodedAccid}`;
-  
+
     router.push(url);
   };
 
@@ -419,10 +419,10 @@ function UserManager() {
                       {user.status === 1
                         ? 'Active'
                         : user.status === 2
-                        ? 'Inactive'
-                        : user.status === 3
-                        ? 'Locked'
-                        : 'Deleted'}
+                          ? 'Inactive'
+                          : user.status === 3
+                            ? 'Locked'
+                            : 'Deleted'}
                     </Td>
                   </Tr>
                 ))}
@@ -450,14 +450,15 @@ function UserManager() {
                       isFirst?.email
                         ? false
                         : dataSubmit?.email === ''
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex alignItems='center'>
                       <FormLabel style={{ width: '16%' }}>Email</FormLabel>
                       <Stack>
                         <Input
+                          maxLength={255}
                           id='email1'
                           type='email'
                           value={dataSubmit?.email}
@@ -466,17 +467,15 @@ function UserManager() {
                         {(isFirst?.email
                           ? false
                           : dataSubmit?.email === ''
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Email is required.
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Email is required.
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
-                  {/* <FormLabel style={{ width: '15%' }}>Email</FormLabel>
-                    <Input id='email1' autoComplete='off' /> */}
                 </GridItem>
                 <GridItem colSpan={1}>
                   <Flex alignItems='center' justifyContent={'space-between'}>
@@ -501,24 +500,21 @@ function UserManager() {
                 style={{ marginTop: '10px' }}
               >
                 <GridItem colSpan={1}>
-                  {/* <Flex alignItems='center'>
-                    <FormLabel style={{ width: '15%' }}>Name</FormLabel>
-                    <Input id='name' autoComplete='off' />
-                  </Flex> */}
                   <FormControl
                     isRequired={true}
                     isInvalid={
                       isFirst?.name
                         ? false
                         : dataSubmit?.name === ''
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex alignItems='center'>
                       <FormLabel style={{ width: '16%' }}>Name</FormLabel>
                       <Stack>
                         <Input
+                          maxLength={255}
                           id='name'
                           value={dataSubmit?.name}
                           onChange={handleChangeName}
@@ -526,12 +522,12 @@ function UserManager() {
                         {(isFirst?.name
                           ? false
                           : dataSubmit?.name === ''
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Name is required.
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Name is required.
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>

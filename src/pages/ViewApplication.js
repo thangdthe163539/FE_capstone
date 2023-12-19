@@ -35,6 +35,7 @@ import { BACK_END_PORT } from '../../env';
 import { Inter } from 'next/font/google';
 import PaginationCustom from '@/components/pagination';
 const inter = Inter({ subsets: ['latin'] });
+import { useRouter } from 'next/router';
 
 const defaultData = {
   accId: '',
@@ -63,6 +64,33 @@ function ApplicationPage() {
   const [isHovered, setIsHovered] = useState(null);
 
   const [account, setAccount] = useState();
+  const [Apps, setApps] = useState();
+  const router = useRouter();
+  useEffect(() => {
+    const url = 'http://localhost:5001/api/App/ListApps';
+    fetch(url, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setApps(data);
+      })
+      .catch((error) => {
+        console.error('Lỗi:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const { user, app } = router.query;
+    if (user && app) {
+      setIsShowFeedback(true);
+      const selectedAppData = Apps.find((item) => item.name === app);
+      if (selectedAppData) {
+        setSelectedApp(selectedAppData);
+      }
+    }
+  }, [router.query]);
+
 
   useEffect(() => {
     // Access localStorage on the client side

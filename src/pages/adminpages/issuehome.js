@@ -788,7 +788,7 @@ function IssuePage() {
   const getStatusLabel = (status) => {
     switch (status) {
       case 1:
-        return 'Unsolve';
+        return 'Unsolved';
       case 2:
         return 'Solved';
       case 3:
@@ -1282,7 +1282,7 @@ function IssuePage() {
                       {sortedIssue.map((status) => (
                         <option key={status} value={status}>
                           {status === 1
-                            ? 'Unsolve'
+                            ? 'Unsolved'
                             : status === 2
                               ? 'Solved'
                               : status === 3
@@ -1306,6 +1306,7 @@ function IssuePage() {
                       <Stack gap={0}>
                         <Input
                           id='title'
+                          maxLength={255}
                           style={{ backgroundColor: 'white' }}
                           defaultValue={detail?.title.trim()}
                           // value={title}
@@ -1373,6 +1374,7 @@ function IssuePage() {
                 <FormLabel>Description</FormLabel>
                 <Stack>
                   <Textarea
+                    maxLength={1000}
                     id='description'
                     defaultValue={detail?.description.trim()}
                     onChange={(e) => {
@@ -1542,7 +1544,7 @@ function IssuePage() {
                         display: 'inline-block',
                         backgroundColor: 'white',
                         width: '300px',
-                      }} 
+                      }}
                     >
                       {mode === 'Application' ? (
                         <FormControl
@@ -1833,6 +1835,7 @@ function IssuePage() {
                       <FormLabel>Title</FormLabel>
                       <Stack alignItems={'start'} gap={0}>
                         <Input
+                          maxLength={255}
                           placeholder='Title'
                           name='title'
                           value={formData.title}
@@ -1895,6 +1898,7 @@ function IssuePage() {
               >
                 <FormLabel>Description</FormLabel>
                 <Textarea
+                  maxLength={1000}
                   id='description'
                   placeholder='Description...'
                   value={description2}

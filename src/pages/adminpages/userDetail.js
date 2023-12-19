@@ -280,8 +280,8 @@ function UserDetail() {
                     {status == 1
                       ? 'Active'
                       : status == 2
-                      ? 'InActive'
-                      : 'Locked'}
+                        ? 'InActive'
+                        : 'Locked'}
                   </Td>
                 </Tr>
                 <Tr>
@@ -377,14 +377,15 @@ function UserDetail() {
                       isFirst?.name
                         ? false
                         : dataSubmit?.name === ''
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex alignItems='center'>
                       <FormLabel style={{ width: '60px' }}>Name</FormLabel>
                       <Stack w={'100%'}>
                         <Input
+                          maxLength={255}
                           id='name'
                           value={dataSubmit?.name}
                           onChange={handleChangeName}
@@ -392,12 +393,12 @@ function UserDetail() {
                         {(isFirst?.name
                           ? false
                           : dataSubmit?.name === ''
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Name is required.
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Name is required.
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>

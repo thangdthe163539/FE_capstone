@@ -256,7 +256,7 @@ function IssueDetailManagePage() {
   const getStatusLabel = (status) => {
     switch (status) {
       case 1:
-        return 'Unsolve';
+        return 'Unsolved';
       case 2:
         return 'Solved';
       case 3:
@@ -520,7 +520,7 @@ function IssueDetailManagePage() {
                 style={{ width: '100%' }}
               >
                 <option value=''>All Issue</option>
-                <option value='Unsolve'>Unsolve</option>
+                <option value='Unsolved'>Unsolved</option>
                 <option value='Solved'>Solved</option>
                 <option value='Deleted'>Deleted</option>
                 <option value='Cancel'>Cancel</option>
@@ -677,14 +677,14 @@ function IssueDetailManagePage() {
                               }}
                             >
                               {item.status === 1
-                                ? 'Unsolve '
+                                ? 'Unsolved '
                                 : item.status === 2
-                                ? 'Solved '
-                                : item.status === 3
-                                ? 'Deleted '
-                                : item.status === 4
-                                ? 'Cancel '
-                                : 'Unknown Status'}
+                                  ? 'Solved '
+                                  : item.status === 3
+                                    ? 'Deleted '
+                                    : item.status === 4
+                                      ? 'Cancel '
+                                      : 'Unknown Status'}
                             </Td>
                           </Tr>
                         );
@@ -732,14 +732,14 @@ function IssueDetailManagePage() {
                       {sortedIssue.map((status) => (
                         <option key={status} value={status}>
                           {status === 1
-                            ? 'Unsolve'
+                            ? 'Unsolved'
                             : status === 2
-                            ? 'Solved'
-                            : status === 3
-                            ? 'Deleted'
-                            : status === 4
-                            ? 'Cancel'
-                            : 'Unknow'}
+                              ? 'Solved'
+                              : status === 3
+                                ? 'Deleted'
+                                : status === 4
+                                  ? 'Cancel'
+                                  : 'Unknow'}
                         </option>
                       ))}
                       {defaultOptions}
@@ -755,6 +755,7 @@ function IssueDetailManagePage() {
                       <FormLabel>Title</FormLabel>
                       <Stack gap={0}>
                         <Input
+                          maxLength={255}
                           id='title'
                           style={{ backgroundColor: 'white' }}
                           defaultValue={detail?.title.trim()}
@@ -779,8 +780,8 @@ function IssueDetailManagePage() {
                       isFirst?.endDate
                         ? false
                         : !formData?.endDate
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex alignItems='center' marginLeft={20}>
@@ -801,12 +802,12 @@ function IssueDetailManagePage() {
                         {(isFirst?.endDate
                           ? false
                           : !formData?.endDate
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Deadline is required
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Deadline is required
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -822,6 +823,7 @@ function IssueDetailManagePage() {
                 <FormLabel>Description</FormLabel>
                 <Stack>
                   <Textarea
+                    maxLength={1000}
                     id='description'
                     defaultValue={detail?.description.trim()}
                     onChange={(e) => {
@@ -834,10 +836,10 @@ function IssueDetailManagePage() {
                   {(isFirst?.description
                     ? false
                     : !description
-                    ? true
-                    : false) && (
-                    <FormErrorMessage>Description is required</FormErrorMessage>
-                  )}
+                      ? true
+                      : false) && (
+                      <FormErrorMessage>Description is required</FormErrorMessage>
+                    )}
                 </Stack>
               </FormControl>
               <br />
