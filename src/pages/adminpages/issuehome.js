@@ -1051,10 +1051,7 @@ function IssuePage() {
             const blob = dataURLtoBlob(image.dataURL);
             return new File([blob], image.fileName, { type: blob.type });
           } else {
-            // Giữ nguyên ảnh khi dataURL không xác định
-            const fullImagePath = `/images/${image.image1}`;
-            const blob = await fetch(fullImagePath).then((res) => res.blob());
-            return new File([blob], image.fileName, { type: blob.type });
+            return null;
           }
         }),
       );
