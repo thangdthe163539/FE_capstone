@@ -273,7 +273,7 @@ function ApplicationPage() {
   }
 
   //pagination
-  const itemPerPage = 8;
+  const itemPerPage = 6;
   const [dynamicList, setDynamicList] = useState([]);
   const [dataDynamicList, setDataDynamicList] = useState([]);
   const [totalPages, setTotalPages] = useState(data ? data?.length : 0);
