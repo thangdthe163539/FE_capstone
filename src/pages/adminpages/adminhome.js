@@ -9,7 +9,7 @@ function ADHomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    const storedAccount = localStorage.getItem('account');
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
@@ -21,8 +21,7 @@ function ADHomePage() {
             router.push('/ViewApplication');
           }
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     } else {
       router.push('/page405');
     }

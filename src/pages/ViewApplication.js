@@ -67,17 +67,61 @@ function ApplicationPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const url = 'http://localhost:5001/api/App/ListApps';
-    fetch(url, {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setApps(data);
-      })
-      .catch((error) => {
-        console.error('Lỗi:', error);
-      });
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
+    if (storedAccount) {
+      try {
+        const accountDataDecode = JSON.parse(storedAccount);
+        if (!accountDataDecode) {
+          router.push('/page405');
+        } else {
+          // if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
+          //   router.push('/page405');
+          // } else if (accountDataDecode.status == 2) {
+          //   router.push('/ViewApplication');
+          // }
+          setAccount(accountDataDecode);
+        }
+      } catch (error) {
+        router.push('/page405');
+      }
+    } else {
+      router.push('/page405');
+    }
+  }, []);
+
+  // useEffect(() => {
+  //   const url = 'http://localhost:5001/api/App/ListApps';
+  //   fetch(url, {
+  //     method: 'GET',
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setApps(data);
+  //     })
+  //     .catch((error) => {
+  //       console.error('Lỗi:', error);
+  //     });
+  // }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${BACK_END_PORT}/api/App/ListApps`);
+        setData(response.data);
+        setDataDynamicList(response.data); // Assuming the API returns an array of objects
+        const response2 = await axios.get(
+          `${BACK_END_PORT}/api/Account/ListAccount`,
+        );
+        setDataAcc(response2.data); // Assuming the API returns an array of objects
+        setApps(response2.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -96,39 +140,6 @@ function ApplicationPage() {
       }
     }
   }, [router.query]);
-
-  useEffect(() => {
-    
-    const storedAccount = localStorage.getItem('account');
-
-    if (storedAccount) {
-      const accountDataDecode = JSON.parse(storedAccount);
-      if (!accountDataDecode) {
-      } else {
-        setAccount(accountDataDecode);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${BACK_END_PORT}/api/App/ListApps`);
-        setData(response.data);
-        setDataDynamicList(response.data); // Assuming the API returns an array of objects
-        const response2 = await axios.get(
-          `${BACK_END_PORT}/api/Account/ListAccount`,
-        );
-        setDataAcc(response2.data); // Assuming the API returns an array of objects
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   function formatDate(date) {
     const day = date.getDate();

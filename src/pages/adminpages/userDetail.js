@@ -48,7 +48,7 @@ function UserDetail() {
   const { email, role, roleid, status, name, accid } = decodedParams;
 
   useEffect(() => {
-    const storedAccount = localStorage.getItem('account');
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
@@ -60,8 +60,7 @@ function UserDetail() {
             router.push('/ViewApplication');
           }
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     } else {
       router.push('/page405');
     }
@@ -137,7 +136,6 @@ function UserDetail() {
     }
   };
 
-
   const handleDelete = () => {
     const url = `http://localhost:5001/api/Account/DeleteAccountWith_key?accountId=${accid}`;
     fetch(url, {
@@ -172,7 +170,6 @@ function UserDetail() {
       };
     }
   }, [isSuccess]);
-
 
   const handleChangeName = (e) => {
     const value = e.target.value;
@@ -273,8 +270,8 @@ function UserDetail() {
                     {status == 1
                       ? 'Active'
                       : status == 2
-                        ? 'InActive'
-                        : 'Locked'}
+                      ? 'InActive'
+                      : 'Locked'}
                   </Td>
                 </Tr>
                 <Tr>
@@ -345,7 +342,10 @@ function UserDetail() {
                       value={selectedOptionRole}
                       onChange={(e) => setSelectedOptionRole(e.target.value)}
                     >
-                      {roles.sort((a, b) => a.roleId == roleid ? -1 : b.roleId == roleid ? 1 : 0)
+                      {roles
+                        .sort((a, b) =>
+                          a.roleId == roleid ? -1 : b.roleId == roleid ? 1 : 0,
+                        )
                         .map((role1) => (
                           <option key={role1.roleId} value={role1.roleId}>
                             {role1.name}
@@ -367,8 +367,8 @@ function UserDetail() {
                       isFirst?.name
                         ? false
                         : dataSubmit?.name === ''
-                          ? true
-                          : false
+                        ? true
+                        : false
                     }
                   >
                     <Flex alignItems='center'>
@@ -383,12 +383,12 @@ function UserDetail() {
                         {(isFirst?.name
                           ? false
                           : dataSubmit?.name === ''
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              Name is required.
-                            </FormErrorMessage>
-                          )}
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Name is required.
+                          </FormErrorMessage>
+                        )}
                       </Stack>
                     </Flex>
                   </FormControl>

@@ -65,8 +65,8 @@ function FeedbackPage() {
   const [account, setAccount] = useState();
 
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
@@ -91,8 +91,8 @@ function FeedbackPage() {
   const [software, setSoftware] = useState();
 
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedSoftware = localStorage.getItem('software');
+    // Access sessionStorage on the client side
+    const storedSoftware = sessionStorage.getItem('software');
 
     if (storedSoftware) {
       const softwareDataDecode = JSON.parse(storedSoftware);
@@ -216,8 +216,8 @@ function FeedbackPage() {
   };
   //
   const handleDetail = (item) => {
-    localStorage.setItem('report', JSON.stringify(item));
-    // console.log(localStorage.getItem('deviceId'));
+    sessionStorage.setItem('report', JSON.stringify(item));
+    // console.log(sessionStorage.getItem('deviceId'));
   };
   //
   return (

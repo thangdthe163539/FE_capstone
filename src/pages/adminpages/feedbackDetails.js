@@ -244,8 +244,8 @@ function FeedBackDetailManagePage() {
 
   const [account, setAccount] = useState();
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
@@ -629,12 +629,12 @@ function FeedBackDetailManagePage() {
                               {item.status === 1
                                 ? 'Unsolved '
                                 : item.status === 2
-                                  ? 'Solved '
-                                  : item.status === 3
-                                    ? 'Deleted '
-                                    : item.status === 4
-                                      ? 'Cancel '
-                                      : 'Unknown Status'}
+                                ? 'Solved '
+                                : item.status === 3
+                                ? 'Deleted '
+                                : item.status === 4
+                                ? 'Cancel '
+                                : 'Unknown Status'}
                             </Td>
                           </Tr>
                         );
@@ -683,12 +683,12 @@ function FeedBackDetailManagePage() {
                           {status === 1
                             ? 'Unsolved'
                             : status === 2
-                              ? 'Solved'
-                              : status === 3
-                                ? 'Deleted'
-                                : status === 4
-                                  ? 'Cancel'
-                                  : 'Unknow'}
+                            ? 'Solved'
+                            : status === 3
+                            ? 'Deleted'
+                            : status === 4
+                            ? 'Cancel'
+                            : 'Unknow'}
                         </option>
                       ))}
                       {defaultOptions}
@@ -702,8 +702,8 @@ function FeedBackDetailManagePage() {
                       isFirst?.title
                         ? false
                         : dataSubmit?.title === ''
-                          ? true
-                          : false
+                        ? true
+                        : false
                     }
                   >
                     <Flex
@@ -712,8 +712,8 @@ function FeedBackDetailManagePage() {
                           isFirst?.title
                             ? false
                             : dataSubmit?.title === ''
-                              ? true
-                              : false
+                            ? true
+                            : false
                         )
                           ? 'start'
                           : 'center'
@@ -732,12 +732,12 @@ function FeedBackDetailManagePage() {
                         {(isFirst?.title
                           ? false
                           : dataSubmit?.title === ''
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              Title is required.
-                            </FormErrorMessage>
-                          )}
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Title is required.
+                          </FormErrorMessage>
+                        )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -750,8 +750,8 @@ function FeedBackDetailManagePage() {
                   isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                      ? true
-                      : false
+                    ? true
+                    : false
                 }
               >
                 <FormLabel>Description</FormLabel>
@@ -768,12 +768,12 @@ function FeedBackDetailManagePage() {
                   {(isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                      ? true
-                      : false) && (
-                      <FormErrorMessage mt={0}>
-                        Description is required.
-                      </FormErrorMessage>
-                    )}
+                    ? true
+                    : false) && (
+                    <FormErrorMessage mt={0}>
+                      Description is required.
+                    </FormErrorMessage>
+                  )}
                 </Stack>
               </FormControl>
               <br />
