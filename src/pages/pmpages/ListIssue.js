@@ -248,6 +248,7 @@ function SecurityPage() {
                   value={searchQuery}
                   onChange={handleSearchInputChange}
                   placeholder='search...'
+                  maxLength={100}
                   w={300}
                   mr={1}
                 />

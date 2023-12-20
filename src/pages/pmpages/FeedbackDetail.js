@@ -195,7 +195,14 @@ function ReportPage(title) {
         isClosable: true,
       });
     } catch (error) {
-      console.error('Lỗi:', error);
+      toast({
+        title: 'Feedback Updated Fail',
+        description: 'The feedback has been fail when updated.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
+      console.error('Error:', error);
     }
   };
 

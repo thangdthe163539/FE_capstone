@@ -253,6 +253,17 @@ function SoftwarePage() {
         isClosable: true,
       });
     } catch (error) {
+      toast({
+        title: 'Application Created Fail',
+        description: 'The application has been fail when created.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
+      setIsOpenEdit(false); // Close the modal after successful save
+      setButtonDisabled(true);
+      setFormData2(defaultData);
+      setSelectedRow(new Set());
       console.error('Error saving data:', error);
     }
   };
@@ -304,6 +315,17 @@ function SoftwarePage() {
         isClosable: true,
       });
     } catch (error) {
+      toast({
+        title: 'Application Updated Fail',
+        description: 'The application has been fail when updated.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
+      setIsOpenEdit(false); // Close the modal after successful save
+      setButtonDisabled(true);
+      setFormData2(defaultData);
+      setSelectedRow(new Set());
       console.error('Error saving data:', error);
     }
   };
@@ -350,7 +372,7 @@ function SoftwarePage() {
                 assets: count || 0, // Use '0' if count is falsy (including undefined)
               };
             } catch (error) {
-              console.log(error);
+              // console.log(error);
               return {
                 ...software,
                 assets: 0, // Use '0' if count is falsy (including undefined)
@@ -463,6 +485,7 @@ function SoftwarePage() {
                   value={searchQuery}
                   onChange={handleSearchInputChange}
                   placeholder='search...'
+                  maxLength={100}
                   w={300}
                   mr={1}
                 />
@@ -511,7 +534,8 @@ function SoftwarePage() {
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
-                    Show {dynamicList.length}/{filteredSoftwareData.length} application(s)
+                    Show {dynamicList.length}/{filteredSoftwareData.length}{' '}
+                    application(s)
                   </Text>
                   <PaginationCustom
                     current={currentPage}
@@ -604,6 +628,7 @@ function SoftwarePage() {
                     name='name'
                     value={formData2.name}
                     onChange={handleInputChange2}
+                    maxLength={255}
                     required
                   />
                 </FormControl>
@@ -621,6 +646,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='publisher'
+                    maxLength={255}
                     value={formData2.publisher}
                     onChange={handleInputChange2}
                   />
@@ -629,6 +655,7 @@ function SoftwarePage() {
                   <FormLabel>Version</FormLabel>
                   <Input
                     name='version'
+                    maxLength={255}
                     value={formData2.version}
                     onChange={handleInputChange2}
                   />
@@ -637,6 +664,7 @@ function SoftwarePage() {
                   <FormLabel>Release</FormLabel>
                   <Input
                     name='release'
+                    maxLength={255}
                     value={formData2.release}
                     onChange={handleInputChange2}
                   />
@@ -672,6 +700,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='osversion'
+                    maxLength={255}
                     value={formData2.osversion}
                     onChange={handleInputChange2}
                   />
@@ -680,6 +709,7 @@ function SoftwarePage() {
                   <FormLabel>Download Link</FormLabel>
                   <Input
                     name='download'
+                    maxLength={255}
                     value={formData2.download}
                     onChange={handleInputChange2}
                   />
@@ -688,6 +718,7 @@ function SoftwarePage() {
                   <FormLabel>Document Link</FormLabel>
                   <Input
                     name='docs'
+                    maxLength={255}
                     value={formData2.docs}
                     onChange={handleInputChange2}
                   />
@@ -721,6 +752,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='language'
+                    maxLength={255}
                     value={formData2.language}
                     onChange={handleInputChange2}
                   />
@@ -739,6 +771,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='db'
+                    maxLength={255}
                     value={formData2.db}
                     onChange={handleInputChange2}
                   />
@@ -770,6 +803,7 @@ function SoftwarePage() {
               </Flex>
               <Input
                 name='description'
+                maxLength={1000}
                 value={formData2.description}
                 onChange={handleInputChange2}
               />
@@ -817,6 +851,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='name'
+                    maxLength={255}
                     value={formData.name}
                     onChange={handleInputChange}
                     required
@@ -836,6 +871,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='publisher'
+                    maxLength={255}
                     value={formData.publisher}
                     onChange={handleInputChange}
                   />
@@ -844,6 +880,7 @@ function SoftwarePage() {
                   <FormLabel>Version</FormLabel>
                   <Input
                     name='version'
+                    maxLength={255}
                     value={formData.version}
                     onChange={handleInputChange}
                   />
@@ -852,6 +889,7 @@ function SoftwarePage() {
                   <FormLabel>Release</FormLabel>
                   <Input
                     name='release'
+                    maxLength={255}
                     value={formData.release}
                     onChange={handleInputChange}
                   />
@@ -887,6 +925,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='osversion'
+                    maxLength={255}
                     value={formData.osversion}
                     onChange={handleInputChange}
                   />
@@ -895,6 +934,7 @@ function SoftwarePage() {
                   <FormLabel>Download Link</FormLabel>
                   <Input
                     name='download'
+                    maxLength={255}
                     value={formData.download}
                     onChange={handleInputChange}
                   />
@@ -903,6 +943,7 @@ function SoftwarePage() {
                   <FormLabel>Document Link</FormLabel>
                   <Input
                     name='docs'
+                    maxLength={255}
                     value={formData.docs}
                     onChange={handleInputChange}
                   />
@@ -936,6 +977,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='language'
+                    maxLength={255}
                     value={formData.language}
                     onChange={handleInputChange}
                   />
@@ -954,6 +996,7 @@ function SoftwarePage() {
                   </Flex>
                   <Input
                     name='db'
+                    maxLength={255}
                     value={formData.db}
                     onChange={handleInputChange}
                   />
@@ -985,6 +1028,7 @@ function SoftwarePage() {
               </Flex>
               <Input
                 name='description'
+                maxLength={1000}
                 value={formData.description}
                 onChange={handleInputChange}
               />

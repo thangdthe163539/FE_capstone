@@ -477,6 +477,17 @@ function AssetDetailPage() {
         isClosable: true,
       });
     } catch (error) {
+      setIsOpenAdd(true); // Close the modal after successful save
+      setShowModalAdd(false);
+      setShowModalTable(true);
+      setFormData(defaultData);
+      toast({
+        title: 'Software Created Fail',
+        description: 'The software has been fail when created.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -500,7 +511,7 @@ function AssetDetailPage() {
         curDate.getDate(),
       );
       let status;
-      if (formData1.time == 0 || formData1.time == '0') {
+      if (formData3.time == 0 || formData3.time == '0') {
         status = 2;
       } else {
         status = 1;
@@ -532,7 +543,7 @@ function AssetDetailPage() {
       setHaveLicense(true);
       setShowModalAdd(false);
       setShowModalTable(true);
-      setFormData(defaultData);
+      setFormData3(defaultData);
       // setSelectedRow1(new Set());
       // Reload new data for the table
       const newDataResponse = await axios.get(
@@ -552,6 +563,18 @@ function AssetDetailPage() {
         isClosable: true,
       });
     } catch (error) {
+      setIsOpenAdd(false); // Close the modal after successful save
+      setHaveLicense(true);
+      setShowModalAdd(false);
+      setShowModalTable(true);
+      setFormData3(defaultData);
+      toast({
+        title: 'Software Added Fail',
+        description: 'The software has been fail when added.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -602,6 +625,15 @@ function AssetDetailPage() {
         isClosable: true,
       });
     } catch (error) {
+      setIsOpenEditAsset(false); // Close the modal after successful save
+      setShowEditAsset(true); // Close the modal after successful save
+      toast({
+        title: 'Software Updated Fail',
+        description: 'The software has been fail when updated.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -651,6 +683,17 @@ function AssetDetailPage() {
         isClosable: true,
       });
     } catch (error) {
+      setIsOpenEditLi(false); // Close the modal after successful save
+      setFormData2(defaultData);
+      setSelectedRow2(null);
+      setButtonDisabled2(true);
+      toast({
+        title: 'License Updated Fail',
+        description: 'The license has been fail when updated.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -730,6 +773,17 @@ function AssetDetailPage() {
         isClosable: true,
       });
     } catch (error) {
+      setIsOpenEdit(false); // Close the modal after successful save
+      setFormData1(defaultData);
+      setButtonDisabled1(true);
+      setSelectedRow1(null);
+      toast({
+        title: 'Software Updated Fail',
+        description: 'The software has been fail when updated.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Error saving data:', error);
     }
   };
@@ -1337,6 +1391,7 @@ function AssetDetailPage() {
                                 <Input
                                   value={assetData?.name}
                                   name='name'
+                                  maxLength={255}
                                   onChange={handleInputChange3}
                                   className={`${styles.text3}`}
                                 />
@@ -1379,6 +1434,7 @@ function AssetDetailPage() {
                                 <Input
                                   value={assetData?.cpu}
                                   name='cpu'
+                                  maxLength={255}
                                   onChange={handleInputChange3}
                                   className={`${styles.text3}`}
                                 />
@@ -1406,6 +1462,7 @@ function AssetDetailPage() {
                                 <Input
                                   value={assetData?.manufacturer}
                                   name='manufacturer'
+                                  maxLength={255}
                                   onChange={handleInputChange3}
                                   className={`${styles.text3}`}
                                 />
@@ -1429,6 +1486,7 @@ function AssetDetailPage() {
                                 <Input
                                   value={assetData?.version}
                                   name='version'
+                                  maxLength={255}
                                   onChange={handleInputChange3}
                                   className={`${styles.text3}`}
                                 />
@@ -1449,6 +1507,7 @@ function AssetDetailPage() {
                               <Input
                                 value={assetData?.gpu}
                                 name='gpu'
+                                maxLength={255}
                                 onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                               />
@@ -1464,6 +1523,7 @@ function AssetDetailPage() {
                               <Input
                                 value={assetData?.model}
                                 name='model'
+                                maxLength={255}
                                 onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                               />
@@ -1477,6 +1537,7 @@ function AssetDetailPage() {
                               <Input
                                 value={assetData?.lastSuccesfullScan}
                                 name='lastSuccesfullScan'
+                                maxLength={255}
                                 onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                                 disabled
@@ -1494,6 +1555,7 @@ function AssetDetailPage() {
                                 <Input
                                   value={assetData?.ram}
                                   name='ram'
+                                  maxLength={255}
                                   onChange={handleInputChange3}
                                   className={`${styles.text3}`}
                                 />
@@ -1516,6 +1578,7 @@ function AssetDetailPage() {
                               <Input
                                 value={assetData?.serialNumber}
                                 name='serialNumber'
+                                maxLength={255}
                                 onChange={handleInputChange3}
                                 className={`${styles.text3}`}
                               />
@@ -1548,6 +1611,7 @@ function AssetDetailPage() {
                                 <Input
                                   value={assetData?.memory}
                                   name='memory'
+                                  maxLength={255}
                                   onChange={handleInputChange3}
                                   className={`${styles.text3}`}
                                 />
@@ -1595,6 +1659,7 @@ function AssetDetailPage() {
                         value={searchAppQuery}
                         onChange={handleSearchAppInputChange}
                         placeholder='search...'
+                        maxLength={100}
                         w={300}
                         mr={1}
                       />
@@ -1709,6 +1774,7 @@ function AssetDetailPage() {
                         value={searchAppQuery1}
                         onChange={handleSearchAppInputChange1}
                         placeholder='search...'
+                        maxLength={100}
                         w={300}
                         mr={1}
                       />
@@ -1821,6 +1887,7 @@ function AssetDetailPage() {
                         value={searchLiQuery}
                         onChange={handleSearchLiInputChange}
                         placeholder='search...'
+                        maxLength={100}
                         w={300}
                         mr={1}
                       />
@@ -1927,6 +1994,7 @@ function AssetDetailPage() {
                   <FormLabel>Name</FormLabel>
                   <Input
                     name='name'
+                    maxLength={255}
                     value={assetData.name}
                     onChange={handleInputChange3}
                     required
@@ -1936,6 +2004,7 @@ function AssetDetailPage() {
                   <FormLabel>Manufacturer</FormLabel>
                   <Input
                     name='manufacturer'
+                    maxLength={255}
                     value={assetData.manufacturer}
                     onChange={handleInputChange3}
                   />
@@ -1944,6 +2013,7 @@ function AssetDetailPage() {
                   <FormLabel>Model</FormLabel>
                   <Input
                     name='model'
+                    maxLength={255}
                     value={assetData.model}
                     onChange={handleInputChange3}
                   />
@@ -1952,6 +2022,7 @@ function AssetDetailPage() {
                   <FormLabel>Serial Number</FormLabel>
                   <Input
                     name='serialNumber'
+                    maxLength={255}
                     value={assetData.serialNumber}
                     onChange={handleInputChange3}
                   />
@@ -1963,6 +2034,7 @@ function AssetDetailPage() {
                   <FormLabel>CPU</FormLabel>
                   <Input
                     name='cpu'
+                    maxLength={255}
                     value={assetData.cpu}
                     onChange={handleInputChange3}
                   />
@@ -1971,6 +2043,7 @@ function AssetDetailPage() {
                   <FormLabel>GPU</FormLabel>
                   <Input
                     name='gpu'
+                    maxLength={255}
                     value={assetData.gpu}
                     onChange={handleInputChange3}
                   />
@@ -1979,6 +2052,7 @@ function AssetDetailPage() {
                   <FormLabel>RAM</FormLabel>
                   <Input
                     name='ram'
+                    maxLength={255}
                     value={assetData.ram}
                     onChange={handleInputChange3}
                     type='number'
@@ -1988,6 +2062,7 @@ function AssetDetailPage() {
                   <FormLabel>Storage</FormLabel>
                   <Input
                     name='memory'
+                    maxLength={255}
                     value={assetData.memory}
                     onChange={handleInputChange3}
                     type='number'
@@ -2013,6 +2088,7 @@ function AssetDetailPage() {
                   <FormLabel>Version</FormLabel>
                   <Input
                     name='version'
+                    maxLength={255}
                     value={assetData.version}
                     onChange={handleInputChange3}
                   />
@@ -2021,6 +2097,7 @@ function AssetDetailPage() {
                   <FormLabel>IP Address</FormLabel>
                   <Input
                     name='ipAddress'
+                    maxLength={255}
                     value={assetData.ipAddress}
                     onChange={handleInputChange3}
                   />
@@ -2029,6 +2106,7 @@ function AssetDetailPage() {
                   <FormLabel>Bandwidth</FormLabel>
                   <Input
                     name='bandwidth'
+                    maxLength={255}
                     value={assetData.bandwidth}
                     onChange={handleInputChange3}
                   />
@@ -2076,6 +2154,7 @@ function AssetDetailPage() {
                   <FormLabel>Software</FormLabel>
                   <Input
                     name='software'
+                    maxLength={255}
                     value={
                       listAllSoftware.find(
                         (item) => item.softwareId === formData2?.softwareId,
@@ -2099,6 +2178,7 @@ function AssetDetailPage() {
                   </Flex>
                   <Input
                     name='licenseKey'
+                    maxLength={255}
                     value={formData2.licenseKey}
                     onChange={handleInputChange2}
                   />
@@ -2138,7 +2218,7 @@ function AssetDetailPage() {
                   </Flex>
                   <Input
                     name='time'
-                    min={0}
+                    maxLength={10}
                     value={formData2.time}
                     onChange={handleInputChange2}
                     type='number'
@@ -2214,6 +2294,7 @@ function AssetDetailPage() {
                       </Flex>
                       <Input
                         name='name'
+                        maxLength={255}
                         value={formData.name}
                         onChange={handleInputChange}
                         required
@@ -2223,6 +2304,7 @@ function AssetDetailPage() {
                       <FormLabel>Version</FormLabel>
                       <Input
                         name='version'
+                        maxLength={255}
                         value={formData.version}
                         onChange={handleInputChange}
                       />
@@ -2231,6 +2313,7 @@ function AssetDetailPage() {
                       <FormLabel>Release</FormLabel>
                       <Input
                         name='release'
+                        maxLength={255}
                         value={formData.release}
                         onChange={handleInputChange}
                       />
@@ -2251,6 +2334,7 @@ function AssetDetailPage() {
                       </Flex>
                       <Input
                         name='publisher'
+                        maxLength={255}
                         value={formData.publisher}
                         onChange={handleInputChange}
                       />
@@ -2307,6 +2391,7 @@ function AssetDetailPage() {
                         value={searchAddQuery}
                         onChange={handleSearchAddInputChange}
                         placeholder='search software'
+                        maxLength={100}
                         w={300}
                         mr={1}
                       />
@@ -2390,6 +2475,7 @@ function AssetDetailPage() {
                       <Input
                         name='softwareId'
                         value={formData1.name}
+                        maxLength={255}
                         onChange={handleInputChange1}
                         disabled
                       ></Input>
@@ -2424,6 +2510,7 @@ function AssetDetailPage() {
                         </Flex>
                         <Input
                           name='licenseKey'
+                          maxLength={255}
                           value={formData3.licenseKey}
                           onChange={handleInputChange4}
                         />
@@ -2464,6 +2551,7 @@ function AssetDetailPage() {
                         </Flex>
                         <Input
                           name='time'
+                          maxLength={10}
                           value={formData3.time}
                           onChange={handleInputChange4}
                           type='number'
@@ -2550,6 +2638,7 @@ function AssetDetailPage() {
                   </Flex>
                   <Input
                     name='name'
+                    maxLength={255}
                     value={formData1.name}
                     onChange={(e) => handleInputChange1(e)}
                     required
@@ -2559,6 +2648,7 @@ function AssetDetailPage() {
                   <FormLabel>Version</FormLabel>
                   <Input
                     name='version'
+                    maxLength={255}
                     value={formData1.version}
                     onChange={(e) => handleInputChange1(e)}
                   />
@@ -2567,6 +2657,7 @@ function AssetDetailPage() {
                   <FormLabel>Release</FormLabel>
                   <Input
                     name='release'
+                    maxLength={255}
                     value={formData1.release}
                     onChange={(e) => handleInputChange1(e)}
                   />
@@ -2587,6 +2678,7 @@ function AssetDetailPage() {
                   </Flex>
                   <Input
                     name='publisher'
+                    maxLength={255}
                     value={formData1.publisher}
                     onChange={(e) => handleInputChange1(e)}
                   />

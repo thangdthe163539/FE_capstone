@@ -189,6 +189,13 @@ function ReportPage(title) {
       });
       router.push('/pmpages/ListIssue');
     } catch (error) {
+      toast({
+        title: 'Issue Updated Fail',
+        description: 'The issue has been fail when updated.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       console.error('Lỗi:', error);
     }
   };
