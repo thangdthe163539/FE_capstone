@@ -76,7 +76,7 @@ const defaultData2 = {
   name: '',
   publisher: '',
   libraryKey: '',
-  start_Date: new Date().toISOString().split('T')[0],
+  start_Date: '',
   time: '',
   status: '',
 };
@@ -97,6 +97,8 @@ function SoftwarePage() {
         } else {
           if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }
@@ -136,11 +138,6 @@ function SoftwarePage() {
   const [searchQuery1, setSearchQuery1] = useState('');
   const [searchQuery2, setSearchQuery2] = useState('');
   const [searchQuery3, setSearchQuery3] = useState('');
-  const [filteredDeviceData, setFilteredDeviceData] = useState([]);
-  const [filteredLibraryData, setFilteredLibraryData] = useState([]);
-  const [filteredAllAssetData, setFilteredAllAssetData] = useState([]);
-  const [filteredAllIssueData, setFilteredAllIssueData] = useState([]);
-  const [filteredAllFeedbackData, setFilteredAllFeedbackData] = useState([]);
   const [filterStatus1, setFilterStatus1] = useState(-1);
   const [filterStatus2, setFilterStatus2] = useState(-1);
   const [filterStatus3, setFilterStatus3] = useState(-1);
@@ -160,7 +157,7 @@ function SoftwarePage() {
   const [filteredDeviceDataDynamic, setFilteredDeviceDataDynamic] = useState(
     [],
   );
-  const itemPerPage = 6;
+  const itemPerPage = 4;
   const [dynamicList1, setDynamicList1] = useState([]);
   const [currentPage1, setCurrentPage1] = useState(1);
   // filteredIssueData;
@@ -431,6 +428,7 @@ function SoftwarePage() {
       'ram',
       'memory',
       'version',
+      'ipAddress',
     ];
     const errors = [];
 
@@ -566,7 +564,7 @@ function SoftwarePage() {
         {
           name: formData4.name,
           cpu: formData4.cpu,
-          gpu: formData4.gpu !== null ? formData4.gpu : 'null',
+          gpu: formData4.gpu,
           ram: formData4.ram,
           memory: formData4.memory,
           os: formData4.os,
@@ -574,7 +572,7 @@ function SoftwarePage() {
           ipAddress: formData4.ipAddress,
           bandwidth: formData4.bandwidth,
           manufacturer: formData4.manufacturer,
-          model: formData4.model !== null ? formData4.model : 'null',
+          model: formData4.model,
           serialNumber: formData4.serialNumber,
           lastSuccesfullScan: formatDate(currentDateOnly),
           status: 1,
@@ -704,7 +702,7 @@ function SoftwarePage() {
           name: formData3.name,
           publisher: formData3.publisher,
           libraryKey: formData3.libraryKey,
-          start_Date: formData3.start_Date,
+          start_Date: formatDate1(formData3.start_Date),
           time: formData3.time,
           status: status,
         },
@@ -927,7 +925,7 @@ function SoftwarePage() {
     };
 
     fetchData();
-  }, [software, account, showEditApp]);
+  }, [software, account, showEditApp, showModalAdd, isOpenAdd]);
 
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value);
@@ -954,7 +952,6 @@ function SoftwarePage() {
         manufacturer.includes(query)
       );
     });
-    setFilteredDeviceData(filteredData);
     setFilteredDeviceDataDynamic(
       filteredData.filter((item) =>
         filterStatus3 !== -1 ? item.status === filterStatus3 : true,
@@ -968,7 +965,6 @@ function SoftwarePage() {
       const publisher = item?.publisher.toLowerCase();
       return name.includes(query) || publisher.includes(query);
     });
-    setFilteredLibraryData(filteredData);
     setFilteredLibraryDataDynamic(
       filteredData.filter((item) => item.status != 3),
     );
@@ -982,7 +978,6 @@ function SoftwarePage() {
         const manufacturer = item?.manufacturer.toLowerCase();
         return name.includes(query) || manufacturer.includes(query);
       });
-    setFilteredAllAssetData(filteredData);
     setFilteredAllAssetDataDynamic(
       filteredData
         .filter((item) => !assetIdsInAsset.includes(item.assetId))
@@ -995,7 +990,6 @@ function SoftwarePage() {
       const title = item?.title.toLowerCase();
       return title.includes(query);
     });
-    setFilteredAllIssueData(filteredData);
     setFilteredAllIssueDataDynamic(
       filteredData.filter((item) =>
         filterStatus1 !== -1 ? item.status === filterStatus1 : true,
@@ -1008,7 +1002,6 @@ function SoftwarePage() {
       const title = item?.title.toLowerCase();
       return title.includes(query);
     });
-    setFilteredAllFeedbackData(filteredData);
     setFilteredAllFeedbackDataDynamic(
       filteredData.filter((item) =>
         filterStatus2 !== -1 ? item.status === filterStatus2 : true,
@@ -1017,16 +1010,12 @@ function SoftwarePage() {
   };
   // Update filtered data whenever the search query changes
   useEffect(() => {
-    if (deviceData.length || isOpenAdd || showModalAdd) {
-      filterAssets1();
-    }
+    filterAssets1();
   }, [isOpenAdd, searchAddQuery, listAllAsset, showModalAdd]);
   // Update filtered data whenever the search query changes
   useEffect(() => {
-    if (deviceData.length || isOpenAdd) {
-      filterAssets();
-    }
-  }, [searchQuery, deviceData, isOpenAdd, filterStatus3]);
+    filterAssets();
+  }, [searchQuery, deviceData, filterStatus3]);
   useEffect(() => {
     filterLibrary();
   }, [searchQuery1, libraryData]);
@@ -1082,6 +1071,13 @@ function SoftwarePage() {
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
+  };
+  const formatDate1 = (dateString) => {
+    if (dateString) {
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    }
+    return null; // or handle the case where dateString is undefined
   };
   //cut text descriptions
   const trimTextToMaxWidth = (text, maxWidth) => {
@@ -1653,7 +1649,8 @@ function SoftwarePage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredDeviceDataDynamic.length} asset(s)
+                          Show {dynamicList1.length}/
+                          {filteredDeviceDataDynamic.length} asset(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage1}
@@ -1782,7 +1779,8 @@ function SoftwarePage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredLibraryDataDynamic.length} license(s)
+                          Show {dynamicList2.length}/
+                          {filteredLibraryDataDynamic.length} license(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage2}
@@ -1884,7 +1882,8 @@ function SoftwarePage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredAllIssueDataDynamic.length} issue(s)
+                          Show {dynamicList3.length}/
+                          {filteredAllIssueDataDynamic.length} issue(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage3}
@@ -1985,8 +1984,8 @@ function SoftwarePage() {
                         justifyContent={'space-between'}
                       >
                         <Text>
-                          Total {filteredAllFeedbackDataDynamic.length}{' '}
-                          feedback(s)
+                          Show {dynamicList4.length}/
+                          {filteredAllFeedbackDataDynamic.length} feedback(s)
                         </Text>
                         <PaginationCustom
                           current={currentPage4}
@@ -2046,7 +2045,8 @@ function SoftwarePage() {
           setIsOpenAdd(false),
           setShowModalAdd(true),
           setFormData4(defaultData),
-          setInvalidFields4([])
+          setInvalidFields4([]),
+          setSearchAddQuery('')
         )}
         closeOnOverlayClick={false}
         size='6x1'
@@ -2088,12 +2088,21 @@ function SoftwarePage() {
                 <TableContainer>
                   <Table simple>
                     <TableCaption>
-                      <PaginationCustom
-                        current={currentPage5}
-                        onChange={handleChangePage5}
-                        total={totalPages5}
-                        pageSize={itemPerPage}
-                      />
+                      <Flex
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                      >
+                        <Text>
+                          Show {dynamicList5.length}/
+                          {filteredAllAssetDataDynamic.length} asset(s)
+                        </Text>
+                        <PaginationCustom
+                          current={currentPage5}
+                          onChange={handleChangePage5}
+                          total={totalPages5}
+                          pageSize={itemPerPage}
+                        />
+                      </Flex>
                     </TableCaption>
                     <Thead>
                       <Tr>
@@ -2231,6 +2240,7 @@ function SoftwarePage() {
                       </Flex>
                       <Input
                         name='ram'
+                        type='number'
                         value={formData4.ram}
                         onChange={handleInputChange4}
                       />
@@ -2249,6 +2259,7 @@ function SoftwarePage() {
                       </Flex>
                       <Input
                         name='memory'
+                        type='number'
                         value={formData4.memory}
                         onChange={handleInputChange4}
                       />
@@ -2287,8 +2298,18 @@ function SoftwarePage() {
                         onChange={handleInputChange4}
                       />
                     </FormControl>
-                    <FormControl className={styles.formInput}>
-                      <FormLabel>IP Address</FormLabel>
+                    <FormControl
+                      isRequired
+                      isInvalid={invalidFields4.includes('ipAddress')}
+                      className={styles.formInput}
+                    >
+                      <Flex>
+                        <FormLabel>IP Address</FormLabel>
+                        <Spacer />
+                        <FormErrorMessage mt={-2}>
+                          IP Address is required!
+                        </FormErrorMessage>
+                      </Flex>
                       <Input
                         name='ipAddress'
                         value={formData4.ipAddress}
@@ -2317,7 +2338,8 @@ function SoftwarePage() {
                   onClick={() => (
                     setIsOpenAdd(false),
                     setFormData4(defaultData),
-                    setShowModalAdd(true)
+                    setShowModalAdd(true),
+                    setSearchAddQuery('')
                   )}
                 >
                   Cancel
@@ -2764,8 +2786,18 @@ function SoftwarePage() {
                     onChange={handleInputChange2}
                   />
                 </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>IP Address</FormLabel>
+                <FormControl
+                  isRequired
+                  isInvalid={invalidFields4.includes('ipAddress')}
+                  className={styles.formInput}
+                >
+                  <Flex>
+                    <FormLabel>IP Address</FormLabel>
+                    <Spacer />
+                    <FormErrorMessage mt={-2}>
+                      IP Address is required!
+                    </FormErrorMessage>
+                  </Flex>
                   <Input
                     name='ipAddress'
                     value={formData2.ipAddress}

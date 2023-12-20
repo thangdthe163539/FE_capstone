@@ -216,7 +216,7 @@ function FeedBackDetailManagePage() {
   const getStatusLabel = (status) => {
     switch (status) {
       case 1:
-        return 'Unsolve';
+        return 'Unsolved';
       case 2:
         return 'Solved';
       case 3:
@@ -237,11 +237,6 @@ function FeedBackDetailManagePage() {
         {getStatusLabel(status)}
       </option>
     ));
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
 
   const handleBackToList = () => {
     router.push('feedbackhome');
@@ -267,6 +262,8 @@ function FeedBackDetailManagePage() {
         } else {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }
@@ -512,7 +509,7 @@ function FeedBackDetailManagePage() {
                 style={{ width: '100%' }}
               >
                 <option value=''>All Feedback</option>
-                <option value='Unsolve'>Unsolve</option>
+                <option value='Unsolved'>Unsolved</option>
                 <option value='Solved'>Solved</option>
                 <option value='Deleted'>Deleted</option>
                 <option value='Cancel'>Cancel</option>
@@ -654,14 +651,14 @@ function FeedBackDetailManagePage() {
                               }}
                             >
                               {item.status === 1
-                                ? 'Unsolve '
+                                ? 'Unsolved '
                                 : item.status === 2
-                                ? 'Solved '
-                                : item.status === 3
-                                ? 'Deleted '
-                                : item.status === 4
-                                ? 'Cancel '
-                                : 'Unknown Status'}
+                                  ? 'Solved '
+                                  : item.status === 3
+                                    ? 'Deleted '
+                                    : item.status === 4
+                                      ? 'Cancel '
+                                      : 'Unknown Status'}
                             </Td>
                           </Tr>
                         );
@@ -708,14 +705,14 @@ function FeedBackDetailManagePage() {
                       {sortedIssue.map((status) => (
                         <option key={status} value={status}>
                           {status === 1
-                            ? 'Unsolve'
+                            ? 'Unsolved'
                             : status === 2
-                            ? 'Solved'
-                            : status === 3
-                            ? 'Deleted'
-                            : status === 4
-                            ? 'Cancel'
-                            : 'Unknow'}
+                              ? 'Solved'
+                              : status === 3
+                                ? 'Deleted'
+                                : status === 4
+                                  ? 'Cancel'
+                                  : 'Unknow'}
                         </option>
                       ))}
                       {defaultOptions}
@@ -723,24 +720,14 @@ function FeedBackDetailManagePage() {
                   </Flex>
                 </GridItem>
                 <GridItem colSpan={1}>
-                  {/* <Flex alignItems='center'>
-                    <FormLabel>Title</FormLabel>
-                    <Input
-                      id='title'
-                      defaultValue={detail?.title.trim()}
-                      style={{ backgroundColor: 'white' }}
-                      onChange={(e) => setTitle(e.target.value)}
-                    />
-                  </Flex> */}
-
                   <FormControl
                     isRequired={true}
                     isInvalid={
                       isFirst?.title
                         ? false
                         : dataSubmit?.title === ''
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex
@@ -749,8 +736,8 @@ function FeedBackDetailManagePage() {
                           isFirst?.title
                             ? false
                             : dataSubmit?.title === ''
-                            ? true
-                            : false
+                              ? true
+                              : false
                         )
                           ? 'start'
                           : 'center'
@@ -759,6 +746,7 @@ function FeedBackDetailManagePage() {
                       <FormLabel>Title</FormLabel>
                       <Stack w={'100%'}>
                         <Input
+                          maxLength={255}
                           defaultValue={detail?.title.trim()}
                           style={{ backgroundColor: 'white' }}
                           id='title'
@@ -768,27 +756,17 @@ function FeedBackDetailManagePage() {
                         {(isFirst?.title
                           ? false
                           : dataSubmit?.title === ''
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Title is required.
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Title is required.
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
                 </GridItem>
               </Grid>
-              {/* <FormControl mt={4}>
-                <FormLabel>Description</FormLabel>
-                <Textarea
-                  id='description'
-                  defaultValue={detail?.description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  width='100%'
-                  minH={40}
-                />
-              </FormControl> */}
               <FormControl
                 isRequired={true}
                 mt={4}
@@ -796,13 +774,14 @@ function FeedBackDetailManagePage() {
                   isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                    ? true
-                    : false
+                      ? true
+                      : false
                 }
               >
                 <FormLabel>Description</FormLabel>
                 <Stack width='100%'>
                   <Textarea
+                    maxLength={1000}
                     id='description'
                     defaultValue={detail?.description.trim()}
                     onChange={handleChangeDescription}
@@ -813,12 +792,12 @@ function FeedBackDetailManagePage() {
                   {(isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                    ? true
-                    : false) && (
-                    <FormErrorMessage mt={0}>
-                      Description is required.
-                    </FormErrorMessage>
-                  )}
+                      ? true
+                      : false) && (
+                      <FormErrorMessage mt={0}>
+                        Description is required.
+                      </FormErrorMessage>
+                    )}
                 </Stack>
               </FormControl>
               <br />

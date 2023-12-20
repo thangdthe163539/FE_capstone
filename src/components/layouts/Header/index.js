@@ -90,7 +90,7 @@ function Header() {
   //end
   useEffect(() => {
     const storedAccount = localStorage.getItem('account');
-    if (storedAccount) {
+    if (storedAccount && storedAccount.accId !== null) {
       const storedAccountEncode = JSON.parse(storedAccount);
       if (storedAccountEncode) {
         setIsLogin(storedAccountEncode);
@@ -150,7 +150,7 @@ function Header() {
                     border: 'none',
                     color: '#fff',
                   }}
-                  minW={'170px'}
+                  minW={'230px'}
                 >
                   {isLogin?.roleName}: {isLogin?.name}
                 </MenuButton>

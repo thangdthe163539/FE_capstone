@@ -282,7 +282,7 @@ function FeedBackPage() {
   const getStatusLabel = (status) => {
     switch (status) {
       case 1:
-        return 'Unsolve';
+        return 'Unsolved';
       case 2:
         return 'Solved';
       case 3:
@@ -316,6 +316,8 @@ function FeedBackPage() {
         } else {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }
@@ -633,14 +635,14 @@ function FeedBackPage() {
                       {sortedIssue.map((status) => (
                         <option key={status} value={status}>
                           {status === 1
-                            ? 'Unsolve'
+                            ? 'Unsolved'
                             : status === 2
-                            ? 'Solved'
-                            : status === 3
-                            ? 'Deleted'
-                            : status === 4
-                            ? 'Cancel'
-                            : 'Unknow'}
+                              ? 'Solved'
+                              : status === 3
+                                ? 'Deleted'
+                                : status === 4
+                                  ? 'Cancel'
+                                  : 'Unknow'}
                         </option>
                       ))}
                       {defaultOptions}
@@ -648,23 +650,14 @@ function FeedBackPage() {
                   </Flex>
                 </GridItem>
                 <GridItem colSpan={1}>
-                  {/* <Flex alignItems='center'>
-                    <FormLabel>Title</FormLabel>
-                    <Input
-                      id='title'
-                      style={{ backgroundColor: 'white' }}
-                      defaultValue={detail?.title.trim()}
-                      onChange={(e) => setTitle(e.target.value)}
-                    />
-                  </Flex> */}
                   <FormControl
                     isRequired
                     isInvalid={
                       isFirst?.title
                         ? false
                         : dataSubmit?.title === ''
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex
@@ -673,8 +666,8 @@ function FeedBackPage() {
                           isFirst?.title
                             ? false
                             : dataSubmit?.title === ''
-                            ? true
-                            : false
+                              ? true
+                              : false
                         )
                           ? 'start'
                           : 'center'
@@ -683,6 +676,7 @@ function FeedBackPage() {
                       <FormLabel>Title</FormLabel>
                       <Stack w={'100%'}>
                         <Input
+                          maxLength={255}
                           defaultValue={detail?.title.trim()}
                           style={{ backgroundColor: 'white' }}
                           id='title'
@@ -692,27 +686,17 @@ function FeedBackPage() {
                         {(isFirst?.title
                           ? false
                           : dataSubmit?.title === ''
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Title is required.
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Title is required.
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
                 </GridItem>
               </Grid>
-              {/* <FormControl mt={4}>
-                <FormLabel>Description</FormLabel>
-                <Textarea
-                  id='description'
-                  defaultValue={detail?.description.trim()}
-                  onChange={(e) => setDescription(e.target.value)}
-                  width='100%'
-                  minH={40}
-                />
-              </FormControl> */}
               <FormControl
                 mt={4}
                 isRequired={true}
@@ -720,13 +704,14 @@ function FeedBackPage() {
                   isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                    ? true
-                    : false
+                      ? true
+                      : false
                 }
               >
                 <FormLabel>Description</FormLabel>
                 <Stack width='100%'>
                   <Textarea
+                    maxLength={1000}
                     id='description'
                     defaultValue={detail?.description.trim()}
                     onChange={handleChangeDescription}
@@ -737,12 +722,12 @@ function FeedBackPage() {
                   {(isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                    ? true
-                    : false) && (
-                    <FormErrorMessage mt={0}>
-                      Description is required.
-                    </FormErrorMessage>
-                  )}
+                      ? true
+                      : false) && (
+                      <FormErrorMessage mt={0}>
+                        Description is required.
+                      </FormErrorMessage>
+                    )}
                 </Stack>
               </FormControl>
               <br />

@@ -82,6 +82,8 @@ function SoftwarePage() {
         } else {
           if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }
@@ -110,7 +112,6 @@ function SoftwarePage() {
   //
   //pagination
   const itemPerPage = 6;
-  const [softwareDataDynamic, setSoftwareDataDynamic] = useState([]);
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
@@ -118,22 +119,22 @@ function SoftwarePage() {
     setCurrentPage(page);
     let newList = [];
     for (let i = (page - 1) * itemPerPage; i < page * itemPerPage; i++) {
-      if (softwareDataDynamic[i]) {
-        newList.push(softwareDataDynamic[i]);
+      if (filteredSoftwareData[i]) {
+        newList.push(filteredSoftwareData[i]);
       }
     }
     setDynamicList(newList);
   };
 
-  const totalPages = softwareDataDynamic ? softwareDataDynamic?.length : 0;
+  const totalPages = filteredSoftwareData ? filteredSoftwareData?.length : 0;
 
   useEffect(() => {
-    if (softwareDataDynamic.length) {
+    if (filteredSoftwareData.length) {
       handleChangePage(1);
     } else {
       setDynamicList([]);
     }
-  }, [softwareDataDynamic]);
+  }, [filteredSoftwareData]);
   //
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -357,9 +358,7 @@ function SoftwarePage() {
             }
           }),
         );
-        // console.log(mergedData)
-        setSoftwareDataDynamic(mergedData.filter((item) => item.status !== 3));
-        setSoftwareData(mergedData);
+        setSoftwareData(mergedData.filter((item) => item.status !== 3));
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -380,7 +379,7 @@ function SoftwarePage() {
       const publisher = item.publisher.toLowerCase();
       return name.includes(query) || publisher.includes(query);
     });
-    setFilteredSoftwareData(filteredData);
+    setFilteredSoftwareData(filteredData.filter((item) => item.status !== 3));
   };
 
   // Update filtered data whenever the search query changes
@@ -512,12 +511,7 @@ function SoftwarePage() {
               <TableCaption>
                 <Flex alignItems={'center'} justifyContent={'space-between'}>
                   <Text>
-                    Total{' '}
-                    {
-                      filteredSoftwareData.filter((item) => item.status !== 3)
-                        .length
-                    }{' '}
-                    application(s)
+                    Show {dynamicList.length}/{filteredSoftwareData.length} application(s)
                   </Text>
                   <PaginationCustom
                     current={currentPage}

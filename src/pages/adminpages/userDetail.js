@@ -54,6 +54,8 @@ function UserDetail() {
         } else {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
         }
       } catch (error) {
@@ -121,7 +123,7 @@ function UserDetail() {
   }, [isSuccess]);
 
   const [dataSubmit, setDataSubmit] = useState({
-    name: '',
+    name: name,
   });
 
   const [isFirst, setIsFirst] = useState({
@@ -278,8 +280,8 @@ function UserDetail() {
                     {status == 1
                       ? 'Active'
                       : status == 2
-                      ? 'InActive'
-                      : 'Locked'}
+                        ? 'InActive'
+                        : 'Locked'}
                   </Td>
                 </Tr>
                 <Tr>
@@ -375,35 +377,35 @@ function UserDetail() {
                       isFirst?.name
                         ? false
                         : dataSubmit?.name === ''
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex alignItems='center'>
                       <FormLabel style={{ width: '60px' }}>Name</FormLabel>
                       <Stack w={'100%'}>
                         <Input
+                          maxLength={255}
                           id='name'
-                          defaultValue={name}
                           value={dataSubmit?.name}
                           onChange={handleChangeName}
                         />
                         {(isFirst?.name
                           ? false
                           : dataSubmit?.name === ''
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Name is required.
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Name is required.
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
                 </GridItem>
                 <GridItem colSpan={1}>
                   <Flex alignItems='center'>
-                    <FormLabel>Active</FormLabel>
+                    <FormLabel>Status</FormLabel>
                     <Select
                       value={selectedOptionActive}
                       onChange={(e) => {

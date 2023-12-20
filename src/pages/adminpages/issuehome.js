@@ -116,6 +116,8 @@ function IssuePage() {
         } else {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }
@@ -786,7 +788,7 @@ function IssuePage() {
   const getStatusLabel = (status) => {
     switch (status) {
       case 1:
-        return 'Unsolve';
+        return 'Unsolved';
       case 2:
         return 'Solved';
       case 3:
@@ -1280,7 +1282,7 @@ function IssuePage() {
                       {sortedIssue.map((status) => (
                         <option key={status} value={status}>
                           {status === 1
-                            ? 'Unsolve'
+                            ? 'Unsolved'
                             : status === 2
                             ? 'Solved'
                             : status === 3
@@ -1299,11 +1301,12 @@ function IssuePage() {
                     isRequired
                     isInvalid={isFirst?.title ? false : !title ? true : false}
                   >
-                    <Flex alignItems='center'>
+                    <Flex alignItems='center' marginLeft={69}>
                       <FormLabel>Title</FormLabel>
                       <Stack gap={0}>
                         <Input
                           id='title'
+                          maxLength={255}
                           style={{ backgroundColor: 'white' }}
                           defaultValue={detail?.title.trim()}
                           // value={title}
@@ -1332,12 +1335,12 @@ function IssuePage() {
                         : false
                     }
                   >
-                    <Flex alignItems='center'>
+                    <Flex alignItems='center' marginLeft={20}>
                       <FormLabel>Deadline</FormLabel>
                       <Stack gap={0}>
                         <Input
                           style={{
-                            marginLeft: '-7px',
+                            marginLeft: '7px',
                             backgroundColor: 'white',
                           }}
                           type='date'
@@ -1371,6 +1374,7 @@ function IssuePage() {
                 <FormLabel>Description</FormLabel>
                 <Stack>
                   <Textarea
+                    maxLength={1000}
                     id='description'
                     defaultValue={detail?.description.trim()}
                     onChange={(e) => {
@@ -1726,7 +1730,7 @@ function IssuePage() {
                                 position: 'absolute',
                                 top: '100%',
                                 left: 0,
-                                width: '300px',
+                                minWidth: 'fit-content',
                                 border: '2px solid whitesmoke',
                                 background: '#fff',
                                 zIndex: 1,
@@ -1792,7 +1796,7 @@ function IssuePage() {
                                 position: 'absolute',
                                 top: '100%',
                                 left: 0,
-                                width: '300px',
+                                minWidth: 'fit-content',
                                 border: '2px solid whitesmoke',
                                 background: '#fff',
                                 zIndex: 1,
@@ -1831,6 +1835,7 @@ function IssuePage() {
                       <FormLabel>Title</FormLabel>
                       <Stack alignItems={'start'} gap={0}>
                         <Input
+                          maxLength={255}
                           placeholder='Title'
                           name='title'
                           value={formData.title}
@@ -1893,6 +1898,7 @@ function IssuePage() {
               >
                 <FormLabel>Description</FormLabel>
                 <Textarea
+                  maxLength={1000}
                   id='description'
                   placeholder='Description...'
                   value={description2}

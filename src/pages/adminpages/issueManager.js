@@ -111,7 +111,7 @@ function IssuePage() {
             try {
               const response2 = await axios.get(
                 `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
-                  asset?.assetId,
+                asset?.assetId,
               );
               // Filter out duplicate software based on assetID
               const uniqueSoftware = response2.data.filter((sw) => {
@@ -283,6 +283,8 @@ function IssuePage() {
         } else {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }
@@ -495,7 +497,7 @@ function IssuePage() {
             // Extract appIds from the response data
             const response2 = await axios.get(
               `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
-                asset.assetId,
+              asset.assetId,
             );
 
             // Check if the list of software includes the target softwareId
@@ -545,7 +547,7 @@ function IssuePage() {
             // Extract appIds from the response data
             const response2 = await axios.get(
               `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
-                asset.assetId,
+              asset.assetId,
             );
 
             // Check if the list of software includes the target softwareId
@@ -675,7 +677,14 @@ function IssuePage() {
   //End
 
   const handleIssuerDetails = (appId) => {
-    router.push(`issueDetailsManage?appId=${appId}`);
+    const randomParameter = Math.random().toString(36).substring(2);
+    const params = {
+      appId: appId,
+      softrack: randomParameter,
+    };
+    const encodedParams = btoa(JSON.stringify(params));
+    const url = `issueDetailsManage?${encodedParams}`;
+    router.push(url);
   };
 
   const handleSearchInputChange = (e) => {
@@ -888,6 +897,7 @@ function IssuePage() {
           'Content-Type': 'multipart/form-data',
         },
       });
+
       setIsSuccess('true');
       setIsOpenAdd(false);
       setSearchQuery('');
@@ -910,16 +920,18 @@ function IssuePage() {
             <ArrowForwardIcon margin={1}></ArrowForwardIcon>Issue management
             <Text className={styles.alert}>
               {isSuccess === 'true' && (
-                <Alert status='success'>
-                  <AlertIcon />
-                  Your request successfully!
-                </Alert>
+                <ToastCustom
+                  title={'Your request successfully!'}
+                  description={''}
+                  status={'success'}
+                />
               )}
               {isSuccess === 'false' && (
-                <Alert status='error' style={{ width: '350px' }}>
-                  <AlertIcon />
-                  Error processing your request.
-                </Alert>
+                <ToastCustom
+                  title={'Error processing your request.'}
+                  description={''}
+                  status={'error'}
+                />
               )}
             </Text>
           </ListItem>
@@ -1071,8 +1083,8 @@ function IssuePage() {
                             isFirst?.searchQuery
                               ? false
                               : !searchQuery
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1092,12 +1104,12 @@ function IssuePage() {
                           {(isFirst?.searchQuery
                             ? false
                             : !searchQuery
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              This field is required.
-                            </FormErrorMessage>
-                          )}
+                              ? true
+                              : false) && (
+                              <FormErrorMessage mt={0}>
+                                This field is required.
+                              </FormErrorMessage>
+                            )}
                           {showOptions && (
                             <div
                               style={{
@@ -1142,8 +1154,8 @@ function IssuePage() {
                             isFirst?.searchQueryHw
                               ? false
                               : !searchQueryHw
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1163,12 +1175,12 @@ function IssuePage() {
                           {(isFirst?.searchQueryHw
                             ? false
                             : !searchQueryHw
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              This field is required.
-                            </FormErrorMessage>
-                          )}
+                              ? true
+                              : false) && (
+                              <FormErrorMessage mt={0}>
+                                This field is required.
+                              </FormErrorMessage>
+                            )}
                           {showOptionsHw && (
                             <div
                               style={{
@@ -1220,8 +1232,8 @@ function IssuePage() {
                             isFirst?.searchQuerySw
                               ? false
                               : !searchQuerySw
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1279,8 +1291,8 @@ function IssuePage() {
                             isFirst?.searchQueryAnti
                               ? false
                               : !searchQueryAnti
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1303,12 +1315,12 @@ function IssuePage() {
                           {(isFirst?.searchQueryAnti
                             ? false
                             : !searchQueryAnti
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              This field is required.
-                            </FormErrorMessage>
-                          )}
+                              ? true
+                              : false) && (
+                              <FormErrorMessage mt={0}>
+                                This field is required.
+                              </FormErrorMessage>
+                            )}
                           {showOptionsAnti && (
                             <div
                               style={{
@@ -1350,10 +1362,11 @@ function IssuePage() {
                     }
                     isRequired
                   >
-                    <Flex alignItems=''>
+                    <Flex alignItems='center'>
                       <FormLabel>Title</FormLabel>
                       <Stack alignItems={'start'} gap={0}>
                         <Input
+                          maxLength={255}
                           placeholder='Title'
                           name='title'
                           value={formData.title}
@@ -1363,12 +1376,12 @@ function IssuePage() {
                         {(isFirst?.title
                           ? false
                           : !formData.title
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Title is required
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Title is required
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -1380,7 +1393,7 @@ function IssuePage() {
                     }
                     isRequired
                   >
-                    <Flex alignItems='' justifyContent={'space-evenly'}>
+                    <Flex alignItems='center' justifyContent={'space-evenly'}>
                       <FormLabel>Deadline</FormLabel>
                       <Stack gap={0}>
                         <Input
@@ -1396,12 +1409,12 @@ function IssuePage() {
                         {(isFirst?.endDate
                           ? false
                           : !deadline
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Deadline is required
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Deadline is required
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -1416,6 +1429,7 @@ function IssuePage() {
               >
                 <FormLabel>Description</FormLabel>
                 <Textarea
+                  maxLength={1000}
                   id='description'
                   placeholder='Description...'
                   value={description2}
@@ -1426,10 +1440,10 @@ function IssuePage() {
                 {(isFirst?.description
                   ? false
                   : !description2
-                  ? true
-                  : false) && (
-                  <FormErrorMessage>Description is required</FormErrorMessage>
-                )}
+                    ? true
+                    : false) && (
+                    <FormErrorMessage>Description is required</FormErrorMessage>
+                  )}
               </FormControl>
               <br />
               <Grid templateColumns='repeat(1, 1fr)' gap={8}>
