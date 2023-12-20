@@ -62,10 +62,10 @@ function ApplicationPage() {
   const [error, setError] = useState('');
   const [image, setImage] = useState([]);
   const [isHovered, setIsHovered] = useState(null);
-
   const [account, setAccount] = useState();
-  const [Apps, setApps] = useState();
+  const [Apps, setApps] = useState([]);
   const router = useRouter();
+
   useEffect(() => {
     const url = 'http://localhost:5001/api/App/ListApps';
     fetch(url, {
@@ -81,7 +81,13 @@ function ApplicationPage() {
   }, []);
 
   useEffect(() => {
-    const { user, app } = router.query;
+    let user, app;
+    const query = router.asPath.split('?')[1];
+    if (query) {
+      const decodedParams = JSON.parse(atob(query));
+      user = decodedParams?.user;
+      app = decodedParams?.app;
+    }
     if (user && app) {
       setIsShowFeedback(true);
       const selectedAppData = Apps.find((item) => item.name === app);
@@ -91,15 +97,13 @@ function ApplicationPage() {
     }
   }, [router.query]);
 
-
   useEffect(() => {
-    // Access localStorage on the client side
+    
     const storedAccount = localStorage.getItem('account');
 
     if (storedAccount) {
       const accountDataDecode = JSON.parse(storedAccount);
       if (!accountDataDecode) {
-        // router.push('http://localhost:3000');
       } else {
         setAccount(accountDataDecode);
       }
@@ -377,7 +381,7 @@ function ApplicationPage() {
             templateColumns={{
               base: 'repeat(2, minmax(150px, 1fr))', // Responsive cho mobile và các thiết bị nhỏ hơn
               md: 'repeat(3, minmax(200px, 1fr))', // Responsive cho màn hình lớn hơn medium
-              lg: 'repeat(4, minmax(250px, 1fr))', // Responsive cho màn hình lớn
+              lg: 'repeat(3, minmax(250px, 1fr))', // Responsive cho màn hình lớn
             }}
             mt={5}
             gap={'20px'}

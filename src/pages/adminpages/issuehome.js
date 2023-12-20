@@ -38,11 +38,10 @@ import {
   GridItem,
   Image,
 } from '@chakra-ui/react';
-import { Alert, AlertIcon } from '@chakra-ui/react';
 import axios from 'axios';
 import Link from 'next/link';
 import styles from '@/styles/pm.module.css';
-import { ArrowForwardIcon, DeleteIcon, RepeatIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import { FaPlus } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
@@ -91,8 +90,6 @@ function IssuePage() {
   const [selectedOptionActive, setSelectedOptionActive] = useState('');
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
-  const [os, setOs] = useState('');
-  const [osversion, setOsversion] = useState('');
   const [imagesState, setImages] = useState([]);
   const [error, setError] = useState('');
   const [image, setImage] = useState([]);
@@ -226,36 +223,6 @@ function IssuePage() {
     setSearchQueryTb(e.target.value);
   };
 
-  //cut text descriptions
-  const trimTextToMaxWidth = (text, maxWidth) => {
-    const words = text.split(' ');
-
-    let currentWidth = 0;
-    let trimmedWords = [];
-
-    for (let i = 0; i < words.length; i++) {
-      const wordWidth = words[i].length * 7;
-
-      if (currentWidth + wordWidth <= maxWidth) {
-        trimmedWords.push(words[i]);
-        currentWidth += wordWidth;
-      } else {
-        break;
-      }
-    }
-
-    const trimmedText = trimmedWords.join(' ');
-
-    return (
-      <span>
-        {trimmedText}
-        <span style={{ color: 'blue', fontSize: '15px' }}>
-          {words.length > trimmedWords.length ? ' ...' : ''}
-        </span>
-      </span>
-    );
-  };
-
   useEffect(() => {
     const url = 'http://localhost:5001/api/App/ListApps';
     fetch(url, {
@@ -269,6 +236,7 @@ function IssuePage() {
         console.error('Lỗi:', error);
       });
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -317,6 +285,7 @@ function IssuePage() {
       fetchData();
     }
   }, [Apps]);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -328,7 +297,7 @@ function IssuePage() {
             try {
               const response2 = await axios.get(
                 `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
-                  asset?.assetId,
+                asset?.assetId,
               );
               // Filter out duplicate software based on assetID
               const uniqueSoftware = response2.data.filter((sw) => {
@@ -682,7 +651,7 @@ function IssuePage() {
             // Extract appIds from the response data
             const response2 = await axios.get(
               `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
-                asset.assetId,
+              asset.assetId,
             );
 
             // Check if the list of software includes the target softwareId
@@ -732,7 +701,7 @@ function IssuePage() {
             // Extract appIds from the response data
             const response2 = await axios.get(
               `${BACK_END_PORT}/api/Software/list_Softwares_by_Asset/` +
-                asset.assetId,
+              asset.assetId,
             );
 
             // Check if the list of software includes the target softwareId
@@ -1235,8 +1204,14 @@ function IssuePage() {
                           handleDetail();
                           setDetails(issue);
                         }}
+
                       >
-                        {trimTextToMaxWidth(issue.description.trim(), 400)}
+                        <Text
+                          w={'500px'}
+                          textOverflow={'ellipsis'}
+                          overflow={'hidden'}>
+                          {issue.description.trim()}
+                        </Text>
                       </Td>
                       <Td>
                         {
@@ -1284,12 +1259,12 @@ function IssuePage() {
                           {status === 1
                             ? 'Unsolved'
                             : status === 2
-                            ? 'Solved'
-                            : status === 3
-                            ? 'Deleted'
-                            : status === 4
-                            ? 'Cancel'
-                            : 'Unknow'}
+                              ? 'Solved'
+                              : status === 3
+                                ? 'Deleted'
+                                : status === 4
+                                  ? 'Cancel'
+                                  : 'Unknow'}
                         </option>
                       ))}
                       {defaultOptions}
@@ -1309,7 +1284,6 @@ function IssuePage() {
                           maxLength={255}
                           style={{ backgroundColor: 'white' }}
                           defaultValue={detail?.title.trim()}
-                          // value={title}
                           onChange={(e) => {
                             setTitle(e.target.value);
                             setIsFirst({ ...isFirst, title: false });
@@ -1331,8 +1305,8 @@ function IssuePage() {
                       isFirst?.endDate
                         ? false
                         : !formData?.endDate
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex alignItems='center' marginLeft={20}>
@@ -1353,12 +1327,12 @@ function IssuePage() {
                         {(isFirst?.endDate
                           ? false
                           : !formData?.endDate
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Deadline is required
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Deadline is required
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -1387,10 +1361,10 @@ function IssuePage() {
                   {(isFirst?.description
                     ? false
                     : !description
-                    ? true
-                    : false) && (
-                    <FormErrorMessage>Description is required</FormErrorMessage>
-                  )}
+                      ? true
+                      : false) && (
+                      <FormErrorMessage>Description is required</FormErrorMessage>
+                    )}
                 </Stack>
               </FormControl>
               <br />
@@ -1552,8 +1526,8 @@ function IssuePage() {
                             isFirst?.searchQuery
                               ? false
                               : !searchQuery
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1573,12 +1547,12 @@ function IssuePage() {
                           {(isFirst?.searchQuery
                             ? false
                             : !searchQuery
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              This field is required.
-                            </FormErrorMessage>
-                          )}
+                              ? true
+                              : false) && (
+                              <FormErrorMessage mt={0}>
+                                This field is required.
+                              </FormErrorMessage>
+                            )}
                           {showOptions && (
                             <div
                               style={{
@@ -1623,8 +1597,8 @@ function IssuePage() {
                             isFirst?.searchQueryHw
                               ? false
                               : !searchQueryHw
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1644,12 +1618,12 @@ function IssuePage() {
                           {(isFirst?.searchQueryHw
                             ? false
                             : !searchQueryHw
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              This field is required.
-                            </FormErrorMessage>
-                          )}
+                              ? true
+                              : false) && (
+                              <FormErrorMessage mt={0}>
+                                This field is required.
+                              </FormErrorMessage>
+                            )}
                           {showOptionsHw && (
                             <div
                               style={{
@@ -1701,8 +1675,8 @@ function IssuePage() {
                             isFirst?.searchQuerySw
                               ? false
                               : !searchQuerySw
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1760,8 +1734,8 @@ function IssuePage() {
                             isFirst?.searchQueryAnti
                               ? false
                               : !searchQueryAnti
-                              ? true
-                              : false
+                                ? true
+                                : false
                           }
                           isRequired={true}
                         >
@@ -1784,12 +1758,12 @@ function IssuePage() {
                           {(isFirst?.searchQueryAnti
                             ? false
                             : !searchQueryAnti
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              This field is required.
-                            </FormErrorMessage>
-                          )}
+                              ? true
+                              : false) && (
+                              <FormErrorMessage mt={0}>
+                                This field is required.
+                              </FormErrorMessage>
+                            )}
                           {showOptionsAnti && (
                             <div
                               style={{
@@ -1845,12 +1819,12 @@ function IssuePage() {
                         {(isFirst?.title
                           ? false
                           : !formData.title
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Title is required
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Title is required
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -1878,12 +1852,12 @@ function IssuePage() {
                         {(isFirst?.endDate
                           ? false
                           : !deadline
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Deadline is required
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Deadline is required
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -1909,10 +1883,10 @@ function IssuePage() {
                 {(isFirst?.description
                   ? false
                   : !description2
-                  ? true
-                  : false) && (
-                  <FormErrorMessage>Description is required</FormErrorMessage>
-                )}
+                    ? true
+                    : false) && (
+                    <FormErrorMessage>Description is required</FormErrorMessage>
+                  )}
               </FormControl>
               <br />
               <Grid templateColumns='repeat(1, 1fr)' gap={8}>

@@ -176,16 +176,18 @@ function UserManager() {
     name,
     accid,
   ) => {
-    // Mã hóa các tham số
-    const encodedEmail = encodeURIComponent(email);
-    const encodedRoleName = encodeURIComponent(roleName);
-    const encodedRoleid = encodeURIComponent(roleid);
-    const encodedStatus = encodeURIComponent(status);
-    const encodedName = encodeURIComponent(name);
-    const encodedAccid = encodeURIComponent(accid);
     const randomParameter = Math.random().toString(36).substring(2);
-    const url = `userDetail?email=${encodedEmail}&role=${encodedRoleName}&roleid=${encodedRoleid}&r=${randomParameter}&status=${encodedStatus}&name=${encodedName}&accid=${encodedAccid}`;
-
+    const params = {
+      email: email,
+      role: roleName,
+      roleid: roleid,
+      status: status,
+      name: name,
+      accid: accid,
+      softrack: randomParameter,
+    };
+    const encodedParams = btoa(JSON.stringify(params));
+    const url = `userDetail?${encodedParams}`;
     router.push(url);
   };
 
@@ -236,11 +238,7 @@ function UserManager() {
       return;
     }
     const url = 'http://localhost:5001/api/Account/Register';
-
-    // const email = document.getElementById('email1').value;
-    // const name = document.getElementById('name').value;
-    const isActive =
-      selectedOptionActive === '' ? 1 : parseInt(selectedOptionActive);
+    const isActive = selectedOptionActive === '' ? 1 : parseInt(selectedOptionActive);
     const roleId = selectedOptionRole === '' ? 1 : parseInt(selectedOptionRole);
 
     const data = {
@@ -271,6 +269,7 @@ function UserManager() {
         console.error('Lỗi:', error);
       });
   };
+  
   return (
     <>
       <Box className={styles.userBoxM}>

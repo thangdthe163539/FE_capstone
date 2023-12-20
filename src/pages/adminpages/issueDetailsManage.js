@@ -42,7 +42,6 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import styles from '@/styles/pm.module.css';
-import { Alert, AlertIcon } from '@chakra-ui/react';
 import Pagination from '@/components/pagination';
 import ToastCustom from '@/components/toast';
 const defaultData = {
@@ -56,7 +55,6 @@ const defaultData = {
 
 function IssueDetailManagePage() {
   const router = useRouter();
-  const { appId } = router.query;
   const [formData, setFormData] = useState(defaultData);
   const [issue, setIssue] = useState([]);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -73,6 +71,11 @@ function IssueDetailManagePage() {
   const [zoomedIndex, setZoomedIndex] = useState(null);
   const [isHovered, setIsHovered] = useState(null);
   const allowedExtensions = ['jpg', 'png'];
+
+  //getData
+  const query = router.asPath.split('?')[1];
+  const decodedParams = JSON.parse(atob(query));
+  const { appId } = decodedParams;
 
   const [account, setAccount] = useState();
   useEffect(() => {
@@ -325,24 +328,8 @@ function IssueDetailManagePage() {
       })
         .then((response) => response.json())
         .then((data) => {
-          if (data.status !== 400) {
-            const sortedData = data.sort((a, b) => {
-              if (a.status === 1 && b.status !== 1) {
-                return -1;
-              } else if (a.status !== 1 && b.status === 1) {
-                return 1;
-              } else if (a.status === 1 && b.status === 1) {
-                const dateA = new Date(
-                  a.start_Date.split('/').reverse().join('-'),
-                );
-                const dateB = new Date(
-                  b.start_Date.split('/').reverse().join('-'),
-                );
-
-                return dateA.getTime() - dateB.getTime();
-              }
-            });
-            setIssue(sortedData);
+          if (data) {
+            setIssue(data);
           }
         })
         .catch((error) => {

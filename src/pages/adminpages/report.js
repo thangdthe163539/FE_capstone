@@ -266,11 +266,6 @@ function ReportPage() {
             return -1;
           } else if (a.status !== 1 && b.status === 1) {
             return 1;
-          } else if (a.status === 1 && b.status === 1) {
-            const dateA = new Date(a.start_Date.split('/').reverse().join('-'));
-            const dateB = new Date(b.start_Date.split('/').reverse().join('-'));
-
-            return dateA.getTime() - dateB.getTime();
           }
         });
         setFeedback(sortedData);
@@ -292,11 +287,6 @@ function ReportPage() {
             return -1;
           } else if (a.status !== 1 && b.status === 1) {
             return 1;
-          } else if (a.status === 1 && b.status === 1) {
-            const dateA = new Date(a.start_Date.split('/').reverse().join('-'));
-            const dateB = new Date(b.start_Date.split('/').reverse().join('-'));
-
-            return dateA.getTime() - dateB.getTime();
           }
         });
         setIssue(sortedData);

@@ -1,9 +1,22 @@
-import { Box, ListItem, Text, List, Link, Flex, Center } from '@chakra-ui/react';
+import {
+  Box,
+  ListItem,
+  Text,
+  List,
+  Link,
+  Flex,
+  Center,
+} from '@chakra-ui/react';
 import styles from '@/styles/pm.module.css';
 
 function DemoPage() {
-  const user = 'khangdthe151162@fpt.edu.vn';
-  const app = 'FAP';
+
+  const params = {
+    user: 'khangdthe151162@fpt.edu.vn',
+    app: 'FAP',
+  };
+
+  const encodedParams = btoa(JSON.stringify(params));
 
   return (
     <Box className={styles.bodybox}>
@@ -13,7 +26,9 @@ function DemoPage() {
       <List>
         <ListItem className={styles.list}>
           <Flex style={{ fontSize: '18px' }}>
-            <Link href={`http://localhost:3000/ViewApplication?user=${user}&app=${app}`}>
+            <Link
+              href={`http://localhost:3000/ViewApplication?${encodedParams}`}
+            >
               Send feedback to SoftTrack
             </Link>
           </Flex>

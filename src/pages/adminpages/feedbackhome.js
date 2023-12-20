@@ -33,8 +33,6 @@ function FeedbackPage() {
   const [Apps, setApps] = useState([]);
   const [Issues, setIssues] = useState([]);
 
-  const notificationTimeout = 2000;
-
   useEffect(() => {
     // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
@@ -87,9 +85,13 @@ function FeedbackPage() {
   }, [dynamicFilteredAppData]);
 
   const handleIssuerDetails = (appId) => {
-    const encodedAppId = encodeURIComponent(appId);
     const randomParameter = Math.random().toString(36).substring(2);
-    const url = `feedbackDetails?appId=${encodedAppId}&r=${randomParameter}`;
+    const params = {
+      appId: appId,
+      softrack: randomParameter,
+    };
+    const encodedParams = btoa(JSON.stringify(params));
+    const url = `feedbackDetails?${encodedParams}`;
     router.push(url);
   };
 

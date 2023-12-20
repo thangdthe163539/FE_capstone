@@ -41,31 +41,18 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ArrowForwardIcon, DeleteIcon } from '@chakra-ui/icons';
 import styles from '@/styles/pm.module.css';
-import { Alert, AlertIcon } from '@chakra-ui/react';
 import axios from 'axios';
 import Pagination from '@/components/pagination';
 import ToastCustom from '@/components/toast';
-const defaultData = {
-  reportId: '',
-  type: '',
-  description: '',
-  startDate: '',
-  endDate: '',
-  status: '',
-};
 
 function FeedBackDetailManagePage() {
   const router = useRouter();
-  const { appId } = router.query;
   const [issue, setIssue] = useState([]);
-  const [formData, setFormData] = useState(defaultData);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [detail, setDetail] = useState(null);
   const [selectedOptionActive, setSelectedOptionActive] = useState('');
   const notificationTimeout = 2000;
   const [isSuccess, setIsSuccess] = useState('');
-  const [description, setDescription] = useState('');
-  const [title, setTitle] = useState('');
   const [Apps, setApps] = useState([]);
   const [error, setError] = useState('');
   const [image, setImage] = useState([]);
@@ -76,6 +63,11 @@ function FeedBackDetailManagePage() {
   const [searchQueryTb, setSearchQueryTb] = useState('');
   const [dynamicfilteredFb, setDynamicfilteredFb] = useState([]);
   const [filteredFb, setfilteredFb] = useState([]);
+
+  //getData
+  const query = router.asPath.split('?')[1];
+  const decodedParams = JSON.parse(atob(query));
+  const { appId } = decodedParams;
 
   const handleSearchTbInputChange = (e) => {
     setSearchQueryTb(e.target.value);
@@ -314,23 +306,7 @@ function FeedBackDetailManagePage() {
       })
         .then((response) => response.json())
         .then((data) => {
-          const sortedData = data.sort((a, b) => {
-            if (a.status === 1 && b.status !== 1) {
-              return -1;
-            } else if (a.status !== 1 && b.status === 1) {
-              return 1;
-            } else if (a.status === 1 && b.status === 1) {
-              const dateA = new Date(
-                a.start_Date.split('/').reverse().join('-'),
-              );
-              const dateB = new Date(
-                b.start_Date.split('/').reverse().join('-'),
-              );
-
-              return dateA.getTime() - dateB.getTime();
-            }
-          });
-          setIssue(sortedData);
+          setIssue(data);
         })
         .catch((error) => {
           console.error('Lỗi:', error);

@@ -46,16 +46,6 @@ import { useRouter } from 'next/router';
 import Pagination from '@/components/pagination';
 import ToastCustom from '@/components/toast';
 
-const defaultData = {
-  reportId: '',
-  softwareId: '',
-  type: '',
-  description: '',
-  startDate: '',
-  endDate: '',
-  status: '',
-};
-
 function FeedBackPage() {
   const [isOpenDetail, setIsOpenDetail] = useState(false);
   const [searchQueryTb, setSearchQueryTb] = useState('');
@@ -202,36 +192,6 @@ function FeedBackPage() {
     setSearchQueryTb(e.target.value);
   };
 
-  //cut text descriptions
-  const trimTextToMaxWidth = (text, maxWidth) => {
-    const words = text.split(' ');
-
-    let currentWidth = 0;
-    let trimmedWords = [];
-
-    for (let i = 0; i < words.length; i++) {
-      const wordWidth = words[i].length * 7;
-
-      if (currentWidth + wordWidth <= maxWidth) {
-        trimmedWords.push(words[i]);
-        currentWidth += wordWidth;
-      } else {
-        break;
-      }
-    }
-
-    const trimmedText = trimmedWords.join(' ');
-
-    return (
-      <span>
-        {trimmedText}
-        <span style={{ color: 'blue', fontSize: '15px' }}>
-          {words.length > trimmedWords.length ? ' ...' : ''}
-        </span>
-      </span>
-    );
-  };
-
   useEffect(() => {
     const url = 'http://localhost:5001/api/App/ListApps';
     fetch(url, {
@@ -245,7 +205,7 @@ function FeedBackPage() {
         console.error('Lỗi:', error);
       });
   }, []);
-  //lọc
+
   const filteIssue = () => {
     const query = searchQueryTb.toLowerCase();
     const filteredData = Issues.filter((item) => {
@@ -337,11 +297,7 @@ function FeedBackPage() {
       .then((response) => response.json())
       .then((data) => {
         const filteredData = data.filter(
-          (item) =>
-            item.status !== -1 &&
-            item.status !== 3 &&
-            item.status !== 4 &&
-            item.status !== 2,
+          (item) => item.status === 1,
         );
         setIssues(filteredData);
       })
@@ -589,7 +545,12 @@ function FeedBackPage() {
                           setDetails(issue);
                         }}
                       >
-                        {trimTextToMaxWidth(issue.description.trim(), 400)}
+                        <Text 
+                        w={'500px'}
+                        textOverflow={'ellipsis'}
+                        overflow={'hidden'}>
+                          {issue.description.trim()}
+                        </Text>
                       </Td>
                       <Td>
                         {

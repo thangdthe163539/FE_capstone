@@ -34,23 +34,25 @@ import ToastCustom from '@/components/toast';
 
 function UserDetail() {
   const router = useRouter();
-  const { email, role, roleid, status, name, accid } = router.query;
   const [isOpenUD, setIsOpenUD] = useState(false);
   const [selectedOptionActive, setSelectedOptionActive] = useState('');
   const [selectedOptionRole, setSelectedOptionRole] = useState('');
-  const [roles, setRoles] = useState([]);
   const [isSuccess, setIsSuccess] = useState('');
   const notificationTimeout = 2000;
-  const [name1, setName] = useState('');
+  const [toast, setToast] = useState(false);
+  const [roles, setRoles] = useState([]);
+
+  //getData
+  const query = router.asPath.split('?')[1];
+  const decodedParams = JSON.parse(atob(query));
+  const { email, role, roleid, status, name, accid } = decodedParams;
 
   useEffect(() => {
-    // Access localStorage on the client side
     const storedAccount = localStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
         if (!accountDataDecode) {
-          // router.push('/page405');
         } else {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
@@ -59,19 +61,11 @@ function UserDetail() {
           }
         }
       } catch (error) {
-        // router.push('/page405');
       }
     } else {
       router.push('/page405');
     }
   }, []);
-
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
-  useEffect(() => {
-    setName(name);
-  }, [name]);
 
   useEffect(() => {
     const url = 'http://localhost:5001/api/roles/listRole';
@@ -87,41 +81,6 @@ function UserDetail() {
       });
   }, []);
 
-  const handleBackToList = () => {
-    router.push('userManager');
-  };
-
-  const handleDelete = () => {
-    const url = `http://localhost:5001/api/Account/DeleteAccountWith_key?accountId=${accid}`;
-    fetch(url, {
-      method: 'DELETE',
-    })
-      .then((response) => {
-        if (response.ok) {
-          setIsSuccess('true');
-        } else {
-          setIsSuccess('false');
-        }
-      })
-      .catch((error) => {
-        setIsSuccess('false');
-        console.error('Lỗi:', error);
-      });
-  };
-
-  useEffect(() => {
-    if (isSuccess) {
-      const hideNotification = setTimeout(() => {
-        setIsSuccess('');
-        router.push('userManager');
-      }, notificationTimeout);
-
-      return () => {
-        clearTimeout(hideNotification);
-      };
-    }
-  }, [isSuccess]);
-
   const [dataSubmit, setDataSubmit] = useState({
     name: name,
   });
@@ -129,15 +88,6 @@ function UserDetail() {
   const [isFirst, setIsFirst] = useState({
     name: true,
   });
-
-  const handleChangeName = (e) => {
-    const value = e.target.value;
-    setIsFirst({ ...isFirst, name: false });
-    setDataSubmit({ ...dataSubmit, name: value });
-  };
-
-  const [toast, setToast] = useState(false);
-
   const handleUpdateUser = () => {
     if (accid) {
       if (dataSubmit.name.trim() === '') {
@@ -185,6 +135,49 @@ function UserDetail() {
     } else {
       alert('Update failed(id)');
     }
+  };
+
+
+  const handleDelete = () => {
+    const url = `http://localhost:5001/api/Account/DeleteAccountWith_key?accountId=${accid}`;
+    fetch(url, {
+      method: 'DELETE',
+    })
+      .then((response) => {
+        if (response.ok) {
+          setIsSuccess('true');
+        } else {
+          setIsSuccess('false');
+        }
+      })
+      .catch((error) => {
+        setIsSuccess('false');
+        console.error('Lỗi:', error);
+      });
+  };
+
+  const handleBackToList = () => {
+    router.push('userManager');
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      const hideNotification = setTimeout(() => {
+        setIsSuccess('');
+        router.push('userManager');
+      }, notificationTimeout);
+
+      return () => {
+        clearTimeout(hideNotification);
+      };
+    }
+  }, [isSuccess]);
+
+
+  const handleChangeName = (e) => {
+    const value = e.target.value;
+    setIsFirst({ ...isFirst, name: false });
+    setDataSubmit({ ...dataSubmit, name: value });
   };
 
   return (
@@ -352,10 +345,7 @@ function UserDetail() {
                       value={selectedOptionRole}
                       onChange={(e) => setSelectedOptionRole(e.target.value)}
                     >
-                      {roles
-                        .sort((a, b) =>
-                          a.roleId == roleid ? -1 : b.roleId == roleid ? 1 : 0,
-                        )
+                      {roles.sort((a, b) => a.roleId == roleid ? -1 : b.roleId == roleid ? 1 : 0)
                         .map((role1) => (
                           <option key={role1.roleId} value={role1.roleId}>
                             {role1.name}
