@@ -87,8 +87,8 @@ function SoftwarePage() {
   const [account, setAccount] = useState();
 
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
@@ -890,7 +890,7 @@ function SoftwarePage() {
   };
   //
   useEffect(() => {
-    const data = localStorage.getItem('software');
+    const data = sessionStorage.getItem('software');
     if (data) {
       const softwareDataDecode = JSON.parse(data);
       if (!softwareDataDecode) {
@@ -1083,8 +1083,8 @@ function SoftwarePage() {
   //
 
   const handleDetail = (item) => {
-    localStorage.setItem('device', JSON.stringify(item));
-    // console.log(localStorage.getItem('assetId'));
+    sessionStorage.setItem('device', JSON.stringify(item));
+    // console.log(sessionStorage.getItem('assetId'));
   };
   function calculateEndDate(startDate, months) {
     if (months !== 0) {

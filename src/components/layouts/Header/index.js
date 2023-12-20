@@ -77,7 +77,7 @@ function Header() {
       // Wait for the tokenDecode function to complete
       const account = await tokenDecode(data.token);
       if (account) {
-        localStorage.setItem('account', JSON.stringify(account));
+        sessionStorage.setItem('account', JSON.stringify(account));
 
         if (account.status == 3) {
           router.push('http://localhost:3000/');
@@ -104,13 +104,13 @@ function Header() {
   };
 
   function handleLogout() {
-    localStorage.clear();
+    sessionStorage.clear();
     router.push('/');
     window.location.reload();
   }
   //end
   useEffect(() => {
-    const storedAccount = localStorage.getItem('account');
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount && storedAccount.accId !== null) {
       const storedAccountEncode = JSON.parse(storedAccount);
       if (storedAccountEncode) {

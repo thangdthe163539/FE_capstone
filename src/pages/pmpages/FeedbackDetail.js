@@ -62,7 +62,7 @@ function ReportPage(title) {
   const [typePage, setTypePage] = useState(title);
 
   useEffect(() => {
-    const reportData = localStorage.getItem('report');
+    const reportData = sessionStorage.getItem('report');
     if (reportData) {
       const reportDataDecode = JSON.parse(reportData);
       if (!reportDataDecode) {
@@ -77,8 +77,8 @@ function ReportPage(title) {
   const [account, setAccount] = useState();
 
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);

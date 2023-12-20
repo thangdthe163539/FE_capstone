@@ -57,8 +57,8 @@ function UserManager() {
   const notificationTimeout = 2000;
 
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
@@ -238,7 +238,8 @@ function UserManager() {
       return;
     }
     const url = 'http://localhost:5001/api/Account/Register';
-    const isActive = selectedOptionActive === '' ? 1 : parseInt(selectedOptionActive);
+    const isActive =
+      selectedOptionActive === '' ? 1 : parseInt(selectedOptionActive);
     const roleId = selectedOptionRole === '' ? 1 : parseInt(selectedOptionRole);
 
     const data = {
@@ -269,7 +270,7 @@ function UserManager() {
         console.error('Lỗi:', error);
       });
   };
-  
+
   return (
     <>
       <Box className={styles.userBoxM}>
@@ -418,10 +419,10 @@ function UserManager() {
                       {user.status === 1
                         ? 'Active'
                         : user.status === 2
-                          ? 'Inactive'
-                          : user.status === 3
-                            ? 'Locked'
-                            : 'Deleted'}
+                        ? 'Inactive'
+                        : user.status === 3
+                        ? 'Locked'
+                        : 'Deleted'}
                     </Td>
                   </Tr>
                 ))}
@@ -449,8 +450,8 @@ function UserManager() {
                       isFirst?.email
                         ? false
                         : dataSubmit?.email === ''
-                          ? true
-                          : false
+                        ? true
+                        : false
                     }
                   >
                     <Flex alignItems='center'>
@@ -466,12 +467,12 @@ function UserManager() {
                         {(isFirst?.email
                           ? false
                           : dataSubmit?.email === ''
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              Email is required.
-                            </FormErrorMessage>
-                          )}
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Email is required.
+                          </FormErrorMessage>
+                        )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -505,8 +506,8 @@ function UserManager() {
                       isFirst?.name
                         ? false
                         : dataSubmit?.name === ''
-                          ? true
-                          : false
+                        ? true
+                        : false
                     }
                   >
                     <Flex alignItems='center'>
@@ -521,12 +522,12 @@ function UserManager() {
                         {(isFirst?.name
                           ? false
                           : dataSubmit?.name === ''
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              Name is required.
-                            </FormErrorMessage>
-                          )}
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Name is required.
+                          </FormErrorMessage>
+                        )}
                       </Stack>
                     </Flex>
                   </FormControl>

@@ -79,8 +79,8 @@ function IssueDetailManagePage() {
 
   const [account, setAccount] = useState();
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
@@ -661,12 +661,12 @@ function IssueDetailManagePage() {
                               {item.status === 1
                                 ? 'Unsolved '
                                 : item.status === 2
-                                  ? 'Solved '
-                                  : item.status === 3
-                                    ? 'Deleted '
-                                    : item.status === 4
-                                      ? 'Cancel '
-                                      : 'Unknown Status'}
+                                ? 'Solved '
+                                : item.status === 3
+                                ? 'Deleted '
+                                : item.status === 4
+                                ? 'Cancel '
+                                : 'Unknown Status'}
                             </Td>
                           </Tr>
                         );
@@ -716,12 +716,12 @@ function IssueDetailManagePage() {
                           {status === 1
                             ? 'Unsolved'
                             : status === 2
-                              ? 'Solved'
-                              : status === 3
-                                ? 'Deleted'
-                                : status === 4
-                                  ? 'Cancel'
-                                  : 'Unknow'}
+                            ? 'Solved'
+                            : status === 3
+                            ? 'Deleted'
+                            : status === 4
+                            ? 'Cancel'
+                            : 'Unknow'}
                         </option>
                       ))}
                       {defaultOptions}
@@ -762,8 +762,8 @@ function IssueDetailManagePage() {
                       isFirst?.endDate
                         ? false
                         : !formData?.endDate
-                          ? true
-                          : false
+                        ? true
+                        : false
                     }
                   >
                     <Flex alignItems='center' marginLeft={20}>
@@ -784,12 +784,12 @@ function IssueDetailManagePage() {
                         {(isFirst?.endDate
                           ? false
                           : !formData?.endDate
-                            ? true
-                            : false) && (
-                            <FormErrorMessage mt={0}>
-                              Deadline is required
-                            </FormErrorMessage>
-                          )}
+                          ? true
+                          : false) && (
+                          <FormErrorMessage mt={0}>
+                            Deadline is required
+                          </FormErrorMessage>
+                        )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -818,10 +818,10 @@ function IssueDetailManagePage() {
                   {(isFirst?.description
                     ? false
                     : !description
-                      ? true
-                      : false) && (
-                      <FormErrorMessage>Description is required</FormErrorMessage>
-                    )}
+                    ? true
+                    : false) && (
+                    <FormErrorMessage>Description is required</FormErrorMessage>
+                  )}
                 </Stack>
               </FormControl>
               <br />

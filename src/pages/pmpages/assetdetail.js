@@ -255,7 +255,7 @@ function AssetDetailPage() {
   //
 
   useEffect(() => {
-    const data = localStorage.getItem('software');
+    const data = sessionStorage.getItem('software');
     if (data) {
       const softwareDataDecode = JSON.parse(data);
       if (!softwareDataDecode) {
@@ -266,7 +266,7 @@ function AssetDetailPage() {
     }
   }, []);
   useEffect(() => {
-    const deviceData = localStorage.getItem('device');
+    const deviceData = sessionStorage.getItem('device');
     if (deviceData) {
       const deviceDataDecode = JSON.parse(deviceData);
       if (!deviceDataDecode) {
@@ -789,8 +789,8 @@ function AssetDetailPage() {
   };
   //End button handle
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);

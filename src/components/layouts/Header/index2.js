@@ -20,15 +20,15 @@ function Header2() {
   const [account2, setAccount2] = useState(null); // Initialize the account state
 
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = JSON.parse(localStorage.getItem('account'));
+    // Access sessionStorage on the client side
+    const storedAccount = JSON.parse(sessionStorage.getItem('account'));
     if (storedAccount) {
       setAccount2(storedAccount); // Set the account state
     }
   }, []);
 
   function handleLogout() {
-    localStorage.clear();
+    sessionStorage.clear();
     router.push('/');
   }
 

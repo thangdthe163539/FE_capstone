@@ -17,7 +17,7 @@ function ApplicationPage() {
     alignItems: 'center',
   };
   function handleLogout() {
-    localStorage.clear();
+    sessionStorage.clear();
     router.push('/');
   }
   return (

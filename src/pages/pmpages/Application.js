@@ -72,8 +72,8 @@ function SoftwarePage() {
   const [account, setAccount] = useState();
 
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
@@ -415,8 +415,8 @@ function SoftwarePage() {
   };
   //
   const handleDetail = (item) => {
-    localStorage.setItem('software', JSON.stringify(item));
-    // console.log(localStorage.getItem('deviceId'));
+    sessionStorage.setItem('software', JSON.stringify(item));
+    // console.log(sessionStorage.getItem('deviceId'));
   };
   //
   const handleDelete = async () => {
