@@ -220,7 +220,7 @@ function ReportPage(title) {
 
     if (files) {
       const newImages = Array.from(files).map((file) => {
-        const extension = file.name.split('.').pop().toLowerCase();
+        const extension = file.name.split('.').pop()?.toLowerCase();
 
         if (allowedExtensions.includes(extension)) {
           const reader = new FileReader();

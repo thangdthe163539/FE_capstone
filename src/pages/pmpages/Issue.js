@@ -225,9 +225,9 @@ function SoftwarePage() {
 
   // Filter function to search for assets
   const filterAssets = () => {
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery?.toLowerCase();
     const filteredData = softwareData.filter((item) => {
-      const name = item.name.toLowerCase();
+      const name = item.name?.toLowerCase();
       return name.includes(query);
     });
     setFilteredSoftwareData(filteredData);

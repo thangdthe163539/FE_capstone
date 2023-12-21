@@ -919,12 +919,12 @@ function AssetDetailPage() {
 
   // filter search asset data
   const filterSoftware = () => {
-    const query = searchAppQuery.toLowerCase();
+    const query = searchAppQuery?.toLowerCase();
     const filteredData = data
       .filter((item) => item.type != 'Antivirus' && item.status != 3)
       .filter((item) => {
-        const name = item?.name.toLowerCase();
-        const publisher = item?.publisher.toLowerCase();
+        const name = item?.name?.toLowerCase();
+        const publisher = item?.publisher?.toLowerCase();
         return name.includes(query) || publisher.includes(query);
       });
     setFilteredSoftwareDataDynamic(filteredData);
@@ -934,12 +934,12 @@ function AssetDetailPage() {
     filterSoftware();
   }, [searchAppQuery, data]);
   const filterAntivirus = () => {
-    const query = searchAppQuery1.toLowerCase();
+    const query = searchAppQuery1?.toLowerCase();
     const filteredData = data
       .filter((item) => item.type == 'Antivirus' && item.status != 3)
       .filter((item) => {
-        const name = item?.name.toLowerCase();
-        const publisher = item?.publisher.toLowerCase();
+        const name = item?.name?.toLowerCase();
+        const publisher = item?.publisher?.toLowerCase();
         return name.includes(query) || publisher.includes(query);
       });
     setFilteredAntivirusDataDynamic(filteredData);
@@ -950,15 +950,15 @@ function AssetDetailPage() {
   }, [searchAppQuery1, data]);
   // filter search add asset data
   const filterAdd = () => {
-    const query = searchAddQuery.toLowerCase();
+    const query = searchAddQuery?.toLowerCase();
     const filteredData = listAllSoftware
       .filter((item) =>
         isAntivirus ? item.type === 'Antivirus' : item.type !== 'Antivirus',
       )
       .filter((item) => item.status != 3)
       .filter((item) => {
-        const name = item?.name.toLowerCase();
-        const publisher = item?.publisher.toLowerCase();
+        const name = item?.name?.toLowerCase();
+        const publisher = item?.publisher?.toLowerCase();
         return name.includes(query) || publisher.includes(query);
       });
     setFilteredAllSoftwareDataDynamic(
@@ -988,9 +988,9 @@ function AssetDetailPage() {
   ]);
   //
   const filterLicense = () => {
-    const query = searchLiQuery.toLowerCase();
+    const query = searchLiQuery?.toLowerCase();
     const filteredData = listLicense.filter((item) => {
-      const name = item?.name.toLowerCase();
+      const name = item?.name?.toLowerCase();
       return name.includes(query);
     });
     setFilteredLicenseDataDynamic(

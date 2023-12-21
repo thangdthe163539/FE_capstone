@@ -1020,11 +1020,11 @@ function SoftwarePage() {
   };
   // Filter function to search for assets
   const filterAssets = () => {
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery?.toLowerCase();
     const filteredData = deviceData.filter((item) => {
-      const name = item?.name.toLowerCase();
-      const model = item?.model.toLowerCase();
-      const manufacturer = item?.manufacturer.toLowerCase();
+      const name = item?.name?.toLowerCase();
+      const model = item?.model?.toLowerCase();
+      const manufacturer = item?.manufacturer?.toLowerCase();
       return (
         name.includes(query) ||
         model.includes(query) ||
@@ -1038,10 +1038,10 @@ function SoftwarePage() {
     );
   };
   const filterLibrary = () => {
-    const query = searchQuery1.toLowerCase();
+    const query = searchQuery1?.toLowerCase();
     const filteredData = libraryData.filter((item) => {
-      const name = item?.name.toLowerCase();
-      const publisher = item?.publisher.toLowerCase();
+      const name = item?.name?.toLowerCase();
+      const publisher = item?.publisher?.toLowerCase();
       return name.includes(query) || publisher.includes(query);
     });
     setFilteredLibraryDataDynamic(
@@ -1049,12 +1049,12 @@ function SoftwarePage() {
     );
   };
   const filterAssets1 = () => {
-    const query = searchAddQuery.toLowerCase();
+    const query = searchAddQuery?.toLowerCase();
     const filteredData = listAllAsset
       .filter((item) => item.status != 3)
       .filter((item) => {
-        const name = item?.name.toLowerCase();
-        const manufacturer = item?.manufacturer.toLowerCase();
+        const name = item?.name?.toLowerCase();
+        const manufacturer = item?.manufacturer?.toLowerCase();
         return name.includes(query) || manufacturer.includes(query);
       });
     setFilteredAllAssetDataDynamic(
@@ -1073,7 +1073,7 @@ function SoftwarePage() {
   const filterIssue = () => {
     const query = searchQuery2.toLowerCase();
     const filteredData = reportData.filter((item) => {
-      const title = item?.title.toLowerCase();
+      const title = item?.title?.toLowerCase();
       return title.includes(query);
     });
     setFilteredAllIssueDataDynamic(
@@ -1083,9 +1083,9 @@ function SoftwarePage() {
     );
   };
   const filterFeedback = () => {
-    const query = searchQuery3.toLowerCase();
+    const query = searchQuery3?.toLowerCase();
     const filteredData = feedbackData.filter((item) => {
-      const title = item?.title.toLowerCase();
+      const title = item?.title?.toLowerCase();
       return title.includes(query);
     });
     setFilteredAllFeedbackDataDynamic(

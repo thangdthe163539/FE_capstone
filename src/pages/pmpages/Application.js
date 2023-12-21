@@ -403,10 +403,10 @@ function SoftwarePage() {
 
   // Filter function to search for assets
   const filterAssets = () => {
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery?.toLowerCase();
     const filteredData = softwareData.filter((item) => {
-      const name = item.name.toLowerCase();
-      const publisher = item.publisher.toLowerCase();
+      const name = item.name?.toLowerCase();
+      const publisher = item.publisher?.toLowerCase();
       return name.includes(query) || publisher.includes(query);
     });
     setFilteredSoftwareData(filteredData.filter((item) => item.status !== 3));

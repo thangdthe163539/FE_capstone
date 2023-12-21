@@ -189,10 +189,10 @@ function FeedbackPage() {
   }, [data, softwareData]);
   // Filter function to search for assets
   const filterAssets = () => {
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery?.toLowerCase();
     const filteredData = reportData.filter((item) => {
-      const name = item.name.toLowerCase();
-      const title = item.title.toLowerCase();
+      const name = item.name?.toLowerCase();
+      const title = item.title?.toLowerCase();
       return name.includes(query) || title.includes(query);
     });
     setFilteredReportData(filteredData);
