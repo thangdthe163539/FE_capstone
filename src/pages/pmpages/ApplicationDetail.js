@@ -486,10 +486,15 @@ function SoftwarePage() {
       console.log('Data saved:', response.data);
       setShowEditApp(true); // Close the modal after successful save
       // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/App/get_App_by_Id/` + software.appId,
-      );
-      setAppData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/App/get_App_by_Id/` + software.appId,
+        );
+        setAppData(newDataResponse.data);
+      } catch (error) {
+        setAppData([]);
+      }
+
       toast({
         title: 'Application Updated',
         description: 'The application has been successfully updated.',
@@ -534,10 +539,14 @@ function SoftwarePage() {
       setFormData4(defaultData);
       // setSelectedRow1(null);
       // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
-      );
-      setDeviceData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
+        );
+        setDeviceData(newDataResponse.data);
+      } catch (error) {
+        setDeviceData([]);
+      }
       toast({
         title: 'Asset Added',
         description: 'The asset has been successfully added.',
@@ -599,10 +608,14 @@ function SoftwarePage() {
       setIsOpenAdd(true);
       setFormData4(defaultData);
       // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
-      );
-      setDeviceData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
+        );
+        setDeviceData(newDataResponse.data);
+      } catch (error) {
+        setDeviceData([]);
+      }
       toast({
         title: 'Asset Created',
         description: 'The asset has been successfully created.',
@@ -660,10 +673,14 @@ function SoftwarePage() {
       setButtonDisabled(true);
       setSelectedRow(new Set());
       // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
-      );
-      setDeviceData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
+        );
+        setDeviceData(newDataResponse.data);
+      } catch (error) {
+        setDeviceData([]);
+      }
       toast({
         title: 'Asset Updated',
         description: 'The asset has been successfully updated.',
@@ -699,10 +716,15 @@ function SoftwarePage() {
       setButtonDisabled(true);
 
       // Reload the data for the table after deletion
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
-      );
-      setDeviceData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/Asset/list_Asset_by_App/` + software?.appId,
+        );
+        setDeviceData(newDataResponse.data);
+      } catch (error) {
+        setDeviceData([]);
+      }
+
       toast({
         title: 'Asset Deleted',
         description: 'The asset has been successfully deleted.',
@@ -750,10 +772,14 @@ function SoftwarePage() {
       setButtonDisabled1(true);
       setSelectedRow1(null);
       // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
-      );
-      setLibraryData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
+        );
+        setLibraryData(newDataResponse.data);
+      } catch (error) {
+        setLibraryData([]);
+      }
       toast({
         title: 'License Created',
         description: 'The license has been successfully created.',
@@ -799,10 +825,15 @@ function SoftwarePage() {
       setFormData1(defaultData2);
       setSelectedRow1(null);
       // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
-      );
-      setLibraryData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/Library/ListLibrariesByApp/` + software?.appId,
+        );
+        setLibraryData(newDataResponse.data);
+      } catch (error) {
+        setLibraryData([]);
+      }
+
       toast({
         title: 'License Updated',
         description: 'The license has been successfully updated.',

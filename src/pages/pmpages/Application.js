@@ -241,10 +241,14 @@ function SoftwarePage() {
       setFormData(defaultData);
       setSelectedRow(new Set());
       // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
-      );
-      setData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
+        );
+        setData(newDataResponse.data);
+      } catch (error) {
+        setData([]);
+      }
       toast({
         title: 'Application Created',
         description: 'The application has been successfully created.',
@@ -303,10 +307,14 @@ function SoftwarePage() {
       setFormData2(defaultData);
       setSelectedRow(new Set());
       // Reload new data for the table
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
-      );
-      setData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
+        );
+        setData(newDataResponse.data);
+      } catch (error) {
+        setData([]);
+      }
       toast({
         title: 'Application Updated',
         description: 'The application has been successfully updated.',
@@ -446,10 +454,15 @@ function SoftwarePage() {
       setSelectedRow(new Set());
 
       // Reload the data for the table after deletion
-      const newDataResponse = await axios.get(
-        `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
-      );
-      setData(newDataResponse.data);
+      try {
+        const newDataResponse = await axios.get(
+          `${BACK_END_PORT}/api/App/list_App_by_user/` + account?.accId,
+        );
+        setData(newDataResponse.data);
+      } catch (error) {
+        setData([]);
+      }
+
       toast({
         title: 'Application Deleted',
         description: 'The application has been successfully deleted.',

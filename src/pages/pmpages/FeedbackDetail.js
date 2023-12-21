@@ -164,16 +164,16 @@ function ReportPage(title) {
             const blob = dataURLtoBlob(image.dataURL);
             return new File([blob], image.fileName, { type: blob.type });
           } else {
-            console.log(image.image1 + '----111');
-
-            // Giữ nguyên ảnh khi dataURL không xác định
-            const fullImagePath = `/images/${image.image1}`;
-            const blob = await fetch(fullImagePath).then((res) => res.blob());
-            return new File([blob], image.fileName, { type: blob.type });
+            // console.log(image.image1 + '----111');
+            // // Giữ nguyên ảnh khi dataURL không xác định
+            // const fullImagePath = `/images/${image.image1}`;
+            // const blob = await fetch(fullImagePath).then((res) => res.blob());
+            // return new File([blob], image.fileName, { type: blob.type });
+            return null;
           }
         }),
       );
-      fileObjects.forEach((file, index) => {
+      fileObjects.forEach((file) => {
         submitData.append(`Images`, file);
       });
     } else {
