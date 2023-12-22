@@ -137,13 +137,18 @@ function IssueDetailManagePage() {
   const filterStatus = () => {
     const query = searchQueryTb.toLowerCase();
     const filteredData = issue.filter((item) => {
-      const status = getStatusLabel(item.status).toLowerCase(); // Chuyển đổi số trạng thái thành nhãn tương ứng
-      return status.includes(query);
+      const status = getStatusLabel(item.status).toLowerCase();
+      if (query === '') {
+        return true;
+      } else {
+        return status === query;
+      }
     });
     setfilteredFb(filteredData);
     setDynamicfilteredFb(filteredData);
   };
 
+  
   useEffect(() => {
     filterStatus();
   }, [searchQueryTb, Apps, issue]);

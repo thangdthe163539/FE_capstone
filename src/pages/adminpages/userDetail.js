@@ -329,6 +329,7 @@ function UserDetail() {
                     <FormLabel style={{ width: '70px' }}>Email</FormLabel>
                     <Input
                       id='email1'
+                      color={'gray'}
                       value={email}
                       isReadOnly
                       background={'whitesmoke'}

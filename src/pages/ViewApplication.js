@@ -90,19 +90,20 @@ function ApplicationPage() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   const url = 'http://localhost:5001/api/App/ListApps';
-  //   fetch(url, {
-  //     method: 'GET',
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setApps(data);
-  //     })
-  //     .catch((error) => {
-  //       console.error('Lỗi:', error);
-  //     });
-  // }, []);
+  useEffect(() => {
+    const url = 'http://localhost:5001/api/App/ListApps';
+    fetch(url, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setApps(data);
+      })
+      .catch((error) => {
+        console.error('Lỗi:', error);
+      });
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -113,7 +114,7 @@ function ApplicationPage() {
           `${BACK_END_PORT}/api/Account/ListAccount`,
         );
         setDataAcc(response2.data); // Assuming the API returns an array of objects
-        setApps(response2.data);
+        // setApps(response2.data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);

@@ -125,7 +125,7 @@ function SoftwarePage() {
   };
 
   //pagination
-  const itemPerPage = 4;
+  const itemPerPage = 5;
   const [dynamicList, setDynamicList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   // filteredIssueData;
