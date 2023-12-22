@@ -65,10 +65,8 @@ function UserManager() {
         if (!accountDataDecode) {
           // router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status !== 1) {
             router.push('/page405');
-          } else if (accountDataDecode.status == 2) {
-            router.push('/ViewApplication');
           }
         }
       } catch (error) {

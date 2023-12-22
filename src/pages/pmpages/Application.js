@@ -65,6 +65,24 @@ const defaultData = {
   db: '',
   status: '',
 };
+const defaultValidate = {
+  name: true,
+  publisher: true,
+  osversion: true,
+  description: true,
+  language: true,
+  db: true,
+  description: true,
+};
+const defaultWrongValidate = {
+  name: false,
+  publisher: false,
+  osversion: false,
+  description: false,
+  language: false,
+  db: false,
+  description: false,
+};
 
 function SoftwarePage() {
   // console.log(BACK_END_PORT);
@@ -80,10 +98,11 @@ function SoftwarePage() {
         if (!accountDataDecode) {
           router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
+          if (
+            accountDataDecode.roleId !== 2 ||
+            accountDataDecode.status !== 1
+          ) {
             router.push('/page405');
-          } else if (accountDataDecode.status == 2) {
-            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }

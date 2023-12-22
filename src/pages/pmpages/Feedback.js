@@ -78,10 +78,8 @@ function SoftwarePage() {
         if (!accountDataDecode) {
           router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 2 || accountDataDecode.status == 3) {
+          if (accountDataDecode.roleId !== 2 || accountDataDecode.status !== 1) {
             router.push('/page405');
-          } else if (accountDataDecode.status == 2) {
-            router.push('/ViewApplication');
           }
           setAccount(accountDataDecode);
         }

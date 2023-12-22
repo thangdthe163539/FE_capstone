@@ -4,7 +4,9 @@ import {
   List,
   Text,
   Flex,
+  Spacer,
   Center,
+  useToast,
   InputGroup,
   InputLeftElement,
   Input,
@@ -19,6 +21,7 @@ import {
   ModalBody,
   ModalCloseButton,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Button,
   Grid,
@@ -65,6 +68,13 @@ function ApplicationPage() {
   const [account, setAccount] = useState();
   const [Apps, setApps] = useState([]);
   const router = useRouter();
+  const toast = useToast();
+  const [isFirst, setIsFirst] = useState({
+    title: true,
+    description: true,
+  });
+  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState('');
 
   useEffect(() => {
     // Access sessionStorage on the client side
@@ -159,7 +169,30 @@ function ApplicationPage() {
 
     const Id = parseInt(selectedApp.appId);
     const desc = document.getElementById('description').value;
-    const title = document.getElementById('title').value;
+    const tit = document.getElementById('title').value;
+    // const desc = description;
+    // const tit = title;
+    // if ((!tit && tit.length == 0) || (!desc && desc.length == 0)) {
+    //   setIsFirst({
+    //     tit: true,
+    //     description: true,
+    //   });
+    //   return;
+    // }
+    // if (!tit || tit.length == 0) {
+    //   setIsFirst({
+    //     ...isFirst,
+    //     tit: true,
+    //   });
+    //   return;
+    // }
+    // if (!desc || desc.length == 0) {
+    //   setIsFirst({
+    //     ...isFirst,
+    //     description: true,
+    //   });
+    //   return;
+    // }
 
     const curDate = new Date();
     const currentDateOnly = new Date(
@@ -198,7 +231,21 @@ function ApplicationPage() {
       setIsShowFeedback(false);
       setSelectedApp(defaultData);
       setImages([]);
+      toast({
+        title: 'Send Feedback',
+        description: 'The feedback has been successfully sended.',
+        status: 'success',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
     } catch (error) {
+      toast({
+        title: 'Send Feedback Fail',
+        description: 'The feedback has been fail when sended.',
+        status: 'error',
+        duration: 3000, // Duration in milliseconds
+        isClosable: true,
+      });
       setImages([]);
       setIsShowFeedback(false);
       console.error('Lỗi:', error);
@@ -474,19 +521,57 @@ function ApplicationPage() {
                 </Flex>
               </GridItem>
               <GridItem colSpan={1} width='600px'>
-                <Flex alignItems='center'>
-                  <FormLabel>Title</FormLabel>
-                  <Input id='title' placeholder='Title' />
-                </Flex>
+                <FormControl
+                  isRequired
+                  isInvalid={isFirst?.title ? false : !title ? true : false}
+                >
+                  <Flex alignItems='center'>
+                    <FormLabel>Title</FormLabel>
+                    <Input
+                      id='title'
+                      placeholder='Title'
+                      onChange={(e) => {
+                        setTitle(e.target.value);
+                        setIsFirst({ ...isFirst, title: false });
+                      }}
+                    />
+                  </Flex>
+                  <Flex>
+                    <Spacer />
+                    {(isFirst?.title ? false : !title ? true : false) && (
+                      <FormErrorMessage>Title is required</FormErrorMessage>
+                    )}
+                  </Flex>
+                </FormControl>
               </GridItem>
             </Grid>
-            <FormControl mt={4}>
-              <FormLabel>Description</FormLabel>
+            <FormControl
+              mt={4}
+              isRequired
+              isInvalid={
+                isFirst?.description ? false : !description ? true : false
+              }
+            >
+              <Flex>
+                <FormLabel>Description</FormLabel>
+                <Spacer />
+                {(isFirst?.description
+                  ? false
+                  : !description
+                  ? true
+                  : false) && (
+                  <FormErrorMessage>Description is required</FormErrorMessage>
+                )}
+              </Flex>
               <Textarea
                 id='description'
                 placeholder='Description...'
                 width='100%'
                 minH={40}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  setIsFirst({ ...isFirst, description: false });
+                }}
               />
             </FormControl>
             <br />
