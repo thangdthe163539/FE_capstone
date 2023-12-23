@@ -44,6 +44,12 @@ import { ArrowForwardIcon, EmailIcon } from '@chakra-ui/icons';
 import styles from '@/styles/admin.module.css';
 import { FaPlus } from 'react-icons/fa';
 import ToastCustom from '@/components/toast';
+
+function validateEmail(email) {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailPattern.test(email);
+}
+
 function UserManager() {
   const router = useRouter();
   const [userData, setUserData] = useState([]);
@@ -57,16 +63,18 @@ function UserManager() {
   const notificationTimeout = 2000;
 
   useEffect(() => {
-    // Access sessionStorage on the client side
-    const storedAccount = sessionStorage.getItem('account');
+    // Access localStorage on the client side
+    const storedAccount = localStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
         if (!accountDataDecode) {
           // router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 1 || accountDataDecode.status !== 1) {
+          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
             router.push('/page405');
+          } else if (accountDataDecode.status == 2) {
+            router.push('/ViewApplication');
           }
         }
       } catch (error) {
@@ -174,18 +182,16 @@ function UserManager() {
     name,
     accid,
   ) => {
+    // Mã hóa các tham số
+    const encodedEmail = encodeURIComponent(email);
+    const encodedRoleName = encodeURIComponent(roleName);
+    const encodedRoleid = encodeURIComponent(roleid);
+    const encodedStatus = encodeURIComponent(status);
+    const encodedName = encodeURIComponent(name);
+    const encodedAccid = encodeURIComponent(accid);
     const randomParameter = Math.random().toString(36).substring(2);
-    const params = {
-      email: email,
-      role: roleName,
-      roleid: roleid,
-      status: status,
-      name: name,
-      accid: accid,
-      softrack: randomParameter,
-    };
-    const encodedParams = btoa(JSON.stringify(params));
-    const url = `userDetail?${encodedParams}`;
+    const url = `userDetail?email=${encodedEmail}&role=${encodedRoleName}&roleid=${encodedRoleid}&r=${randomParameter}&status=${encodedStatus}&name=${encodedName}&accid=${encodedAccid}`;
+
     router.push(url);
   };
 
@@ -227,7 +233,11 @@ function UserManager() {
   const [toast, setToast] = useState(false);
 
   const handleAddUser = () => {
-    if (dataSubmit.email.trim() === '' || dataSubmit.name.trim() === '') {
+    if (
+      dataSubmit.email.trim() === '' ||
+      dataSubmit.name.trim() === '' ||
+      !validateEmail(dataSubmit.email)
+    ) {
       setToast(true);
       setTimeout(() => {
         setToast(false);
@@ -236,6 +246,9 @@ function UserManager() {
       return;
     }
     const url = 'http://localhost:5001/api/Account/Register';
+
+    // const email = document.getElementById('email1').value;
+    // const name = document.getElementById('name').value;
     const isActive =
       selectedOptionActive === '' ? 1 : parseInt(selectedOptionActive);
     const roleId = selectedOptionRole === '' ? 1 : parseInt(selectedOptionRole);
@@ -269,6 +282,18 @@ function UserManager() {
       });
   };
 
+  console.log(
+    dataSubmit?.email === '' ? 'Email is required.' : 'Invalid email address',
+  );
+  console.log(
+    isFirst?.email
+      ? false
+      : dataSubmit?.email === ''
+      ? true
+      : !validateEmail(dataSubmit?.email)
+      ? true
+      : false,
+  );
   return (
     <>
       <Box className={styles.userBoxM}>
@@ -449,6 +474,8 @@ function UserManager() {
                         ? false
                         : dataSubmit?.email === ''
                         ? true
+                        : !validateEmail(dataSubmit?.email)
+                        ? true
                         : false
                     }
                   >
@@ -466,9 +493,13 @@ function UserManager() {
                           ? false
                           : dataSubmit?.email === ''
                           ? true
+                          : !validateEmail(dataSubmit?.email)
+                          ? true
                           : false) && (
                           <FormErrorMessage mt={0}>
-                            Email is required.
+                            {dataSubmit?.email === ''
+                              ? 'Email is required.'
+                              : 'Invalid email address.'}
                           </FormErrorMessage>
                         )}
                       </Stack>
