@@ -1518,19 +1518,18 @@ function IssuePage() {
             <ModalBody pb={8}>
               <Grid templateColumns='repeat(3, 1fr)' gap={8}>
                 <GridItem colSpan={1}>
-                  <Flex alignItems=''>
+                  <Flex alignItems='baseline'>
                     <Select value={mode} onChange={toggleMode} width='140px'>
                       <option value='Application'>Application</option>
                       <option value='Hardware'>Hardware</option>
                       <option value='Software'>Software</option>
                       <option value='Antivirus'>Antivirus</option>
                     </Select>
-                    <div
+                    <Box
                       style={{
                         position: 'relative',
                         display: 'inline-block',
                         backgroundColor: 'white',
-                        width: '300px',
                       }}
                     >
                       {mode === 'Application' ? (
@@ -1554,7 +1553,6 @@ function IssuePage() {
                               setIsFirst({ ...isFirst, searchQuery: false });
                             }}
                             placeholder={'Name - Os - Version'}
-                            w={300}
                             mr={1}
                           />
                           {(isFirst?.searchQuery
@@ -1567,41 +1565,39 @@ function IssuePage() {
                             </FormErrorMessage>
                           )}
                           {showOptions && (
-                            <div
+                            <Box
                               style={{
                                 position: 'absolute',
                                 top: '100%',
                                 left: 0,
-                                width: '270px',
+                                width: 'fit-content',
+                                maxHeight: '250px',
                                 border: '2px solid whitesmoke',
                                 background: '#fff',
                                 zIndex: 1,
                                 borderRadius: '5px',
+                                overflow: 'auto',
                               }}
                             >
                               {filteredAppData.map((app) => (
-                                <Box
-                                  key={app.appId}
-                                  style={{ padding: '8px', cursor: 'pointer' }}
-                                >
-                                  <Flex>
-                                    <Text
+                                <Box key={app.appId} style={{ padding: '5px' }}>
+                                  <Grid templateColumns='repeat(2, 1fr)'>
+                                    <GridItem
                                       className={styles.listitem}
                                       onClick={() => handleSelectAppName(app)}
                                     >
                                       {app.name?.trim()}
-                                    </Text>
-                                    <Spacer />
-                                    <Text
+                                    </GridItem>
+                                    <GridItem
                                       className={styles.listitem}
                                       onClick={() => handleSelectAppOs(app)}
                                     >
                                       {app.os?.trim()} - {app.osversion?.trim()}
-                                    </Text>
-                                  </Flex>
+                                    </GridItem>
+                                  </Grid>
                                 </Box>
                               ))}
-                            </div>
+                            </Box>
                           )}
                         </FormControl>
                       ) : mode === 'Hardware' ? (
@@ -1625,7 +1621,6 @@ function IssuePage() {
                               setIsFirst({ ...isFirst, searchQueryHw: false });
                             }}
                             placeholder={'Model - CPU - GPU'}
-                            w={300}
                             mr={1}
                           />
                           {(isFirst?.searchQueryHw
@@ -1638,48 +1633,48 @@ function IssuePage() {
                             </FormErrorMessage>
                           )}
                           {showOptionsHw && (
-                            <div
+                            <Box
                               style={{
                                 position: 'absolute',
                                 top: '100%',
                                 left: 0,
-                                width: '600px',
+                                width: '800px',
+                                maxHeight: '250px',
                                 border: '2px solid whitesmoke',
                                 background: '#fff',
                                 zIndex: 1,
                                 borderRadius: '5px',
+                                overflow: 'auto',
                               }}
                             >
                               {filteredHwData.map((item) => (
                                 <Box
                                   key={item.assetId}
-                                  style={{ padding: '8px', cursor: 'pointer' }}
+                                  style={{ padding: '5px' }}
                                 >
-                                  <Flex>
-                                    <Text
+                                  <Grid templateColumns='repeat(3, 1fr)'>
+                                    <GridItem
                                       className={styles.listitem}
                                       onClick={() => handleSelectHwModel(item)}
                                     >
                                       {item.model?.trim()}
-                                    </Text>
-                                    <Spacer />
-                                    <Text
+                                    </GridItem>
+                                    <GridItem
                                       className={styles.listitem}
                                       onClick={() => handleSelectHwCPU(item)}
                                     >
                                       {item.cpu?.trim()}
-                                    </Text>
-                                    <Spacer />
-                                    <Text
+                                    </GridItem>
+                                    <GridItem
                                       className={styles.listitem}
                                       onClick={() => handleSelectHwGPU(item)}
                                     >
                                       {item.gpu?.trim()}
-                                    </Text>
-                                  </Flex>
+                                    </GridItem>
+                                  </Grid>
                                 </Box>
                               ))}
-                            </div>
+                            </Box>
                           )}
                         </FormControl>
                       ) : mode === 'Software' ? (
@@ -1712,22 +1707,24 @@ function IssuePage() {
                             </FormErrorMessage>
                           )}
                           {showOptionsSw && (
-                            <div
+                            <Box
                               style={{
                                 position: 'absolute',
                                 top: '100%',
                                 left: 0,
-                                minWidth: 'fit-content',
+                                width: '420px',
+                                maxHeight: '250px',
                                 border: '2px solid whitesmoke',
                                 background: '#fff',
                                 zIndex: 1,
                                 borderRadius: '5px',
+                                overflow: 'auto',
                               }}
                             >
                               {filteredSwData.map((item) => (
                                 <Box
                                   key={item.softwareId}
-                                  style={{ padding: '8px', cursor: 'pointer' }}
+                                  style={{ padding: '5px' }}
                                 >
                                   <Text
                                     className={styles.listitem}
@@ -1738,7 +1735,7 @@ function IssuePage() {
                                   </Text>
                                 </Box>
                               ))}
-                            </div>
+                            </Box>
                           )}
                         </FormControl>
                       ) : (
@@ -1778,22 +1775,24 @@ function IssuePage() {
                             </FormErrorMessage>
                           )}
                           {showOptionsAnti && (
-                            <div
+                            <Box
                               style={{
                                 position: 'absolute',
                                 top: '100%',
                                 left: 0,
-                                minWidth: 'fit-content',
+                                width: '420px',
+                                maxHeight: '250px',
                                 border: '2px solid whitesmoke',
                                 background: '#fff',
                                 zIndex: 1,
                                 borderRadius: '5px',
+                                overflow: 'auto',
                               }}
                             >
                               {filteredAntiData.map((item) => (
                                 <Box
                                   key={item.softwareId}
-                                  style={{ padding: '8px', cursor: 'pointer' }}
+                                  style={{ padding: '5px' }}
                                 >
                                   <Text
                                     className={styles.listitem}
@@ -1804,11 +1803,11 @@ function IssuePage() {
                                   </Text>
                                 </Box>
                               ))}
-                            </div>
+                            </Box>
                           )}
                         </FormControl>
                       )}
-                    </div>
+                    </Box>
                   </Flex>
                 </GridItem>
                 <GridItem colSpan={1}>
@@ -1818,7 +1817,7 @@ function IssuePage() {
                     }
                     isRequired
                   >
-                    <Flex alignItems=''>
+                    <Flex alignItems='baseline'>
                       <FormLabel>Title</FormLabel>
                       <Stack alignItems={'start'} gap={0}>
                         <Input
@@ -1827,7 +1826,7 @@ function IssuePage() {
                           name='title'
                           value={formData.title}
                           onChange={handleInputChange}
-                          style={{ backgroundColor: 'white' }}
+                          style={{ backgroundColor: 'white', width: '264px' }}
                         />
                         {(isFirst?.title
                           ? false
@@ -1849,13 +1848,13 @@ function IssuePage() {
                     }
                     isRequired
                   >
-                    <Flex alignItems='' justifyContent={'space-evenly'}>
+                    <Flex alignItems='baseline' justifyContent={'space-evenly'}>
                       <FormLabel>Deadline</FormLabel>
                       <Stack gap={0}>
                         <Input
                           style={{
-                            marginLeft: '-7px',
                             backgroundColor: 'white',
+                            width: '100%',
                           }}
                           type='date'
                           name='endDate'
