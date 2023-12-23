@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 function DemoPage() {
   const params = {
     user: 'khangdthe151162@fpt.edu.vn',
-    app: 'New',
+    app: 'FAP',
   };
   const router = useRouter();
   const encodedParams = btoa(JSON.stringify(params));
@@ -22,10 +22,8 @@ function DemoPage() {
   const handleURL = () => {
     const url = `http://localhost:3000/ViewApplication?${encodedParams}`;
     const accountDataDecode = JSON.parse(sessionStorage.getItem('account'));
-    console.log('acc demo: ' + accountDataDecode);
     if (!accountDataDecode) {
       sessionStorage.setItem('url', JSON.stringify(url));
-      console.log('url demo: ' + url);
     }
     router.push(url);
   };

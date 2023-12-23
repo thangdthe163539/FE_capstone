@@ -127,7 +127,6 @@ function ApplicationPage() {
         // setApps(response2.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
         setLoading(false);
       }
     };
@@ -150,7 +149,7 @@ function ApplicationPage() {
         setSelectedApp(selectedAppData);
       }
     }
-  }, [router.query]);
+  }, [router.query, Apps]);
 
   function formatDate(date) {
     const day = date.getDate();
