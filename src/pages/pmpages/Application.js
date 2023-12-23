@@ -63,7 +63,7 @@ const defaultData = {
   docs: '',
   language: '',
   db: '',
-  status: '',
+  status: '1',
 };
 const defaultValidate = {
   name: true,
@@ -213,7 +213,7 @@ function SoftwarePage() {
         docs: formData.docs === null ? '' : formData.docs,
         language: formData.language,
         db: formData.db,
-        status: formData.status,
+        status: formData.status === null ? '1' : formData.status,
       });
       console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
@@ -281,10 +281,10 @@ function SoftwarePage() {
           osversion: formData2.osversion,
           description: formData2.description,
           download: formData2.download === null ? '' : formData2.download,
-          docs: formData2.docs === null ? '' : formData.docs,
+          docs: formData2.docs === null ? '' : formData2.docs,
           language: formData2.language,
           db: formData2.db,
-          status: formData2.status,
+          status: formData2.status === null ? '1' : formData2.status,
         },
       );
       console.log('Data saved:', response.data);

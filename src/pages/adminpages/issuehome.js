@@ -110,7 +110,7 @@ function IssuePage() {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
         if (!accountDataDecode) {
-          // router.push('/page405');
+          router.push('/page405');
         } else {
           if (
             accountDataDecode.roleId !== 1 ||

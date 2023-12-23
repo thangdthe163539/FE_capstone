@@ -59,72 +59,7 @@ import { BACK_END_PORT } from '../../../env';
 import PaginationCustom from '@/components/pagination';
 import Header2 from '@/components/layouts/Header/index2';
 //
-const defaultData = {
-  appId: '',
-  assetId: '',
-  libraryId: '',
-  name: '',
-  os: 'Windows',
-  version: '',
-  publisher: '',
-  type: '',
-  installDate: '',
-  status: '',
-};
-const defaultData2 = {
-  appId: '',
-  libraryId: '',
-  name: '',
-  publisher: '',
-  libraryKey: '',
-  start_Date: '',
-  time: '',
-  status: '',
-};
-const defaultValidate = {
-  name: true,
-  publisher: true,
-  version: true,
-  manufacturer: true,
-  cpu: true,
-  ram: true,
-  memory: true,
-  ipAddress: true,
-  libraryKey: true,
-  start_Date: true,
-  time: true,
-};
-const defaultWrongValidate = {
-  name: false,
-  publisher: false,
-  version: false,
-  manufacturer: false,
-  cpu: false,
-  ram: false,
-  memory: false,
-  ipAddress: false,
-  libraryKey: false,
-  start_Date: false,
-  time: false,
-};
-const defaultValidate1 = {
-  name: true,
-  publisher: true,
-  osversion: true,
-  description: true,
-  language: true,
-  db: true,
-  description: true,
-};
-const defaultWrongValidate1 = {
-  name: false,
-  publisher: false,
-  osversion: false,
-  description: false,
-  language: false,
-  db: false,
-  description: false,
-};
+
 function SoftwarePage() {
   // console.log(BACK_END_PORT);
   const router = useRouter();
@@ -155,6 +90,72 @@ function SoftwarePage() {
     }
   }, []);
   //
+  const defaultData = {
+    appId: '',
+    assetId: '',
+    libraryId: '',
+    name: '',
+    os: 'Windows',
+    version: '',
+    publisher: '',
+    type: '',
+    installDate: '',
+    status: 1,
+  };
+  const defaultData2 = {
+    appId: '',
+    libraryId: '',
+    name: '',
+    publisher: '',
+    libraryKey: '',
+    start_Date: '',
+    time: '',
+    status: 1,
+  };
+  const defaultValidate = {
+    name: true,
+    publisher: true,
+    version: true,
+    manufacturer: true,
+    cpu: true,
+    ram: true,
+    memory: true,
+    ipAddress: true,
+    libraryKey: true,
+    start_Date: true,
+    time: true,
+  };
+  const defaultWrongValidate = {
+    name: false,
+    publisher: false,
+    version: false,
+    manufacturer: false,
+    cpu: false,
+    ram: false,
+    memory: false,
+    ipAddress: false,
+    libraryKey: false,
+    start_Date: false,
+    time: false,
+  };
+  const defaultValidate1 = {
+    name: true,
+    publisher: true,
+    osversion: true,
+    description: true,
+    language: true,
+    db: true,
+    description: true,
+  };
+  const defaultWrongValidate1 = {
+    name: false,
+    publisher: false,
+    osversion: false,
+    description: false,
+    language: false,
+    db: false,
+    description: false,
+  };
   const [software, setSoftware] = useState();
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
@@ -166,7 +167,7 @@ function SoftwarePage() {
   const [formData1, setFormData1] = useState(defaultData2);
   const [formData2, setFormData2] = useState(defaultData);
   const [formData3, setFormData3] = useState(defaultData2);
-  const [formData4, setFormData4] = useState(defaultData2);
+  const [formData4, setFormData4] = useState(defaultData);
   const [feedbackData, setFeedbackData] = useState([]);
   const [deviceData, setDeviceData] = useState([]);
   const [softwareData, setSoftwareData] = useState([]);
@@ -388,7 +389,30 @@ function SoftwarePage() {
     setIsFirst({ ...isFirst, [name]: false });
     // console.log(formData4);
   };
-
+  const handleNumberChange4 = (value, name) => {
+    // Assuming 'name' is passed as the second argument to the function that calls handleInputChange4
+    setFormData4({ ...formData4, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
+    // console.log(formData4);
+  };
+  const handleNumberChange3 = (value, name) => {
+    // Assuming 'name' is passed as the second argument to the function that calls handleInputChange4
+    setFormData3({ ...formData3, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
+    // console.log(formData4);
+  };
+  const handleNumberChange1 = (value, name) => {
+    // Assuming 'name' is passed as the second argument to the function that calls handleInputChange4
+    setFormData1({ ...formData1, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
+    // console.log(formData4);
+  };
+  const handleNumberChange2 = (value, name) => {
+    // Assuming 'name' is passed as the second argument to the function that calls handleInputChange4
+    setFormData2({ ...formData2, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
+    // console.log(formData4);
+  };
   //
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -530,8 +554,8 @@ function SoftwarePage() {
       !formData4.name ||
       !formData4.manufacturer ||
       !formData4.cpu ||
-      formData4.ram < 0 ||
-      formData4.memory < 0 ||
+      !formData4.ram ||
+      !formData4.memory ||
       !formData4.version ||
       !formData4.ipAddress
     ) {
@@ -554,7 +578,7 @@ function SoftwarePage() {
           gpu: formData4.gpu === null ? '' : formData4.gpu,
           ram: formData4.ram,
           memory: formData4.memory,
-          os: formData4.os,
+          os: formData4.os === null ? 'Windows' : formData4.os,
           version: formData4.version,
           ipAddress: formData4.ipAddress,
           bandwidth: formData4.bandwidth === null ? '' : formData4.bandwidth,
@@ -607,8 +631,8 @@ function SoftwarePage() {
       !formData2.name ||
       !formData2.manufacturer ||
       !formData2.cpu ||
-      formData2.ram < 0 ||
-      formData2.memory < 0 ||
+      !formData2.ram ||
+      !formData2.memory ||
       !formData2.version ||
       !formData2.ipAddress
     ) {
@@ -626,7 +650,7 @@ function SoftwarePage() {
           gpu: formData2.gpu === null ? '' : formData2.gpu,
           ram: formData2.ram,
           memory: formData2.memory,
-          os: formData2.os,
+          os: formData2.os === null ? 'Windows' : formData2.os,
           version: formData2.version,
           ipAddress: formData2.ipAddress,
           bandwidth: formData2.bandwidth === null ? '' : formData2.bandwidth,
@@ -635,7 +659,7 @@ function SoftwarePage() {
           serialNumber:
             formData2.serialNumber === null ? '' : formData2.serialNumber,
           lastSuccesfullScan: curDate,
-          status: formData2.status,
+          status: formData2.status === null ? '1' : formData2.status,
         },
       );
       console.log('Data saved:', response.data);
@@ -718,7 +742,7 @@ function SoftwarePage() {
       !formData3.publisher ||
       !formData3.libraryKey ||
       !formData3.start_Date ||
-      formData3.time < 0
+      !formData3.time
     ) {
       setIsFirst(defaultWrongValidate);
       return;
@@ -788,7 +812,7 @@ function SoftwarePage() {
       !formData1.publisher ||
       !formData1.libraryKey ||
       !formData1.start_Date ||
-      formData1.time < 0
+      !formData1.time
     ) {
       setIsFirst(defaultWrongValidate);
       return;
@@ -1298,11 +1322,11 @@ function SoftwarePage() {
                             >
                               {appData?.name ? appData?.name : 'N/A'}
                             </Td>
-                            <Td className={styles.text2}>Version:</Td>
+                            <Td className={styles.text2}>Programming:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.version ? appData?.version : 'N/A'}
+                              {appData?.language ? appData?.language : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>OS:</Td>
                             <Td className={`${styles.text3}`}>
@@ -1316,11 +1340,11 @@ function SoftwarePage() {
                             >
                               {appData?.publisher ? appData?.publisher : 'N/A'}
                             </Td>
-                            <Td className={styles.text2}>Release:</Td>
+                            <Td className={styles.text2}>Database:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.release ? appData?.release : 'N/A'}
+                              {appData?.db ? appData?.db : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>OS Version:</Td>
                             <Td className={`${styles.text3}`}>
@@ -1328,17 +1352,35 @@ function SoftwarePage() {
                             </Td>
                           </Tr>
                           <Tr>
-                            <Td className={styles.text2}>Programming:</Td>
+                            <Td className={styles.text2}>Version:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.language ? appData?.language : 'N/A'}
+                              {appData?.version ? appData?.version : 'N/A'}
                             </Td>
-                            <Td className={styles.text2}>Database:</Td>
+                            <Td className={styles.text2}>Document link:</Td>
                             <Td
                               className={`${styles.text3} ${styles.borderRight}`}
                             >
-                              {appData?.db ? appData?.db : 'N/A'}
+                              {appData?.docs ? appData?.docs : 'N/A'}
+                            </Td>
+                            <Td className={styles.text2}>Type:</Td>
+                            <Td className={`${styles.text3}`}>
+                              {appData?.type ? appData?.type : 'N/A'}
+                            </Td>
+                          </Tr>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>Release:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
+                              {appData?.release ? appData?.release : 'N/A'}
+                            </Td>
+                            <Td className={styles.text2}>Download link:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
+                              {appData?.download ? appData?.download : 'N/A'}
                             </Td>
                             <Td className={styles.text2}>Status:</Td>
                             <Td className={`${styles.text3}`}>
@@ -1349,18 +1391,6 @@ function SoftwarePage() {
                                 : appData?.status === 3
                                 ? 'Deleted'
                                 : 'Unknown'}
-                            </Td>
-                          </Tr>
-                          <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Download link:</Td>
-                            <Td colSpan='5' className={`${styles.text3}`}>
-                              {appData?.download ? appData?.download : 'N/A'}
-                            </Td>
-                          </Tr>
-                          <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>Document link:</Td>
-                            <Td colSpan='5' className={`${styles.text3}`}>
-                              {appData?.docs ? appData?.docs : 'N/A'}
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
@@ -1431,18 +1461,35 @@ function SoftwarePage() {
                               </FormControl>
                             </Td>
                             <Td className={styles.text2}>
-                              <FormControl>
-                                <FormLabel>Version:</FormLabel>
+                              <FormControl isRequired>
+                                <FormLabel>Programming:</FormLabel>
                               </FormControl>
                             </Td>
                             <Td className={styles.borderRight}>
-                              <Input
-                                name='version'
-                                maxLength={255}
-                                value={appData?.version}
-                                onChange={handleInputChange}
-                                className={styles.text3}
-                              />
+                              <FormControl
+                                isRequired
+                                isInvalid={
+                                  isFirst1.language
+                                    ? false
+                                    : !appData.language
+                                    ? true
+                                    : false
+                                }
+                              >
+                                <Input
+                                  name='language'
+                                  maxLength={255}
+                                  value={appData?.language}
+                                  onChange={handleInputChange}
+                                  className={styles.text3}
+                                />
+                                <Flex>
+                                  <Spacer />
+                                  <FormErrorMessage>
+                                    Programming is required!
+                                  </FormErrorMessage>
+                                </Flex>
+                              </FormControl>
                             </Td>
                             <Td className={styles.text2}>
                               <FormControl>
@@ -1497,19 +1544,37 @@ function SoftwarePage() {
                               </FormControl>
                             </Td>
                             <Td className={styles.text2}>
-                              <FormControl>
-                                <FormLabel>Release:</FormLabel>
+                              <FormControl isRequired>
+                                <FormLabel>Database:</FormLabel>
                               </FormControl>
                             </Td>
                             <Td className={styles.borderRight}>
-                              <Input
-                                name='release'
-                                maxLength={255}
-                                value={appData?.release}
-                                onChange={handleInputChange}
-                                className={styles.text3}
-                              />
+                              <FormControl
+                                isRequired
+                                isInvalid={
+                                  isFirst1.db
+                                    ? false
+                                    : !appData.db
+                                    ? true
+                                    : false
+                                }
+                              >
+                                <Input
+                                  name='db'
+                                  maxLength={255}
+                                  value={appData?.db}
+                                  onChange={handleInputChange}
+                                  className={styles.text3}
+                                />
+                                <Flex>
+                                  <Spacer />
+                                  <FormErrorMessage>
+                                    Database is required!
+                                  </FormErrorMessage>
+                                </Flex>
+                              </FormControl>
                             </Td>
+
                             <Td className={styles.text2}>
                               <FormControl isRequired>
                                 <FormLabel>OS Version:</FormLabel>
@@ -1544,66 +1609,79 @@ function SoftwarePage() {
                           </Tr>
                           <Tr>
                             <Td className={styles.text2}>
-                              <FormControl isRequired>
-                                <FormLabel>Programming:</FormLabel>
+                              <FormControl>
+                                <FormLabel>Version:</FormLabel>
                               </FormControl>
                             </Td>
                             <Td className={styles.borderRight}>
-                              <FormControl
-                                isRequired
-                                isInvalid={
-                                  isFirst1.language
-                                    ? false
-                                    : !appData.language
-                                    ? true
-                                    : false
-                                }
-                              >
-                                <Input
-                                  name='language'
-                                  maxLength={255}
-                                  value={appData?.language}
-                                  onChange={handleInputChange}
-                                  className={styles.text3}
-                                />
-                                <Flex>
-                                  <Spacer />
-                                  <FormErrorMessage>
-                                    Programming is required!
-                                  </FormErrorMessage>
-                                </Flex>
-                              </FormControl>
+                              <Input
+                                name='version'
+                                maxLength={255}
+                                value={appData?.version}
+                                onChange={handleInputChange}
+                                className={styles.text3}
+                              />
                             </Td>
                             <Td className={styles.text2}>
-                              <FormControl isRequired>
-                                <FormLabel>Database:</FormLabel>
+                              <FormControl>
+                                <FormLabel>Document link:</FormLabel>
                               </FormControl>
                             </Td>
                             <Td className={styles.borderRight}>
-                              <FormControl
-                                isRequired
-                                isInvalid={
-                                  isFirst1.db
-                                    ? false
-                                    : !appData.db
-                                    ? true
-                                    : false
-                                }
-                              >
-                                <Input
-                                  name='db'
-                                  maxLength={255}
-                                  value={appData?.db}
-                                  onChange={handleInputChange}
-                                  className={styles.text3}
-                                />
-                                <Flex>
-                                  <Spacer />
-                                  <FormErrorMessage>
-                                    Database is required!
-                                  </FormErrorMessage>
-                                </Flex>
+                              <Input
+                                name='docs'
+                                maxLength={255}
+                                value={appData?.docs}
+                                onChange={handleInputChange}
+                                className={styles.text3}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>Type:</FormLabel>
                               </FormControl>
+                            </Td>
+                            <Td>
+                              <Select
+                                name='type'
+                                value={appData?.type}
+                                onChange={handleInputChange}
+                                className={styles.text3}
+                              >
+                                <option value='Web App'>Web App</option>
+                                <option value='Desktop App'>Desktop App</option>
+                                <option value='Mobile App'>Mobile App</option>
+                              </Select>
+                            </Td>
+                          </Tr>
+                          <Tr className={styles.borderTop}>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>Release:</FormLabel>
+                              </FormControl>
+                            </Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                name='release'
+                                maxLength={255}
+                                value={appData?.release}
+                                onChange={handleInputChange}
+                                className={styles.text3}
+                              />
+                            </Td>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>Download link:</FormLabel>
+                              </FormControl>
+                            </Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                name='download'
+                                maxLength={255}
+                                value={appData?.download}
+                                onChange={handleInputChange}
+                                className={styles.text3}
+                              />
                             </Td>
                             <Td className={styles.text2}>
                               <FormControl>
@@ -1621,38 +1699,6 @@ function SoftwarePage() {
                                 <option value='2'>Inactive</option>
                                 <option value='3'>Deleted</option>
                               </Select>
-                            </Td>
-                          </Tr>
-                          <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>
-                              <FormControl>
-                                <FormLabel>Download link:</FormLabel>
-                              </FormControl>
-                            </Td>
-                            <Td colSpan='5'>
-                              <Input
-                                name='download'
-                                maxLength={255}
-                                value={appData?.download}
-                                onChange={handleInputChange}
-                                className={styles.text3}
-                              />
-                            </Td>
-                          </Tr>
-                          <Tr className={styles.borderTop}>
-                            <Td className={styles.text2}>
-                              <FormControl>
-                                <FormLabel>Document link:</FormLabel>
-                              </FormControl>
-                            </Td>
-                            <Td colSpan='5'>
-                              <Input
-                                name='docs'
-                                maxLength={255}
-                                value={appData?.docs}
-                                onChange={handleInputChange}
-                                className={styles.text3}
-                              />
                             </Td>
                           </Tr>
                           <Tr className={styles.borderTop}>
@@ -2404,14 +2450,29 @@ function SoftwarePage() {
                           RAM is required!
                         </FormErrorMessage>
                       </Flex>
-                      <Input
+                      {/* <Input
                         name='ram'
-                        maxLength={255}
+                        maxLength={10}
                         type='number'
+                        min={1}
                         value={formData4.ram}
                         onKeyDown={handleKeyDown}
                         onChange={handleInputChange4}
-                      />
+                      /> */}
+                      <NumberInput
+                        name='ram'
+                        min={1}
+                        value={formData4.ram}
+                        onKeyDown={handleKeyDown}
+                        onChange={(value) => handleNumberChange4(value, 'ram')}
+                        allowMouseWheel
+                      >
+                        <NumberInputField />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
                     </FormControl>
                     <FormControl
                       isRequired
@@ -2431,14 +2492,30 @@ function SoftwarePage() {
                           Storage is required!
                         </FormErrorMessage>
                       </Flex>
-                      <Input
+                      {/* <Input
                         name='memory'
-                        maxLength={255}
+                        maxLength={10}
                         type='number'
                         value={formData4.memory}
                         onKeyDown={handleKeyDown}
                         onChange={handleInputChange4}
-                      />
+                      /> */}
+                      <NumberInput
+                        name='memory'
+                        min={1}
+                        value={formData4.memory}
+                        onKeyDown={handleKeyDown}
+                        onChange={(value) =>
+                          handleNumberChange4(value, 'memory')
+                        }
+                        allowMouseWheel
+                      >
+                        <NumberInputField />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
                     </FormControl>
                   </GridItem>
                   <GridItem>
@@ -2690,15 +2767,29 @@ function SoftwarePage() {
                     </FormErrorMessage>
                   </Flex>
                   <InputGroup>
-                    <Input
+                    {/* <Input
                       name='time'
-                      maxLength={255}
+                      maxLength={10}
                       value={formData3.time}
                       onKeyDown={handleKeyDown}
                       onChange={handleInputChange3}
                       type='number'
                       required
-                    />
+                    /> */}
+                    <NumberInput
+                      name='time'
+                      min={0}
+                      value={formData3.time}
+                      onKeyDown={handleKeyDown}
+                      onChange={(value) => handleNumberChange3(value, 'time')}
+                      allowMouseWheel
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                     <InputRightAddon>month(s)</InputRightAddon>
                   </InputGroup>
                 </FormControl>
@@ -2851,7 +2942,7 @@ function SoftwarePage() {
                     </FormErrorMessage>
                   </Flex>
                   <InputGroup>
-                    <Input
+                    {/* <Input
                       name='time'
                       value={formData1.time}
                       maxLength={10}
@@ -2859,7 +2950,21 @@ function SoftwarePage() {
                       onChange={handleInputChange1}
                       type='number'
                       required
-                    />
+                    />     */}
+                    <NumberInput
+                      name='time'
+                      min={0}
+                      value={formData1.time}
+                      onKeyDown={handleKeyDown}
+                      onChange={(value) => handleNumberChange1(value, 'time')}
+                      allowMouseWheel
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                     <InputRightAddon>month(s)</InputRightAddon>
                   </InputGroup>
                 </FormControl>
@@ -3004,14 +3109,28 @@ function SoftwarePage() {
                       RAM is required!
                     </FormErrorMessage>
                   </Flex>
-                  <Input
+                  {/* <Input
                     name='ram'
                     maxLength={10}
                     value={formData2.ram}
                     onKeyDown={handleKeyDown}
                     onChange={handleInputChange2}
                     type='number'
-                  />
+                  /> */}
+                  <NumberInput
+                    name='ram'
+                    min={1}
+                    value={formData2.ram}
+                    onKeyDown={handleKeyDown}
+                    onChange={(value) => handleNumberChange2(value, 'ram')}
+                    allowMouseWheel
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
                 </FormControl>
                 <FormControl
                   isRequired
@@ -3027,14 +3146,28 @@ function SoftwarePage() {
                       Storage is required!
                     </FormErrorMessage>
                   </Flex>
-                  <Input
+                  {/* <Input
                     name='memory'
                     maxLength={10}
                     value={formData2.memory}
                     onKeyDown={handleKeyDown}
                     onChange={handleInputChange2}
                     type='number'
-                  />
+                  /> */}
+                  <NumberInput
+                    name='memory'
+                    min={1}
+                    value={formData2.memory}
+                    onKeyDown={handleKeyDown}
+                    onChange={(value) => handleNumberChange2(value, 'memory')}
+                    allowMouseWheel
+                  >
+                    <NumberInputField />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper />
+                      <NumberDecrementStepper />
+                    </NumberInputStepper>
+                  </NumberInput>
                 </FormControl>
               </GridItem>
               <GridItem>

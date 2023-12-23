@@ -63,18 +63,19 @@ function UserManager() {
   const notificationTimeout = 2000;
 
   useEffect(() => {
-    // Access localStorage on the client side
-    const storedAccount = localStorage.getItem('account');
+    // Access sessionStorage on the client side
+    const storedAccount = sessionStorage.getItem('account');
     if (storedAccount) {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
         if (!accountDataDecode) {
-          // router.push('/page405');
+          router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 1 || accountDataDecode.status == 3) {
+          if (
+            accountDataDecode.roleId !== 1 ||
+            accountDataDecode.status !== 1
+          ) {
             router.push('/page405');
-          } else if (accountDataDecode.status == 2) {
-            router.push('/ViewApplication');
           }
         }
       } catch (error) {

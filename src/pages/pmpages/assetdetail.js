@@ -332,6 +332,30 @@ function AssetDetailPage() {
     setIsFirst({ ...isFirst, [name]: false });
     // console.log(formData);
   };
+  const handleNumberChange1 = (value, name) => {
+    // Assuming 'name' is passed as the second argument to the function that calls handleInputChange4
+    setAssetData({ ...assetData, [name]: value });
+    setIsFirst1({ ...isFirst1, [name]: false });
+    // console.log(formData4);
+  };
+  const handleNumberChange4 = (value, name) => {
+    // Assuming 'name' is passed as the second argument to the function that calls handleInputChange4
+    setFormData4({ ...formData4, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
+    // console.log(formData4);
+  };
+  const handleNumberChange3 = (value, name) => {
+    // Assuming 'name' is passed as the second argument to the function that calls handleInputChange4
+    setFormData3({ ...formData3, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
+    // console.log(formData4);
+  };
+  const handleNumberChange2 = (value, name) => {
+    // Assuming 'name' is passed as the second argument to the function that calls handleInputChange4
+    setFormData2({ ...formData2, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
+    // console.log(formData4);
+  };
   const handleSearchAppInputChange = (e) => {
     setSearchAppQuery(e.target.value);
   };
@@ -468,11 +492,7 @@ function AssetDetailPage() {
   const handleSaveAdd = async () => {
     // Validate inputs before saving
     if (haveLicense) {
-      if (
-        !formData3.licenseKey ||
-        !formData3.start_Date ||
-        formData3.time < 0
-      ) {
+      if (!formData3.licenseKey || !formData3.start_Date || !formData3.time) {
         setIsFirst(defaultWrongValidate);
         return;
       }
@@ -571,8 +591,8 @@ function AssetDetailPage() {
       !assetData.name ||
       !assetData.manufacturer ||
       !assetData.cpu ||
-      assetData.ram < 0 ||
-      assetData.memory < 0 ||
+      !assetData.ram ||
+      !assetData.memory ||
       !assetData.version ||
       !assetData.ipAddress
     ) {
@@ -640,7 +660,7 @@ function AssetDetailPage() {
   //
   const handleSaveEdit = async () => {
     // Validate inputs before saving
-    if (!formData2.licenseKey || !formData2.start_Date || formData2.time < 0) {
+    if (!formData2.licenseKey || !formData2.start_Date || !formData2.time) {
       setIsFirst(defaultWrongValidate);
       return;
     }
@@ -1112,7 +1132,7 @@ function AssetDetailPage() {
                   >
                     <TableContainer>
                       <Table>
-                        <Thead>
+                        <Tbody>
                           <Tr>
                             <Th
                               className={`${styles.cTh} ${styles.borderRight}`}
@@ -1129,8 +1149,6 @@ function AssetDetailPage() {
                               Hardware
                             </Th>
                           </Tr>
-                        </Thead>
-                        <Tbody>
                           <Tr className={styles.borderTop}>
                             <Td className={styles.text2}>Name:</Td>
                             <Td
@@ -1214,6 +1232,33 @@ function AssetDetailPage() {
                             <Td className={`${styles.text3}`}>
                               {assetData?.memory ? assetData?.memory : 'N/A'}GB
                             </Td>
+                          </Tr>
+                          <Tr>
+                            <Th
+                              className={`${styles.cTh} `}
+                              colSpan={4}
+                              textAlign='center'
+                            >
+                              Network
+                            </Th>
+                            <Th colSpan={2}></Th>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>IP Address:</Td>
+                            <Td
+                              className={`${styles.text3} ${styles.borderRight}`}
+                            >
+                              {assetData?.ipAddress
+                                ? assetData?.ipAddress
+                                : 'N/A'}
+                            </Td>
+                            <Td className={styles.text2}>Bandwidth:</Td>
+                            <Td className={`${styles.text3} `}>
+                              {assetData?.bandwidth
+                                ? assetData?.bandwidth
+                                : 'N/A'}
+                            </Td>
+                            <Td colSpan={2}></Td>
                           </Tr>
                         </Tbody>
                       </Table>
@@ -1459,13 +1504,29 @@ function AssetDetailPage() {
                                     : false
                                 }
                               >
-                                <Input
+                                {/* <Input
                                   value={assetData?.ram}
                                   name='ram'
                                   maxLength={255}
                                   onChange={handleInputChange3}
                                   className={`${styles.text3}`}
-                                />
+                                /> */}
+                                <NumberInput
+                                  name='ram'
+                                  min={1}
+                                  value={assetData.ram}
+                                  onKeyDown={handleKeyDown}
+                                  onChange={(value) =>
+                                    handleNumberChange1(value, 'ram')
+                                  }
+                                  allowMouseWheel
+                                >
+                                  <NumberInputField />
+                                  <NumberInputStepper>
+                                    <NumberIncrementStepper />
+                                    <NumberDecrementStepper />
+                                  </NumberInputStepper>
+                                </NumberInput>
                                 <Flex>
                                   <Spacer />
                                   <FormErrorMessage>
@@ -1521,13 +1582,29 @@ function AssetDetailPage() {
                                     : false
                                 }
                               >
-                                <Input
+                                {/* <Input
                                   value={assetData?.memory}
                                   name='memory'
                                   maxLength={255}
                                   onChange={handleInputChange3}
                                   className={`${styles.text3}`}
-                                />
+                                /> */}
+                                <NumberInput
+                                  name='memory'
+                                  min={1}
+                                  value={assetData.memory}
+                                  onKeyDown={handleKeyDown}
+                                  onChange={(value) =>
+                                    handleNumberChange1(value, 'memory')
+                                  }
+                                  allowMouseWheel
+                                >
+                                  <NumberInputField />
+                                  <NumberInputStepper>
+                                    <NumberIncrementStepper />
+                                    <NumberDecrementStepper />
+                                  </NumberInputStepper>
+                                </NumberInput>
                                 <Flex>
                                   <Spacer />
                                   <FormErrorMessage>
@@ -1536,6 +1613,63 @@ function AssetDetailPage() {
                                 </Flex>
                               </FormControl>
                             </Td>
+                          </Tr>
+                          <Tr>
+                            <Th
+                              className={`${styles.cTh} `}
+                              colSpan={4}
+                              textAlign='center'
+                            >
+                              Network
+                            </Th>
+                            <Th colSpan={2}></Th>
+                          </Tr>
+                          <Tr>
+                            <Td className={styles.text2}>
+                              <FormControl isRequired>
+                                <FormLabel>IP Address:</FormLabel>
+                              </FormControl>
+                            </Td>
+                            <Td className={styles.borderRight}>
+                              <FormControl
+                                isInvalid={
+                                  isFirst1.ipAddress
+                                    ? false
+                                    : !assetData.ipAddress
+                                    ? true
+                                    : false
+                                }
+                              >
+                                <Input
+                                  value={assetData?.ipAddress}
+                                  name='ipAddress'
+                                  maxLength={255}
+                                  onChange={handleInputChange3}
+                                  className={`${styles.text3}`}
+                                />
+                                <Flex>
+                                  <Spacer />
+                                  <FormErrorMessage>
+                                    IP Address is required!
+                                  </FormErrorMessage>
+                                </Flex>
+                              </FormControl>
+                            </Td>
+                            <Td className={styles.text2}>
+                              <FormControl>
+                                <FormLabel>Bandwidth:</FormLabel>
+                              </FormControl>
+                            </Td>
+                            <Td className={styles.borderRight}>
+                              <Input
+                                value={assetData?.bandwidth}
+                                name='bandwidth'
+                                maxLength={255}
+                                onChange={handleInputChange3}
+                                className={`${styles.text3}`}
+                              />
+                            </Td>
+                            <Td colSpan={2}></Td>
                           </Tr>
                         </Tbody>
                       </Table>
@@ -1984,14 +2118,28 @@ function AssetDetailPage() {
                     </FormErrorMessage>
                   </Flex>
                   <InputGroup>
-                    <Input
+                    {/* <Input
                       name='time'
                       maxLength={10}
                       value={formData2.time}
                       onKeyDown={handleKeyDown}
                       onChange={handleInputChange2}
                       type='number'
-                    />
+                    /> */}
+                    <NumberInput
+                      name='time'
+                      min={0}
+                      value={formData2.time}
+                      onKeyDown={handleKeyDown}
+                      onChange={(value) => handleNumberChange2(value, 'time')}
+                      allowMouseWheel
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
                     <InputRightAddon>month(s)</InputRightAddon>
                   </InputGroup>
                 </FormControl>
@@ -2030,13 +2178,7 @@ function AssetDetailPage() {
       >
         <ModalOverlay />
         <ModalContent
-          w={
-            showModalAdd
-              ? 'fit-content'
-              : showModalTable
-              ? '100vw'
-              : 'fit-content'
-          }
+          w={showModalAdd ? 'fit-content' : showModalTable ? '100vw' : '40vw'}
         >
           <ModalHeader>
             {showModalAdd
@@ -2343,15 +2485,31 @@ function AssetDetailPage() {
                             Time is required!
                           </FormErrorMessage>
                         </Flex>
+                        {/* <Input
+                          name='time'
+                          maxLength={10}
+                          value={formData3.time}
+                          onKeyDown={handleKeyDown}
+                          onChange={handleInputChange4}
+                          type='number'
+                        /> */}
                         <InputGroup>
-                          <Input
+                          <NumberInput
                             name='time'
-                            maxLength={10}
+                            min={0}
                             value={formData3.time}
                             onKeyDown={handleKeyDown}
-                            onChange={handleInputChange4}
-                            type='number'
-                          />
+                            onChange={(value) =>
+                              handleNumberChange3(value, 'time')
+                            }
+                            allowMouseWheel
+                          >
+                            <NumberInputField />
+                            <NumberInputStepper>
+                              <NumberIncrementStepper />
+                              <NumberDecrementStepper />
+                            </NumberInputStepper>
+                          </NumberInput>
                           <InputRightAddon>month(s)</InputRightAddon>
                         </InputGroup>
                       </FormControl>

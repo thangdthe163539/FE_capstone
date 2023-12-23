@@ -255,7 +255,7 @@ function FeedBackDetailManagePage() {
       try {
         const accountDataDecode = JSON.parse(storedAccount);
         if (!accountDataDecode) {
-          // router.push('/page405');
+          router.push('/page405');
         } else {
           if (accountDataDecode.roleId !== 1 || accountDataDecode.status !== 1) {
             router.push('/page405');
