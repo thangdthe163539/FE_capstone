@@ -446,8 +446,8 @@ function AssetDetailPage() {
         {
           name: formData.name,
           publisher: formData.publisher,
-          version: formData.version,
-          release: formData.release,
+          version: formData.version === null ? '' : formData.version,
+          release: formData.release === null ? '' : formData.release,
           type: isAntivirus ? 'Antivirus' : formData.type,
           os: formData.os,
           status: 1,
@@ -615,16 +615,17 @@ function AssetDetailPage() {
         {
           name: assetData.name,
           cpu: assetData.cpu,
-          gpu: assetData.gpu,
+          gpu: assetData.gpu === null ? '' : assetData.gpu,
           ram: assetData.ram,
           memory: assetData.memory,
           os: assetData.os,
           version: assetData.version,
           ipAddress: assetData.ipAddress,
-          bandwidth: assetData.bandwidth,
+          bandwidth: assetData.bandwidth === null ? '' : assetData.bandwidth,
           manufacturer: assetData.manufacturer,
-          model: assetData.model,
-          serialNumber: assetData.serialNumber,
+          model: assetData.model === null ? '' : assetData.model,
+          serialNumber:
+            assetData.serialNumber === null ? '' : assetData.serialNumber,
           lastSuccesfullScan: curDate,
           status: assetData.status,
         },
@@ -673,6 +674,12 @@ function AssetDetailPage() {
     }
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+      let status;
+      if (formData2.time == 0 || formData2.time == '0') {
+        status = 2;
+      } else {
+        status = 1;
+      }
       const response = await axios.put(
         `${BACK_END_PORT}/api/License/UpdateLicense/` + formData2.licenseId,
         {
@@ -682,7 +689,7 @@ function AssetDetailPage() {
           licenseKey: formData2.licenseKey,
           startDate: formData2.startDate,
           time: formData2.time,
-          status: formData2.time !== 0 ? 1 : 2,
+          status: status,
         },
       );
       console.log('Data saved:', response.data);
@@ -782,8 +789,8 @@ function AssetDetailPage() {
         {
           name: formData1.name,
           publisher: formData1.publisher,
-          version: formData1.version,
-          release: formData1.release,
+          version: formData1.version === null ? '' : formData1.version,
+          release: formData1.release === null ? '' : formData1.release,
           type: formData1.type,
           os: formData1.os,
           status: formData1.status,
@@ -836,7 +843,10 @@ function AssetDetailPage() {
         if (!accountDataDecode) {
           router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 2 || accountDataDecode.status !== 1) {
+          if (
+            accountDataDecode.roleId !== 2 ||
+            accountDataDecode.status !== 1
+          ) {
             router.push('/page405');
           }
           setAccount(accountDataDecode);

@@ -22,6 +22,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 function Header() {
   const [isLogin, setIsLogin] = useState({});
   const [isSuccess, setIsSuccess] = useState('');
+  const [acc, setAcc] = useState([]);
   const router = useRouter();
   // start config firebase - login gg
   const firebaseConfig = {
@@ -76,22 +77,24 @@ function Header() {
       // const status = data.status;
       // Wait for the tokenDecode function to complete
       const account = await tokenDecode(data.token);
+      setAcc(account);
+      // setIsLogin(account);
       if (account) {
         sessionStorage.setItem('account', JSON.stringify(account));
 
         if (account.status == 3) {
-          router.push('http://localhost:3000/');
+          router.push('/');
         } else if (account.status == 2) {
-          router.push('/ViewApplication');
+          router.push('/');
         } else if (account.status == 1) {
           if (account.roleId == 1) {
             router.push('adminpages/adminhome');
           } else if (account.roleId == 2) {
             router.push('/pmpages/PoHome');
           } else if (account.roleId == 3) {
-            router.push('/ViewApplication');
+            router.push('/');
           } else {
-            router.push('http://localhost:3000/');
+            router.push('/');
           }
         }
       } else {
@@ -115,9 +118,12 @@ function Header() {
       const storedAccountEncode = JSON.parse(storedAccount);
       if (storedAccountEncode) {
         setIsLogin(storedAccountEncode);
+        console.log(isLogin.status);
+        console.log(storedAccountEncode.status);
+        console.log(storedAccount.status);
       }
     }
-  }, []);
+  }, [acc]);
   return (
     <Box>
       <Flex className={`${styles.navbar}`}>
@@ -135,31 +141,33 @@ function Header() {
         <Box>
           {isLogin && isLogin?.name ? (
             <Flex alignItems={'center'}>
-              {(isLogin?.roleName === 'Admin' ||
-                isLogin?.roleName === 'Product owner') && (
-                <>
-                  <Link
-                    style={{ marginRight: '2%', padding: '20px 12px' }}
-                    href={
-                      isLogin?.roleName === 'Admin'
-                        ? 'adminpages/adminhome'
-                        : '/pmpages/PoHome'
-                    }
-                  >
-                    Dashboard
-                  </Link>
-
-                  <Link
-                    style={{
-                      marginRight: '2%',
-                      padding: '20px 12px',
-                      minWidth: '150px',
-                    }}
-                    href={'/ViewApplication'}
-                  >
-                    View Application
-                  </Link>
-                </>
+              {((isLogin?.roleName === 'Admin' && isLogin?.status === 1) ||
+                (isLogin?.roleName === 'Product owner' &&
+                  isLogin?.status === 1)) && (
+                <Link
+                  style={{ marginRight: '2%', padding: '20px 12px' }}
+                  href={
+                    isLogin?.roleName === 'Admin'
+                      ? 'adminpages/adminhome'
+                      : '/pmpages/PoHome'
+                  }
+                >
+                  Dashboard
+                </Link>
+              )}
+              {isLogin?.status !== 3 ? (
+                <Link
+                  style={{
+                    marginRight: '2%',
+                    padding: '20px 12px',
+                    minWidth: '150px',
+                  }}
+                  href={'/ViewApplication'}
+                >
+                  View Application
+                </Link>
+              ) : (
+                ''
               )}
               <Menu>
                 <MenuButton

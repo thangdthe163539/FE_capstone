@@ -95,7 +95,10 @@ function SoftwarePage() {
         if (!accountDataDecode) {
           router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 2 || accountDataDecode.status !== 1) {
+          if (
+            accountDataDecode.roleId !== 2 ||
+            accountDataDecode.status !== 1
+          ) {
             router.push('/page405');
           }
           setAccount(accountDataDecode);
@@ -468,14 +471,14 @@ function SoftwarePage() {
           // accId: account.accId,
           name: appData.name,
           publisher: appData.publisher,
-          version: appData.version,
-          release: appData.release,
+          version: appData.version === null ? '' : appData.version,
+          release: appData.release === null ? '' : appData.release,
           type: appData.type,
           os: appData.os,
           osversion: appData.osversion,
           description: appData.description,
-          download: appData.download,
-          docs: appData.docs,
+          download: appData.download === null ? '' : appData.download,
+          docs: appData.docs === null ? '' : appData.docs,
           language: appData.language,
           db: appData.db,
           status: appData.status,
@@ -568,6 +571,7 @@ function SoftwarePage() {
   };
   const handleSaveCreate = async () => {
     // Validate inputs before saving
+    console.log('send formData4: ' + formData4);
     const validationErrors = validateInputs4();
     if (validationErrors.length > 0) {
       // You can handle validation errors as needed
@@ -587,16 +591,17 @@ function SoftwarePage() {
         {
           name: formData4.name,
           cpu: formData4.cpu,
-          gpu: formData4.gpu,
+          gpu: formData4.gpu === null ? '' : formData4.gpu,
           ram: formData4.ram,
           memory: formData4.memory,
           os: formData4.os,
           version: formData4.version,
           ipAddress: formData4.ipAddress,
-          bandwidth: formData4.bandwidth,
+          bandwidth: formData4.bandwidth === null ? '' : formData4.bandwidth,
           manufacturer: formData4.manufacturer,
-          model: formData4.model,
-          serialNumber: formData4.serialNumber,
+          model: formData4.model === null ? '' : formData4.model,
+          serialNumber:
+            formData4.serialNumber === null ? '' : formData4.serialNumber,
           lastSuccesfullScan: formatDate(currentDateOnly),
           status: 1,
         },
@@ -637,6 +642,14 @@ function SoftwarePage() {
   };
   const handleSaveEditAsset = async () => {
     // Validate inputs before saving
+    console.log(
+      'send formData2: ' +
+        formData2.gpu +
+        formData2.model +
+        formData2.serialNumber +
+        formData2.bandwidth,
+    );
+
     const validationErrors = validateInputs2();
     if (validationErrors.length > 0) {
       // You can handle validation errors as needed
@@ -651,16 +664,17 @@ function SoftwarePage() {
         {
           name: formData2.name,
           cpu: formData2.cpu,
-          gpu: formData2.gpu,
+          gpu: formData2.gpu === null ? '' : formData2.gpu,
           ram: formData2.ram,
           memory: formData2.memory,
           os: formData2.os,
           version: formData2.version,
           ipAddress: formData2.ipAddress,
-          bandwidth: formData2.bandwidth,
+          bandwidth: formData2.bandwidth === null ? '' : formData2.bandwidth,
           manufacturer: formData2.manufacturer,
-          model: formData2.model,
-          serialNumber: formData2.serialNumber,
+          model: formData2.model === null ? '' : formData2.model,
+          serialNumber:
+            formData2.serialNumber === null ? '' : formData2.serialNumber,
           lastSuccesfullScan: curDate,
           status: formData2.status,
         },
@@ -897,6 +911,7 @@ function SoftwarePage() {
     } else {
       setSelectedRow(item.assetId);
       setFormData2(item);
+      console.log(item);
       setButtonDisabled(false);
     }
   };
