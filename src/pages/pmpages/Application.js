@@ -605,11 +605,7 @@ function SoftwarePage() {
 
       <Modal //Modal edit software
         isOpen={isOpenEdit}
-        onClose={() => (
-          setIsOpenEdit(false),
-          setInvalidFields2([]),
-          setIsFirst(defaultValidate)
-        )}
+        onClose={() => (setIsOpenEdit(false), setIsFirst(defaultValidate))}
         closeOnOverlayClick={false}
         size='4x1'
       >
@@ -849,9 +845,7 @@ function SoftwarePage() {
             </Button>
             <Button
               onClick={() => (
-                setIsOpenEdit(false),
-                setInvalidFields2([]),
-                setIsFirst(defaultValidate)
+                setIsOpenEdit(false), setIsFirst(defaultValidate)
               )}
             >
               Cancel
@@ -865,7 +859,6 @@ function SoftwarePage() {
         onClose={() => (
           setIsOpenAdd(false),
           setFormData(defaultData),
-          setInvalidFields1([]),
           setIsFirst(defaultValidate)
         )}
         closeOnOverlayClick={false}
@@ -1105,7 +1098,6 @@ function SoftwarePage() {
               onClick={() => (
                 setIsOpenAdd(false),
                 setFormData(defaultData),
-                setInvalidFields1([]),
                 setIsFirst(defaultValidate)
               )}
             >
