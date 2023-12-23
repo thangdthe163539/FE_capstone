@@ -213,7 +213,7 @@ function SoftwarePage() {
         docs: formData.docs === null ? '' : formData.docs,
         language: formData.language,
         db: formData.db,
-        status: 1,
+        status: formData.status,
       });
       console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
