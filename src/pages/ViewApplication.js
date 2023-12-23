@@ -169,30 +169,13 @@ function ApplicationPage() {
     const Id = parseInt(selectedApp.appId);
     const desc = document.getElementById('description').value;
     const tit = document.getElementById('title').value;
-    // const desc = description;
-    // const tit = title;
-    // if ((!tit && tit.length == 0) || (!desc && desc.length == 0)) {
-    //   setIsFirst({
-    //     tit: true,
-    //     description: true,
-    //   });
-    //   return;
-    // }
-    // if (!tit || tit.length == 0) {
-    //   setIsFirst({
-    //     ...isFirst,
-    //     tit: true,
-    //   });
-    //   return;
-    // }
-    // if (!desc || desc.length == 0) {
-    //   setIsFirst({
-    //     ...isFirst,
-    //     description: true,
-    //   });
-    //   return;
-    // }
-
+    if (!title || !description) {
+      setIsFirst({
+        title: false,
+        description: false,
+      });
+      return;
+    }
     const curDate = new Date();
     const currentDateOnly = new Date(
       curDate.getFullYear(),
@@ -229,6 +212,10 @@ function ApplicationPage() {
       });
       setIsShowFeedback(false);
       setSelectedApp(defaultData);
+      setIsFirst({
+        title: true,
+        description: true,
+      });
       setImages([]);
       toast({
         title: 'Send Feedback',
@@ -247,7 +234,10 @@ function ApplicationPage() {
       });
       setImages([]);
       setIsShowFeedback(false);
-      console.error('Lỗi:', error);
+      setIsFirst({
+        title: true,
+        description: true,
+      });
     }
   };
 
@@ -487,7 +477,14 @@ function ApplicationPage() {
       </List>
       <Modal
         isOpen={isShowFeedback}
-        onClose={() => (setIsShowFeedback(false), setFormData(defaultData))}
+        onClose={() => (
+          setIsShowFeedback(false),
+          setFormData(defaultData),
+          setIsFirst({
+            title: true,
+            description: true,
+          })
+        )}
         closeOnOverlayClick={false}
         size='lg'
       >
@@ -676,7 +673,12 @@ function ApplicationPage() {
             </Button>
             <Button
               onClick={() => (
-                setIsShowFeedback(false), setFormData(defaultData)
+                setIsShowFeedback(false),
+                setFormData(defaultData),
+                setIsFirst({
+                  title: true,
+                  description: true,
+                })
               )}
             >
               Cancel
