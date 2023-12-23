@@ -18,6 +18,7 @@ function DemoPage() {
 
   const encodedParams = btoa(JSON.stringify(params));
 
+  // const handleDemo - checkLogin ?  : tao sessionStorage url
   return (
     <Box className={styles.bodybox}>
       <Center>

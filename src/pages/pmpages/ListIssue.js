@@ -73,7 +73,10 @@ function SecurityPage() {
         if (!accountDataDecode) {
           router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 2 || accountDataDecode.status !== 1) {
+          if (
+            accountDataDecode.roleId !== 2 ||
+            accountDataDecode.status !== 1
+          ) {
             router.push('/page405');
           }
           setAccount(accountDataDecode);
@@ -189,7 +192,10 @@ function SecurityPage() {
     const filteredData = reportData.filter((item) => {
       const name = item.name?.toLowerCase();
       const title = item.title?.toLowerCase();
-      return name.includes(query) || title.includes(query);
+      if (name || title) {
+        return name.includes(query) || title.includes(query);
+      }
+      return null;
     });
     setFilteredReportData(filteredData);
     setDynamicFilteredReportData(

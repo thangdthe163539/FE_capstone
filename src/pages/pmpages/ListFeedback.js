@@ -191,7 +191,10 @@ function FeedbackPage() {
     const filteredData = reportData.filter((item) => {
       const name = item.name?.toLowerCase();
       const title = item.title?.toLowerCase();
-      return name.includes(query) || title.includes(query);
+      if (name || title) {
+        return name.includes(query) || title.includes(query);
+      }
+      return null;
     });
     setFilteredReportData(filteredData);
     setDynamicFilteredReportData(

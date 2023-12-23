@@ -125,8 +125,6 @@ function SoftwarePage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
-  const [invalidFields1, setInvalidFields1] = useState([]);
-  const [invalidFields2, setInvalidFields2] = useState([]);
   const toast = useToast();
   //
   //pagination
@@ -155,63 +153,19 @@ function SoftwarePage() {
     }
   }, [filteredSoftwareData]);
   //
+  const [isFirst, setIsFirst] = useState(defaultValidate);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    validateInputs1();
     setFormData({ ...formData, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
   };
   const handleInputChange2 = (e) => {
     const { name, value } = e.target;
-    validateInputs2();
     setFormData2({ ...formData2, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
     // console.log(formData2);
   };
-  const validateInputs1 = () => {
-    const requiredFields = [
-      'name',
-      'publisher',
-      'osversion',
-      'description',
-      'language',
-      'db',
-      'description',
-    ];
-    const errors = [];
 
-    for (const field of requiredFields) {
-      if (!formData[field]) {
-        errors.push(field);
-      }
-    }
-
-    // Update state to mark fields as invalid
-    setInvalidFields1(errors);
-
-    return errors;
-  };
-  const validateInputs2 = () => {
-    const requiredFields = [
-      'name',
-      'publisher',
-      'osversion',
-      'description',
-      'language',
-      'db',
-      'description',
-    ];
-    const errors = [];
-
-    for (const field of requiredFields) {
-      if (!formData2[field]) {
-        errors.push(field);
-      }
-    }
-
-    // Update state to mark fields as invalid
-    setInvalidFields2(errors);
-
-    return errors;
-  };
   //
   //
   const [selectedRow, setSelectedRow] = useState(new Set());
@@ -231,10 +185,16 @@ function SoftwarePage() {
   //
   const handleSaveAdd = async () => {
     // Validate inputs before saving
-    const validationErrors = validateInputs1();
-    if (validationErrors.length > 0) {
-      // You can handle validation errors as needed
-      console.error('Validation Errors:', validationErrors);
+    if (
+      !formData.name ||
+      !formData.publisher ||
+      !formData.os ||
+      !formData.osversion ||
+      !formData.description ||
+      !formData.language ||
+      !formData.db
+    ) {
+      setIsFirst(defaultWrongValidate);
       return;
     }
     try {
@@ -259,6 +219,7 @@ function SoftwarePage() {
       setIsOpenAdd(false); // Close the modal after successful save
       setFormData(defaultData);
       setSelectedRow(new Set());
+      setIsFirst(defaultValidate);
       // Reload new data for the table
       try {
         const newDataResponse = await axios.get(
@@ -293,10 +254,16 @@ function SoftwarePage() {
   //
   const handleSaveEdit = async () => {
     // Validate inputs before saving
-    const validationErrors = validateInputs2();
-    if (validationErrors.length > 0) {
-      // You can handle validation errors as needed
-      console.error('Validation Errors:', validationErrors);
+    if (
+      !formData2.name ||
+      !formData2.publisher ||
+      !formData2.os ||
+      !formData2.osversion ||
+      !formData2.description ||
+      !formData2.language ||
+      !formData2.db
+    ) {
+      setIsFirst(defaultWrongValidate);
       return;
     }
     try {
@@ -325,6 +292,7 @@ function SoftwarePage() {
       setButtonDisabled(true);
       setFormData2(defaultData);
       setSelectedRow(new Set());
+      setIsFirst(defaultValidate);
       // Reload new data for the table
       try {
         const newDataResponse = await axios.get(
@@ -424,9 +392,12 @@ function SoftwarePage() {
   const filterAssets = () => {
     const query = searchQuery?.toLowerCase();
     const filteredData = softwareData.filter((item) => {
-      const name = item.name?.toLowerCase();
-      const publisher = item.publisher?.toLowerCase();
-      return name.includes(query) || publisher.includes(query);
+      const name = item?.name?.toLowerCase();
+      const publisher = item?.publisher?.toLowerCase();
+      if (name || publisher) {
+        return name.includes(query) || publisher.includes(query);
+      }
+      return null;
     });
     setFilteredSoftwareData(filteredData.filter((item) => item.status !== 3));
   };
@@ -634,7 +605,11 @@ function SoftwarePage() {
 
       <Modal //Modal edit software
         isOpen={isOpenEdit}
-        onClose={() => (setIsOpenEdit(false), setInvalidFields2([]))}
+        onClose={() => (
+          setIsOpenEdit(false),
+          setInvalidFields2([]),
+          setIsFirst(defaultValidate)
+        )}
         closeOnOverlayClick={false}
         size='4x1'
       >
@@ -647,7 +622,9 @@ function SoftwarePage() {
               <GridItem>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields2.includes('name')}
+                  isInvalid={
+                    isFirst.name ? false : !formData2.name ? true : false
+                  }
                 >
                   <Flex>
                     <FormLabel>Name</FormLabel>
@@ -666,7 +643,13 @@ function SoftwarePage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields2.includes('publisher')}
+                  isInvalid={
+                    isFirst.publisher
+                      ? false
+                      : !formData2.publisher
+                      ? true
+                      : false
+                  }
                   className={styles.formInput}
                 >
                   <Flex>
@@ -720,7 +703,13 @@ function SoftwarePage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields2.includes('osversion')}
+                  isInvalid={
+                    isFirst.osversion
+                      ? false
+                      : !formData2.osversion
+                      ? true
+                      : false
+                  }
                   className={styles.formInput}
                 >
                   <Flex>
@@ -772,7 +761,13 @@ function SoftwarePage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields2.includes('language')}
+                  isInvalid={
+                    isFirst.language
+                      ? false
+                      : !formData2.language
+                      ? true
+                      : false
+                  }
                   className={styles.formInput}
                 >
                   <Flex>
@@ -791,7 +786,7 @@ function SoftwarePage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields2.includes('db')}
+                  isInvalid={isFirst.db ? false : !formData2.db ? true : false}
                   className={styles.formInput}
                 >
                   <Flex>
@@ -823,7 +818,13 @@ function SoftwarePage() {
             </Grid>
             <FormControl
               isRequired
-              isInvalid={invalidFields2.includes('description')}
+              isInvalid={
+                isFirst.description
+                  ? false
+                  : !formData2.description
+                  ? true
+                  : false
+              }
               className={styles.formInput}
             >
               <Flex>
@@ -847,7 +848,11 @@ function SoftwarePage() {
               Save
             </Button>
             <Button
-              onClick={() => (setIsOpenEdit(false), setInvalidFields2([]))}
+              onClick={() => (
+                setIsOpenEdit(false),
+                setInvalidFields2([]),
+                setIsFirst(defaultValidate)
+              )}
             >
               Cancel
             </Button>
@@ -858,7 +863,10 @@ function SoftwarePage() {
       <Modal // Modal add new application
         isOpen={isOpenAdd}
         onClose={() => (
-          setIsOpenAdd(false), setFormData(defaultData), setInvalidFields1([])
+          setIsOpenAdd(false),
+          setFormData(defaultData),
+          setInvalidFields1([]),
+          setIsFirst(defaultValidate)
         )}
         closeOnOverlayClick={false}
         size='4x1'
@@ -872,7 +880,9 @@ function SoftwarePage() {
               <GridItem>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields1.includes('name')}
+                  isInvalid={
+                    isFirst.name ? false : !formData.name ? true : false
+                  }
                 >
                   <Flex>
                     <FormLabel>Name</FormLabel>
@@ -891,7 +901,13 @@ function SoftwarePage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields1.includes('publisher')}
+                  isInvalid={
+                    isFirst.publisher
+                      ? false
+                      : !formData.publisher
+                      ? true
+                      : false
+                  }
                   className={styles.formInput}
                 >
                   <Flex>
@@ -945,7 +961,13 @@ function SoftwarePage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields1.includes('osversion')}
+                  isInvalid={
+                    isFirst.osversion
+                      ? false
+                      : !formData.osversion
+                      ? true
+                      : false
+                  }
                   className={styles.formInput}
                 >
                   <Flex>
@@ -997,7 +1019,9 @@ function SoftwarePage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields1.includes('language')}
+                  isInvalid={
+                    isFirst.language ? false : !formData.language ? true : false
+                  }
                   className={styles.formInput}
                 >
                   <Flex>
@@ -1016,7 +1040,7 @@ function SoftwarePage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields1.includes('db')}
+                  isInvalid={isFirst.db ? false : !formData.db ? true : false}
                   className={styles.formInput}
                 >
                   <Flex>
@@ -1048,7 +1072,13 @@ function SoftwarePage() {
             </Grid>
             <FormControl
               isRequired
-              isInvalid={invalidFields1.includes('description')}
+              isInvalid={
+                isFirst.description
+                  ? false
+                  : !formData.description
+                  ? true
+                  : false
+              }
               className={styles.formInput}
             >
               <Flex>
@@ -1075,7 +1105,8 @@ function SoftwarePage() {
               onClick={() => (
                 setIsOpenAdd(false),
                 setFormData(defaultData),
-                setInvalidFields1([])
+                setInvalidFields1([]),
+                setIsFirst(defaultValidate)
               )}
             >
               Cancel

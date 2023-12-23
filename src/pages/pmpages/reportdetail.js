@@ -86,7 +86,10 @@ function ReportPage(title) {
         if (!accountDataDecode) {
           router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 2 || accountDataDecode.status !== 1) {
+          if (
+            accountDataDecode.roleId !== 2 ||
+            accountDataDecode.status !== 1
+          ) {
             router.push('/page405');
           }
           setAccount(accountDataDecode);

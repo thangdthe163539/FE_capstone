@@ -81,7 +81,7 @@ function Header() {
       // setIsLogin(account);
       if (account) {
         sessionStorage.setItem('account', JSON.stringify(account));
-
+        //check cos session url -> viewapp
         if (account.status == 3) {
           router.push('/');
         } else if (account.status == 2) {

@@ -207,14 +207,16 @@ function IssuePage() {
     const query = searchQueryHw.toLowerCase();
 
     const filteredData = Hardware.filter((item) => {
-      const name = item.name.toLowerCase();
-      const os = item.os.toLowerCase();
-      const version = item.version.toLowerCase();
-
+      const model = item?.model?.toLowerCase();
+      const cpu = item?.cpu?.toLowerCase();
+      const gpu = item?.gpu?.toLowerCase();
       // Check if the query matches either name or OS
-      return (
-        name.includes(query) || os.includes(query) || version.includes(query)
-      );
+      if (model || cpu || gpu) {
+        return (
+          model?.includes(query) || cpu?.includes(query) || gpu?.includes(query)
+        );
+      }
+      return null;
     });
 
     setFilteredHwData(filteredData);
@@ -229,14 +231,17 @@ function IssuePage() {
     const filteredData = Software.filter(
       (item) => item.type !== 'Antivirus',
     ).filter((item) => {
-      const name = item.name.toLowerCase();
-      const os = item.os.toLowerCase();
-      const version = item.version.toLowerCase();
-
-      // Check if the query matches either name or OS
-      return (
-        name.includes(query) || os.includes(query) || version.includes(query)
-      );
+      const name = item?.name?.toLowerCase();
+      const os = item?.os?.toLowerCase();
+      const version = item?.version?.toLowerCase();
+      if (name || os || version) {
+        return (
+          name?.includes(query) ||
+          os?.includes(query) ||
+          version?.includes(query)
+        );
+      }
+      return null;
     });
 
     setFilteredSwData(filteredData);
@@ -251,14 +256,18 @@ function IssuePage() {
     const filteredData = Software.filter(
       (item) => item.type === 'Antivirus',
     ).filter((item) => {
-      const name = item.name.toLowerCase();
-      const os = item.os.toLowerCase();
-      const version = item.version.toLowerCase();
+      const name = item?.name?.toLowerCase();
+      const os = item?.os?.toLowerCase();
+      const version = item?.version?.toLowerCase();
 
-      // Check if the query matches either name or OS
-      return (
-        name.includes(query) || os.includes(query) || version.includes(query)
-      );
+      if (name || os || version) {
+        return (
+          name?.includes(query) ||
+          os?.includes(query) ||
+          version?.includes(query)
+        );
+      }
+      return null;
     });
 
     setFilteredAntiData(filteredData);
@@ -281,7 +290,10 @@ function IssuePage() {
         if (!accountDataDecode) {
           // router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 1 || accountDataDecode.status !== 1) {
+          if (
+            accountDataDecode.roleId !== 1 ||
+            accountDataDecode.status !== 1
+          ) {
             router.push('/page405');
           }
           setAccount(accountDataDecode);
@@ -330,7 +342,7 @@ function IssuePage() {
     setShowOptions(false);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      title: 'Application-' + app.name,
+      title: 'Application: ' + app.name,
     }));
   };
 
@@ -349,7 +361,7 @@ function IssuePage() {
     setShowOptions(false);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      title: 'Application-' + item.os + '-' + item.osversion,
+      title: 'Application: ' + item.os + '-' + item.osversion,
     }));
   };
   const handleSelectHwModel = async (item) => {
@@ -387,7 +399,7 @@ function IssuePage() {
       setShowOptionsHw(false);
       setFormData((prevFormData) => ({
         ...prevFormData,
-        title: 'Hardware-' + item.model,
+        title: 'Hardware: ' + item.model,
       }));
     } catch (error) {
       console.log('Error in handleSelectHwName:', error);
@@ -428,7 +440,7 @@ function IssuePage() {
       setShowOptionsHw(false);
       setFormData((prevFormData) => ({
         ...prevFormData,
-        title: 'Hardware-' + item.cpu,
+        title: 'Hardware: ' + item.cpu,
       }));
     } catch (error) {
       console.log('Error in handleSelectHwName:', error);
@@ -470,7 +482,7 @@ function IssuePage() {
       setShowOptionsHw(false);
       setFormData((prevFormData) => ({
         ...prevFormData,
-        title: 'Hardware-' + item.gpu,
+        title: 'Hardware: ' + item.gpu,
       }));
     } catch (error) {
       console.log('Error in handleSelectHwName:', error);
@@ -520,7 +532,7 @@ function IssuePage() {
       setShowOptionsSw(false);
       setFormData((prevFormData) => ({
         ...prevFormData,
-        title: 'Software-' + item.name + '-' + item.version,
+        title: 'Software: ' + item.name + '-' + item.version,
       }));
     } catch (error) {
       console.log('Error in handleSelectSwName:', error);
@@ -570,7 +582,7 @@ function IssuePage() {
       setShowOptionsAnti(false);
       setFormData((prevFormData) => ({
         ...prevFormData,
-        title: 'Antivirus-' + item.name + '-' + item.version,
+        title: 'Antivirus: ' + item.name + '-' + item.version,
       }));
     } catch (error) {
       console.log('Error in handleSelectAntiName:', error);
@@ -1131,14 +1143,14 @@ function IssuePage() {
                                       className={styles.listitem}
                                       onClick={() => handleSelectAppName(app)}
                                     >
-                                      {app.name.trim()}
+                                      {app.name?.trim()}
                                     </Text>
                                     <Spacer />
                                     <Text
                                       className={styles.listitem}
                                       onClick={() => handleSelectAppOs(app)}
                                     >
-                                      {app.os.trim()} - {app.osversion.trim()}
+                                      {app.os?.trim()} - {app.osversion?.trim()}
                                     </Text>
                                   </Flex>
                                 </Box>
@@ -1202,21 +1214,21 @@ function IssuePage() {
                                       className={styles.listitem}
                                       onClick={() => handleSelectHwModel(item)}
                                     >
-                                      {item.model.trim()}
+                                      {item.model?.trim()}
                                     </Text>
                                     <Spacer />
                                     <Text
                                       className={styles.listitem}
                                       onClick={() => handleSelectHwCPU(item)}
                                     >
-                                      {item.cpu.trim()}
+                                      {item.cpu?.trim()}
                                     </Text>
                                     <Spacer />
                                     <Text
                                       className={styles.listitem}
                                       onClick={() => handleSelectHwGPU(item)}
                                     >
-                                      {item.gpu.trim()}
+                                      {item.gpu?.trim()}
                                     </Text>
                                   </Flex>
                                 </Box>
@@ -1275,8 +1287,8 @@ function IssuePage() {
                                     className={styles.listitem}
                                     onClick={() => handleSelectSwName(item)}
                                   >
-                                    {item.name.trim()} - {item.version.trim()} -{' '}
-                                    {item.os.trim()}
+                                    {item.name?.trim()} - {item.version?.trim()} -{' '}
+                                    {item.os?.trim()}
                                   </Text>
                                 </Box>
                               ))}
@@ -1341,8 +1353,8 @@ function IssuePage() {
                                     className={styles.listitem}
                                     onClick={() => handleSelectAntiName(item)}
                                   >
-                                    {item.name.trim()} - {item.version.trim()} -{' '}
-                                    {item.os.trim()}
+                                    {item.name?.trim()} - {item.version?.trim()} -{' '}
+                                    {item.os?.trim()}
                                   </Text>
                                 </Box>
                               ))}

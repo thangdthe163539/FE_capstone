@@ -83,7 +83,38 @@ function AssetDetailPage() {
     os: 'Windows',
     status_AssetSoftware: '',
   };
-
+  const defaultValidate = {
+    name: true,
+    publisher: true,
+    licenseKey: true,
+    start_Date: true,
+    time: true,
+  };
+  const defaultWrongValidate = {
+    name: false,
+    publisher: false,
+    licenseKey: false,
+    start_Date: false,
+    time: false,
+  };
+  const defaultValidate1 = {
+    name: true,
+    version: true,
+    manufacturer: true,
+    cpu: true,
+    ram: true,
+    memory: true,
+    ipAddress: true,
+  };
+  const defaultWrongValidate1 = {
+    name: false,
+    version: false,
+    manufacturer: false,
+    cpu: false,
+    ram: false,
+    memory: false,
+    ipAddress: false,
+  };
   const router = useRouter();
   const [device, setDevice] = useState();
   const [account, setAccount] = useState();
@@ -117,15 +148,6 @@ function AssetDetailPage() {
   const [isButtonDisabled1, setButtonDisabled1] = useState(true);
   const [isButtonDisabled2, setButtonDisabled2] = useState(true);
   const [isButtonDisabled3, setButtonDisabled3] = useState(true);
-  const [filteredSoftwareData, setFilteredSoftwareData] = useState([]);
-  const [filteredAntivirusData, setFilteredAntivirusData] = useState([]);
-  const [filteredLicenseData, setFilteredLicenseData] = useState([]);
-  const [filteredAllSoftwareData, setFilteredAllSoftwareData] = useState([]);
-  const [invalidFields, setInvalidFields] = useState([]);
-  const [invalidFields1, setInvalidFields1] = useState([]);
-  const [invalidFields2, setInvalidFields2] = useState([]);
-  const [invalidFields3, setInvalidFields3] = useState([]);
-  const [invalidFields4, setInvalidFields4] = useState([]);
   const [software, setSoftware] = useState();
   const [isAntivirus, setIsAntivirus] = useState(false);
   //pagination software data
@@ -277,102 +299,37 @@ function AssetDetailPage() {
     }
   }, []);
   //
+  const [isFirst, setIsFirst] = useState(defaultValidate);
+  const [isFirst1, setIsFirst1] = useState(defaultValidate1);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    validateInputs();
     setFormData({ ...formData, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
     // console.log(formData);
   };
   const handleInputChange1 = (e) => {
     const { name, value } = e.target;
-    validateInputs1();
     setFormData1({ ...formData1, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
     // console.log(formData1);
   };
   const handleInputChange2 = (e) => {
     const { name, value } = e.target;
-    validateInputs2();
     setFormData2({ ...formData2, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
     // console.log(formData2);
   };
   const handleInputChange3 = (e) => {
     const { name, value } = e.target;
-    validateInputs3();
     setAssetData({ ...assetData, [name]: value });
+    setIsFirst1({ ...isFirst1, [name]: false });
     // console.log(formData);
   };
   const handleInputChange4 = (e) => {
     const { name, value } = e.target;
-    validateInputs4();
     setFormData3({ ...formData3, [name]: value });
+    setIsFirst({ ...isFirst, [name]: false });
     // console.log(formData);
-  };
-  const validateInputs = () => {
-    const requiredFields = ['name', 'publisher'];
-    const errors = [];
-    for (const field of requiredFields) {
-      if (!formData[field]) {
-        errors.push(field);
-      }
-    }
-    // Update state to mark fields as invalid
-    setInvalidFields(errors);
-    return errors;
-  };
-  const validateInputs1 = () => {
-    const requiredFields = ['name', 'publisher'];
-    const errors = [];
-    for (const field of requiredFields) {
-      if (!formData1[field]) {
-        errors.push(field);
-      }
-    }
-    // Update state to mark fields as invalid
-    setInvalidFields1(errors);
-    return errors;
-  };
-  const validateInputs2 = () => {
-    const requiredFields = ['start_Date', 'licenseKey', 'time'];
-    const errors = [];
-    for (const field of requiredFields) {
-      if (!formData2[field] && !(formData2[field] === 0)) {
-        errors.push(field);
-      }
-    }
-    // Update state to mark fields as invalid
-    setInvalidFields2(errors);
-    return errors;
-  };
-  const validateInputs3 = () => {
-    const requiredFields = [
-      'name',
-      'manufacturer',
-      'cpu',
-      'ram',
-      'memory',
-      'version',
-    ];
-    const errors = [];
-    for (const field of requiredFields) {
-      if (!assetData[field]) {
-        errors.push(field);
-      }
-    }
-    // Update state to mark fields as invalid
-    setInvalidFields3(errors);
-    return errors;
-  };
-  const validateInputs4 = () => {
-    const requiredFields = ['licenseKey', 'start_Date', 'time'];
-    const errors = [];
-    for (const field of requiredFields) {
-      if (!formData3[field] && !(formData3 === 0)) {
-        errors.push(field);
-      }
-    }
-    // Update state to mark fields as invalid
-    setInvalidFields4(errors);
-    return errors;
   };
   const handleSearchAppInputChange = (e) => {
     setSearchAppQuery(e.target.value);
@@ -428,19 +385,22 @@ function AssetDetailPage() {
   const handleSwitchChange = () => {
     setHaveLicense((prevHaveLicense) => !prevHaveLicense);
   };
+  const handleKeyDown = (e) => {
+    // Prevent entering 'e' and dot ('.') in the input field
+    if (e.key === 'e' || e.key === '.' || e.key === ',') {
+      e.preventDefault();
+    }
+  };
 
   //all button handle
   const handleSaveCreate = async () => {
     // Validate inputs before saving
-    const validationErrors = validateInputs();
-    if (validationErrors.length > 0) {
-      // You can handle validation errors as needed
-      console.error('Validation Errors:', validationErrors);
+    if (!formData.name || !formData.publisher) {
+      setIsFirst(defaultWrongValidate);
       return;
     }
     try {
       // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-      const curDate = new Date();
       const response = await axios.post(
         `${BACK_END_PORT}/api/Software/CreateSoftware`,
         {
@@ -458,6 +418,7 @@ function AssetDetailPage() {
       setShowModalAdd(false);
       setShowModalTable(true);
       setFormData(defaultData);
+      setIsFirst(defaultValidate);
       // setSelectedRow1(new Set());
       // Reload new data for the table
       try {
@@ -491,6 +452,7 @@ function AssetDetailPage() {
       setShowModalAdd(false);
       setShowModalTable(true);
       setFormData(defaultData);
+      setIsFirst(defaultValidate);
       toast({
         title: 'Software Created Fail',
         description: 'The software has been fail when created.',
@@ -505,10 +467,13 @@ function AssetDetailPage() {
   const handleSaveAdd = async () => {
     // Validate inputs before saving
     if (haveLicense) {
-      const validationErrors = validateInputs4();
-      if (validationErrors.length > 0) {
-        // You can handle validation errors as needed
-        console.error('Validation Errors:', validationErrors);
+      if (
+        !formData3.name ||
+        !formData3.licenseKey ||
+        !formData3.start_Date ||
+        formData3.time < 0
+      ) {
+        setIsFirst(defaultWrongValidate);
         return;
       }
     }
@@ -554,7 +519,7 @@ function AssetDetailPage() {
       setShowModalAdd(false);
       setShowModalTable(true);
       setFormData3(defaultData);
-      // setSelectedRow1(new Set());
+      setIsFirst(defaultValidate);
       // Reload new data for the table
       try {
         const newDataResponse = await axios.get(
@@ -588,6 +553,7 @@ function AssetDetailPage() {
       setShowModalAdd(false);
       setShowModalTable(true);
       setFormData3(defaultData);
+      setIsFirst(defaultValidate);
       toast({
         title: 'Software Added Fail',
         description: 'The software has been fail when added.',
@@ -601,10 +567,16 @@ function AssetDetailPage() {
   //
   const handleEditAsset = async () => {
     // Validate inputs before saving
-    const validationErrors = validateInputs3();
-    if (validationErrors.length > 0) {
-      // You can handle validation errors as needed
-      console.error('Validation Errors:', validationErrors);
+    if (
+      !assetData.name ||
+      !assetData.manufacturer ||
+      !assetData.cpu ||
+      assetData.ram < 0 ||
+      assetData.memory < 0 ||
+      !assetData.version ||
+      !assetData.ipAddress
+    ) {
+      setIsFirst1(defaultWrongValidate1);
       return;
     }
     try {
@@ -633,6 +605,7 @@ function AssetDetailPage() {
       console.log('Data saved:', response.data);
       setIsOpenEditAsset(false); // Close the modal after successful save
       setShowEditAsset(true); // Close the modal after successful save
+      setIsFirst1(defaultValidate1);
       // Reload new data for the table
       try {
         const newDataResponse = await axios.get(
@@ -653,6 +626,7 @@ function AssetDetailPage() {
     } catch (error) {
       setIsOpenEditAsset(false); // Close the modal after successful save
       setShowEditAsset(true); // Close the modal after successful save
+      setIsFirst1(defaultValidate1);
       toast({
         title: 'Software Updated Fail',
         description: 'The software has been fail when updated.',
@@ -666,10 +640,13 @@ function AssetDetailPage() {
   //
   const handleSaveEdit = async () => {
     // Validate inputs before saving
-    const validationErrors = validateInputs2();
-    if (validationErrors.length > 0) {
-      // You can handle validation errors as needed
-      console.error('Validation Errors:', validationErrors);
+    if (
+      !formData2.name ||
+      !formData2.licenseKey ||
+      !formData2.start_Date ||
+      formData2.time < 0
+    ) {
+      setIsFirst(defaultWrongValidate);
       return;
     }
     try {
@@ -697,6 +674,7 @@ function AssetDetailPage() {
       setFormData2(defaultData);
       setSelectedRow2(null);
       setButtonDisabled2(true);
+      setIsFirst(defaultValidate);
       // Reload new data for the table
       try {
         const newDataResponse = await axios.get(
@@ -729,6 +707,7 @@ function AssetDetailPage() {
       setFormData2(defaultData);
       setSelectedRow2(null);
       setButtonDisabled2(true);
+      setIsFirst(defaultValidate);
       toast({
         title: 'License Updated Fail',
         description: 'The license has been fail when updated.',
@@ -776,10 +755,8 @@ function AssetDetailPage() {
   //
   const handleEditSoftware = async () => {
     // Validate inputs before saving
-    const validationErrors = validateInputs1();
-    if (validationErrors.length > 0) {
-      // You can handle validation errors as needed
-      console.error('Validation Errors:', validationErrors);
+    if (!formData1.name || !formData1.publisher) {
+      setIsFirst(defaultWrongValidate);
       return;
     }
     try {
@@ -801,6 +778,7 @@ function AssetDetailPage() {
       setFormData1(defaultData);
       setButtonDisabled1(true);
       setSelectedRow1(null);
+      setIsFirst(defaultValidate);
       // Reload new data for the table
       try {
         const newDataResponse = await axios.get(
@@ -823,6 +801,7 @@ function AssetDetailPage() {
       setFormData1(defaultData);
       setButtonDisabled1(true);
       setSelectedRow1(null);
+      setIsFirst(defaultValidate);
       toast({
         title: 'Software Updated Fail',
         description: 'The software has been fail when updated.',
@@ -933,7 +912,10 @@ function AssetDetailPage() {
       .filter((item) => {
         const name = item?.name?.toLowerCase();
         const publisher = item?.publisher?.toLowerCase();
-        return name.includes(query) || publisher.includes(query);
+        if (name || publisher) {
+          return name.includes(query) || publisher.includes(query);
+        }
+        return null;
       });
     setFilteredSoftwareDataDynamic(filteredData);
   };
@@ -948,7 +930,10 @@ function AssetDetailPage() {
       .filter((item) => {
         const name = item?.name?.toLowerCase();
         const publisher = item?.publisher?.toLowerCase();
-        return name.includes(query) || publisher.includes(query);
+        if (name || publisher) {
+          return name.includes(query) || publisher.includes(query);
+        }
+        return null;
       });
     setFilteredAntivirusDataDynamic(filteredData);
   };
@@ -967,7 +952,10 @@ function AssetDetailPage() {
       .filter((item) => {
         const name = item?.name?.toLowerCase();
         const publisher = item?.publisher?.toLowerCase();
-        return name.includes(query) || publisher.includes(query);
+        if (name || publisher) {
+          return name.includes(query) || publisher.includes(query);
+        }
+        return null;
       });
     setFilteredAllSoftwareDataDynamic(
       filteredData
@@ -999,7 +987,10 @@ function AssetDetailPage() {
     const query = searchLiQuery?.toLowerCase();
     const filteredData = listLicense.filter((item) => {
       const name = item?.name?.toLowerCase();
-      return name.includes(query);
+      if (name) {
+        return name.includes(query);
+      }
+      return null;
     });
     setFilteredLicenseDataDynamic(
       filteredData.filter((item) => item.licenseId !== null),
@@ -1076,24 +1067,6 @@ function AssetDetailPage() {
         </ListItem>
         <Tabs>
           <TabList>
-            {/* <Tab
-              className={styles.tab}
-              _selected={{
-                color: '#4d9ffe',
-                borderBottom: '1px solid #4d9ffe',
-              }}
-            >
-              System
-            </Tab>
-            <Tab
-              className={styles.tab}
-              _selected={{
-                color: '#4d9ffe',
-                borderBottom: '1px solid #4d9ffe',
-              }}
-            >
-              Hardware
-            </Tab> */}
             <Tab
               className={styles.tab}
               _selected={{
@@ -1132,142 +1105,6 @@ function AssetDetailPage() {
             </Tab>
           </TabList>
           <TabPanels>
-            {/* <TabPanel>
-              <Center>
-                <Box
-                  borderWidth='1px'
-                  borderRadius='lg'
-                  p={4}
-                  boxShadow='md'
-                  width='fit-content'
-                >
-                  <TableContainer>
-                    <Table>
-                      <Tbody>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>Name:</Td>
-                          <Td
-                            className={`${styles.text3} ${styles.borderRight}`}
-                          >
-                            {assetData?.name ? assetData?.name : 'N/A'}
-                          </Td>
-                          <Td className={styles.text2}>Manufacturer:</Td>
-                          <Td
-                            className={`${styles.text3} ${styles.borderRight}`}
-                          >
-                            {assetData?.manufacturer
-                              ? assetData?.manufacturer
-                              : 'N/A'}
-                          </Td>
-                          <Td className={styles.text2}>Model:</Td>
-                          <Td
-                            className={`${styles.text3} ${styles.borderRight}`}
-                          >
-                            {assetData?.model ? assetData?.model : 'N/A'}
-                          </Td>
-                          <Td className={styles.text2}>Serial number:</Td>
-                          <Td className={`${styles.text3}`}>
-                            {assetData?.serialNumber
-                              ? assetData?.serialNumber
-                              : 'N/A'}
-                          </Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>OS:</Td>
-                          <Td
-                            className={`${styles.text3} ${styles.borderRight}`}
-                          >
-                            {assetData?.os ? assetData?.os : 'N/A'}
-                          </Td>
-
-                          <Td className={styles.text2}>Version:</Td>
-                          <Td
-                            className={`${styles.text3} ${styles.borderRight}`}
-                          >
-                            {assetData?.version ? assetData?.version : 'N/A'}
-                          </Td>
-
-                          <Td className={styles.text2}>Status:</Td>
-                          <Td
-                            className={`${styles.text3} ${styles.borderRight}`}
-                          >
-                            {assetData?.status === 1
-                              ? 'Active'
-                              : assetData?.status === 2
-                              ? 'Inactive'
-                              : assetData?.status === 3
-                              ? 'Deleted'
-                              : 'Unknown'}
-                          </Td>
-                          <Td className={styles.text2}>Last updated:</Td>
-                          <Td className={`${styles.text3}`}>
-                            {assetData?.lastSuccesfullScan
-                              ? assetData?.lastSuccesfullScan
-                              : 'N/A'}
-                          </Td>
-                        </Tr>
-                      </Tbody>
-                    </Table>
-                  </TableContainer>
-                  <Button
-                    colorScheme='gray'
-                    mt={3}
-                    onClick={() => setIsOpenEditAsset(true)}
-                  >
-                    Edit
-                  </Button>
-                </Box>
-              </Center>
-            </TabPanel>
-            <TabPanel>
-              <Center>
-                <Box
-                  borderWidth='1px'
-                  borderRadius='lg'
-                  p={4}
-                  boxShadow='md'
-                  width='fit-content'
-                >
-                  <TableContainer>
-                    <Table>
-                      <Tbody>
-                        <Tr className={styles.borderTop}>
-                          <Td className={styles.text2}>CPU:</Td>
-                          <Td
-                            className={`${styles.text3} ${styles.borderRight}`}
-                          >
-                            {assetData?.cpu}
-                          </Td>
-                          <Td className={styles.text2}>GPU:</Td>
-                          <Td className={`${styles.text3}`}>
-                            {assetData?.gpu}
-                          </Td>
-                        </Tr>
-                        <Tr>
-                          <Td className={styles.text2}>RAM:</Td>
-                          <Td
-                            className={`${styles.text3} ${styles.borderRight}`}
-                          >
-                            {assetData?.ram}GB
-                          </Td>
-                          <Td className={styles.text2}>Storage:</Td>
-                          <Td className={`${styles.text3}`}>
-                            {assetData?.memory}GB
-                          </Td>
-                        </Tr>
-                      </Tbody>
-                    </Table>
-                  </TableContainer>
-                  <Button
-                    colorScheme='gray'
-                    mt={3}
-                    onClick={() => setIsOpenEditAsset(true)}
-                  >
-                    Edit
-                  </Button>
-                </Box>
-              </Center>
-            </TabPanel> */}
             <TabPanel>
               {showEditAsset ? (
                 <Center>
@@ -1433,7 +1270,13 @@ function AssetDetailPage() {
                             </Td>
                             <Td className={styles.borderRight}>
                               <FormControl
-                                isInvalid={invalidFields3.includes('name')}
+                                isInvalid={
+                                  isFirst1.name
+                                    ? false
+                                    : !assetData.name
+                                    ? true
+                                    : false
+                                }
                               >
                                 <Input
                                   value={assetData?.name}
@@ -1476,7 +1319,13 @@ function AssetDetailPage() {
                             </Td>
                             <Td>
                               <FormControl
-                                isInvalid={invalidFields3.includes('cpu')}
+                                isInvalid={
+                                  isFirst1.cpu
+                                    ? false
+                                    : !assetData.cpu
+                                    ? true
+                                    : false
+                                }
                               >
                                 <Input
                                   value={assetData?.cpu}
@@ -1502,9 +1351,13 @@ function AssetDetailPage() {
                             </Td>
                             <Td className={styles.borderRight}>
                               <FormControl
-                                isInvalid={invalidFields3.includes(
-                                  'manufacturer',
-                                )}
+                                isInvalid={
+                                  isFirst1.manufacturer
+                                    ? false
+                                    : !assetData.manufacturer
+                                    ? true
+                                    : false
+                                }
                               >
                                 <Input
                                   value={assetData?.manufacturer}
@@ -1528,7 +1381,13 @@ function AssetDetailPage() {
                             </Td>
                             <Td className={styles.borderRight}>
                               <FormControl
-                                isInvalid={invalidFields3.includes('version')}
+                                isInvalid={
+                                  isFirst1.version
+                                    ? false
+                                    : !assetData.version
+                                    ? true
+                                    : false
+                                }
                               >
                                 <Input
                                   value={assetData?.version}
@@ -1597,7 +1456,13 @@ function AssetDetailPage() {
                             </Td>
                             <Td>
                               <FormControl
-                                isInvalid={invalidFields3.includes('ram')}
+                                isInvalid={
+                                  isFirst1.ram
+                                    ? false
+                                    : !assetData.ram
+                                    ? true
+                                    : false
+                                }
                               >
                                 <Input
                                   value={assetData?.ram}
@@ -1653,7 +1518,13 @@ function AssetDetailPage() {
                             </Td>
                             <Td>
                               <FormControl
-                                isInvalid={invalidFields3.includes('memory')}
+                                isInvalid={
+                                  isFirst1.memory
+                                    ? false
+                                    : !assetData.memory
+                                    ? true
+                                    : false
+                                }
                               >
                                 <Input
                                   value={assetData?.memory}
@@ -1686,7 +1557,7 @@ function AssetDetailPage() {
                       colorScheme='gray'
                       mt={3}
                       onClick={() => (
-                        setShowEditAsset(true), setInvalidFields3([])
+                        setShowEditAsset(true), setIsFirst1(defaultValidate1)
                       )}
                     >
                       Back
@@ -2024,169 +1895,9 @@ function AssetDetailPage() {
         </Tabs>
       </List>
 
-      <Modal //Modal edit asset
-        isOpen={isOpenEditAsset}
-        onClose={() => setIsOpenEditAsset(false)}
-        closeOnOverlayClick={false}
-        size='4x1'
-      >
-        <ModalOverlay />
-        <ModalContent w='60ws'>
-          <ModalHeader>Edit asset</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={8}>
-            <Grid templateColumns='repeat(3, 1fr)' gap={4}>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    name='name'
-                    maxLength={255}
-                    value={assetData.name}
-                    onChange={handleInputChange3}
-                    required
-                  />
-                </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Manufacturer</FormLabel>
-                  <Input
-                    name='manufacturer'
-                    maxLength={255}
-                    value={assetData.manufacturer}
-                    onChange={handleInputChange3}
-                  />
-                </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Model</FormLabel>
-                  <Input
-                    name='model'
-                    maxLength={255}
-                    value={assetData.model}
-                    onChange={handleInputChange3}
-                  />
-                </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Serial Number</FormLabel>
-                  <Input
-                    name='serialNumber'
-                    maxLength={255}
-                    value={assetData.serialNumber}
-                    onChange={handleInputChange3}
-                  />
-                </FormControl>
-                {/* Add more fields for the first column */}
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>CPU</FormLabel>
-                  <Input
-                    name='cpu'
-                    maxLength={255}
-                    value={assetData.cpu}
-                    onChange={handleInputChange3}
-                  />
-                </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>GPU</FormLabel>
-                  <Input
-                    name='gpu'
-                    maxLength={255}
-                    value={assetData.gpu}
-                    onChange={handleInputChange3}
-                  />
-                </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>RAM</FormLabel>
-                  <Input
-                    name='ram'
-                    maxLength={255}
-                    value={assetData.ram}
-                    onChange={handleInputChange3}
-                    type='number'
-                  />
-                </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Storage</FormLabel>
-                  <Input
-                    name='memory'
-                    maxLength={255}
-                    value={assetData.memory}
-                    onChange={handleInputChange3}
-                    type='number'
-                  />
-                </FormControl>
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Operation System</FormLabel>
-                  <Select
-                    name='os'
-                    value={assetData.os}
-                    onChange={handleInputChange3}
-                  >
-                    <option value='Windows'>Windows</option>
-                    <option value='macOS'>macOS</option>
-                    <option value='Linux'>Linux</option>
-                    <option value='Android'>Android</option>
-                    <option value='iOS'>iOS</option>
-                  </Select>
-                </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Version</FormLabel>
-                  <Input
-                    name='version'
-                    maxLength={255}
-                    value={assetData.version}
-                    onChange={handleInputChange3}
-                  />
-                </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>IP Address</FormLabel>
-                  <Input
-                    name='ipAddress'
-                    maxLength={255}
-                    value={assetData.ipAddress}
-                    onChange={handleInputChange3}
-                  />
-                </FormControl>
-                <FormControl className={styles.formInput}>
-                  <FormLabel>Bandwidth</FormLabel>
-                  <Input
-                    name='bandwidth'
-                    maxLength={255}
-                    value={assetData.bandwidth}
-                    onChange={handleInputChange3}
-                  />
-                </FormControl>
-                {/* Add more fields for the second column */}
-              </GridItem>
-            </Grid>
-            {/* Additional fields can be added to the respective columns */}
-            <FormControl className={styles.formInput}>
-              <FormLabel>Status</FormLabel>
-              <Select
-                name='status'
-                value={assetData.status}
-                onChange={handleInputChange3}
-              >
-                <option value='1'>Active</option>
-                <option value='2'>Inactive</option>
-                {/* <option value='3'>Deleted</option> */}
-              </Select>
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={handleEditAsset}>
-              Save
-            </Button>
-            <Button onClick={() => setIsOpenEditAsset(false)}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
       <Modal //Modal edit license
         isOpen={isOpenEditLi}
-        onClose={() => (setIsOpenEditLi(false), setInvalidFields2([]))}
+        onClose={() => (setIsOpenEditLi(false), setIsFirst(defaultValidate))}
         closeOnOverlayClick={false}
         size='xl'
       >
@@ -2213,7 +1924,13 @@ function AssetDetailPage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields2.includes('licenseKey')}
+                  isInvalid={
+                    isFirst.licenseKey
+                      ? false
+                      : !formData2.licenseKey
+                      ? true
+                      : false
+                  }
                   className={styles.formInput}
                 >
                   <Flex>
@@ -2234,7 +1951,13 @@ function AssetDetailPage() {
               <GridItem>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields2.includes('start_Date')}
+                  isInvalid={
+                    isFirst.start_Date
+                      ? false
+                      : !formData2.start_Date
+                      ? true
+                      : false
+                  }
                 >
                   <Flex>
                     <FormLabel>Start date</FormLabel>
@@ -2253,7 +1976,9 @@ function AssetDetailPage() {
                 </FormControl>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields2.includes('time')}
+                  isInvalid={
+                    isFirst.time ? false : !formData2.time ? true : false
+                  }
                   className={styles.formInput}
                 >
                   <Flex>
@@ -2267,6 +1992,7 @@ function AssetDetailPage() {
                     name='time'
                     maxLength={10}
                     value={formData2.time}
+                    onKeyDown={handleKeyDown}
                     onChange={handleInputChange2}
                     type='number'
                   />
@@ -2280,7 +2006,9 @@ function AssetDetailPage() {
               Save
             </Button>
             <Button
-              onClick={() => (setIsOpenEditLi(false), setInvalidFields2([]))}
+              onClick={() => (
+                setIsOpenEditLi(false), setIsFirst(defaultValidate)
+              )}
             >
               Cancel
             </Button>
@@ -2296,8 +2024,7 @@ function AssetDetailPage() {
           setShowModalTable(true),
           setFormData(defaultData),
           setFormData3(defaultData),
-          setInvalidFields([]),
-          setInvalidFields4([]),
+          setIsFirst(defaultValidate),
           setSearchAddQuery('')
         )}
         closeOnOverlayClick={false}
@@ -2330,7 +2057,9 @@ function AssetDetailPage() {
                   <GridItem>
                     <FormControl
                       isRequired
-                      isInvalid={invalidFields.includes('name')}
+                      isInvalid={
+                        isFirst.name ? false : !formData.name ? true : false
+                      }
                     >
                       <Flex>
                         <FormLabel>Name</FormLabel>
@@ -2370,7 +2099,13 @@ function AssetDetailPage() {
                   <GridItem>
                     <FormControl
                       isRequired
-                      isInvalid={invalidFields.includes('publisher')}
+                      isInvalid={
+                        isFirst.publisher
+                          ? false
+                          : !formData.publisher
+                          ? true
+                          : false
+                      }
                     >
                       <Flex>
                         <FormLabel>Publisher</FormLabel>
@@ -2545,7 +2280,13 @@ function AssetDetailPage() {
                     <GridItem>
                       <FormControl
                         isRequired
-                        isInvalid={invalidFields4.includes('licenseKey')}
+                        isInvalid={
+                          isFirst.licenseKey
+                            ? false
+                            : !formData3.licenseKey
+                            ? true
+                            : false
+                        }
                         className={styles.formInput}
                       >
                         <Flex>
@@ -2566,7 +2307,13 @@ function AssetDetailPage() {
                     <GridItem>
                       <FormControl
                         isRequired
-                        isInvalid={invalidFields4.includes('start_Date')}
+                        isInvalid={
+                          isFirst.start_Date
+                            ? false
+                            : !formData3.start_Date
+                            ? true
+                            : false
+                        }
                         className={styles.formInput}
                       >
                         <Flex>
@@ -2586,7 +2333,9 @@ function AssetDetailPage() {
                       </FormControl>
                       <FormControl
                         isRequired
-                        isInvalid={invalidFields4.includes('time')}
+                        isInvalid={
+                          isFirst.time ? false : !formData3.time ? true : false
+                        }
                         className={styles.formInput}
                       >
                         <Flex>
@@ -2600,6 +2349,7 @@ function AssetDetailPage() {
                           name='time'
                           maxLength={10}
                           value={formData3.time}
+                          onKeyDown={handleKeyDown}
                           onChange={handleInputChange4}
                           type='number'
                         />
@@ -2623,7 +2373,7 @@ function AssetDetailPage() {
                     setShowModalAdd(false),
                     setShowModalTable(true),
                     setFormData(defaultData),
-                    setInvalidFields([])
+                    setIsFirst(defaultValidate)
                   )}
                 >
                   Back
@@ -2645,7 +2395,7 @@ function AssetDetailPage() {
                 <Button
                   onClick={() => (
                     setShowModalTable(true),
-                    setInvalidFields4([]),
+                    setIsFirst(defaultValidate),
                     setFormData3(defaultData)
                   )}
                 >
@@ -2659,7 +2409,7 @@ function AssetDetailPage() {
 
       <Modal // Modal edit software
         isOpen={isOpenEdit}
-        onClose={() => (setIsOpenEdit(false), setInvalidFields1([]))}
+        onClose={() => (setIsOpenEdit(false), setIsFirst(defaultValidate))}
         closeOnOverlayClick={false}
         size='lg'
       >
@@ -2674,7 +2424,9 @@ function AssetDetailPage() {
               <GridItem>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields1.includes('name')}
+                  isInvalid={
+                    isFirst.name ? false : !formData1.name ? true : false
+                  }
                 >
                   <Flex>
                     <FormLabel>Name</FormLabel>
@@ -2714,7 +2466,13 @@ function AssetDetailPage() {
               <GridItem>
                 <FormControl
                   isRequired
-                  isInvalid={invalidFields1.includes('publisher')}
+                  isInvalid={
+                    isFirst.publisher
+                      ? false
+                      : !formData1.publisher
+                      ? true
+                      : false
+                  }
                 >
                   <Flex>
                     <FormLabel>Publisher</FormLabel>
@@ -2766,7 +2524,9 @@ function AssetDetailPage() {
               Save
             </Button>
             <Button
-              onClick={() => (setIsOpenEdit(false), setInvalidFields1([]))}
+              onClick={() => (
+                setIsOpenEdit(false), setIsFirst(defaultValidate)
+              )}
             >
               Cancel
             </Button>

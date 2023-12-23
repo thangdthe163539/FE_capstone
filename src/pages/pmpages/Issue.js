@@ -78,7 +78,10 @@ function SoftwarePage() {
         if (!accountDataDecode) {
           router.push('/page405');
         } else {
-          if (accountDataDecode.roleId !== 2 || accountDataDecode.status !== 1) {
+          if (
+            accountDataDecode.roleId !== 2 ||
+            accountDataDecode.status !== 1
+          ) {
             router.push('/page405');
           }
           setAccount(accountDataDecode);
@@ -226,7 +229,10 @@ function SoftwarePage() {
     const query = searchQuery?.toLowerCase();
     const filteredData = softwareData.filter((item) => {
       const name = item.name?.toLowerCase();
-      return name.includes(query);
+      if (name) {
+        return name.includes(query);
+      }
+      return null;
     });
     setFilteredSoftwareData(filteredData);
     setDynamicFilteredSoftwareData(
