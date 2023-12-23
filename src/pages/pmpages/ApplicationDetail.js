@@ -20,6 +20,7 @@ import {
   Center,
   InputGroup,
   InputLeftAddon,
+  InputRightAddon,
   Tooltip,
 } from '@chakra-ui/react';
 import {
@@ -529,8 +530,8 @@ function SoftwarePage() {
       !formData4.name ||
       !formData4.manufacturer ||
       !formData4.cpu ||
-      !formData4.ram ||
-      !formData4.memory ||
+      formData4.ram < 0 ||
+      formData4.memory < 0 ||
       !formData4.version ||
       !formData4.ipAddress
     ) {
@@ -606,8 +607,8 @@ function SoftwarePage() {
       !formData2.name ||
       !formData2.manufacturer ||
       !formData2.cpu ||
-      !formData2.ram ||
-      !formData2.memory ||
+      formData2.ram < 0 ||
+      formData2.memory < 0 ||
       !formData2.version ||
       !formData2.ipAddress
     ) {
@@ -717,7 +718,7 @@ function SoftwarePage() {
       !formData3.publisher ||
       !formData3.libraryKey ||
       !formData3.start_Date ||
-      !formData3.time
+      formData3.time < 0
     ) {
       setIsFirst(defaultWrongValidate);
       return;
@@ -787,7 +788,7 @@ function SoftwarePage() {
       !formData1.publisher ||
       !formData1.libraryKey ||
       !formData1.start_Date ||
-      !formData1.time
+      formData1.time < 0
     ) {
       setIsFirst(defaultWrongValidate);
       return;
@@ -2688,15 +2689,18 @@ function SoftwarePage() {
                       Time is required!
                     </FormErrorMessage>
                   </Flex>
-                  <Input
-                    name='time'
-                    maxLength={255}
-                    value={formData3.time}
-                    onKeyDown={handleKeyDown}
-                    onChange={handleInputChange3}
-                    type='number'
-                    required
-                  />
+                  <InputGroup>
+                    <Input
+                      name='time'
+                      maxLength={255}
+                      value={formData3.time}
+                      onKeyDown={handleKeyDown}
+                      onChange={handleInputChange3}
+                      type='number'
+                      required
+                    />
+                    <InputRightAddon>month(s)</InputRightAddon>
+                  </InputGroup>
                 </FormControl>
               </GridItem>
             </Grid>
@@ -2846,15 +2850,18 @@ function SoftwarePage() {
                       Time is required!
                     </FormErrorMessage>
                   </Flex>
-                  <Input
-                    name='time'
-                    value={formData1.time}
-                    maxLength={10}
-                    onKeyDown={handleKeyDown}
-                    onChange={handleInputChange1}
-                    type='number'
-                    required
-                  />
+                  <InputGroup>
+                    <Input
+                      name='time'
+                      value={formData1.time}
+                      maxLength={10}
+                      onKeyDown={handleKeyDown}
+                      onChange={handleInputChange1}
+                      type='number'
+                      required
+                    />
+                    <InputRightAddon>month(s)</InputRightAddon>
+                  </InputGroup>
                 </FormControl>
               </GridItem>
             </Grid>

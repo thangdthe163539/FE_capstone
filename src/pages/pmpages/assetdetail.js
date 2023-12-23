@@ -19,6 +19,7 @@ import {
   Center,
   InputGroup,
   InputLeftAddon,
+  InputRightAddon,
   Tooltip,
 } from '@chakra-ui/react';
 import {
@@ -468,7 +469,6 @@ function AssetDetailPage() {
     // Validate inputs before saving
     if (haveLicense) {
       if (
-        !formData3.name ||
         !formData3.licenseKey ||
         !formData3.start_Date ||
         formData3.time < 0
@@ -640,12 +640,7 @@ function AssetDetailPage() {
   //
   const handleSaveEdit = async () => {
     // Validate inputs before saving
-    if (
-      !formData2.name ||
-      !formData2.licenseKey ||
-      !formData2.start_Date ||
-      formData2.time < 0
-    ) {
+    if (!formData2.licenseKey || !formData2.start_Date || formData2.time < 0) {
       setIsFirst(defaultWrongValidate);
       return;
     }
@@ -1988,14 +1983,17 @@ function AssetDetailPage() {
                       Time is required!
                     </FormErrorMessage>
                   </Flex>
-                  <Input
-                    name='time'
-                    maxLength={10}
-                    value={formData2.time}
-                    onKeyDown={handleKeyDown}
-                    onChange={handleInputChange2}
-                    type='number'
-                  />
+                  <InputGroup>
+                    <Input
+                      name='time'
+                      maxLength={10}
+                      value={formData2.time}
+                      onKeyDown={handleKeyDown}
+                      onChange={handleInputChange2}
+                      type='number'
+                    />
+                    <InputRightAddon>month(s)</InputRightAddon>
+                  </InputGroup>
                 </FormControl>
               </GridItem>
             </Grid>
@@ -2345,14 +2343,17 @@ function AssetDetailPage() {
                             Time is required!
                           </FormErrorMessage>
                         </Flex>
-                        <Input
-                          name='time'
-                          maxLength={10}
-                          value={formData3.time}
-                          onKeyDown={handleKeyDown}
-                          onChange={handleInputChange4}
-                          type='number'
-                        />
+                        <InputGroup>
+                          <Input
+                            name='time'
+                            maxLength={10}
+                            value={formData3.time}
+                            onKeyDown={handleKeyDown}
+                            onChange={handleInputChange4}
+                            type='number'
+                          />
+                          <InputRightAddon>month(s)</InputRightAddon>
+                        </InputGroup>
                       </FormControl>
                     </GridItem>
                   </Grid>
