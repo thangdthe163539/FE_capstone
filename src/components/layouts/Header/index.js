@@ -82,19 +82,26 @@ function Header() {
       if (account) {
         sessionStorage.setItem('account', JSON.stringify(account));
         //check cos session url -> viewapp
-        if (account.status == 3) {
-          router.push('/');
-        } else if (account.status == 2) {
-          router.push('/');
-        } else if (account.status == 1) {
-          if (account.roleId == 1) {
-            router.push('adminpages/adminhome');
-          } else if (account.roleId == 2) {
-            router.push('/pmpages/PoHome');
-          } else if (account.roleId == 3) {
+        const url = JSON.parse(sessionStorage.getItem('url'));
+        console.log('login:' + url);
+        if (url) {
+          router.push(url);
+          sessionStorage.removeItem('url');
+        } else {
+          if (account.status == 3) {
             router.push('/');
-          } else {
+          } else if (account.status == 2) {
             router.push('/');
+          } else if (account.status == 1) {
+            if (account.roleId == 1) {
+              router.push('adminpages/adminhome');
+            } else if (account.roleId == 2) {
+              router.push('/pmpages/PoHome');
+            } else if (account.roleId == 3) {
+              router.push('/');
+            } else {
+              router.push('/');
+            }
           }
         }
       } else {

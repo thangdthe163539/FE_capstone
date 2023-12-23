@@ -68,7 +68,7 @@ function IssuePage() {
   const [formData, setFormData] = useState(defaultData);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchQueryTb, setSearchQueryTb] = useState('');
-  const [filteredAppData, setfilteredAppData] = useState([]);
+  const [filteredApp, setFilteredApp] = useState([]);
   const [dynamicFilteredAppData, setDynamicFilteredAppData] = useState([]);
   const [filteredAppAddData, setfilteredAppAddData] = useState([]);
   const [searchQuerySof, setSearchQuerySof] = useState('');
@@ -93,13 +93,15 @@ function IssuePage() {
   const [showOptionsHw, setShowOptionsHw] = useState(false);
   const [showOptionsSw, setShowOptionsSw] = useState(false);
   const [showOptionsAnti, setShowOptionsAnti] = useState(false);
+  const [filteredAppData, setFilteredAppData] = useState([]);
   const [filteredHwData, setFilteredHwData] = useState([]);
   const [filteredSwData, setFilteredSwData] = useState([]);
   const [filteredAntiData, setFilteredAntiData] = useState([]);
   const [Hardware, setHardware] = useState([]);
   const [Software, setSoftware] = useState([]);
   const [account, setAccount] = useState();
-
+  const currentDate = new Date();
+  const currentDateString = currentDate.toISOString().split('T')[0];
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -756,9 +758,7 @@ function IssuePage() {
       const name = item.name.toLowerCase();
       return name.includes(query);
     });
-    setfilteredAppData(
-      filteredData.filter((item) => countIssue(item.appId) !== 0),
-    );
+    setFilteredApp(filteredData.filter((item) => countIssue(item.appId) !== 0));
     setDynamicFilteredAppData(
       filteredData.filter((item) => countIssue(item.appId) !== 0),
     );
@@ -776,22 +776,28 @@ function IssuePage() {
     filteApp();
   }, [searchQueryTb, Apps, Issues]);
 
-  const filteAppAdd = () => {
+  const filterApps = () => {
     const query = searchQuery.toLowerCase();
-    const filteredData = Apps.filter((item) => {
-      const name = item.name.toLowerCase();
-      const os = item.os.toLowerCase();
-      const version = item.osversion.toLowerCase();
-      return (
-        name.includes(query) || os.includes(query) || version.includes(query)
-      );
-    });
-    setfilteredAppAddData(filteredData);
-  };
 
+    const filteredData = Apps.filter((item) => {
+      const name = item?.name?.toLowerCase();
+      const os = item?.os?.toLowerCase();
+      const version = item?.osversion?.toLowerCase();
+      if (name || os || version) {
+        return (
+          name?.includes(query) ||
+          os?.includes(query) ||
+          version?.includes(query)
+        );
+      }
+      return null;
+    });
+
+    setFilteredAppData(filteredData);
+  };
   useEffect(() => {
-    filteAppAdd();
-  }, [searchQuery, Apps]);
+    filterApps();
+  }, [searchQuery]);
   //END
 
   const [os, setOs] = useState('');
@@ -1413,6 +1419,7 @@ function IssuePage() {
                           type='date'
                           name='endDate'
                           value={deadline}
+                          min={currentDateString}
                           onChange={(e) => handleDeadline(e)}
                         />
                         {(isFirst?.endDate

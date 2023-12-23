@@ -98,7 +98,8 @@ function IssuePage() {
   const [isHovered, setIsHovered] = useState(null);
   const [mode, setMode] = useState('Application');
   const allowedExtensions = ['jpg', 'png'];
-
+  const currentDate = new Date();
+  const currentDateString = currentDate.toISOString().split('T')[0];
   const router = useRouter();
   const [account, setAccount] = useState();
 
@@ -1859,6 +1860,7 @@ function IssuePage() {
                           type='date'
                           name='endDate'
                           value={deadline}
+                          min={currentDateString}
                           onChange={(e) => handleDeadline(e)}
                         />
                         {(isFirst?.endDate
