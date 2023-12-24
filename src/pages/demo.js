@@ -14,7 +14,6 @@ function DemoPage() {
   const router = useRouter();
   
   const params = {
-    user: 'khangdthe151162@fpt.edu.vn',
     app: 'FAP',
   };
   

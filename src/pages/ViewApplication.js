@@ -135,14 +135,13 @@ function ApplicationPage() {
   }, []);
 
   useEffect(() => {
-    let user, app;
+    let app;
     const query = router.asPath.split('?')[1];
     if (query) {
       const decodedParams = JSON.parse(atob(query));
-      user = decodedParams?.user;
       app = decodedParams?.app;
     }
-    if (user && app) {
+    if (app) {
       setIsShowFeedback(true);
       const selectedAppData = Apps.find((item) => item.name === app);
       if (selectedAppData) {
