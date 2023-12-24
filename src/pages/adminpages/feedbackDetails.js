@@ -69,6 +69,17 @@ function FeedBackDetailManagePage() {
   const decodedParams = JSON.parse(atob(query));
   const { appId } = decodedParams;
 
+  // const [appId, setappId] = useState(0)
+  // //getData
+  // useEffect(() => {
+  //   const query = router.asPath.split('?')[1];
+  //   if (query) {
+  //     const decodedParams = JSON.parse(atob(query));
+  //     setappId(decodedParams)
+  //   }
+  // }, [router])
+
+
   const handleSearchTbInputChange = (e) => {
     setSearchQueryTb(e.target.value);
   };
@@ -109,7 +120,7 @@ function FeedBackDetailManagePage() {
         return status === query;
       }
     });
-    
+
     setfilteredFb(filteredData);
     setDynamicfilteredFb(filteredData);
   };
@@ -630,12 +641,12 @@ function FeedBackDetailManagePage() {
                               {item.status === 1
                                 ? 'Unsolved '
                                 : item.status === 2
-                                ? 'Solved '
-                                : item.status === 3
-                                ? 'Deleted '
-                                : item.status === 4
-                                ? 'Cancel '
-                                : 'Unknown Status'}
+                                  ? 'Solved '
+                                  : item.status === 3
+                                    ? 'Deleted '
+                                    : item.status === 4
+                                      ? 'Cancel '
+                                      : 'Unknown Status'}
                             </Td>
                           </Tr>
                         );
@@ -684,12 +695,12 @@ function FeedBackDetailManagePage() {
                           {status === 1
                             ? 'Unsolved'
                             : status === 2
-                            ? 'Solved'
-                            : status === 3
-                            ? 'Deleted'
-                            : status === 4
-                            ? 'Cancel'
-                            : 'Unknow'}
+                              ? 'Solved'
+                              : status === 3
+                                ? 'Deleted'
+                                : status === 4
+                                  ? 'Cancel'
+                                  : 'Unknow'}
                         </option>
                       ))}
                       {defaultOptions}
@@ -703,8 +714,8 @@ function FeedBackDetailManagePage() {
                       isFirst?.title
                         ? false
                         : dataSubmit?.title === ''
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex
@@ -713,8 +724,8 @@ function FeedBackDetailManagePage() {
                           isFirst?.title
                             ? false
                             : dataSubmit?.title === ''
-                            ? true
-                            : false
+                              ? true
+                              : false
                         )
                           ? 'start'
                           : 'center'
@@ -733,12 +744,12 @@ function FeedBackDetailManagePage() {
                         {(isFirst?.title
                           ? false
                           : dataSubmit?.title === ''
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Title is required.
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Title is required.
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>
@@ -751,8 +762,8 @@ function FeedBackDetailManagePage() {
                   isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                    ? true
-                    : false
+                      ? true
+                      : false
                 }
               >
                 <FormLabel>Description</FormLabel>
@@ -769,12 +780,12 @@ function FeedBackDetailManagePage() {
                   {(isFirst?.description
                     ? false
                     : dataSubmit?.description === ''
-                    ? true
-                    : false) && (
-                    <FormErrorMessage mt={0}>
-                      Description is required.
-                    </FormErrorMessage>
-                  )}
+                      ? true
+                      : false) && (
+                      <FormErrorMessage mt={0}>
+                        Description is required.
+                      </FormErrorMessage>
+                    )}
                 </Stack>
               </FormControl>
               <br />

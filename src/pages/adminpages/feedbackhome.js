@@ -83,10 +83,9 @@ function FeedbackPage() {
   }, [dynamicFilteredAppData]);
 
   const handleIssuerDetails = (appId) => {
-    const randomParameter = Math.random().toString(36).substring(2);
+    // const randomParameter = Math.random().toString(36).substring(2);
     const params = {
-      appId: appId,
-      softrack: randomParameter,
+      appId: appId
     };
     const encodedParams = btoa(JSON.stringify(params));
     const url = `feedbackDetails?${encodedParams}`;

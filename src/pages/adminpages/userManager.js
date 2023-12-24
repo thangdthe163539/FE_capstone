@@ -46,7 +46,7 @@ import { FaPlus } from 'react-icons/fa';
 import ToastCustom from '@/components/toast';
 
 function validateEmail(email) {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailPattern = /^[a-zA-Z0-9]+@fpt\.edu\.vn$/;
   return emailPattern.test(email);
 }
 
@@ -183,15 +183,16 @@ function UserManager() {
     name,
     accid,
   ) => {
-    // Mã hóa các tham số
-    const encodedEmail = encodeURIComponent(email);
-    const encodedRoleName = encodeURIComponent(roleName);
-    const encodedRoleid = encodeURIComponent(roleid);
-    const encodedStatus = encodeURIComponent(status);
-    const encodedName = encodeURIComponent(name);
-    const encodedAccid = encodeURIComponent(accid);
-    const randomParameter = Math.random().toString(36).substring(2);
-    const url = `userDetail?email=${encodedEmail}&role=${encodedRoleName}&roleid=${encodedRoleid}&r=${randomParameter}&status=${encodedStatus}&name=${encodedName}&accid=${encodedAccid}`;
+    const params = {
+      email: email,
+      roleName: roleName,
+      roleid: roleid,
+      status: status,
+      name: name,
+      accid: accid
+    };
+    const encodedParams = btoa(JSON.stringify(params));
+    const url = `userDetail?${encodedParams}`;
 
     router.push(url);
   };

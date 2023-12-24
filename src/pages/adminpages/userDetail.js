@@ -42,10 +42,19 @@ function UserDetail() {
   const [toast, setToast] = useState(false);
   const [roles, setRoles] = useState([]);
 
+  const [dataUser, setDataUser] = useState({
+    email: "", roleName: "", roleid: 0, status: 0, name: "", accid: ""
+  })
+  const { email, roleName, roleid, status, name, accid } = dataUser
   //getData
-  const query = router.asPath.split('?')[1];
-  const decodedParams = JSON.parse(atob(query));
-  const { email, role, roleid, status, name, accid } = decodedParams;
+  useEffect(() => {
+    const query = router.asPath.split('?')[1];
+    if (query) {
+      const decodedParams = JSON.parse(atob(query));
+      setDataUser(decodedParams)
+    }
+  }, [router])
+
 
   useEffect(() => {
     const storedAccount = sessionStorage.getItem('account');
@@ -62,7 +71,7 @@ function UserDetail() {
             router.push('/page405');
           }
         }
-      } catch (error) {}
+      } catch (error) { }
     } else {
       router.push('/page405');
     }
@@ -272,8 +281,8 @@ function UserDetail() {
                     {status == 1
                       ? 'Active'
                       : status == 2
-                      ? 'InActive'
-                      : 'Locked'}
+                        ? 'InActive'
+                        : 'Locked'}
                   </Td>
                 </Tr>
                 <Tr>
@@ -288,7 +297,7 @@ function UserDetail() {
                       textAlign: 'left',
                     }}
                   >
-                    {role}
+                    {roleName}
                   </Td>
                 </Tr>
               </Tbody>
@@ -370,8 +379,8 @@ function UserDetail() {
                       isFirst?.name
                         ? false
                         : dataSubmit?.name === ''
-                        ? true
-                        : false
+                          ? true
+                          : false
                     }
                   >
                     <Flex alignItems='center'>
@@ -386,12 +395,12 @@ function UserDetail() {
                         {(isFirst?.name
                           ? false
                           : dataSubmit?.name === ''
-                          ? true
-                          : false) && (
-                          <FormErrorMessage mt={0}>
-                            Name is required.
-                          </FormErrorMessage>
-                        )}
+                            ? true
+                            : false) && (
+                            <FormErrorMessage mt={0}>
+                              Name is required.
+                            </FormErrorMessage>
+                          )}
                       </Stack>
                     </Flex>
                   </FormControl>

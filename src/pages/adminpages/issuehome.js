@@ -1034,8 +1034,6 @@ function IssuePage() {
 
     let formattedDate = '';
     if (dateParts.length === 3) {
-      đ/mm/yy
-      m/d/y
       formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
     } else {
       console.error('Ngày không hợp lệ.');
