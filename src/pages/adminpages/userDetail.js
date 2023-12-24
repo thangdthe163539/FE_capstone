@@ -45,6 +45,7 @@ function UserDetail() {
   const [dataUser, setDataUser] = useState({
     email: "", roleName: "", roleid: 0, status: 0, name: "", accid: ""
   })
+  console.log(dataUser)
   const { email, roleName, roleid, status, name, accid } = dataUser
   //getData
   useEffect(() => {
@@ -94,6 +95,8 @@ function UserDetail() {
   const [dataSubmit, setDataSubmit] = useState({
     name: name,
   });
+
+
 
   const [isFirst, setIsFirst] = useState({
     name: true,
@@ -187,6 +190,11 @@ function UserDetail() {
     setIsFirst({ ...isFirst, name: false });
     setDataSubmit({ ...dataSubmit, name: value });
   };
+
+  useEffect(()=>{
+    if (dataUser?.name)
+    setDataSubmit({name: dataUser?.name})
+  },[dataUser])
 
   return (
     <>
