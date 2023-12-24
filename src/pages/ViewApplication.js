@@ -216,6 +216,8 @@ function ApplicationPage() {
         title: true,
         description: true,
       });
+      setTitle('');
+      setDescription('');
       setImages([]);
       toast({
         title: 'Send Feedback',
@@ -238,6 +240,8 @@ function ApplicationPage() {
         title: true,
         description: true,
       });
+      setTitle('');
+      setDescription('');
     }
   };
 

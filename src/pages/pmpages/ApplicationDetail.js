@@ -98,7 +98,7 @@ function SoftwarePage() {
     os: 'Windows',
     version: '',
     publisher: '',
-    type: '',
+    type: 'Web App',
     installDate: '',
     status: 1,
   };

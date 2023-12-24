@@ -50,7 +50,6 @@ import { BACK_END_PORT } from '../../../env';
 const defaultData = {
   accId: '',
   appId: '',
-  deviceId: '',
   name: '',
   version: '',
   release: '',
