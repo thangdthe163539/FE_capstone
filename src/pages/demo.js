@@ -18,7 +18,6 @@ function DemoPage() {
   const router = useRouter();
   const encodedParams = btoa(JSON.stringify(params));
 
-  // const handleDemo - checkLogin ?  : tao sessionStorage url
   const handleURL = () => {
     const url = `http://localhost:3000/ViewApplication?${encodedParams}`;
     const accountDataDecode = JSON.parse(sessionStorage.getItem('account'));

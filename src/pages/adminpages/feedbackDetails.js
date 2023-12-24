@@ -108,7 +108,7 @@ function FeedBackDetailManagePage() {
   const filterStatus = () => {
     const query = searchQueryTb.toLowerCase();
     const filteredData = issue.filter((item) => {
-      const status = getStatusLabel(item.status).toLowerCase(); // Chuyển đổi số trạng thái thành nhãn tương ứng
+      const status = getStatusLabel(item.status).toLowerCase();
       if (query === '') {
         return true;
       } else {
@@ -138,7 +138,7 @@ function FeedBackDetailManagePage() {
 
           reader.onload = () => {
             setImage((prevImages) => [
-              ...(Array.isArray(prevImages) ? prevImages : []), // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
+              ...(Array.isArray(prevImages) ? prevImages : []), 
               { fileName: file.name, dataURL: reader.result },
             ]);
             setError('');

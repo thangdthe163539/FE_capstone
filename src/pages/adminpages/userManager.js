@@ -284,18 +284,6 @@ function UserManager() {
       });
   };
 
-  console.log(
-    dataSubmit?.email === '' ? 'Email is required.' : 'Invalid email address',
-  );
-  console.log(
-    isFirst?.email
-      ? false
-      : dataSubmit?.email === ''
-      ? true
-      : !validateEmail(dataSubmit?.email)
-      ? true
-      : false,
-  );
   return (
     <>
       <Box className={styles.userBoxM}>

@@ -214,7 +214,6 @@ function SoftwarePage() {
         db: formData.db,
         status: formData.status === null ? '1' : formData.status,
       });
-      console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
       setFormData(defaultData);
       setSelectedRow(new Set());
@@ -286,7 +285,6 @@ function SoftwarePage() {
           status: formData2.status === null ? '1' : formData2.status,
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
       setButtonDisabled(true);
       setFormData2(defaultData);

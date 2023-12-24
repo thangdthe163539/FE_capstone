@@ -118,7 +118,7 @@ function FeedBackPage() {
 
           reader.onload = () => {
             setImage((prevImages) => [
-              ...(Array.isArray(prevImages) ? prevImages : []), // Kiểm tra và sử dụng prevImages nếu là mảng, nếu không sử dụng mảng trống
+              ...(Array.isArray(prevImages) ? prevImages : []),
               { fileName: file.name, dataURL: reader.result },
             ]);
             setError('');

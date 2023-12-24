@@ -83,7 +83,6 @@ function FeedbackPage() {
   }, [dynamicFilteredAppData]);
 
   const handleIssuerDetails = (appId) => {
-    // const randomParameter = Math.random().toString(36).substring(2);
     const params = {
       appId: appId
     };

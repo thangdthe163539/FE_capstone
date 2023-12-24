@@ -182,7 +182,6 @@ function FeedbackPage() {
         };
       });
       setReportData(mergedData);
-      console.log(reportData);
     }
   }, [data, softwareData]);
   // Filter function to search for assets

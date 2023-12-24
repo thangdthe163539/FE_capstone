@@ -298,7 +298,6 @@ function ReportPage() {
                   // No need to set assets here
                 };
               } catch (error) {
-                console.log(error);
                 return {
                   ...software,
                   // Handle error if needed
@@ -373,7 +372,6 @@ function ReportPage() {
                 // No need to set assets here
               };
             } catch (error) {
-              console.log(error);
               return {
                 ...asset,
                 // Handle error if needed

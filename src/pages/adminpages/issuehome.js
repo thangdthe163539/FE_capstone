@@ -268,7 +268,6 @@ function IssuePage() {
                 // No need to set assets here
               };
             } catch (error) {
-              console.log(error);
               return {
                 // Handle error if needed
               };
@@ -311,7 +310,6 @@ function IssuePage() {
               });
               allSoftware.push(...uniqueSoftware);
             } catch (error) {
-              console.log(error);
               return {
                 // Handle error if needed
               };
@@ -544,7 +542,6 @@ function IssuePage() {
           // Add matchingAppIds to appIds
           appIds = appIds.concat(matchingAppIds);
         } catch (error) {
-          console.log(`Error for appId ${app.appId}:`, error);
           // Handle error for the specific app if needed
         }
       }
@@ -560,7 +557,6 @@ function IssuePage() {
         title: 'Hardware: ' + item.model,
       }));
     } catch (error) {
-      console.log('Error in handleSelectHwName:', error);
       // Handle error if needed
     }
   };
@@ -587,7 +583,6 @@ function IssuePage() {
           // Add matchingAppIds to appIds
           appIds = appIds.concat(matchingAppIds);
         } catch (error) {
-          console.log(`Error for appId ${app.appId}:`, error);
           // Handle error for the specific app if needed
         }
       }
@@ -603,7 +598,6 @@ function IssuePage() {
         title: 'Hardware: ' + item.cpu,
       }));
     } catch (error) {
-      console.log('Error in handleSelectHwName:', error);
       // Handle error if needed
     }
   };
@@ -630,7 +624,6 @@ function IssuePage() {
           // Add matchingAppIds to appIds
           appIds = appIds.concat(matchingAppIds);
         } catch (error) {
-          console.log(`Error for appId ${app.appId}:`, error);
           // Handle error for the specific app if needed
         }
       }
@@ -646,7 +639,6 @@ function IssuePage() {
         title: 'Hardware: ' + item.gpu,
       }));
     } catch (error) {
-      console.log('Error in handleSelectHwName:', error);
       // Handle error if needed
     }
   };
@@ -680,7 +672,6 @@ function IssuePage() {
             }
           }
         } catch (error) {
-          console.log(`Error for appId ${app.appId}:`, error);
           // Handle error for the specific app if needed
         }
       }
@@ -696,7 +687,6 @@ function IssuePage() {
         title: 'Software: ' + item.name + '-' + item.version,
       }));
     } catch (error) {
-      console.log('Error in handleSelectSwName:', error);
       // Handle error if needed
     }
   };
@@ -730,7 +720,6 @@ function IssuePage() {
             }
           }
         } catch (error) {
-          console.log(`Error for appId ${app.appId}:`, error);
           // Handle error for the specific app if needed
         }
       }
@@ -746,11 +735,9 @@ function IssuePage() {
         title: 'Antivirus: ' + item.name + '-' + item.version,
       }));
     } catch (error) {
-      console.log('Error in handleSelectAntiName:', error);
       // Handle error if needed
     }
   };
-  console.log('4:' + appId);
 
   //end
 
@@ -898,7 +885,6 @@ function IssuePage() {
 
   const toggleMode = (e) => {
     setMode(e.target.value);
-    console.log(mode);
   };
 
   const [isFirst, setIsFirst] = useState({

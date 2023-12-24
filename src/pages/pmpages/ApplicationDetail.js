@@ -417,7 +417,6 @@ function SoftwarePage() {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      console.log('Selected File:', selectedFile);
       // You can perform actions with the selected file here
     }
   };
@@ -461,7 +460,6 @@ function SoftwarePage() {
           status: appData.status,
         },
       );
-      console.log('Data saved:', response.data);
       setShowEditApp(true); // Close the modal after successful save
       setIsFirst1(defaultValidate1);
       // Reload new data for the table
@@ -513,7 +511,6 @@ function SoftwarePage() {
           status: 1,
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
       setShowModalAdd(true);
       setFormData4(defaultData);
@@ -590,7 +587,6 @@ function SoftwarePage() {
           status: 1,
         },
       );
-      console.log('Data saved:', response.data);
       setShowModalAdd(true);
       setIsOpenAdd(true);
       setFormData4(defaultData);
@@ -662,7 +658,6 @@ function SoftwarePage() {
           status: formData2.status === null ? '1' : formData2.status,
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
       setFormData2(defaultData);
       setButtonDisabled(true);
@@ -767,7 +762,6 @@ function SoftwarePage() {
           status: status,
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenAddLi(false); // Close the modal after successful save
       setFormData3(defaultData2);
       setButtonDisabled1(true);
@@ -837,7 +831,6 @@ function SoftwarePage() {
           status: status,
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenEditLi(false); // Close the modal after successful save
       setButtonDisabled1(true);
       setFormData1(defaultData2);
@@ -919,7 +912,6 @@ function SoftwarePage() {
     } else {
       setSelectedRow(item.assetId);
       setFormData2(item);
-      console.log(item);
       setButtonDisabled(false);
     }
   };

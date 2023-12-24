@@ -438,7 +438,6 @@ function AssetDetailPage() {
           status: 1,
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenAdd(true); // Close the modal after successful save
       setShowModalAdd(false);
       setShowModalTable(true);
@@ -533,7 +532,6 @@ function AssetDetailPage() {
               }),
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenAdd(false); // Close the modal after successful save
       setHaveLicense(true);
       setShowModalAdd(false);
@@ -622,7 +620,6 @@ function AssetDetailPage() {
           status: assetData.status,
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenEditAsset(false); // Close the modal after successful save
       setShowEditAsset(true); // Close the modal after successful save
       setIsFirst1(defaultValidate1);
@@ -684,7 +681,6 @@ function AssetDetailPage() {
           status: status,
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenEditLi(false); // Close the modal after successful save
       setFormData2(defaultData);
       setSelectedRow2(null);
@@ -788,7 +784,6 @@ function AssetDetailPage() {
           status: formData1.status,
         },
       );
-      console.log('Data saved:', response.data);
       setIsOpenEdit(false); // Close the modal after successful save
       setFormData1(defaultData);
       setButtonDisabled1(true);

@@ -45,7 +45,6 @@ function UserDetail() {
   const [dataUser, setDataUser] = useState({
     email: "", roleName: "", roleid: 0, status: 0, name: "", accid: ""
   })
-  console.log(dataUser)
   const { email, roleName, roleid, status, name, accid } = dataUser
   //getData
   useEffect(() => {
