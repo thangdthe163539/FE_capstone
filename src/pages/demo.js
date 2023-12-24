@@ -11,11 +11,13 @@ import styles from '@/styles/pm.module.css';
 import { useRouter } from 'next/router';
 
 function DemoPage() {
+  const router = useRouter();
+  
   const params = {
     user: 'khangdthe151162@fpt.edu.vn',
     app: 'FAP',
   };
-  const router = useRouter();
+  
   const encodedParams = btoa(JSON.stringify(params));
 
   const handleURL = () => {
