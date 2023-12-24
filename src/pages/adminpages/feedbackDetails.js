@@ -64,20 +64,15 @@ function FeedBackDetailManagePage() {
   const [dynamicfilteredFb, setDynamicfilteredFb] = useState([]);
   const [filteredFb, setfilteredFb] = useState([]);
 
+  const [appId, setappId] = useState(0)
   //getData
-  const query = router.asPath.split('?')[1];
-  const decodedParams = JSON.parse(atob(query));
-  const { appId } = decodedParams;
-
-  // const [appId, setappId] = useState(0)
-  // //getData
-  // useEffect(() => {
-  //   const query = router.asPath.split('?')[1];
-  //   if (query) {
-  //     const decodedParams = JSON.parse(atob(query));
-  //     setappId(decodedParams)
-  //   }
-  // }, [router])
+  useEffect(() => {
+    const query = router.asPath.split('?')[1];
+    if (query) {
+      const decodedParams = JSON.parse(atob(query));
+      setappId(decodedParams?.appId)
+    }
+  }, [router])
 
 
   const handleSearchTbInputChange = (e) => {
@@ -330,7 +325,7 @@ function FeedBackDetailManagePage() {
 
   useEffect(() => {
     fetchDataAndUpdateState();
-  }, []);
+  }, [appId]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -343,7 +338,7 @@ function FeedBackDetailManagePage() {
         clearTimeout(hideNotification);
       };
     }
-  }, [isSuccess]);
+  }, [isSuccess, appId]);
 
   const [dataSubmit, setDataSubmit] = useState({
     title: detail?.title.trim(),

@@ -73,9 +73,15 @@ function IssueDetailManagePage() {
   const allowedExtensions = ['jpg', 'png'];
 
   //getData
-  const query = router.asPath.split('?')[1];
-  const decodedParams = JSON.parse(atob(query));
-  const { appId } = decodedParams;
+  const [appId, setappId] = useState(0)
+  //getData
+  useEffect(() => {
+    const query = router.asPath.split('?')[1];
+    if (query) {
+      const decodedParams = JSON.parse(atob(query));
+      setappId(decodedParams?.appId)
+    }
+  }, [router])
 
   const [account, setAccount] = useState();
   useEffect(() => {
