@@ -268,6 +268,7 @@ function IssuePage() {
                 // No need to set assets here
               };
             } catch (error) {
+              
               return {
                 // Handle error if needed
               };
